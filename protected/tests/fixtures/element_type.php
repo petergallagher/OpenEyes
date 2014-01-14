@@ -41,11 +41,12 @@
  */
 return array(
 	 'history' => array(
-		  'name' => 'History',
-		  'class_name' => 'BaseEventTypeElement',
-		  'event_type_id' => $this->getRecord('event_type', 'examination')->id,
-		  'display_order' => 1,
-		 'id' => 1,
+		'name' => 'History',
+		'class_name' => 'BaseEventTypeElement',
+		'event_type_id' => $this->getRecord('event_type', 'examination')->id,
+		'display_order' => 1,
+		'id' => 1,
+		'default' => 1,
 	 ),
 	 'pasthistory' => array(
 		  'name' => 'Past History',
