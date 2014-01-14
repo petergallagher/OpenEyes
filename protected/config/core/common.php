@@ -66,7 +66,8 @@ return array(
                 'site/login', //disabled csrf check on login form
                 'api/create',
                 'api/update',
-                'api/delete'
+                'api/delete',
+				'OphInIolmaster/api/create'
             ),
         ),
         'event' => array(
@@ -86,6 +87,8 @@ return array(
             'showScriptName' => false,
             'rules' => array(
                 // API
+				array('OphInIolmaster/api/read', 'pattern'=>'OphInIolmaster/api/<resource:\w+>/<id:\d+>', 'verb'=>'GET'),
+				array('OphInIolmaster/api/create', 'pattern' => 'OphInIolmaster/api/<resource:\w+>', 'verb' => 'POST'),
                 array('api/read', 'pattern'=>'api/<resource:\w+>/<id:\d+>', 'verb'=>'GET'),
 				array('api/vread', 'pattern' => 'api/<resource:\w+>/@<id:\d+>/history/@<vid:\d+>', 'verb' => 'GET'),
                 array('api/update', 'pattern' => 'api/<resource:\w+>/<id:\d+>', 'verb' => 'PUT'),
