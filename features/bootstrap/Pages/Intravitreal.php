@@ -1,8 +1,6 @@
 <?php
 
-use SensioLabs\Behat\PageObjectExtension\PageObject\Page;
-
-class Intravitreal extends Page
+class Intravitreal extends OpenEyesPage
 {
     protected $path ="/site/OphTrLaser/Default/create?patient_id={patientId}";
 
@@ -39,7 +37,7 @@ class Intravitreal extends Page
         'rightPreInjectionAntiseptic' => array('xpath' => "//*[@id='Element_OphTrIntravitrealinjection_Treatment_right_pre_antisept_drug_id']"),
         'rightPreInjectionSkinCleanser' => array('xpath' => "//*[@id='Element_OphTrIntravitrealinjection_Treatment_right_pre_skin_drug_id']"),
         'rightPreInjectionIOPTickbox' => array('xpath' => "//*[@id='Element_OphTrIntravitrealinjection_Treatment_right_pre_ioplowering_required']"),
-        'rightPerInjectionIOPDrops' => array('xpath' => "//*[@id='div_Element_OphTrIntravitrealinjection_Treatment_right_pre_ioploweringdrugs']/div[2]/select"),
+        'rightPerInjectionIOPDrops' => array('xpath' => "//select[@id='Element_OphTrIntravitrealinjection_Treatment[right_pre_ioploweringdrugs]']"),
         'rightDrug' => array('xpath' => "//*[@id='Element_OphTrIntravitrealinjection_Treatment_right_drug_id']"),
         'rightNumberOfInjections' => array('xpath' => "//*[@id='Element_OphTrIntravitrealinjection_Treatment_right_number']"),
         'rightBatchNumber' => array('xpath' => "//*[@id='Element_OphTrIntravitrealinjection_Treatment_right_batch_number']"),
@@ -53,7 +51,7 @@ class Intravitreal extends Page
         'leftPreInjectionAntiseptic' => array('xpath' => "//*[@id='Element_OphTrIntravitrealinjection_Treatment_left_pre_antisept_drug_id']"),
         'leftPreInjectionSkinCleanser' => array('xpath' => "//*[@id='Element_OphTrIntravitrealinjection_Treatment_left_pre_skin_drug_id']"),
         'leftPreInjectionIOPTickbox' => array('xpath' => "//div[@id='div_Element_OphTrIntravitrealinjection_Treatment_left_pre_ioplowering_required']/div[2]/input[2]"),
-        'leftPerInjectionIOPDrops' => array('xpath' => "//*[@id='div_Element_OphTrIntravitrealinjection_Treatment_left_pre_ioploweringdrugs']/div[2]/select"),
+        'leftPerInjectionIOPDrops' => array('xpath' => "//select[@id='Element_OphTrIntravitrealinjection_Treatment[left_pre_ioploweringdrugs]']"),
         'leftDrug' => array('xpath' => "//*[@id='Element_OphTrIntravitrealinjection_Treatment_left_drug_id']"),
         'leftNumberOfInjections' => array('xpath' => "//*[@id='Element_OphTrIntravitrealinjection_Treatment_left_number']"),
         'leftBatchNumber' => array('xpath' => "//*[@id='Element_OphTrIntravitrealinjection_Treatment_left_batch_number']"),
@@ -82,9 +80,11 @@ class Intravitreal extends Page
         'leftPostInjectionDrops' => array('xpath' => "//*[@id='Element_OphTrIntravitrealinjection_PostInjectionExamination_left_drops_id']"),
 
         //Complications
-        'rightComplicationsDropdown' => array('xpath' => "//*[@id='Element_OphTrIntravitrealinjection_Complications_right_complications']/div[2]/select"),
-        'leftComplicationsDropdown' => array('xpath' => "//*[@id='Element_OphTrIntravitrealinjection_Complications_left_complications']/div[2]/select"),
-        'saveIntravitrealInjection' => array('xpath' => "//*[@id='et_save']")
+        'rightComplicationsDropdown' => array('xpath' => "//select[@id='Element_OphTrIntravitrealinjection_Complications[right_complications]']"),
+        'leftComplicationsDropdown' => array('xpath' => "//select[@id='Element_OphTrIntravitrealinjection_Complications[left_complications]']"),
+        'saveIntravitrealInjection' => array('xpath' => "//*[@id='et_save']"),
+
+        'existingAllergyCheck' => array ('xpath' => "//*[contains(text(),'Patient is allergic to: Tetracycline')]"),
     );
 
         protected function isRightSideOpen()
@@ -99,6 +99,19 @@ class Intravitreal extends Page
              $this->getElement('addRightSide')->click();
              }
          }
+
+        protected function doesAllergyWarningExist()
+        {
+            return (bool) $this->find('xpath', $this->getElement('existingAllergyCheck')->getXpath());
+        }
+
+        public function confirmAllergyWarning ($allergy)
+        {
+            if ($this->doesAllergyWarningExist()){
+                print "Patient is allergic to: Tetracycline";
+            }
+            elseif (print "NO Tetracycline or other Allergy warning!!!");
+        }
 
          public function rightTypeTopical ()
          {

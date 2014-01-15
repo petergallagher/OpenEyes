@@ -20,11 +20,9 @@
 
 <?php echo "<?php\n"?>$this->beginContent('//patient/event_container', array());<?php echo "?>\n"?>
 
-<h2 class="event-title"><?php echo '<?php ';?>echo $this->event_type->name <?php echo '?>';?></h2>
-
 <?php echo "<?php\n"?>
 $form = $this->beginWidget('BaseEventTypeCActiveForm', array(
-	'id'=>'clinical-create',
+	'id'=>'update-form',
 	'enableAjaxValidation'=>false,
 	'layoutColumns' => array(
 		'label' => 2,
@@ -33,7 +31,7 @@ $form = $this->beginWidget('BaseEventTypeCActiveForm', array(
 ));
 
 // Event actions
-$this->event_actions[] = EventAction::button('Save', 'save', array('level' => 'secondary'), array('class'=>'button small', 'form'=>'clinical-create'));
+$this->event_actions[] = EventAction::button('Save', 'save', array('level' => 'save'), array('form'=>'update-form'));
 
 <?php echo "?>\n"?>
 

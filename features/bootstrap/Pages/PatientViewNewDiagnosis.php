@@ -1,8 +1,8 @@
 <?php
 
-use SensioLabs\Behat\PageObjectExtension\PageObject\Page;
+//use SensioLabs\Behat\PageObjectExtension\PageObject\Page;
 
-class PatientViewNewDiagnosis extends Page
+class PatientViewNewDiagnosis extends OpenEyesPage
 {
     protected $path = "/site/patient/view/";
 
@@ -15,39 +15,39 @@ class PatientViewNewDiagnosis extends Page
         'userProfile' => array('xpath' => "//*[@id='user_id']/a"),
         'addOpthalmicDiagnosis' => array('xpath' => "//button[@id='btn-add_new_ophthalmic_diagnosis']"),
         'selectOphthalmicDisorder' => array('xpath' => "//*[@id='DiagnosisSelection_ophthalmic_disorder_id']"),
-        'opthRightEye' => array('xpath' => "//*[@id='add-ophthalmic-diagnosis']/div[4]/input[1]"),
-        'opthLeftEye' => array('xpath' => "//*[@id='add-ophthalmic-diagnosis']/div[4]/input[3]"),
-        'opthBothEyes' => array('xpath' => "//*[@id='add-ophthalmic-diagnosis']/div[4]/input[2]"),
+        'opthRightEye' => array('xpath' => "//*[@class='diagnosis_eye row field-row']//*[@value='2']"),
+        'opthLeftEye' => array('xpath' => "//*[@class='diagnosis_eye row field-row']//*[@value='1']"),
+        'opthBothEyes' => array('xpath' => "//*[@class='diagnosis_eye row field-row']//*[@value='3']"),
         'opthDay' => array('xpath' => "//*[@id='add-ophthalmic-diagnosis']//select[@name='fuzzy_day']"),
         'opthMonth' => array('xpath' => "//*[@id='add-ophthalmic-diagnosis']//select[@name='fuzzy_month']"),
         'opthYear' => array('xpath' => "//*[@id='add-ophthalmic-diagnosis']//select[@name='fuzzy_year']"),
-        'opthSaveButton' => array('xpath' => "//*[@class='classy green mini btn_save_ophthalmic_diagnosis']//*[contains(text(),'Save')]"),
+        'opthSaveButton' => array('xpath' => "//form[@id='add-ophthalmic-diagnosis']//*[contains(text(),'Save')]"),
         'addSystemicDiagnosis' => array('xpath' => "//button[@id='btn-add_new_systemic_diagnosis']"),
         'selectSystemicDiagnosis' => array('xpath' => "//*[@id='DiagnosisSelection_systemic_disorder_id']"),
         'sysDay' => array('xpath' => "//*[@id='add-systemic-diagnosis']//select[@name='fuzzy_day']"),
         'sysMonth'=> array('xpath' => "//*[@id='add-systemic-diagnosis']//select[@name='fuzzy_month']"),
         'sysYear' => array ('xpath' => "//*[@id='add-systemic-diagnosis']//select[@name='fuzzy_year']"),
-        'sysNoEyes' => array('xpath' => "//*[@id='add-systemic-diagnosis']/div[4]/input[1]"),
-        'sysRightEye' => array('xpath' => "//*[@id='add-systemic-diagnosis']/div[4]/input[2]"),
-        'sysBothEyes' => array('xpath' => "//*[@id='add-systemic-diagnosis']/div[4]/input[3]"),
-        'sysLeftEye' => array('xpath' => "//*[@id='add-systemic-diagnosis']/div[4]/input[4]"),
-        'sysSaveButton' => array('xpath' => "//*[@class='classy green mini btn_save_systemic_diagnosis']//*[contains(text(),'Save')]"),
+        'sysNoEyes' => array('xpath' => "//*[@id='add_new_systemic_diagnosis']//*[@class='diagnosis_eye row field-row']//*[@value='']"),
+        'sysRightEye' => array('xpath' => "//*[@id='add_new_systemic_diagnosis']//*[@class='diagnosis_eye row field-row']//*[@value=2]"),
+        'sysBothEyes' => array('xpath' => "//*[@id='add_new_systemic_diagnosis']//*[@class='diagnosis_eye row field-row']//*[@value=3]"),
+        'sysLeftEye' => array('xpath' => "//*[@id='add_new_systemic_diagnosis']//*[@class='diagnosis_eye row field-row']//*[@value=1]"),
+        'sysSaveButton' => array('xpath' => "//*[@class='secondary small btn_save_systemic_diagnosis']"),
         'addPreviousOperation' => array('xpath' => "//*[@id='btn-add_previous_operation']"),
         'commonOperation' => array('xpath' => "//select[@id='common_previous_operation']"),
         'operationDay' => array('xpath' => "//*[@id='add-previous_operation']//select[@name='fuzzy_day']"),
         'operationMonth' => array('xpath' => "//*[@id='add-previous_operation']//select[@name='fuzzy_month']"),
         'operationYear' => array('xpath' => "//*[@id='add-previous_operation']//select[@name='fuzzy_year']"),
-        'operationNoEyes' => array('xpath' => "//*[@id='add-previous_operation']/div[4]/input[1]"),
-        'operationRightEye' => array('xpath' => "//*[@id='add-previous_operation']/div[4]/input[2]"),
-        'operationBothEyes' => array('xpath' => "//*[@id='add-previous_operation']/div[4]/input[3]"),
-        'operationLeftEye' => array('xpath' => "//*[@id='add-previous_operation']/div[4]/input[4]"),
-        'operationSaveButton' => array('xpath' => "//*[@class='classy green mini btn_save_previous_operation']//*[contains(text(),'Save')]"),
+        'operationNoEyes' => array('xpath' => "//*[@id='add-previous_operation']//*[@class='row field-row']//*[@value='']"),
+        'operationRightEye' => array('xpath' => "//*[@id='add-previous_operation']//*[@class='row field-row']//*[@value=2]"),
+        'operationBothEyes' => array('xpath' => "//*[@id='add-previous_operation']//*[@class='row field-row']//*[@value=3]"),
+        'operationLeftEye' => array('xpath' => "//*[@id='add-previous_operation']//*[@class='row field-row']//*[@value=1]"),
+        'operationSaveButton' => array('xpath' => "//*[@class='secondary small btn_save_previous_operation']"),
         'editCVIstatusButton' => array('xpath'=> "//*[@id='btn-edit_oph_info']"),
         'cviStatus' => array('xpath' => "//select[@id='PatientOphInfo_cvi_status_id']"),
         'CVIDay' => array('xpath' => "//*[@id='edit-oph_info']//select[@name='fuzzy_day']"),
         'CVIMonth' => array('xpath' => "//*[@id='edit-oph_info']//select[@name='fuzzy_month']"),
         'CVIYear' => array('xpath' => "//*[@id='edit-oph_info']//select[@name='fuzzy_year']"),
-        'saveCVI' => array('xpath' => "//*[@class='classy green mini btn_save_oph_info']//*[contains(text(),'Save')]"),
+        'saveCVI' => array('xpath' => "//*[@class='secondary small btn_save_previous_operation btn_save_oph_info']"),
         'addMedicationButton' => array('xpath' => "//button[@id='btn-add_medication']"),
         'selectMedication' => array('xpath' => "//select[@id='drug_id']"),
         'selectRoute' => array('xpath' => "//select[@id='route_id']"),
@@ -55,23 +55,23 @@ class PatientViewNewDiagnosis extends Page
         'openMedicationDate' => array('xpath' => "//*[@id='start_date']"),
         'hopefullFIX' => array('xpath' => "//form[@id='add-medication']/div[8]"),
         'selectDateFrom' => array('xpath' => "//*[@id='ui-datepicker-div']//*[contains(text(),'10')]"),
-        'saveMedication' => array('xpath' => "//*[@class='classy green mini btn_save_medication']//*[contains(text(),'Save')]"),
+        'saveMedication' => array('xpath' => "//*[@class='secondary small btn_save_medication']"),
         'addAllergyButton' => array('xpath' => "//*[@id='btn-add_allergy']"),
         'selectAllergy' => array('xpath' => "//select[@id='allergy_id']"),
         'noAllergyTickbox' => array('xpath' => "//*[@id='no_allergies']"),
-        'saveAllergy' => array('xpath' => "//*[@id='add-allergy']//*[contains(text(),'Save')]"),
+        'saveAllergy' => array('xpath' => "//*[@class='secondary small btn_save_allergy']"),
         'addFamilyHistoryButton' => array('xpath' => "//*[@id='btn-add_family_history']"),
         'selectRelativeID' => array('xpath' => "//*[@id='relative_id']"),
         'selectFamilySide' => array('xpath' => "//*[@id='side_id']"),
         'selectFamilyCondition' => array('xpath' => "//*[@id='condition_id']"),
         'enterFamilyComments' => array('xpath' => "//*[@id='comments']"),
-        'saveFamilyHistory' => array('xpath' => "//*[@class='classy green mini btn_save_family_history']//*[contains(text(),'Save')]"),
+        'saveFamilyHistory' => array('xpath' => "//*[@class='secondary small btn_save_family_history']"),
         'createNewEpisodeAddEvent' => array('xpath' => "//*[@class='box patient-info episode-links']//*[contains(text(),'Create episode / add event')]"),
-        'addEpisodeButton' => array('xpath' => "//*[@class='large-8 large-centered column']//button"),
-        'addEpisode' => array('xpath' => "//*[@id='episodes_sidebar']/div[1]//*[contains(text(),'Add episode')]"),
+        'addEpisodeButton' => array('xpath' => "//*[@id='add-episode']"),
+        'addEpisode' => array('xpath' => "//*[@class='secondary small add-episode']//*[@class='icon-button-small-plus-sign']"),
         'confirmCreateEpisode' => array('xpath' => "//*[@id='add-new-episode-form']//*[contains(text(),'Create new episode')]"),
         'latestEvent' => array('xpath' => "//*[@class='box patient-info episode-links']//*[contains(text(),'Latest Event')]"),
-        'removeAllergyButton' => array('xpath' => "//*[@id='patient_allergies']//*[contains(text(),'Remove')]"),
+        'removeAllergyButton' => array('xpath' => "//*[@id='currentAllergies']//*[contains(text(),'Remove')]"),
         'removeConfirmButton' => array('xpath' => "//*[@id='delete_allergy']/div[2]//*[contains(text(),'Remove allergy')]")
 
         );
@@ -126,37 +126,46 @@ class PatientViewNewDiagnosis extends Page
     public function saveOpthalmicDiagnosis ()
     {
         $this->getElement('opthSaveButton')->press();
-        $this->getSession()->wait(1000,false);
+        $this->getSession()->wait(10000,"$('#add_new_ophthalmic_diagnosis').css('display') == 'none'");
     }
 
     public function addSystemicDiagnosis ($diagnosis)
     {
-        $this->getElement('addSystemicDiagnosis')->press();
+        //the waits make sure the action is completed before going forward
+		$this->getElement('addSystemicDiagnosis')->press();
+		$this->waitForElementDisplayBlock('#add_new_systemic_diagnosis');
+		//$this->getSession()->wait(2000,"$('#add_new_systemic_diagnosis').css('display') == 'block'");
         $this->getElement('selectSystemicDiagnosis')->selectOption($diagnosis);
+		$this->getSession()->wait(2000,"$('#DiagnosisSelection_systemic_disorder_id').val() == '" . $diagnosis . "'");
     }
 
     public function selectSystemicSide ($side)
     {
-        if ($side===("None")) {
-        $this->getElement('sysNoEyes')->check();
+        $el = null;
+		if ($side===("None")) {
+        	$el = $this->getElement('sysNoEyes');
+			$el->check();
         }
         if ($side===("Right")) {
-            $this->getElement('sysRightEye')->check();
+			$el = $this->getElement('sysRightEye');
+			$el->check();
         }
         if ($side===("Both")) {
-            $this->getElement('sysBothEyes')->check();
+			$el = $this->getElement('sysBothEyes');
+			$el->check();
         }
         if ($side===("Left")) {
-            $this->getElement('sysLeftEye')->check();
+			$el = $this->getElement('sysLeftEye');
+			$el->check();
         }
-        $this->getSession()->wait(3000);
+        $this->getSession()->wait(3000, "$(\"#add-systemic-diagnosis [name='diagnosis_eye']:checked\").val() == " .   $el->getValue());
 
     }
 
     public function saveSystemicDiagnosis ()
     {
         $this->getElement('sysSaveButton')->press();
-        $this->getSession()->wait(1000,false);
+        $this->getSession()->wait(10000,"$('#add_new_systemic_diagnosis').css('display') == 'none'");
     }
 
     public function previousOperation ($operation)
@@ -185,7 +194,7 @@ class PatientViewNewDiagnosis extends Page
     public function savePreviousOperation ()
     {
         $this->getElement('operationSaveButton')->click();
-        $this->getSession()->wait(10000);
+        $this->getSession()->wait(15000, "window.$ && $('#add_previous_operation').css('display') == 'none'");
     }
 
     public function medicationDetails ($medication, $route, $frequency, $datefrom)
@@ -198,13 +207,16 @@ class PatientViewNewDiagnosis extends Page
         $this->getSession()->wait(5000, "$.active == 0");
         $this->getElement('selectFrequency')->selectOption($frequency);
         $this->getSession()->wait(5000, "$.active == 0");
-        $this->getSession()->wait(5000, "$('#ui-datepicker-div').css('display') == 'block'");
+		$this->waitForElementDisplayBlock('#ui-datepicker-div');
+		//$this->getSession()->wait(5000, "$('#ui-datepicker-div').css('display') == 'block'");
         $this->getElement('openMedicationDate')->click();
-        $this->getSession()->wait(5000, "$('#ui-datepicker-div').css('display') == 'block'");
+		$this->waitForElementDisplayBlock('#ui-datepicker-div');
+        //$this->getSession()->wait(5000, "$('#ui-datepicker-div').css('display') == 'block'");
         $this->getElement('selectDateFrom')->click($datefrom);
         $this->getSession()->wait(5000, "$.active == 0");
         $this->getElement('saveMedication')->click();
-        $this->getSession()->wait(2000);
+		$this->waitForElementDisplayNone('#add_medication');
+		//$this->getSession()->wait(2000, "$('#add_medication').css('display') == 'none'");
     }
 
     public function editCVIstatus ($status)
@@ -218,7 +230,8 @@ class PatientViewNewDiagnosis extends Page
     public function saveCVIstatus ()
     {
         $this->getElement('saveCVI')->click();
-        $this->getSession()->wait(3000);
+		$this->waitForElementDisplayNone('#edit_oph_info');
+        //$this->getSession()->wait(10000, "$('#edit_oph_info').css('display') == 'none'");
     }
 
     protected function doesRemoveAllergyExist ()
@@ -232,26 +245,29 @@ class PatientViewNewDiagnosis extends Page
         {
         $this->getElement('removeAllergyButton')->click();
         $this->getElement('removeConfirmButton')->click();
-        $this->getSession()->wait(3000,false);
         }
     }
 
     public function addAllergy ($allergy)
     {
         $this->getElement('addAllergyButton')->click();
-        $this->getSession()->wait(1000,false);
+        $this->getSession()->wait(1000);
         $this->getElement('selectAllergy')->selectOption($allergy);
         $this->getElement('saveAllergy')->click();
-        $this->getSession()->wait(1000,false);
+		$this->waitForElementDisplayNone('#add_allergy');
+        //$this->getSession()->wait(10000,"$('#add_allergy').css('display') == 'none'");
     }
+
+
 
     public function noAllergyTickbox ()
     {
         $this->getElement('addAllergyButton')->click();
-        $this->getSession()->wait(1000,false);
+        $this->getSession()->wait(1000);
         $this->getElement('noAllergyTickbox')->check();
         $this->getElement('saveAllergy')->click();
-        $this->getSession()->wait(1000,false);
+		$this->waitForElementDisplayNone('#add_allergy');
+        //$this->getSession()->wait(10000,"$('#add_allergy').css('display') == 'none'");
     }
 
     public function addFamilyHistory ($relative, $side, $condition, $comments)
@@ -262,7 +278,8 @@ class PatientViewNewDiagnosis extends Page
         $this->getElement('selectFamilyCondition')->selectOption($condition);
         $this->getElement('enterFamilyComments')->setValue($comments);
         $this->getElement('saveFamilyHistory')->click();
-        $this->getSession()->wait(1000,false);
+		$this->waitForElementDisplayNone('#add_family_history');
+        //$this->getSession()->wait(10000,"$('#add_family_history').css('display') == 'none'");
     }
 
     public function addEpisodeAndEvent()
@@ -300,7 +317,9 @@ class PatientViewNewDiagnosis extends Page
     public function selectLatestEvent ()
     {
         $this->getElement('latestEvent')->click();
-        $this->getSession()->wait(3000);
+		//make sure the Episodes and Events page is shown after clicking latest event link
+		$this->waitForTitle('Episodes and events');
+        //$this->getSession()->wait(15000, "$('h1.badge').html() ==  'Episodes and events' ");
     }
 
     protected function episodesAndEventsAreNotPresent()

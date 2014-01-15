@@ -27,11 +27,15 @@
 	table tr:nth-of-type(even) {
 		background: #fff;
 	}
-	tr.heading h3 {
+	tr.heading h3,
+	tr.heading h4 {
 		font-size: inherit;
 		margin: 0;
 		padding: 0;
 		font-weight: bold;
+	}
+	tr.heading h4 {
+		color: #666;
 	}
 </style>
 </head>
@@ -48,13 +52,8 @@
 				<!-- Overview -->
 				<div class="row">
 					<div class="large-12 column">
-						<h2>Overview</h2>
-						<p>Here you will find templates containing the markup used for
-						the OpenEyes application.</p>
-						<h2>Templates</h2>
 
-						<p>Select the template you'd like to view:</p>
-
+						<br />
 						<table class="">
 							<thead>
 								<tr>
@@ -140,6 +139,16 @@
 									<td><span class="complete">Complete</span></td>
 								</tr>
 								<tr class="heading">
+									<td colspan="3"><h3>Audit logs</h3></td>
+								</tr>
+								<tr>
+									<td>
+										<a href="audit.php">Audit logs</a>
+									</td>
+									<td>The main audit logs template, showing the filters and logs with log details.</td>
+									<td><span class="complete">Complete</span></td>
+								</tr>
+								<tr class="heading">
 									<td colspan="3"><h3>Patient summary</h3></td>
 								</tr>
 								<tr>
@@ -176,6 +185,9 @@
 								<tr class="heading">
 									<td colspan="3"><h3>Event modules</h3></td>
 								</tr>
+								<tr class="heading">
+									<td colspan="3"><h4>Examination</h4></td>
+								</tr>
 								<tr>
 									<td>
 										<a href="examination-create.php">Examination create</a>
@@ -189,6 +201,9 @@
 									</td>
 									<td>The examination view template - a good template to refer to when displaying sub-elements.</td>
 									<td><span class="complete">Complete</span></td>
+								</tr>
+								<tr class="heading">
+									<td colspan="3"><h4>Operation booking</h4></td>
 								</tr>
 								<tr>
 									<td>
@@ -218,6 +233,9 @@
 									<td>The operation booking schedule template.</td>
 									<td><span class="complete">Complete</span></td>
 								</tr>
+								<tr class="heading">
+									<td colspan="3"><h4>Consent</h4></td>
+								</tr>
 								<tr>
 									<td>
 										<a href="consent-select-booking.php">Consent select booking</a>
@@ -239,6 +257,9 @@
 									<td>The consent view template.</td>
 									<td><span class="complete">Complete</span></td>
 								</tr>
+								<tr class="heading">
+									<td colspan="3"><h4>Anaesthetic satisfaction audit</h4></td>
+								</tr>
 								<tr>
 									<td>
 										<a href="anaesthetic-satisfaction-audit-create.php">Anaesthetic satisfaction audit create</a>
@@ -252,6 +273,9 @@
 									</td>
 									<td>The anaesthetic satisfaction audit view template.</td>
 									<td><span class="complete">Complete</span></td>
+								</tr>
+								<tr class="heading">
+									<td colspan="3"><h4>Correspondence</h4></td>
 								</tr>
 								<tr>
 									<td>
@@ -267,6 +291,9 @@
 									<td>The correspondence view template.</td>
 									<td><span class="complete">Complete</span></td>
 								</tr>
+								<tr class="heading">
+									<td colspan="3"><h4>Intravitreal injection</h4></td>
+								</tr>
 								<tr>
 									<td>
 										<a href="intravitreal-injection-create.php">Intravitreal injection create</a>
@@ -281,6 +308,9 @@
 									<td>The intravitreal injection view template.</td>
 									<td><span class="complete">Complete</span></td>
 								</tr>
+								<tr class="heading">
+									<td colspan="3"><h4>Laser</h4></td>
+								</tr>
 								<tr>
 									<td>
 										<a href="laser-create.php">Laser create</a>
@@ -294,6 +324,9 @@
 									</td>
 									<td>The laser view template.</td>
 									<td><span class="complete">Complete</span></td>
+								</tr>
+								<tr class="heading">
+									<td colspan="3"><h4>Operation note</h4></td>
 								</tr>
 								<tr>
 									<td>
@@ -316,6 +349,9 @@
 									<td>The operation note view template - shows an example of highlighting element fields.</td>
 									<td><span class="complete">Complete</span></td>
 								</tr>
+								<tr class="heading">
+									<td colspan="3"><h4>Phasing</h4></td>
+								</tr>
 								<tr>
 									<td>
 										<a href="phasing-create.php">Phasing create</a>
@@ -330,6 +366,9 @@
 									<td>The phasing view template.</td>
 									<td><span class="complete">Complete</span></td>
 								</tr>
+								<tr class="heading">
+									<td colspan="3"><h4>Prescription</h4></td>
+								</tr>
 								<tr>
 									<td>
 										<a href="prescription-create.php">Prescription create</a>
@@ -343,6 +382,9 @@
 									</td>
 									<td>The prescription view template.</td>
 									<td><span class="complete">Complete</span></td>
+								</tr>
+								<tr class="heading">
+									<td colspan="3"><h4>Therapy application</h4></td>
 								</tr>
 								<tr>
 									<td>

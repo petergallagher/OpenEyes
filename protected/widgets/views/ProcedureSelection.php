@@ -17,9 +17,11 @@
  * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
  */
 ?>
-<div class="row field-row eventDetail<?php if ($last) {?> eventDetailLast<?php }?>" id="typeProcedure"<?php if ($hidden) {?> style="display: none;"<?php }?>>
+<div class="row field-row procedure-selection eventDetail<?php if ($last) {?> eventDetailLast<?php }?>" id="typeProcedure"<?php if ($hidden) {?> style="display: none;"<?php }?>>
 	<div class="large-2 column">
-		<label><?php echo $label?>:</label>
+		<label for="select_procedure_id_<?php echo $identifier;?>">
+			<?php echo $label?>:
+		</label>
 	</div>
 	<div class="large-4 column">
 		<fieldset>
@@ -49,11 +51,10 @@
 						'name'=>'procedure_id_'.$identifier,
 						'id'=>'autocomplete_procedure_id_'.$identifier,
 						'source'=>"js:function(request, response) {
-						var existingProcedures = [];
-						$('#procedureList_$identifier').children('h4').children('div.procedureItem').map(function() {
-							var text = $.trim($(this).children('span:nth-child(2)').text());
-							existingProcedures.push(text);
-						});
+
+						var existingProcedures = $('#procedureList_$identifier .procedure .value')
+							.map(function() { return $(this).text(); })
+							.get();
 
 						$.ajax({
 							'url': '" . Yii::app()->createUrl('procedure/autocomplete') . "',
@@ -101,7 +102,7 @@
 	$totalDuration = 0;
 	?>
 	<div class="large-6 column">
-		<div id="procedureList_<?php echo $identifier?>" class="panel element-field" style="<?php if (empty($selected_procedures)) {?> display: none;<?php }?>">
+		<div id="procedureList_<?php echo $identifier?>" class="panel procedures" style="<?php if (empty($selected_procedures)) {?> display: none;<?php }?>">
 			<table class="plain">
 				<thead>
 				<tr>
@@ -115,14 +116,13 @@
 				<tbody class="body">
 				<?php
 				if (!empty($selected_procedures)) {
-					foreach ($selected_procedures as $procedure) {?>
+					foreach ($selected_procedures as $procedure) {
+						$totalDuration += $procedure['default_duration'];
+				?>
 						<tr class="item">
-							<td>
-								<?php
-								$totalDuration += $procedure['default_duration'];
-								echo CHtml::hiddenField('Procedures_'.$identifier.'[]', $procedure['id']);
-								echo $procedure['term'];
-								?>
+							<td class="procedure">
+								<span class="field"><?= CHtml::hiddenField('Procedures_'.$identifier.'[]', $procedure['id']); ?></span>
+								<span class="value"><?= $procedure['term']; ?></span>
 							</td>
 							<?php if ($durations) {?>
 								<td class="duration">
@@ -140,30 +140,32 @@
 				}?>
 				</tbody>
 			</table>
-			<table class="grid"<?php if (empty($selected_procedures) || !$durations) {?> style="display: none;"<?php }?>>
-				<tfoot>
-				<tr>
-					<td>
-						Calculated Total Duration:
-					</td>
-					<td id="projected_duration_<?php echo $identifier?>">
-						<?php echo $totalDuration?> mins
-					</td>
-					<td>
-						Estimated Total Duration:
-					</td>
-					<td>
-						<input
-							type="text"
-							value="<?php echo $total_duration?>"
-							id="<?php echo $class?>_total_duration_<?php echo $identifier?>"
-							name="<?php echo $class?>[total_duration_<?php echo $identifier?>]"
-							style="width:60px"
-							/>
-					</td>
-				</tr>
-				</tfoot>
-			</table>
+			<?php if ($durations) {?>
+				<table class="grid durations">
+					<tfoot>
+					<tr>
+						<td>
+							Calculated Total Duration:
+						</td>
+						<td id="projected_duration_<?php echo $identifier?>">
+							<?php echo $totalDuration?> mins
+						</td>
+						<td>
+							Estimated Total Duration:
+						</td>
+						<td>
+							<input
+								type="text"
+								value="<?php echo $total_duration?>"
+								id="<?php echo $class?>_total_duration_<?php echo $identifier?>"
+								name="<?php echo $class?>[total_duration_<?php echo $identifier?>]"
+								style="width:60px"
+								/>
+						</td>
+					</tr>
+					</tfoot>
+				</table>
+			<?php }?>
 		</div>
 	</div>
 </div>
@@ -212,7 +214,7 @@ function removeProcedure(element, identifier)
 	if (len <= 1) {
 		$('#procedureList_'+identifier).hide();
 		<?php if ($durations) {?>
-		$('div.extraDetails').hide();
+		$('#procedureList_'+identifier).find('.durations').hide();
 		<?php }?>
 	}
 
@@ -327,14 +329,16 @@ $('select[id^="select_procedure_id"]').unbind('change').change(function() {
 	return false;
 });
 
-$(document).ready(function() {
-	if ($('input[name="<?php echo $class?>[eye_id]"]:checked').val() == 3) {
-		$('#projected_duration_<?php echo $identifier?>').html((parseInt($('#projected_duration_<?php echo $identifier?>').html().match(/[0-9]+/)) * 2) + " mins");
-	}
-	$('input[name="<?php echo $class?>[eye_id]"]').click(function() {
-		updateTotalDuration('<?php echo $identifier?>');
+<?php if ($durations): ?>
+	$(document).ready(function() {
+		if ($('input[name="<?php echo $class?>[eye_id]"]:checked').val() == 3) {
+			$('#projected_duration_<?php echo $identifier?>').html((parseInt($('#projected_duration_<?php echo $identifier?>').html().match(/[0-9]+/)) * 2) + " mins");
+		}
+		$('input[name="<?php echo $class?>[eye_id]"]').click(function() {
+			updateTotalDuration('<?php echo $identifier?>');
+		});
 	});
-});
+<?php endif ?>
 
 function ProcedureSelectionSelectByName(name, callback, identifier)
 {
@@ -351,7 +355,7 @@ function ProcedureSelectionSelectByName(name, callback, identifier)
 
 			if (enableDurations) {
 				updateTotalDuration(identifier);
-				$('div.extraDetails').show();
+				$('#procedureList_'+identifier).find('.durations').show();
 			}
 
 			// clear out text field

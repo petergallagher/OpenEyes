@@ -19,17 +19,20 @@
 ?>
 <?php
 extract($this->getEpisodes());
-$current_episode = @$this->current_episode;
-$noEpisodesFound=(boolean) (count($ordered_episodes)<1 && count($supportserviceepisodes) <1 && count($legacyepisodes) <1);
+$current_episode = isset($current_episode) ? $current_episode : @$this->current_episode;
+$noEpisodes = (count($episodes) <1 && count($supportserviceepisodes) <1 && count($legacyepisodes) <1);
 ?>
 
 <h1 class="badge">Episodes and events</h1>
-<?php if($noEpisodesFound && BaseController::checkUserLevel(4)) { ?>
+
+<?php if($noEpisodes && $this->checkAccess('OprnCreateEpisode')) { ?>
 	<div class="row">
 		<div class="large-8 large-centered column">
 			<div class="box content">
 				<div class="panel">
-					<div class="alert-box alert with-icon">There are currently no episodes for this patient, please click the Add episode button to open a new episode.</div>
+					<div class="alert-box alert with-icon">
+						There are currently no episodes for this patient, please click the Add episode button to open a new episode.
+					</div>
 					<button class="small add-episode" id="add-episode">
 						Add episode
 					</button>
@@ -37,9 +40,10 @@ $noEpisodesFound=(boolean) (count($ordered_episodes)<1 && count($supportservicee
 			</div>
 		</div>
 	</div>
-<?php } else { ?>
-	<?php $this->beginContent('//patient/episodes_container');?>
-		<?php
+<?php } else {
+
+		$this->beginContent('//patient/episodes_container');
+
 		if ($current_episode) {
 			if ($this->editing) {
 				$this->renderPartial('/clinical/updateEpisode',
@@ -50,7 +54,11 @@ $noEpisodesFound=(boolean) (count($ordered_episodes)<1 && count($supportservicee
 					array('episode' => $current_episode)
 				);
 			}
-		}
-		?>
-	<?php $this->endContent(); ?>
-<?php }	?>
+		} else if (count($legacyepisodes)) {?>
+			<h2>No episodes</h2>
+			<div class="alert-box alert with-icon">
+				There are currently no episodes for this patient, please click the Add episode button to open a new episode.
+			</div>
+		<?php }
+		$this->endContent();
+}?>

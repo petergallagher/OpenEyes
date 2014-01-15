@@ -27,6 +27,7 @@ function showActiveChildElements() {
 }
 
 function addElement(element, animate, is_child, previous_id, params) {
+
 	if (typeof (animate) === 'undefined')
 		animate = true;
 	if (typeof (is_child) === 'undefined')
@@ -50,16 +51,21 @@ function addElement(element, animate, is_child, previous_id, params) {
 
 	$.get(baseUrl + "/" + moduleName + "/Default/ElementForm", params, function(data) {
 		if (is_child) {
-			var container = $(element).closest('.sub-elements.inactive').parent().find('.sub-elements:first');
+			if (element.tagName == 'LI') {
+				var container = $(element).closest('.sub-elements.inactive').parent().find('.sub-elements:first');
+			} else {
+				var container = $(element).closest('.sub-elements.active').parent().find('.sub-elements:first');
+			}
 		} else {
 			var container = $('.js-active-elements');
 		}
 
 		$(element).remove();
+
 		var insert_before = container.find('.sub-element, .element').first();
 
 		while (parseInt(insert_before.attr('data-element-display-order')) < parseInt(display_order)) {
-			insert_before = insert_before.nextAll('div:first');
+			insert_before = insert_before.nextAll('.sub-element, .element').first();
 		}
 		if (insert_before.length) {
 			insert_before.before(data);
@@ -73,7 +79,7 @@ function addElement(element, animate, is_child, previous_id, params) {
 			var cel = $(container).find('.'+element_type_class);
 			var pel = $(container).parents('.sub-element, .element');
 			var sideField = $(cel).find('input.sideField');
-		if ($(sideField).length && $(pel).find('input.sideField').length) {
+			if ($(sideField).length && $(pel).find('input.sideField').length) {
 				$(sideField).val($(pel).find('.sideField').val());
 
 				if($(sideField).val() == '1') {
@@ -85,27 +91,13 @@ function addElement(element, animate, is_child, previous_id, params) {
 			}
 		}
 
-		$('#event_display textarea.autosize:visible').autosize();
+		$('#event-content textarea.autosize:visible').autosize();
 		showActiveChildElements();
-
-		var inserted = (insert_before.length) ? insert_before.prevAll('section:first') : container.find('.sub-element:last, .element:last');
-
-		if (animate) {
-			var offTop = inserted.offset().top - 50;
-			var speed = (Math.abs($(window).scrollTop() - offTop)) * 1.5;
-			$('body').animate({
-				scrollTop : offTop
-			}, speed, null, function() {
-				$('.element-title', inserted).effect('pulsate', {
-					times : 2
-				}, 600);
-			});
-		}
 
 		var el_class = $(element).attr('data-element-type-class');
 		var initFunctionName = el_class.replace('Element_', '') + '_init';
 		if(typeof(window[initFunctionName]) == 'function') {
-			window[initFunctionName]();
+			window[initFunctionName](previous_id);
 		}
 
 		// now init any children
@@ -116,8 +108,24 @@ function addElement(element, animate, is_child, previous_id, params) {
 			}
 		});
 
-		// Update waypoints to cope with change in page size
-		$.waypoints('refresh');
+		var inserted = (insert_before.length) ? insert_before.prevAll('section:first') : container.find('.sub-element:last, .element:last').last();
+
+		if (animate) {
+			setTimeout(function() {
+				var offTop = inserted.offset().top - 90;
+				var speed = (Math.abs($(window).scrollTop() - offTop)) * 1.5;
+				$('body').animate({
+					scrollTop : offTop
+				}, speed, null, function() {
+					$('.element-title', inserted).effect('pulsate', {
+						times : 2
+					}, 600);
+				});
+			}, 100);
+		}
+
+		// Update stick elements to cope with change in page size
+		OpenEyes.UI.StickyElements.refresh();
 
 		// Update text macros (if defined)
 		if(typeof updateTextMacros == 'function') {
@@ -161,8 +169,8 @@ function removeElement(element, is_child) {
 
 	showActiveChildElements();
 
-	// Update waypoints to cope with change in page size
-	$.waypoints('refresh');
+	// Update sticky elements to cope with change in page size
+	OpenEyes.UI.StickyElements.refresh();
 
 	// Update text macros (if defined)
 	if(typeof updateTextMacros == 'function') {
@@ -180,7 +188,7 @@ $(document).ready(function() {
 	/**
 	 * Autoadjust height of textareas
 	 */
-	$('#event_display textarea.autosize:visible').autosize();
+	$('#event-content textarea.autosize:visible').autosize();
 
 	/**
 	 * Add all optional elements
@@ -216,7 +224,14 @@ $(document).ready(function() {
 	 * View previous elements
 	 */
 	$('.js-active-elements').delegate('.viewPrevious', 'click', function(e) {
-		var element = $(this).closest('.element');
+		if ($(this).hasClass('subElement')) {
+			var elementType = 'sub-element';
+		} else {
+			var elementType = 'element';
+		}
+
+		var element = $(this).closest('.' + elementType);
+
 		if (!$(element).hasClass('clicked')) {
 			$(element).addClass('clicked');
 		}
@@ -239,10 +254,14 @@ $(document).ready(function() {
 				});
 				$('#previous_elements .copy_element').click(function() {
 					var element_id = $(this).attr('data-element-id');
-					var element = $('.js-active-elements .element.' + $(this).attr('data-element-type-class'))
+					if (elementType == 'element') {
+						var element = $('.js-active-elements .element.' + $(this).attr('data-element-type-class'));
+					} else {
+						var element = $('.js-active-elements .sub-element.' + $(this).attr('data-element-type-class'));
+					}
 					$(element).addClass('clicked');
 					$('#previous_elements').dialog('close');
-					addElement(element, false, false, element_id);
+					addElement(element, false, (elementType == 'sub-element'), element_id);
 				});
 				$(element).removeClass('clicked');
 			}
@@ -255,11 +274,14 @@ $(document).ready(function() {
 	 */
 	$('.optional-elements').delegate('.remove-all', 'click', function(e) {
 		if($(this).closest('.element').length) {
-			$(this).closest('.element').find('.active_child_elements .element').each(function() {
+			$(this).closest('.element').find('.sub-elements.active .sub-element:not(.required)').each(function() {
 				removeElement(this, true);
 			})
 		} else {
-			$('.js-active-elements .element').each(function() {
+			$('.js-active-elements .sub-element:not(.required)').each(function() {
+				removeElement(this, true);
+			});
+			$('.js-active-elements .element:not(.required)').each(function() {
 				removeElement(this);
 			});
 		}

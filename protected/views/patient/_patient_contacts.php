@@ -31,7 +31,7 @@
 					<th>Name</th>
 					<th>Location</th>
 					<th>Type</th>
-					<?php if (BaseController::checkUserLevel(4)) {?><th></th><?php }?>
+					<?php if ($this->checkAccess('OprnEditContact')) {?><th></th><?php }?>
 				</tr>
 			</thead>
 			<tbody id="patient_contacts">
@@ -40,7 +40,7 @@
 				}?>
 			</tbody>
 		</table>
-		<?php if (BaseController::checkUserLevel(4)) {?>
+		<?php if ($this->checkAccess('OprnEditContact')) {?>
 			<div class="row data-row">
 
 				<div class="large-2 column">
@@ -606,11 +606,11 @@ $(document).ready(function() {
 			'success': function(html) {
 				if (html == "1") {
 					$('#add_site_dialog').dialog('close');
-					new OpenEyes.Dialog.Alert({
+					new OpenEyes.UI.Dialog.Alert({
 						content: "Your request has been sent, we aim to process requests within 1 working day."
 					}).open();
 				} else {
-					new OpenEyes.Dialog.Alert({
+					new OpenEyes.UI.Dialog.Alert({
 						content: "There was an unexpected error sending your message, please try again or contact support for assistance."
 					}).open();
 				}

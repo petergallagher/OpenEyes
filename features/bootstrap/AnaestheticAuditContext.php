@@ -143,20 +143,42 @@ class AnaestheticAuditContext extends PageObjectContext
         $asa->saveEvent();
     }
 
-//    /**
-//     * @Then /^I Cancel the Event$/
-//     */
-//    public function iCancelTheEvent()
-//    {
-//       $this->clickLink(AnaestheticAudit::$cancelEvent);
-//    }
-//
-//    /**
-//     * @Then /^I Cancel the Examination$/
-//     */
-//    public function iCancelTheExamination()
-//    {
-//        $this->clickLink(AnaestheticAudit::$cancelExam);
-//    }
+    /**
+     * @Given /^I edit the Last Event$/
+     */
+    public function iEditTheLastEvent()
+    {
+        /**
+         * @var AnaestheticAudit $asa
+         */
+        $asa = $this->getPage('AnaestheticAudit');
+        $asa->editEvent();
+    }
+
+    /**
+     * @Given /^I delete the Last Event$/
+     */
+    public function iDeleteTheLastEvent()
+    {
+        /**
+         * @var AnaestheticAudit $asa
+         */
+        $asa = $this->getPage('AnaestheticAudit');
+        $asa->deleteEvent();
+    }
+
+    /**
+     * @Then /^I confirm that the ASA Validation error messages have been displayed$/
+     */
+    public function iConfirmThatTheAsaValidationErrorMessagesHaveBeenDisplayed()
+    {
+        /**
+         * @var AnaestheticAudit $asa
+         */
+        $asa = $this->getPage('AnaestheticAudit');
+        $asa->validationErrorCheck();
+
+    }
+
 
 }

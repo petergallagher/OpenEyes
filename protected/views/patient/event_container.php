@@ -1,15 +1,3 @@
-<?php
-
-extract($this->getEpisodes());
-
-if ($module = $this->getModule()) {
-	$module = $module->getName();
-	if (file_exists(Yii::getPathOfAlias('application.modules.'.$module.'.assets'))) {
-		Yii::app()->getAssetManager()->publish(Yii::getPathOfAlias('application.modules.'.$module.'.assets'),true).'/';
-	}
-}
-?>
-
 <h1 class="badge">Episodes and events</h1>
 
 <div class="box content">
@@ -25,9 +13,14 @@ if ($module = $this->getModule()) {
 
 		<div class="large-10 column event <?php echo $this->moduleNameCssClass;?> <?php echo $this->moduleStateCssClass; ?>">
 
-			<?php $this->renderPartial('//patient/event_tabs',array('hidden'=>(boolean) (count($ordered_episodes)<1 && count($supportserviceepisodes) <1 && count($legacyepisodes) <1)))?>
+			<?php $this->renderPartial('//patient/event_tabs')?>
 
 			<div class="event-content" id="event-content">
+
+				<h2 class="event-title"><?php echo $this->title?></h2>
+
+				<?php $this->renderPartial('//base/_messages'); ?>
+
 					<?php echo $content; ?>
 					<?php if ($this->action->id == 'view') {
 						$this->renderEventMetadata();

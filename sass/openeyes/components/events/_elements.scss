@@ -1,26 +1,36 @@
-/**
- * OpenEyes
- *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
- * (C) OpenEyes Foundation, 2011-2013
- * This file is part of OpenEyes.
- * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
- *
- * @package OpenEyes
- * @link http://www.openeyes.org.uk
- * @author OpenEyes <info@openeyes.org.uk>
- * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
- * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
- * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
- */
+// * OpenEyes
+// *
+// * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
+// * (C) OpenEyes Foundation, 2011-2013
+// * This file is part of OpenEyes.
+// * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+// * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+// * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+// *
+// * @package OpenEyes
+// * @link http://www.openeyes.org.uk
+// * @author OpenEyes <info@openeyes.org.uk>
+// * @copyright Copyright (c) 2008-2011, Moorfields Eye Hospital NHS Foundation Trust
+// * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
+// * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+
+%element-panel {
+	@extend %clearfix;
+	padding: 10px 10px 0 10px;
+	margin: 0;
+	background: #dae6f1;
+	.metadata {
+		margin-left: 0;
+		padding-top: 0;
+	}
+}
 
 .element {
 	position: relative;
 	canvas,
 	.canvas {
 		border: 1px solid #ccc;
+		display: block;
 		margin: 0;
 	}
 	.element-eyes {
@@ -39,9 +49,6 @@
 			width: 0;
 			z-index: 1;
 		}
-	}
-	.field-row {
-		padding-bottom: .9em;
 	}
 	.inactive .active-form,
 	.inactive-form {
@@ -83,7 +90,7 @@
 
 .eye-message {
 	font-size: $default-font-size;
-	padding: 1em 0;
+	padding: 0 0 1em 0;
 	text-align: center;
 }
 
@@ -123,15 +130,6 @@ $oe-element-edit-title-font-style: italic;
 				margin: 1em;
 			}
 		}
-		select {
-			width: auto;
-			&.full-width {
-				width: 100%;
-			}
-		}
-		.field-row {
-			padding-bottom: .8em;
-		}
 		.alert-box {
 			margin: 1em 0;
 		}
@@ -141,13 +139,16 @@ $oe-element-edit-title-font-style: italic;
 	}
 	.element-title-additional {
 		float: left;
-		font-size: $default-font-size;
-		line-height: 2.4em;
 		margin-left: .5em;
-		small {
+		line-height: 2em;
+		.info {
 			display: inline-block;
-			font-size: 85%;
-			margin-left: .5em;
+			font-size: $default-font-size;
+			small {
+				display: inline-block;
+				font-size: 85%;
+				margin-left: .5em;
+			}
 		}
 	}
 	.element-fields {
@@ -184,6 +185,14 @@ $oe-element-edit-title-font-style: italic;
 	}
 }
 
+.edit {
+    &.highlight-fields {
+      .sub-elements {
+        margin: 10px -10px 0 -10px;
+      }
+    }
+}
+
 .view {
 	&.highlight-fields {
 		.element {
@@ -199,10 +208,16 @@ $oe-element-edit-title-font-style: italic;
 				padding-bottom: emCalc(4px);
 				padding-top: emCalc(4px);
 			}
+			&:not(.event-types) {
+				.field-value {
+					font-size: emCalc(16px);
+				}
+			}
 		}
-		.field-value {
-			font-size: emCalc(16px);
-		}
+        .sub-elements {
+          margin: 10px -10px 0 -10px;
+          padding-top: 10px;
+        }
 	}
 	.element-data {
 		.data-title {

@@ -1,8 +1,6 @@
 <?php
 
-use SensioLabs\Behat\PageObjectExtension\PageObject\Page;
-
-class Correspondence extends Page
+class Correspondence extends OpenEyesPage
 {
     protected $path ="/site/OphCoCorrespondence/Default/create?patient_id={patientId}";
 
@@ -19,8 +17,8 @@ class Correspondence extends Page
         'drugs' => array('xpath' => "//select[@id='drugs']"),
         'outcome' => array('xpath' => "//select[@id='outcome']"),
         'letterCc' => array('xpath' => "//select[@id='cc']"),
-        'addEnclosure' => array('xpath' => "//*[@id='clinical-create']/div[2]/div/div[10]//*[contains(text(),'Add')]"),
-        'enterEnclosure' => array('xpath' => "//*[@id='enclosureItems']/div/input"),
+        'addEnclosure' => array('xpath' => "//*[@class='field-row']//*[contains(text(),'Add')]"),
+        'enterEnclosure' => array('xpath' => "//div[@id='enclosureItems']/div/div/input"),
         'saveDraft' => array('xpath' => "//*[@id='et_save_draft']")
     );
 
@@ -83,7 +81,6 @@ class Correspondence extends Page
     public function enclosure ($enclosure)
     {
         $this->getElement('addEnclosure')->click();
-        $this->getSession()->wait(2000);
         $this->getElement('enterEnclosure')->setValue($enclosure);
     }
 

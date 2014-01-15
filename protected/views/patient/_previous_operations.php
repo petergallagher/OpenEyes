@@ -36,7 +36,7 @@
 			<tr>
 				<th>Date</th>
 				<th>Operation</th>
-				<th>Actions</th>
+				<?php if ($this->checkAccess('OprnEditPreviousOperation')) { ?><th>Actions</th><?php } ?>
 			</tr>
 			</thead>
 			<tbody>
@@ -44,16 +44,18 @@
 				<tr>
 					<td><?php echo $operation->dateText?></td>
 					<td><?php if ($operation->side) { echo $operation->side->adjective.' ';}?><?php echo $operation->operation?></td>
-					<td>
-						<a href="#" class="editOperation" rel="<?php echo $operation->id?>">Edit</a>&nbsp;&nbsp;
-						<a href="#" class="removeOperation" rel="<?php echo $operation->id?>">Remove</a>
-					</td>
+					<?php if ($this->checkAccess('OprnEditPreviousOperation')): ?>
+						<td>
+							<a href="#" class="editOperation" rel="<?php echo $operation->id?>">Edit</a>&nbsp;&nbsp;
+							<a href="#" class="removeOperation" rel="<?php echo $operation->id?>">Remove</a>
+						</td>
+					<?php endif ?>
 				</tr>
 			<?php }?>
 			</tbody>
 		</table>
 
-		<?php if (BaseController::checkUserLevel(4)) {?>
+		<?php if ($this->checkAccess('OprnEditPreviousOperation')) {?>
 			<div class="box-actions">
 				<button  id="btn-add_previous_operation" class="secondary small">
 					Add Previous operation
@@ -174,7 +176,7 @@
 	});
 	$('button.btn_save_previous_operation').click(function() {
 		if ($('#previous_operation').val().length <1) {
-			new OpenEyes.Dialog.Alert({
+			new OpenEyes.UI.Dialog.Alert({
 				content: "Please enter an operation."
 			}).open();
 			return false;
@@ -251,13 +253,13 @@
 				if (html == 'success') {
 					$('a.removeOperation[rel="'+$('#operation_id').val()+'"]').parent().parent().remove();
 				} else {
-					new OpenEyes.Dialog.Alert({
+					new OpenEyes.UI.Dialog.Alert({
 						content: "Sorry, an internal error occurred and we were unable to remove the operation.\n\nPlease contact support for assistance."
 					}).open();
 				}
 			},
 			'error': function() {
-				new OpenEyes.Dialog.Alert({
+				new OpenEyes.UI.Dialog.Alert({
 					content: "Sorry, an internal error occurred and we were unable to remove the operation.\n\nPlease contact support for assistance."
 				}).open();
 			}

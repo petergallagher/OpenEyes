@@ -19,8 +19,8 @@
 
 
 // Event actions
-$this->event_actions[] = EventAction::link('Cancel', Yii::app()->createUrl('/patient/episode/'.$episode->id), array('level' => 'warning small'));
-$this->event_actions[] = EventAction::button('Save', 'save', array('id' => 'episode_save', 'level' => 'secondary small'));
+$this->event_actions[] = EventAction::link('Cancel', Yii::app()->createUrl('/patient/episode/'.$episode->id), array('level' => 'cancel'));
+$this->event_actions[] = EventAction::button('Save', 'save', array('id' => 'episode_save', 'level' => 'save'));
 
 if ($episode->diagnosis) {
 	$eye = $episode->eye ? $episode->eye->name : 'None';
@@ -80,10 +80,10 @@ $form = $this->beginWidget('BaseEventTypeCActiveForm', array(
 	?>
 	<section class="element element-data">
 		<fieldset>
-			<legend class="data-title">Principle eye:</legend>
+			<legend class="data-title">Principal eye:</legend>
 			<?php foreach (Eye::model()->findAll(array('order'=>'display_order')) as $eye) {?>
 				<label class="inline">
-					<?php echo CHtml::radioButton('eye_id', $eye_id,array('value' => $eye->id,'class'=>'episodeSummaryRadio'))?>
+					<?php echo CHtml::radioButton('eye_id', ($eye->id == $eye_id), array('value' => $eye->id,'class'=>'episodeSummaryRadio'))?>
 					<?php echo $eye->name?>
 				</label>
 			<?php }?>

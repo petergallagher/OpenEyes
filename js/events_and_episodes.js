@@ -19,24 +19,12 @@
 $(document).ready(function(){
 	$collapsed = true;
 
-	var patientWarningSpan = $('.patientReminder .icons li.warning span');
-	$('.patientReminder .icons li.warning').hover(function() {
-			var infoWrap = $('<div class="warningHover"></div>');
-			infoWrap.appendTo('body');
-			infoWrap.html('<span style="display: inline-block">' + patientWarningSpan.html() + '</span>');
-			var width = patientWarningSpan.width() + Math.ceil(patientWarningSpan.width()/30);
-			var offsetPos = $(this).offset();
-			var top = offsetPos.top + $(this).height() + 6;
-			var middle = offsetPos.left + $(this).width()/2;
-			var left = middle - infoWrap.width()/2 - 8;
-
-			infoWrap.css({'position': 'absolute', 'top': top + "px", 'left': left + "px", "width": width});
-			infoWrap.fadeIn('fast');
-		},
-		function(e){
-			$('body > div:last').remove();
+	$(document).keydown(function(event){
+		if(event.keyCode == 13) {
+			event.preventDefault();
+			return false;
 		}
-	);
+	});
 
 	(function addNewEvent() {
 
@@ -44,7 +32,7 @@ $(document).ready(function(){
 		var html = template.html();
 		var data = template.data('specialty');
 
-		var dialog = new OpenEyes.Dialog({
+		var dialog = new OpenEyes.UI.Dialog({
 			destroyOnClose: false,
 			title: 'Add a new ' + (data && data.name ? data.name : 'Support services') + ' event',
 			content: html,
@@ -69,7 +57,7 @@ $(document).ready(function(){
 			'url': baseUrl+'/patient/verifyAddNewEpisode?patient_id='+OE_patient_id,
 			'success': function(response) {
 				if (response != '1') {
-					new OpenEyes.Dialog.Alert({
+					new OpenEyes.UI.Dialog.Alert({
 						content: "There is already an open episode for your firm's subspecialty.\n\nIf you wish to create a new episode in a different subspecialty please switch to a firm that has the subspecialty you want."
 					}).open();
 				} else {

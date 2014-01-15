@@ -45,14 +45,14 @@
 				<thead>
 					<tr>
 						<th>Allergies</th>
-						<?php if (BaseController::checkUserLevel(4)) { ?><th>Actions</th><?php } ?>
+						<?php if ($this->checkAccess('OprnEditAllergy')) { ?><th>Actions</th><?php } ?>
 					</tr>
 				</thead>
 				<tbody>
 					<?php foreach ($this->patient->allergies as $allergy) { ?>
 					<tr data-allergy-id="<?php echo $allergy->id ?>" data-allergy-name="<?php echo $allergy->name ?>">
 						<td><?php echo $allergy->name ?></td>
-						<?php if (BaseController::checkUserLevel(4)) { ?>
+						<?php if ($this->checkAccess('OprnEditAllergy')) { ?>
 							<td>
 								<a href="#" rel="<?php echo $allergy->id?>" class="small removeAllergy">
 									Remove
@@ -65,7 +65,7 @@
 			</table>
 			<?php
 		}
-		if (BaseController::checkUserLevel(4)) { ?>
+		if ($this->checkAccess('OprnEditAllergy')) { ?>
 			<div class="box-actions">
 				<button id="btn-add_allergy" class="secondary small">
 					Edit
@@ -118,7 +118,7 @@
 	</div>
 </section>
 
-<?php if (BaseController::checkUserLevel(4)) { ?>
+<?php if (BaseController::checkAccess('OprnEditAllergy')) { ?>
 
 	<!-- Confirm deletion dialog -->
 	<div id="confirm_remove_allergy_dialog" title="Confirm remove allergy" style="display: none;">
@@ -162,7 +162,7 @@
 		});
 		$('button.btn_save_allergy').click(function() {
 			if ($('#allergy_id').val() == '' && !$('#no_allergies')[0].checked) {
-				new OpenEyes.Dialog.Alert({
+				new OpenEyes.UI.Dialog.Alert({
 					content: "Please select an allergy or confirm patient has no allergies"
 				}).open();
 				return false;
@@ -200,13 +200,13 @@
 						sort_selectbox($('#allergy_id'));
 
 					} else {
-						new OpenEyes.Dialog.Alert({
+						new OpenEyes.UI.Dialog.Alert({
 							content: "Sorry, an internal error occurred and we were unable to remove the allergy.\n\nPlease contact support for assistance."
 						}).open();
 					}
 				},
 				'error': function() {
-					new OpenEyes.Dialog.Alert({
+					new OpenEyes.UI.Dialog.Alert({
 						content: "Sorry, an internal error occurred and we were unable to remove the allergy.\n\nPlease contact support for assistance."
 					}).open();
 				}

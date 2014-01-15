@@ -21,26 +21,23 @@
 <?php
 $form = $this->beginWidget('CActiveForm', array(
 	'id' => 'site-and-firm-form',
+	'action' => '/site/changesiteandfirm',
 ));
 ?>
 	<?php echo CHtml::hiddenField('returnUrl',$this->returnUrl)?>
 
 	<?php if ($this->subspecialty) {?>
 		<?php echo CHtml::hiddenField('subspecialty_id',$this->subspecialty->id)?>
-		<div>
-			<p>
-				To add an event to this episode you must switch to a <?php echo $this->subspecialty->name?> firm.
-			</p>
-		</div>
+		<p>
+			To add an event to this episode you must switch to a <?php echo $this->subspecialty->name?> firm.
+		</p>
 	<?php }?>
 
 	<?php if ($this->support_services) {?>
 		<?php echo CHtml::hiddenField('support_services',1)?>
-		<div>
-			<p>
-				To add an event to this episode you must switch to a support services firm.
-			</p>
-		</div>
+		<p>
+			To add an event to this episode you must switch to a support services firm.
+		</p>
 	<?php }?>
 
 	<?php if ($this->patient) {?>

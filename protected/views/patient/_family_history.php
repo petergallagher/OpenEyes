@@ -18,7 +18,7 @@
 					<th>Side</th>
 					<th>Condition</th>
 					<th>Comments</th>
-					<th>Actions</th>
+					<?php if ($this->checkAccess('OprnEditFamilyHistory')) { ?><th>Actions</th><?php } ?>
 				</tr>
 			</thead>
 			<tbody>
@@ -28,16 +28,18 @@
 						<td class="side"><?php echo $history->side->name?></td>
 						<td class="condition"><?php echo $history->condition->name?></td>
 						<td class="comments"><?php echo $history->comments?></td>
-						<td>
-							<a href="#" class="editFamilyHistory" rel="<?php echo $history->id?>">Edit</a>&nbsp;&nbsp;
-							<a href="#" class="removeFamilyHistory" rel="<?php echo $history->id?>">Remove</a>
-						</td>
+						<?php if ($this->checkAccess('OprnEditFamilyHistory')): ?>
+							<td>
+								<a href="#" class="editFamilyHistory" rel="<?php echo $history->id?>">Edit</a>&nbsp;&nbsp;
+								<a href="#" class="removeFamilyHistory" rel="<?php echo $history->id?>">Remove</a>
+							</td>
+						<?php endif ?>
 					</tr>
 				<?php }?>
 			</tbody>
 		</table>
 
-		<?php if (BaseController::checkUserLevel(4)) { ?>
+		<?php if ($this->checkAccess('OprnEditFamilyHistory')) { ?>
 			<div class="box-actions">
 				<button id="btn-add_family_history" class="secondary small">
 					Add Family History
@@ -121,14 +123,14 @@
 <div id="confirm_remove_family_history_dialog" title="Confirm remove family history" style="display: none;">
 	<div id="delete_family_history">
 		<div class="alert-box alert with-icon">
-			<strong>WARNING: This will remove the family_history from the patient record.</strong>
+			<strong>WARNING: This will remove the family history from the patient record.</strong>
 		</div>
 		<p>
 			<strong>Are you sure you want to proceed?</strong>
 		</p>
 		<div class="buttons">
 			<input type="hidden" id="family_history_id" value="" />
-			<button type="submit" class="warning small btn_remove_family_history">Remove family_history</button>
+			<button type="submit" class="warning small btn_remove_family_history">Remove family history</button>
 			<button type="submit" class="secondary small btn_cancel_remove_family_history">Cancel</button>
 			<img class="loader" src="<?php echo Yii::app()->createUrl('img/ajax-loader.gif')?>" alt="loading..." style="display: none;" />
 		</div>
@@ -153,19 +155,19 @@
 	});
 	$('button.btn_save_family_history').click(function() {
 		if ($('#relative_id').val() == '') {
-			new OpenEyes.Dialog.Alert({
+			new OpenEyes.UI.Dialog.Alert({
 				content: "Please select a relative."
 			}).open();
 			return false;
 		}
 		if ($('#side_id').val() == '') {
-			new OpenEyes.Dialog.Alert({
+			new OpenEyes.UI.Dialog.Alert({
 				content: "Please select a side."
 			}).open();
 			return false;
 		}
 		if ($('#condition_id').val() == '') {
-			new OpenEyes.Dialog.Alert({
+			new OpenEyes.UI.Dialog.Alert({
 				content: "Please select a condition."
 			}).open();
 			return false;
@@ -227,13 +229,13 @@
 				if (html == 'success') {
 					$('a.removeFamilyHistory[rel="'+$('#family_history_id').val()+'"]').parent().parent().remove();
 				} else {
-					new OpenEyes.Dialog.Alert({
+					new OpenEyes.UI.Dialog.Alert({
 						content: "Sorry, an internal error occurred and we were unable to remove the family_history.\n\nPlease contact support for assistance."
 					}).open();
 				}
 			},
 			'error': function() {
-				new OpenEyes.Dialog.Alert({
+				new OpenEyes.UI.Dialog.Alert({
 					content: "Sorry, an internal error occurred and we were unable to remove the family_history.\n\nPlease contact support for assistance."
 				}).open();
 			}

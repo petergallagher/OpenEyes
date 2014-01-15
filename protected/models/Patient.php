@@ -123,13 +123,16 @@ class Patient extends BaseActiveRecord
 				'condition' => 'support_services=1',
 			),
 			'episodes' => array(self::HAS_MANY, 'Episode', 'patient_id',
-				'condition' => "(legacy=0 or legacy is null)",
+				'condition' => "(patient_episode.legacy=0 or patient_episode.legacy is null)",
+				'alias' => 'patient_episode'
 			),
 			'contact' => array(self::BELONGS_TO, 'Contact', 'contact_id'),
 			'gp' => array(self::BELONGS_TO, 'Gp', 'gp_id'),
 			'practice' => array(self::BELONGS_TO, 'Practice', 'practice_id'),
 			'contactAssignments' => array(self::HAS_MANY, 'PatientContactAssignment', 'patient_id'),
-			'allergies' => array(self::MANY_MANY, 'Allergy', 'patient_allergy_assignment(patient_id, allergy_id)', 'order' => 'name'),
+			'allergies' => array(self::MANY_MANY, 'Allergy', 'patient_allergy_assignment(patient_id, allergy_id)',
+				'alias' => 'patient_allergies',
+				'order' => 'patient_allergies.name'),
 			'secondarydiagnoses' => array(self::HAS_MANY, 'SecondaryDiagnosis', 'patient_id'),
 			'ethnic_group' => array(self::BELONGS_TO, 'EthnicGroup', 'ethnic_group_id'),
 			'previousOperations' => array(self::HAS_MANY, 'PreviousOperation', 'patient_id', 'order' => 'date'),
@@ -284,7 +287,7 @@ class Patient extends BaseActiveRecord
 	}
 
 	/**
-	 * calculate the patient's age
+	 * Get the patient's age
 	 *
 	 * @return string
 	 */
@@ -294,12 +297,27 @@ class Patient extends BaseActiveRecord
 	}
 
 	/**
-	* @return boolean Is patient a child?
-	*/
-	public function isChild()
+	 * Calculate the patient's age
+	 *
+	 * @param string $check_date Date to check age on (default is today)
+	 * @return string
+	 */
+	public function ageOn($check_date)
+	{
+		return Helper::getAge($this->dob, $this->date_of_death, $check_date);
+	}
+
+	/**
+	 * @param string $check_date Optional date to check age on (default is today)
+	 * @return boolean Is patient a child?
+	 */
+	public function isChild($check_date = null)
 	{
 		$age_limit = (isset(Yii::app()->params['child_age_limit'])) ? Yii::app()->params['child_age_limit'] : self::CHILD_AGE_LIMIT;
-		return ($this->getAge() < $age_limit);
+		if(!$check_date) {
+			$check_date = date('Y-m-d');
+		}
+		return ($this->ageOn($check_date) < $age_limit);
 	}
 
 	/**
@@ -468,6 +486,23 @@ class Patient extends BaseActiveRecord
 
 		return Episode::model()->getCurrentEpisodeByFirm($this->id, $firm, true);
 	}
+
+	/**
+	 * Get or create an episode for the patient under the given Firm (Note that an episode will be returned if there
+	 * is match on Firm Subspecialty rather than on Firm)
+	 *
+	 * @param $firm
+	 * @param bool $include_closed
+	 * @return CActiveRecord|Episode|null
+	 */
+	public function getOrCreateEpisodeForFirm($firm, $include_closed = false)
+	{
+		if (!$episode = Episode::getCurrentEpisodeByFirm($this->id, $firm, $include_closed)) {
+			$episode = $this->addEpisode($firm);
+		}
+		return $episode;
+	}
+
 
 	/**
 	 * returns the ophthalmic information object for this patient (creates a default one if one does not exist - but does not save it)
@@ -790,11 +825,12 @@ class Patient extends BaseActiveRecord
 		foreach ($snomeds as $id) {
 			$disorders[] = Disorder::model()->findByPk($id);
 		}
+
 		$patient_disorder_ids = $this->getAllDisorderIds();
 		$res = array();
 		foreach ($patient_disorder_ids as $p_did) {
 			foreach ($disorders as $d) {
-				if ($d->id == $p_did || $d->ancestorOfIds(array($p_did))) {
+				if (($d->id == $p_did) || $d->ancestorOfIds(array($p_did))) {
 					$res[] = Disorder::model()->findByPk($p_did);
 					break;
 				}
@@ -965,17 +1001,33 @@ class Patient extends BaseActiveRecord
 		} elseif ($this->hasDisorderTypeByIds(Disorder::$SNOMED_DIABETES_TYPE_II_SET)) {
 			return Disorder::model()->findByPk(Disorder::SNOMED_DIABETES_TYPE_II);
 		}
+
 		return null;
 	}
 
 	/**
-	 * Type of diabetes mellitus as a letter string
+	 * Get the patient diabetes type as Disorder instance - will return generic Diabetes
+	 * if no specific type available, but patient has diabetes
+	 *
+	 * @return Disorder|null
+	 */
+	public function getDiabetes()
+	{
+		$type = $this->getDiabetesType();
+		if ($type === null && $this->hasDisorderTypeByIds(Disorder::$SNOMED_DIABETES_SET)) {
+			return Disorder::model()->findByPk(Disorder::SNOMED_DIABETES);
+		}
+		return $type;
+	}
+
+	/**
+	 * Diabetes mellitus as a letter string
 	 *
 	 * @return string
 	 */
 	public function getDmt()
 	{
-		if ($disorder = $this->getDiabetesType()) {
+		if ($disorder = $this->getDiabetes()) {
 			return $disorder->term;
 		}
 
@@ -1128,6 +1180,13 @@ class Patient extends BaseActiveRecord
 		return  $this->getOpenEpisodeOfSubspecialty($subspecialty_id) ? true : false;
 	}
 
+	/**
+	 * add an episode to the patient for the given Firm
+	 *
+	 * @param $firm
+	 * @return Episode
+	 * @throws Exception
+	 */
 	public function addEpisode($firm)
 	{
 		$episode = new Episode;
