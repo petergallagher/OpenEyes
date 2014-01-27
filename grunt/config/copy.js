@@ -4,19 +4,7 @@ module.exports = {
 			{
 				cwd:'protected/assets',
 				expand: true,
-				src: ['css/**/*.css'],
-				dest: 'docs/public/assets'
-			},
-			{
-				cwd:'protected/assets',
-				expand: true,
-				src: ['img/**/*'],
-				dest: 'docs/public/assets'
-			},
-			{
-				cwd:'protected/assets',
-				expand: true,
-				src: ['js/**/*.js'],
+				src: ['{css,img,js}/**/*'],
 				dest: 'docs/public/assets'
 			},
 			{
@@ -32,10 +20,10 @@ module.exports = {
 				dest: 'docs/public/assets'
 			},
 			{
-				cwd: 'docs/src/',
+				cwd: 'protected',
 				expand: true,
-				src: ['components/**/*'],
-				dest: 'docs/public/'
+				src: ['modules/eyedraw/{css,img}/**/*'],
+				dest: 'docs/public/assets'
 			},
 			{
 				cwd: 'docs/src/',
@@ -52,19 +40,13 @@ module.exports = {
 			{
 				cwd: 'docs/src/assets',
 				expand: true,
-				src: ['js/**/*'],
-				dest: 'docs/public/assets'
-			},
-			{
-				cwd: 'docs/src/assets',
-				expand: true,
-				src: ['css/**/*'],
+				src: ['{js,css,img}/**/*'],
 				dest: 'docs/public/assets'
 			},
 			{
 				cwd: 'docs/src/',
 				expand: true,
-				src: ['index.php'],
+				src: ['*.php'],
 				dest: 'docs/public/'
 			}
 		]
