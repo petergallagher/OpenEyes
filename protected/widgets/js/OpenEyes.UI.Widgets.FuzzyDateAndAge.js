@@ -69,8 +69,6 @@
 			self.updateValue(self._entryField.val());
 		});
 
-		self.setDatePattern();
-
 		//TODO: need to link date formats correctly on this object
 		if (self.options.dob) {
 			self._dob = moment(self.options.dob, self.options.dateFormat, true);
@@ -82,6 +80,8 @@
 			self._dob = null;
 		}
 
+		self.setDatePattern();
+
 	}
 
 	FuzzyDateAndAge.prototype.setDatePattern = function() {
@@ -91,18 +91,24 @@
 		var month_exp = '(?:((?:\\d{1,2})|(?:[a-z]+))' + date_delimiter_set + ')';
 		// 2 or 4 digit number
 		var year_exp = '((?:\\d{2})|(?:\\d{4}))';
+		if (this._dob) {
+			// 1 - 4 digits (to catch an age)
+			year_exp = '(\\d{1,4})';
+		}
 
-		var expression = '^' + day_exp + '?' +
+		// only match for the day when a month is present - ensures consistent bracket matching
+		var expression = '^(?:' + day_exp + '(?='+month_exp+'))?' +
 				month_exp + '?' +
 				year_exp + '$';
-
+		
 		this._pattern = new RegExp(expression,'i');
 	}
 
 	FuzzyDateAndAge.prototype.getFuzzyMatches = function(fuzzyDate) {
+
 		var match = fuzzyDate.match(this._pattern);
 		if (match) {
-			return {'day': match[1], 'month': match[2], 'year': match[3]};
+			return {'day': match[1], 'month': match[3], 'year': match[4]};
 		}
 		return null;
 	}
@@ -116,49 +122,66 @@
 		values = this.getFuzzyMatches(fuzzyDate);
 
 		if (values === null) {
-			this._startField.val('');
-			this._endField.val('');
-			this.setRangeSpan();
-			this.showErrorMessage();
+			this.invalidValues('unrecognised entry');
 			return;
 		}
 		var start_date, end_date;
-		var start_day, end_day, start_month, end_month, start_year, end_year;
 
 		if (this._dob
-				&& values.year.length < 4
-				&& values.month === undefined) {
-			start_date = this._dob.clone().add('y', parseInt(values.year));
-			end_date = start_date.clone().add('y', 1).subtract('d', 1);
-
+					&& values.year.length < 4
+					&& !values.day) {
+			var vals = this.ageCalc(values.month, values.year);
+			if (vals) {
+				this.setValues(vals[0], vals[1]);
+				return;
+			}
 		}
-		else {
-			var year = this.interpretYear(parseInt(values.year));
-			var month = this.interpretMonth(values.month);
+		// no age/dob match ...
+		var year = this.interpretYear(parseInt(values.year));
+		var month = this.interpretMonth(values.month);
+		if (values.month && month === null) {
+			this.invalidValues('invalid month ' + values.month);
+			return;
+		}
 
-			start_date = moment({year: year, month: 0, day: 1});
-			end_date = start_date.clone().date(31);
+		start_date = moment({year: year, month: 0, day: 1});
+		end_date = start_date.clone().date(31);
 
-			//work out the month
-			if (month) {
-				start_date.month(month-1);
-				if (values.day) {
-					start_date.date(values.day);
-					end_date = start_date.clone();
-				}
-				else {
-					end_date.month(start_date.month());
-				}
+		//work out the month
+		if (month) {
+			start_date.month(month-1);
+			if (values.day) {
+				start_date.date(values.day);
+				end_date = start_date.clone();
 			}
 			else {
-				// set to end of the year
-				end_date.month(11);
+				end_date.month(start_date.month());
 			}
 		}
+		else {
+			// set to end of the year
+			end_date.month(11);
+		}
+		this.setValues(start_date, end_date);
 
-		this._startField.val(start_date.format(this.options.dateFormat));
-		this._endField.val(end_date.format(this.options.dateFormat));
-		this.setRangeSpan();
+	}
+
+	FuzzyDateAndAge.prototype.ageCalc = function(start, end) {
+		// expect to be looking at age values
+		var start_add, end_add;
+		if (!start) {
+			start_add = parseInt(values.year);
+			end_add = start_add+1;
+		} else {
+			if (parseInt(start)) {
+				start_add = parseInt(values.month);
+				end_add = parseInt(values.year);
+			}
+			else {
+				return null;
+			}
+		}
+		return [this._dob.clone().add('y', start_add), this._dob.clone().add('y', end_add).subtract('d', 1)];
 	}
 
 	FuzzyDateAndAge.prototype.interpretYear = function(year) {
@@ -186,9 +209,23 @@
 		return null;
 	}
 
+	FuzzyDateAndAge.prototype.invalidValues = function(reason) {
+		this._startField.val('');
+		this._endField.val('');
+		this.setRangeSpan();
+		this.showErrorMessage(reason);
+	}
+
 	FuzzyDateAndAge.prototype.showErrorMessage = function(msg) {
 		msg = msg || this.options.defaultErrorMsg;
 		this._errorSpan.text(msg);
+		this._errorSpan.show();
+	}
+
+	FuzzyDateAndAge.prototype.setValues = function(st_moment, end_moment) {
+		this._startField.val(st_moment.format(this.options.dateFormat));
+		this._endField.val(end_moment.format(this.options.dateFormat));
+		this.setRangeSpan();
 	}
 
 	FuzzyDateAndAge.prototype.setRangeSpan = function() {
@@ -199,6 +236,7 @@
 			range += ' - ' + ed;
 		}
 		this._rangeSpan.text(range);
+		this._errorSpan.hide();
 	}
 
 	/**

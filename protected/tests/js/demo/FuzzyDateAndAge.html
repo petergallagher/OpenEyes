@@ -39,13 +39,13 @@
 	<div id="setup">
 		<label for="dob">Date Of Birth</label>
 		<input type="text" name="dob" id="dob" />
-		<input type="button" value="reset" />
 		<div id="dob-error" style="display:none;"></div>
 	</div>
 
 	<hr />
 	<fieldset>
-		<div id="date-container">
+		<label style="float:left;" for="date-container">Fuzzy Date:</label>
+		<div id="date-container" style="display:block; float: left;">
 			<div>
 				<label>Start date</label>
 				<input type="text" name="sd" id="start-date" />
@@ -61,7 +61,6 @@
 <script>
 	var fda;
 	function resetFDA(dob) {
-		console.log(dob);
 		fda = new OpenEyes.UI.Widgets.FuzzyDateAndAge({
 			'startField': $('#start-date'),
 			'endField': $('#end-date'),

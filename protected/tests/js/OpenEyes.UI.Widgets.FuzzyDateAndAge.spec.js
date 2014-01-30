@@ -72,50 +72,90 @@ describe('OpenEyes.UI.Widgets.FuzzyDateAndAge', function(){
 				'47': {
 					'st': '01/01/1947',
 					'en': '31/12/1947'
+				},
+				'05/24/81': {
+					'st': '',
+					'en': '',
+					'err': 'invalid month 24'
 				}
 			};
 
-				it ('should get the correct values for the entered fuzzy date', function() {
-					for (var fuzzy in testValues) {
+			for (var fuzzy in testValues) {
+				// because tests get executed later, need to define a scope enclosure for each entry
+				// in the testValues array
+				(function(fuzzy) {
+					it ('should get the correct values for the entered fuzzy date ' + fuzzy, function() {
+
 						var fdw = fdwInit();
 						fdw._entryField.val(fuzzy).trigger('input');
 						expect($('#start-date').val()).to.equal(testValues[fuzzy].st);
 						expect($('#end-date').val()).to.equal(testValues[fuzzy].en);
-					}
+						if (testValues[fuzzy].err) {
+							expect(fdw._errorSpan.is(":visible")).to.equal(true);
+							expect(fdw._errorSpan.text()).to.equal(testValues[fuzzy].err);
+						}
+						else {
+							expect(fdw._errorSpan.is(":visible")).to.equal(false);
+						}
 
-				});
+					});
+				})(fuzzy);
+			}
+
 		});
 
-
-
-		describe('It should set the dates based on age', function() {
+		describe('Testing fuzzy date and age matches', function() {
 			var dobValues = {
-				'12/03/1949': {
+				'12/03/1949': [{
 					'tst': 44,
 					'st': '12/03/1993',
 					'en': '11/03/1994'
-				},
+				}],
 				'01/03/1977':
-				{
+				[{
 					'tst': 34,
 					'st': '01/03/2011',
 					'en': '29/02/2012'
+				},
+					{
+						'tst': '3-5',
+						'st': '01/03/1980',
+						'en': '28/02/1982'
+					}],
+				'02/10/1965':
+				[
+					{
+						'tst': '30-35',
+						'st': '02/10/1995',
+						'en': '01/10/2000'
+					},
+					{
+						'tst': 'apr 78',
+						'st': '01/04/1978',
+						'en': '30/04/1978'
+					}
+				]
+			};
+
+			for (var dob in dobValues) {
+				for (var i = 0; i < dobValues[dob].length; i++) {
+					test = dobValues[dob][i];
+
+					(function(dob, test) {
+						it ('should get the right dates for entering ' + test.tst + ' with dob ' + dob, function() {
+							var fdw = fdwInit({
+								'dob': dob
+							});
+							fdw._entryField.val(test.tst).trigger('input');
+							expect($('#start-date').val()).to.equal(test.st);
+							expect($('#end-date').val()).to.equal(test.en);
+						});
+
+					})(dob, test)
+
 				}
+
 			}
-
-			it ('should get the correct dates by calculating age from different DOBs', function() {
-				for (var dob in dobValues) {
-
-					var fdw = fdwInit({
-						'dob': dob
-					});
-
-					fdw._entryField.val(dobValues[dob].tst).trigger('input');
-					expect($('#start-date').val()).to.equal(dobValues[dob].st);
-					expect($('#end-date').val()).to.equal(dobValues[dob].en);
-				}
-			});
-
 
 		});
 
