@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>FuzzyDateAndAgeDemo</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+	<!-- Add spec CSS here -->
+	<!-- <link rel="stylesheet" type="text/css" href="style.css" /> -->
+
+	<!-- Framework CSS -->
+	<link rel="stylesheet" href="../../../assets/components/mocha/mocha.css" />
+	<style type="text/css">
+		html, body { background: #fff; }
+	</style>
+</head>
+<body>
+
+<!-- Framework dependencies -->
+<script src="../../../assets/components/mocha/mocha.js"></script>
+<script src="../../../assets/components/chai/chai.js"></script>
+<script src="../../../assets/components/sinonjs-built/pkg/sinon-1.7.3.js"></script>
+
+<script>
+	this.expect = chai.expect;
+	this.assert = chai.assert;
+	mocha.setup('bdd');
+</script>
+
+<!-- Add spec dependencies here -->
+<script src="../../../assets/components/jquery/jquery.min.js"></script>
+<script src="../../../assets/components/momentjs/min/moment.min.js"></script>
+<script src="../../../assets/js/OpenEyes.js"></script>
+<script src="../../../assets/js/OpenEyes.UI.js"></script>
+<script src="../../../assets/js/OpenEyes.UI.Widgets.js"></script>
+<script src="../../../widgets/js/OpenEyes.UI.Widgets.FuzzyDateAndAge.js"></script>
+
+<form>
+	<div id="setup">
+		<label for="dob">Date Of Birth</label>
+		<input type="text" name="dob" id="dob" />
+		<input type="button" value="reset" />
+		<div id="dob-error" style="display:none;"></div>
+	</div>
+
+	<hr />
+	<fieldset>
+		<div id="date-container">
+			<div>
+				<label>Start date</label>
+				<input type="text" name="sd" id="start-date" />
+			</div>
+			<div>
+				<label>End date</label>
+				<input type="text" name="ed" id="end-date" />
+			</div>
+		</div>
+	</fieldset>
+
+</form>
+<script>
+	var fda;
+	function resetFDA(dob) {
+		console.log(dob);
+		fda = new OpenEyes.UI.Widgets.FuzzyDateAndAge({
+			'startField': $('#start-date'),
+			'endField': $('#end-date'),
+			'dob': dob,
+			containerElement: $('#date-container')
+		});
+	}
+	$('#dob').on('input', function(e) {
+		e.preventDefault();
+		if (moment($(e.target).val(), fda.options.dateFormat, true).isValid()) {
+			resetFDA($(e.target).val());
+			$('#dob-error').hide();
+		} else {
+			$('#dob-error').html('invalid DOB').show();
+		}
+	});
+
+	$(document).ready(function() {
+		resetFDA();
+	});
+
+</script>
+</body>
+</html>
