@@ -98,17 +98,22 @@
 
 		// only match for the day when a month is present - ensures consistent bracket matching
 		var expression = '^(?:' + day_exp + '(?='+month_exp+'))?' +
-				month_exp + '?' +
+				'(?:' + year_exp + date_delimiter_set + '|' + month_exp + ')?' +
 				year_exp + '$';
-		
+		//console.log(expression);
 		this._pattern = new RegExp(expression,'i');
 	}
 
 	FuzzyDateAndAge.prototype.getFuzzyMatches = function(fuzzyDate) {
 
 		var match = fuzzyDate.match(this._pattern);
+		console.log(fuzzyDate +":" + match);
 		if (match) {
-			return {'day': match[1], 'month': match[3], 'year': match[4]};
+			var month = match[3];
+			if (!month) {
+				month = match[4];
+			}
+			return {'day': match[1], 'month': month, 'year': match[5]};
 		}
 		return null;
 	}
@@ -138,29 +143,37 @@
 		}
 		// no age/dob match ...
 		var year = this.interpretYear(parseInt(values.year));
-		var month = this.interpretMonth(values.month);
-		if (values.month && month === null) {
-			this.invalidValues('invalid month ' + values.month);
-			return;
-		}
-
-		start_date = moment({year: year, month: 0, day: 1});
-		end_date = start_date.clone().date(31);
-
-		//work out the month
-		if (month) {
-			start_date.month(month-1);
-			if (values.day) {
-				start_date.date(values.day);
-				end_date = start_date.clone();
-			}
-			else {
-				end_date.month(start_date.month());
-			}
+		if (!values.day && parseInt(values.month) > 12) {
+			// we assume it is a year for a range
+			var start_year = this.interpretYear(parseInt(values.month));
+			start_date = moment({year: start_year, month: 0, day: 1});
+			end_date = moment({year: year, month: 11, day: 31});
 		}
 		else {
-			// set to end of the year
-			end_date.month(11);
+			var month = this.interpretMonth(values.month);
+			if (values.month && month === null) {
+				this.invalidValues('invalid month ' + values.month);
+				return;
+			}
+
+			start_date = moment({year: year, month: 0, day: 1});
+			end_date = start_date.clone().date(31);
+
+			//work out the month
+			if (month) {
+				start_date.month(month-1);
+				if (values.day) {
+					start_date.date(values.day);
+					end_date = start_date.clone();
+				}
+				else {
+					end_date.month(start_date.month());
+				}
+			}
+			else {
+				// set to end of the year
+				end_date.month(11);
+			}
 		}
 		this.setValues(start_date, end_date);
 

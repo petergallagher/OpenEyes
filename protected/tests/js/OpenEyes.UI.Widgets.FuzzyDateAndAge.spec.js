@@ -133,6 +133,11 @@ describe('OpenEyes.UI.Widgets.FuzzyDateAndAge', function(){
 						'tst': 'apr 78',
 						'st': '01/04/1978',
 						'en': '30/04/1978'
+					},
+					{
+						'tst': '2001-2010',
+						'st': '01/01/2001',
+						'en': '31/12/2010'
 					}
 				]
 			};
