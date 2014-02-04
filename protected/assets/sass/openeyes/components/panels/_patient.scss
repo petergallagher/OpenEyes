@@ -15,38 +15,6 @@
 // * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
 
 // Patient panel
-//
-// This panel contains the information for the current patient.
-//
-// Markup:
-// <div class="panel patient radius">
-//     <div class="patient-details">
-//         <a href="#">
-//             <span class="patient-surname">COTTRELL,</span>
-//             <span class="patient-name">Kristen (48)</span>
-//         </a>
-//     </div>
-//     <div class="hospital-number">
-//         No. 1001982
-//     </div>
-//     <div class="row">
-//         <div class="large-6 small-6 columns">
-//             <div class="nhs-number">
-//                 <span class="hide-text">
-//                     NHS number:
-//                 </span>
-//                 451 380 5322
-//             </div>
-//             <span class="icon icon-alert icon-alert-female_trans">Female</span>
-//         </div>
-//         <div class="large-6 small-6 columns text-right patient-summary-anchor">
-//             <a href="#">Patient Summary</a>
-//         </div>
-//     </div>
-// </div>
-//
-// Styleguide 16.3
-
 .panel {
 	&.patient {
 		@include panel($padding: 9px 10px);

@@ -14,6 +14,90 @@
 // * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
 // * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
 
+// Forms
+//
+// For a more detailed overview of how to construct forms, please view the main
+// forms documentation.
+//
+// Styleguide 8
+
+// Labels and fields
+//
+// Markup:
+// <div class="row">
+//     <div class="large-9 column">
+//         <div class="field-row">
+//             <label for="input-text-1">
+//                 Text input
+//             </label>
+//             <input type="text" id="input-text-1">
+//         </div>
+//         <div class="field-row">
+//             <label for="input-password-1">
+//                 Password input
+//             </label>
+//             <input type="password" id="input-password-1">
+//         </div>
+//         <div class="field-row">
+//             <label for="select-1">
+//                 Select input
+//             </label>
+//             <select id="select-1">
+//                 <option>Please select...</option>
+//                 <option>Option 1</option>
+//                 <option>Option 2</option>
+//             </select>
+//         </div>
+//         <div class="field-row">
+//             <label for="input-textarea-1">
+//                 Textarea input
+//             </label>
+//             <textarea id="input-textarea-1"></textarea>
+//         </div>
+//         <div class="field-row">
+//             <label for="input-text-postfix-1">Small text input with postfix label</label>
+//             <div class="row collapse">
+//                 <div class="large-6 column">
+//                     <input type="text" id="input-text-postfix-1">
+//                 </div>
+//                 <div class="large-6 column">
+//                     <div class="postfix field-info align">
+//                         Postfix label
+//                     </div>
+//                 </div>
+//             </div>
+//         </div>
+//         <div class="field-row">
+//             <fieldset>
+//                 <legend>Radio group (inline)</legend>
+//                 <label class="inline">
+//                     <input type="radio" name="radio-input-1">
+//                     Option 1
+//                 </label>
+//                 <label class="inline">
+//                     <input type="radio" name="radio-input-1">
+//                     Option 2
+//                 </label>
+//             </fieldset>
+//         </div>
+//         <div class="field-row">
+//             <fieldset>
+//                 <legend>Checkbox group (inline)</legend>
+//                 <label class="inline">
+//                     <input type="checkbox" name="checkbox-input-1">
+//                     Option 1
+//                 </label>
+//                 <label class="inline">
+//                     <input type="checkbox" name="checkbox-input-1">
+//                     Option 2
+//                 </label>
+//             </fieldset>
+//         </div>
+//     </div>
+// </div>
+//
+// Styleguide 8.1
+
 $oe-form-input-radius: 3px !default;
 
 /* Standard Forms */
@@ -137,7 +221,7 @@ fieldset {
 // input.error,
 // .error textarea,
 // textarea.error {
-// 	@include form-error-color;
+//  @include form-error-color;
 // }
 
 .error label,

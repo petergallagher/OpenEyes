@@ -16,12 +16,12 @@
  * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
  * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
  */
-/* line 3, ../sass/openeyes/components/admin/_navigation.scss */
+/* line 19, ../sass/openeyes/components/admin/_navigation.scss */
 .navigation.admin {
   list-style-type: none;
   margin: 0;
 }
-/* line 6, ../sass/openeyes/components/admin/_navigation.scss */
+/* line 22, ../sass/openeyes/components/admin/_navigation.scss */
 .navigation.admin a {
   -webkit-border-radius: 3px;
   -moz-border-radius: 3px;
@@ -33,17 +33,17 @@
   margin-bottom: 4px;
   padding: 4px 8px;
 }
-/* line 12, ../sass/openeyes/components/admin/_navigation.scss */
+/* line 28, ../sass/openeyes/components/admin/_navigation.scss */
 .navigation.admin a:hover {
   background: #3665ff;
   color: #fff;
 }
-/* line 16, ../sass/openeyes/components/admin/_navigation.scss */
+/* line 32, ../sass/openeyes/components/admin/_navigation.scss */
 .navigation.admin a.selected {
   background: #ccc;
   color: #333;
 }
-/* line 22, ../sass/openeyes/components/admin/_navigation.scss */
+/* line 38, ../sass/openeyes/components/admin/_navigation.scss */
 .navigation.admin li:last-child a {
   margin: 0;
 }

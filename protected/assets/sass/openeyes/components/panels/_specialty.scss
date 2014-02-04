@@ -16,15 +16,7 @@
 
 // Specialy panel
 //
-// This panel wraps the episdes and events when viewing a module.
-//
-// Markup:
-// <div class="panel specialty">
-//     <h3 class="specialty-title">Ophthalmology</h3>
-// </div>
-//
-// Styleguide 16.8
-
+// This panel wraps the episodes and events when viewing a module.
 .panel {
 	&.specialty {
 		@include border-top-left-radius(0);
