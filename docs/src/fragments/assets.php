@@ -1,6 +1,6 @@
 <link rel="stylesheet" type="text/css" href="<?php echo $assets_root_path;?>assets/components/jquery-ui/themes/base/jquery-ui.css" />
 <link rel="stylesheet" type="text/css" href="<?php echo $assets_root_path;?>assets/css/style.css" />
-<link rel="stylesheet" type="text/css" href="<?php echo $assets_root_path;?>assets/css/docs.css" />
+<?php if ($assets_include_docs){?><link rel="stylesheet" type="text/css" href="<?php echo $assets_root_path;?>assets/css/docs.css" /><?php }?>
 
 <script src="<?php echo $assets_root_path;?>assets/components/jquery/jquery.min.js"></script>
 <script src="<?php echo $assets_root_path;?>assets/components/jquery-ui/ui/minified/jquery-ui.min.js"></script>
@@ -24,4 +24,4 @@
 <script src="<?php echo $assets_root_path;?>assets/js/OpenEyes.UI.Dialog.Confirm.js"></script>
 <script src="<?php echo $assets_root_path;?>assets/js/OpenEyes.UI.Widgets.js"></script>
 <script src="<?php echo $assets_root_path;?>assets/js/script.js"></script>
-<script src="<?php echo $assets_root_path;?>assets/js/docs.js"></script>
+<?php if ($assets_include_docs){?><script src="<?php echo $assets_root_path;?>assets/js/docs.js"></script><?php }?>

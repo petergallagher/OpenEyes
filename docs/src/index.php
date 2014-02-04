@@ -7,6 +7,7 @@
 <meta name="viewport" content="width=device-width" />
 <?php
 $assets_root_path = '';
+$assets_include_docs = true;
 include 'fragments/assets.php';
 ?>
 </head>
