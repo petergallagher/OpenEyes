@@ -11,10 +11,10 @@ include 'fragments/assets.php';
 ?>
 </head>
 <body>
-	<div class="container main" role="main">
+	<div class="container main docs" role="main">
 
 		<header class="header row">
-			<div class="large-3 columns">
+			<div class="large-3 column">
 				<a class="logo" href="?">
 					OpenEyes
 				</a>
@@ -33,9 +33,9 @@ include 'fragments/assets.php';
 							<li><a href="styleguide/index.html">Styleguide</a></li>
 							<li><a href="jsdoc/index.html">Javascript API</a></li>
 							<li><a href="static-templates/index.php">Site templates</a></li>
-							<li><a href="components/forms.php">Forms</a></li>
-							<li><a href="components/grids.php">Grids</a></li>
-							<li><a href="components/elements.php">Elements</a></li>
+							<li><a href="forms.php">Forms</a></li>
+							<li><a href="grids.php">Grids</a></li>
+							<li><a href="elements.php">Elements</a></li>
 						</ul>
 					</div>
 				</aside>

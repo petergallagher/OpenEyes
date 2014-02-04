@@ -14,7 +14,7 @@
           _ref2 = stylesheet.cssRules || [];
           for (idx = 0, _len2 = _ref2.length; idx < _len2; idx++) {
             rule = _ref2[idx];
-            if ((rule.type === CSSRule.STYLE_RULE) && pseudos.test(rule.selectorText)) {
+            if ((rule.type === CSSRule.STYLE_RULE) && !/a\b/.test(rule.selectorText) && pseudos.test(rule.selectorText)) {
               replaceRule = function(matched, stuff) {
                 return ".pseudo-class-" + matched.replace(':', '');
               };

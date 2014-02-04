@@ -6,8 +6,8 @@
 <title>OpenEyes - Elements</title>
 <meta name="viewport" content="width=device-width" />
 <?php
-$assets_root_path = '../';
-include '../fragments/assets.php';
+$assets_root_path = '';
+include 'fragments/assets.php';
 ?>
 <style type="text/css">
 .event {
@@ -16,11 +16,11 @@ include '../fragments/assets.php';
 </style>
 </head>
 <body>
-	<div class="container main" role="main">
+	<div class="container main docs" role="main">
 
 		<header class="header row">
-			<div class="large-3 columns">
-				<a class="logo" href="../index.php">
+			<div class="large-3 column">
+				<a class="logo" href="index.php">
 					OpenEyes
 				</a>
 			</div>

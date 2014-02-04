@@ -40,7 +40,7 @@
 </style>
 </head>
 <body class="open-eyes">
-	<div class="container main" role="main">
+	<div class="container main docs" role="main">
 
 		<? include 'components/header.php'; ?>
 
