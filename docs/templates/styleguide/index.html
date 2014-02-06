@@ -77,11 +77,14 @@
 
 											<div class="kss-description">{{html description}}</div>
 
-											<ul class="kss-modifiers-summary">
-												{{#eachModifier}}
-													<li><strong>{{name}}</strong> - {{html description}}
-												{{/eachModifier}}
-											</ul>
+											{{#if modifiers}}
+												<p>States/classes:</p>
+												<ul class="kss-modifiers-summary">
+													{{#eachModifier}}
+														<li><strong>{{name}}</strong> - {{html description}}
+													{{/eachModifier}}
+												</ul>
+											{{/if}}
 
 											<div class="kss-mod-list">
 												<div class="kss-mod">

@@ -46,7 +46,7 @@
 		</div>
 		<div class="row field-row">
 			<div class="large-5 large-offset-2 column">
-				<button type="submit" class="small">
+				<button type="submit">
 					Save
 				</button>
 			</div>

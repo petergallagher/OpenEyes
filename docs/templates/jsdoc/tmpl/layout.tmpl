@@ -6,18 +6,18 @@
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<title>OpenEyes JSDoc: <?js= title ?></title>
 
-	<link rel="stylesheet" href="../assets/core/css/style.css" />
-	<link rel="stylesheet" href="../assets/css/docs.css" />
-	<link rel="stylesheet" href="../assets/core/js/components/jquery-ui/themes/base/minified/jquery-ui.min.css" />
-	<link type="text/css" rel="stylesheet" href="styles/prettify-github.css">
-	<link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+	<link rel="stylesheet" type="text/css" href="../assets/css/style.css" />
+	<link rel="stylesheet" type="text/css" href="../assets/css/docs.css" />
+	<link rel="stylesheet" type="text/css" href="../assets/components/jquery-ui/themes/base/minified/jquery-ui.min.css" />
+	<link rel="stylesheet" type="text/css" href="styles/prettify-github.css">
+	<link rel="stylesheet" type="text/css" href="styles/jsdoc-default.css">
 
-	<script src="../assets/core/js/modernizr.custom.js"></script>
-	<script src="../assets/core/js/components/jquery/jquery.min.js"></script>
-	<script src="../assets/core/js/components/jquery-ui/ui/jquery-ui.js"></script>
-	<script src="../assets/core/js/components/google-code-prettify/src/prettify.js"></script>
-	<script src="../assets/core/js/util.js"></script>
-	<script src="../assets/core/js/dialogs.js"></script>
+	<script src="../assets/js/modernizr.custom.js"></script>
+	<script src="../assets/components/jquery/jquery.min.js"></script>
+	<script src="../assets/components/jquery-ui/ui/jquery-ui.js"></script>
+	<script src="../assets/components/google-code-prettify/src/prettify.js"></script>
+	<script src="../assets/js/util.js"></script>
+	<script src="../assets/js/dialogs.js"></script>
 	<script src="../assets/js/docs.js"></script>
 
 	<style type="text/css">
@@ -26,6 +26,10 @@
 	}
 	pre {
 		font-size: .7em;
+		margin-bottom: 18px;
+	}
+	.sub-tutorials-header .panel {
+		margin: 0 0 16px 0;
 	}
 	</style>
 </head>
@@ -42,20 +46,16 @@
 		</header>
 		<div class="container content">
 			<h1 class="badge"><?js= title ?></h1>
-
-			<div class="box content">
-				<div class="row">
-					<aside class="large-2 column sidebar">
-						<div class="box generic">
-							<?js= this.nav ?>
-						</div>
-					</aside>
-
-					<div class="large-10 column">
-						<div class="box generic">
-					 		<?js= content ?>
-					 	</div>
+			<div class="row">
+				<aside class="large-2 column sidebar">
+					<div class="box generic">
+						<?js= this.nav ?>
 					</div>
+				</aside>
+				<div class="large-10 column">
+					<div class="box generic">
+				 		<?js= content ?>
+				 	</div>
 				</div>
 			</div>
 		</div>
