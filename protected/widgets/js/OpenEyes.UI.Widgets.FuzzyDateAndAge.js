@@ -24,8 +24,11 @@
 		endField: 'selector string, or jquery instance, or DOM element',
 		yearcutoff: 1920,
 		defaultErrorMsg: 'Invalid Fuzzy Date',
+		// class for the span where errors are displayed
 		errorSpanClasses: 'fuzzy-date-error',
+		// class for the tooltip displaying the calculated date range
 		rangeSpanClasses: 'fuzzy-date-range',
+		// selector/jquery instance or dom element that contains the elements to be masked by the fuzzy date entry
 		containerElement: null
 
 	};
@@ -100,14 +103,12 @@
 		var expression = '^(?:' + day_exp + '(?='+month_exp+'))?' +
 				'(?:' + year_exp + date_delimiter_set + '|' + month_exp + ')?' +
 				year_exp + '$';
-		//console.log(expression);
 		this._pattern = new RegExp(expression,'i');
 	}
 
 	FuzzyDateAndAge.prototype.getFuzzyMatches = function(fuzzyDate) {
 
 		var match = fuzzyDate.match(this._pattern);
-		console.log(fuzzyDate +":" + match);
 		if (match) {
 			var month = match[3];
 			if (!month) {

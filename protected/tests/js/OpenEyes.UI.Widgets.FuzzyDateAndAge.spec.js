@@ -77,6 +77,10 @@ describe('OpenEyes.UI.Widgets.FuzzyDateAndAge', function(){
 					'st': '',
 					'en': '',
 					'err': 'invalid month 24'
+				},
+				'10-20': {
+					'st': '01/01/2010',
+					'en': '31/12/2020'
 				}
 			};
 
@@ -138,6 +142,11 @@ describe('OpenEyes.UI.Widgets.FuzzyDateAndAge', function(){
 						'tst': '2001-2010',
 						'st': '01/01/2001',
 						'en': '31/12/2010'
+					},
+					{
+						'tst': '10-20',
+						'st': '02/10/1975',
+						'en': '01/10/1985'
 					}
 				]
 			};
