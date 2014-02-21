@@ -17,25 +17,19 @@
  * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
  */
 
-class OEDbConnection extends CDbConnection
+/**
+ * This is the model class for table "transaction".
+ *
+ * The followings are the available columns in table 'transaction':
+ * @property integer $id
+ */
+class Transaction extends BaseActiveRecord
 {
-	public $transaction = null;
-
-	public function beginTransaction()
+	/**
+	 * @return string the associated database table name
+	 */
+	public function tableName()
 	{
-		if (Yii::app()->params['enable_transactions']) {
-			$transaction = parent::beginTransaction();
-
-			$this->transaction = new Transaction;
-
-			if (!$this->transaction->save()) {
-				throw new Exception("Unable to save transaction: ".print_r($transaction->getErrors(),true));
-			}
-
-			return $transaction;
-		} else {
-			$stub = new OETransactionStub;
-			return $stub;
-		}
+		return 'transaction';
 	}
 }
