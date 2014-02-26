@@ -441,7 +441,20 @@ class Event extends BaseActiveRecordVersionedSoftDelete
 			foreach (ElementType::model()->findAll($criteria) as $element_type) {
 				$element_class = $element_type->class_name;
 
-				foreach ($element_class::model()->findAll('event_id = ?',array($this->id)) as $element) {
+				$criteria = new CDbCriteria;
+				$criteria->addCondition('event_id = :event_id');
+				$criteria->params[':event_id'] = $this->id;
+
+				$model = $element_class::model();
+
+				if (!$this->isActiveVersion()) {
+					$model = $model->fromVersion();
+
+					$criteria->addCondition('transaction_id = :transaction_id');
+					$criteria->params[':transaction_id'] = $this->transaction_id;
+				}
+
+				foreach ($model->findAll($criteria) as $element) {
 					$elements[] = $element;
 				}
 			}

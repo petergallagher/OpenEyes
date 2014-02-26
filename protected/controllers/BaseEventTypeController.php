@@ -518,6 +518,12 @@ class BaseEventTypeController extends BaseModuleController
 			throw new CHttpException(404, 'Invalid event id.');
 		}
 
+		if (isset($_GET['transaction_id'])) {
+			if (!$this->event = $this->event->getPreviousVersionByTransactionID($_GET['transaction_id'])) {
+				throw new Exception("Transaction not found: ".$_GET['transaction_id']);
+			}
+		}
+
 		$this->patient = $this->event->episode->patient;
 		$this->episode = $this->event->episode;
 	}
@@ -803,12 +809,6 @@ class BaseEventTypeController extends BaseModuleController
 						$this->logActivity('updated event');
 
 						$this->event->audit('event','update');
-
-						$this->event->user = Yii::app()->user->id;
-
-						if (!$this->event->save()) {
-							throw new SystemException('Unable to update event: '.print_r($this->event->getErrors(),true));
-						}
 
 						OELog::log("Updated event {$this->event->id}");
 						$transaction->commit();

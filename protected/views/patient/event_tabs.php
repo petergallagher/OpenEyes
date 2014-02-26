@@ -19,7 +19,6 @@
 ?>
 
 <header class="event-header">
-
 	<ul class="inline-list tabs event-actions">
 		<?php foreach ($this->event_tabs as $tab) { ?>
 		<li<?php if (@$tab['active']) { ?> class="selected"<?php } ?>>
@@ -32,10 +31,21 @@
 		<?php } ?>
 	</ul>
 
+	<?php echo CHtml::dropDownList('transaction_id',@$_GET['transaction_id'],$this->event->getFullTransactionList(),array('style' => 'width: 25em;'))?>
+
 	<?php
 	// Event actions
 	$this->renderPartial('//patient/event_actions');
 	?>
 </header>
+<script type="text/javascript">
+	$('#transaction_id').change(function() {
+		var uri = window.location.href.replace(/\?.*$/,'');
 
-
+		if ($(this).val() == 0) {
+			window.location.href = uri;
+		} else {
+			window.location.href = uri + '?transaction_id=' + $(this).val();
+		}
+	});
+</script>

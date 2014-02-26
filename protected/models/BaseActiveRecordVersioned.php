@@ -41,24 +41,55 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 		return $this;
 	}
 
+	/**
+	 * Return current versioning status
+	 */
+	public function getVersionCreateStatus()
+	{
+		return $this->enable_version;
+	}
+
 	/* Fetch from version */
 
 	public function fromVersion()
 	{
-		$this->fetch_from_version = true;
+		// Clone to avoid singleton problems
+		$model = clone $this;
+		$model->fetch_from_version = true;
 
-		return $this;
+		return $model;
 	}
 
 	/* Disable fetch from version */
 
 	public function notFromVersion()
 	{
-		$this->fetch_from_version = false;
+		// Clone to avoid singleton problems
+		$model = clone $this;
+		$model->fetch_from_version = false;
 
-		return $this;
+		return $model;
 	}
 
+	/**
+	 * Fetch current version retrieval status
+	 */
+	public function getVersionRetrievalStatus()
+	{
+		return $this->fetch_from_version;
+	}
+
+	/**
+	 * Returns true if this is the active version of the record
+	 */
+	public function isActiveVersion()
+	{
+		return ($this->active_version !== "0");
+	}
+
+	/**
+	 * Returns true if the current instance of the model is an old version
+	 */
 	public function getTableSchema()
 	{
 		if ($this->fetch_from_version) {
@@ -70,6 +101,10 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 
 	public function getPreviousVersion()
 	{
+		if (!$this->id) {
+			throw new Exception("Model has not been initialised");
+		}
+
 		$condition = 'id = :id';
 		$params = array(':id' => $this->id);
 
@@ -82,6 +117,39 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 			'condition' => $condition,
 			'params' => $params,
 			'order' => 'version_id desc',
+		));
+
+		return $model;
+	}
+
+	/**
+	 * Get previous version by transaction ID
+	 */
+	public function getPreviousVersionByTransactionID($transaction_id)
+	{
+		if (!$this->id) {
+			throw new Exception("Model has not been initialised");
+		}
+
+		return $this->model()->fromVersion()->find(array(
+			'condition' => 'id = :id and transaction_id = :transaction_id',
+			'params' => array(
+				':id' => $this->id,
+				':transaction_id' => $transaction_id,
+			),
+		));
+	}
+
+	/**
+	 * Return true if the model has any historic data for a specific transaction ID
+	 */
+	public function hasTransactionID($transaction_id)
+	{
+		return (boolean)$this->model()->fromVersion()->find(array(
+			'condition' => 'transaction_id = :transaction_id',
+			'params' => array(
+				':transaction_id' => $transaction_id,
+			),
 		));
 	}
 
@@ -214,5 +282,144 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 		$this->fetch_from_version = false;
 
 		return parent::resetScope($resetDefault);
+	}
+
+	/**
+	 * Get the list of transactions for this event
+	 */
+	public function getFullTransactionList()
+	{
+		$transactions = array();
+
+		$model = get_class($this);
+		$active = $model::model()->findByPk($this->id);
+
+		$transactions[0] = 'Current: by '.$active->usermodified->fullName.' on '.$active->NHSDate('last_modified_date').' at '.substr($active->last_modified_date,11,5);
+
+		foreach ($active->getPreviousVersions() as $previous_version) {
+			if ($previous_version->transaction_id) {
+				$transactions[$previous_version->transaction_id] = 'Edit by '.$previous_version->usermodified->fullName.' on '.$previous_version->NHSDate('last_modified_date').' at '.substr($previous_version->last_modified_date,11,5);
+			}
+		}
+
+		return $transactions;
+	}
+
+	/**
+	 * Remap relations to version table queries
+	 */
+	public function getRelated($name)
+	{
+		if (!$this->isActiveVersion()) {
+			return $this->handleVersionRelation($name);
+		}
+
+		return parent::getRelated($name);
+	}
+
+	/**
+	 * Takes a relation defined on the model and returns a query to derive the same data from the version tables
+	 */
+	public function handleVersionRelation($name)
+	{
+		$relations = $this->relations();
+
+		$relation = $relations[$name];
+
+		foreach ($relation as $i => $value) {
+			if (!is_int($i) && !in_array($i,array('condition','on','params','order'))) {
+				throw new Exception("Unhandled relation property: $i");
+			}
+		}
+
+		$criteria = new CDbCriteria;
+
+		isset($relation['condition']) && $criteria->addCondition($relation['condition']);
+		isset($relation['params']) && $criteria->params = $relation['params'];
+		isset($relation['on']) && $criteria->addCondition($relation['on']);
+		isset($relation['order']) && $criteria->order = $relation['order'];
+		isset($relation['limit']) && $criteria->limit = $relation['limit'];
+		isset($relation['offset']) && $criteria->offset = $relation['offset'];
+
+		switch ($relation[0]) {
+			case 'CBelongsToRelation':
+				$related = $relation[1]::model()->findByPk($this->{$relation[2]});
+
+				if (method_exists($related,'getPreviousVersionByTransactionID')) {
+					if ($previous_version = $related->getPreviousVersionByTransactionID($this->transaction_id)) {
+						return $previous_version;
+					}
+				}
+
+				return $related;
+
+			case 'CHasOneRelation':
+				$criteria = new CDbCriteria;
+
+				$criteria->addCondition($relation[2].' = :'.$relation[2]);
+				$criteria->params[':'.$relation[2]] = $this->{$this->tableSchema->primaryKey};
+
+				$related = $relation[1]::model()->find($criteria);
+
+				if (method_exists($related,'getPreviousVersionByTransactionID')) {
+					if ($previous_version = $related->getPreviousVersionByTransactionID($this->transaction_id)) {
+						return $previous_version;
+					}
+				}
+
+				return $related;
+
+			case 'CHasManyRelation':
+				$criteria = new CDbCriteria;
+
+				$criteria->addCondition($relation[2].' = :'.$relation[2]);
+				$criteria->params[':'.$relation[2]] = $this->{$this->tableSchema->primaryKey};
+
+				if ($relation[1]::model()->hasTransactionID($this->transaction_id)) {
+					$criteria->addCondition('transaction_id = :transaction_id');
+					$criteria->params[':transaction_id'] = $this->transaction_id;
+
+					return $relation[1]::model()->fromVersion()->findAll($criteria);
+				}
+
+				return $relation[1]::model()->findAll($criteria);
+
+			case 'CManyManyRelation':
+				$criteria = new CDbCriteria;
+
+				if (preg_match('/^(.*?)\((.*?),[\s\t]*(.*?)\)$/',$relation[2],$m)) {
+					if ($this->tableExists($m[1].'_version') && $this->tableHasTransactionID($m[1].'_version', $this->transaction_id)) {
+						$criteria->join = "join `{$m[1]}_version` on `{$m[1]}_version`.`{$m[3]}` = `t`.`".$relation[1]::model()->tableSchema->primaryKey."` and `{$m[1]}_version`.`{$m[2]}` = :{$m[2]} and `{$m[1]}_version`.`transaction_id` = :transaction_id";
+						$criteria->params[':transaction_id'] = $this->transaction_id;
+					} else {
+						$criteria->join = "join `{$m[1]}` on `{$m[1]}`.`{$m[3]}` = `t`.`".$relation[1]::model()->tableSchema->primaryKey."` and `{$m[1]}`.`{$m[2]}` = :{$m[2]}";
+					}
+
+					$criteria->params[':'.$m[2]] = $this->{$this->tableSchema->primaryKey};
+				}
+
+				return $relation[1]::model()->findAll($criteria);
+		}
+
+		return parent::getRelated($name);
+	}
+
+	public function tableExists($table)
+	{
+		return (boolean)Yii::app()->db->getSchema()->getTable($table);
+	}
+
+	/**
+	 * Returns true if the table has any data for the given transaction id
+	 */
+	public function tableHasTransactionID($table, $transaction_id)
+	{
+		return (boolean)Yii::app()->db->createCommand()
+			->select("transaction_id")
+			->from($table)
+			->where("transaction_id = :transaction_id",array(
+				":transaction_id" => $transaction_id,
+			))
+			->queryScalar();
 	}
 }
