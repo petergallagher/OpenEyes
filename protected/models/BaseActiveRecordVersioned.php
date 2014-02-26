@@ -84,7 +84,7 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 	 */
 	public function isActiveVersion()
 	{
-		return ($this->active_version !== "0");
+		return !$this->version_id;
 	}
 
 	/**
@@ -274,6 +274,15 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 		}
 
 		return parent::save($runValidation, $attributes, $allow_overriding);
+	}
+
+	public function delete()
+	{
+		if ($this->version_id) {
+			throw new Exception("delete() should not be called on versiond model instances.");
+		}
+
+		return parent::delete();
 	}
 
 	public function resetScope($resetDefault=true)

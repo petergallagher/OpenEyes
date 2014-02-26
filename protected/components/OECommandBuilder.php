@@ -28,12 +28,12 @@ class OECommandBuilder extends CDbCommandBuilder
 		$columns = array();
 
 		foreach (array_keys($table_version->columns) as $column) {
-			if (!in_array($column,array('active_version','version_date','version_id'))) {
+			if (!in_array($column,array('version_date','version_id'))) {
 				$columns[] = $column;
 			}
 		}
 
-		$sql="INSERT INTO {$table_version->rawName} (`".implode("`,`",$columns)."`,`active_version`,`version_date`,`version_id`) SELECT `".implode("`,`",$columns)."`, 0, :oevalue1, :oevalue2 FROM {$table->rawName}";
+		$sql="INSERT INTO {$table_version->rawName} (`".implode("`,`",$columns)."`,`version_date`,`version_id`) SELECT `".implode("`,`",$columns)."`, :oevalue1, :oevalue2 FROM {$table->rawName}";
 
 		$sql=$this->applyJoin($sql,$criteria->join);
 		$sql=$this->applyCondition($sql,$criteria->condition);
