@@ -241,7 +241,7 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 		return false;
 	}
 
-	public function versionToTableByPk($pk, $condition, $params=array())
+	private function versionToTableByPk($pk, $condition, $params=array())
 	{
 		$builder = $this->getCommandBuilder();
 		$table = $this->getTableSchema();
@@ -254,7 +254,7 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 		return $command->execute();
 	}
 
-	public function versionAllToTable($condition, $params=array())
+	private function versionAllToTable($condition, $params=array())
 	{
 		$builder = $this->getCommandBuilder();
 		$table = $this->getTableSchema();
