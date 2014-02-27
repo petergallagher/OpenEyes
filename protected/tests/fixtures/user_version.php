@@ -32,6 +32,8 @@ return array(
 		'global_firm_rights' => 1,
 		'contact_id' =>1,
 		'transaction_id' => 3,
+		'last_modified_user_id' => 2,
+		'last_modified_date' => '2012-01-01 12:00:00',
 	),
 	'user_version2' => array(
 		'id' => 1,
@@ -44,7 +46,9 @@ return array(
 		'salt' => 'qWQJaOT4Kz',
 		'password' => '4a3de11333d5814d90270c27116f1bdc', // pw: secret,
 		'global_firm_rights' => 1,
-		'contact_id' =>1,
+		'contact_id' => 2,
 		'transaction_id' => 2,
+		'last_modified_user_id' => 3,
+		'last_modified_date' => '2013-01-01 12:00:00',
 	),
 );

@@ -294,7 +294,7 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 	}
 
 	/**
-	 * Get the list of transactions for this event
+	 * Get the list of transactions for this object
 	 */
 	public function getFullTransactionList()
 	{
@@ -303,11 +303,11 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 		$model = get_class($this);
 		$active = $model::model()->findByPk($this->id);
 
-		$transactions[0] = 'Current: by '.$active->usermodified->fullName.' on '.$active->NHSDate('last_modified_date').' at '.substr($active->last_modified_date,11,5);
+		$transactions[0] = 'Current: by '.User::model()->findByPk($active->last_modified_user_id)->fullName.' on '.$active->NHSDate('last_modified_date').' at '.substr($active->last_modified_date,11,5);
 
 		foreach ($active->getPreviousVersions() as $previous_version) {
 			if ($previous_version->transaction_id) {
-				$transactions[$previous_version->transaction_id] = 'Edit by '.$previous_version->usermodified->fullName.' on '.$previous_version->NHSDate('last_modified_date').' at '.substr($previous_version->last_modified_date,11,5);
+				$transactions[$previous_version->transaction_id] = 'Edit by '.User::model()->findByPk($previous_version->last_modified_user_id)->fullName.' on '.$previous_version->NHSDate('last_modified_date').' at '.substr($previous_version->last_modified_date,11,5);
 			}
 		}
 
@@ -317,19 +317,19 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 	/**
 	 * Remap relations to version table queries
 	 */
-	public function getRelated($name)
+	public function getRelated($name,$refresh=false,$params=array())
 	{
 		if (!$this->isActiveVersion()) {
 			return $this->handleVersionRelation($name);
 		}
 
-		return parent::getRelated($name);
+		return parent::getRelated($name,$refresh,$params);
 	}
 
 	/**
 	 * Takes a relation defined on the model and returns a query to derive the same data from the version tables
 	 */
-	public function handleVersionRelation($name)
+	private function handleVersionRelation($name)
 	{
 		$relations = $this->relations();
 
@@ -397,7 +397,7 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 				$criteria = new CDbCriteria;
 
 				if (preg_match('/^(.*?)\((.*?),[\s\t]*(.*?)\)$/',$relation[2],$m)) {
-					if ($this->tableExists($m[1].'_version') && $this->tableHasTransactionID($m[1].'_version', $this->transaction_id)) {
+					if (Yii::app()->db->getSchema()->getTable($m[1].'_version') && $this->tableHasTransactionID($m[1].'_version', $this->transaction_id)) {
 						$criteria->join = "join `{$m[1]}_version` on `{$m[1]}_version`.`{$m[3]}` = `t`.`".$relation[1]::model()->tableSchema->primaryKey."` and `{$m[1]}_version`.`{$m[2]}` = :{$m[2]} and `{$m[1]}_version`.`transaction_id` = :transaction_id";
 						$criteria->params[':transaction_id'] = $this->transaction_id;
 					} else {
@@ -411,11 +411,6 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 		}
 
 		return parent::getRelated($name);
-	}
-
-	public function tableExists($table)
-	{
-		return (boolean)Yii::app()->db->getSchema()->getTable($table);
 	}
 
 	/**

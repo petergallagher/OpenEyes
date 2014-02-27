@@ -22,6 +22,8 @@ class BaseActiveRecordVersionedTest extends CDbTestCase
 	public $fixtures = array(
 		'users' => 'User',
 		'user_versions' => ':user_version',
+		'specialty' => 'Specialty',
+		'specialty_versions' => ':specialty_version',
 	);
 
 	protected function setUp()
@@ -246,7 +248,7 @@ class BaseActiveRecordVersionedTest extends CDbTestCase
 		$this->assertEquals($this->user_versions['user_version2']['email'],$previous_version->email);
 
 		// Cleanup
-		Yii::app()->db->createCommand("update user set username = 'JoeBloggs', first_name = 'Joe', last_name = 'Bloggs', email = 'joe@bloggs.com' where id = 1")->query();
+		Yii::app()->db->createCommand("update user set username = '{$this->users['user1']['username']}', first_name = '{$this->users['user1']['first_name']}', last_name = '{$this->users['user1']['last_name']}', email = '{$this->users['user1']['email']}' where id = 1")->query();
 	}
 
 	public function testUpdateAllWithVersioning()
@@ -378,5 +380,96 @@ class BaseActiveRecordVersionedTest extends CDbTestCase
 		Yii::app()->db->createCommand("update user set username = '{$this->users['user1']['username']}', first_name = '{$this->users['user1']['first_name']}', last_name = '{$this->users['user1']['last_name']}', email = '{$this->users['user1']['email']}' where id = 1")->query();
 		Yii::app()->db->createCommand("update user set username = '{$this->users['user2']['username']}', first_name = '{$this->users['user2']['first_name']}', last_name = '{$this->users['user2']['last_name']}', email = '{$this->users['user2']['email']}' where id = 2")->query();
 		Yii::app()->db->createCommand("update user set username = '{$this->users['user3']['username']}', first_name = '{$this->users['user3']['first_name']}', last_name = '{$this->users['user3']['last_name']}', email = '{$this->users['user3']['email']}' where id = 3")->query();
+	}
+
+	public function testSaveDeniedOnVersionedModels()
+	{
+		$user = User::model()->findByPk(1);
+
+		$previous_version = $user->getPreviousVersion();
+
+		$this->setExpectedException('Exception', 'save() should not be called on versiond model instances.');
+
+		$previous_version->save();
+	}
+
+	public function testDeleteDeniedOnVersionedModels()
+	{
+		$specialty = Specialty::model()->find();
+
+		$previous_version = $specialty->getPreviousVersion();
+
+		$this->setExpectedException('Exception', 'delete() should not be called on versiond model instances.');
+
+		$previous_version->delete();
+	}
+
+	public function testResetScopeNoVersion()
+	{
+		$user = User::model()->findByPk(1);
+
+		$user->noVersion();
+
+		$this->assertFalse($user->getVersionCreateStatus());
+
+		$user->resetScope();
+
+		$this->assertTrue($user->getVersionCreateStatus());
+	}
+
+	public function testResetScopeFromVersionClone()
+	{
+		$user = User::model()->findByPk(1);
+
+		$user = $user->fromVersion();
+
+		$this->assertTrue($user->getVersionRetrievalStatus());
+
+		$user->resetScope();
+
+		$this->assertFalse($user->getVersionRetrievalStatus());
+	}
+
+	public function testGetFullTransactionList()
+	{
+		$user = User::model()->findByPk(1);
+
+		$transaction_list = $user->getFullTransactionList();
+
+		$this->assertCount(3, $transaction_list);
+
+		$this->assertEquals('Current: by Joe Bloggs on 1 Jan 1900 at 00:00', $transaction_list[0]);
+		$this->assertEquals('Edit by icabod icabod on 1 Jan 2013 at 12:00', $transaction_list[2]);
+		$this->assertEquals('Edit by Jane Bloggs on 1 Jan 2012 at 12:00', $transaction_list[3]);
+
+		$user = User::model()->findByPk(2);
+
+		$transaction_list = $user->getFullTransactionList();
+
+		$this->assertCount(1, $transaction_list);
+
+		$this->assertEquals('Current: by Joe Bloggs on 1 Jan 1900 at 00:00', $transaction_list[0]);
+	}
+
+	public function testGetRelated_BelongsToNotFromVersion()
+	{
+		$user = User::model()->findByPk(1);
+
+		$contact = $user->contact;
+
+		$this->assertEquals(1, $contact->id);
+		$this->assertEquals('Enoch', $contact->first_name);
+	}
+
+	public function testGetRelated_BelongsToFromVersion()
+	{
+		$user = User::model()->findByPk(1);
+
+		$previous_version = $user->getPreviousVersion();
+
+		$contact = $previous_version->contact;
+
+		$this->assertEquals(2, $contact->id);
+		$this->assertEquals('User', $contact->first_name);
 	}
 }
