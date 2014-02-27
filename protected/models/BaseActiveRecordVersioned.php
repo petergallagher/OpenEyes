@@ -273,7 +273,24 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 			throw new Exception("save() should not be called on versiond model instances.");
 		}
 
-		return parent::save($runValidation, $attributes, $allow_overriding);
+		if (Yii::app()->db->getCurrentTransaction()) {
+			$this->transaction_id = Yii::app()->db->transaction->id;
+		} else {
+			$transaction = Yii::app()->db->beginTransaction();
+		}
+
+		$result = parent::save($runValidation, $attributes, $allow_overriding);
+
+		if (isset($transaction)) {
+			try {
+				$transaction->commit();
+			} catch (Exception $e) {
+				$transaction->rollback();
+				throw $e;
+			}
+		}
+
+		return $result;
 	}
 
 	public function delete()
