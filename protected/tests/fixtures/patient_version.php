@@ -19,26 +19,20 @@
 
 
 return array(
-	'servicespecialtyassignment1' => array(
+	'patient1' => array(
 		'id' => 1,
-		'service_id' => 1,
-		'subspecialty_id' => 1,
-	),
-	'servicespecialtyassignment2' => array(
-		'id' => 2,
-		'service_id' => 2,
-		'subspecialty_id' => 2,
-	),
-	'servicespecialtyassignment3' => array(
-		'id' => 3,
-		'service_id' => 3,
-		'specialty_id' => 3,
-		'subspecialty_id' => 3,
-	),
-	'servicespecialtyassignment4' => array(
-		'id' => 4,
-		'service_id' => 4,
-		'subspecialty_id' => 4,
+		'pas_key' => '123',
+		'title' => 'Mr.',
+		'first_name' => 'John',
+		'last_name' => 'Jones',
+		'dob' => '1970-01-01',
+		'gender' => 'M',
+		'hos_num' => 12345,
+		'nhs_num' => 54321,
+		'practice_id' => 1,
+		'address_id' => 1,
+		'contact_id' => 1,
+		'version_id' => 1,
+		'transaction_id' => 1,
 	),
 );
-

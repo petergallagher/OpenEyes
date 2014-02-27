@@ -336,7 +336,7 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 		$relation = $relations[$name];
 
 		foreach ($relation as $i => $value) {
-			if (!is_int($i) && !in_array($i,array('condition','on','params','order'))) {
+			if (!is_int($i) && !in_array($i,array('condition','on','params','order','limit','offset','alias'))) {
 				throw new Exception("Unhandled relation property: $i");
 			}
 		}
@@ -349,6 +349,7 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 		isset($relation['order']) && $criteria->order = $relation['order'];
 		isset($relation['limit']) && $criteria->limit = $relation['limit'];
 		isset($relation['offset']) && $criteria->offset = $relation['offset'];
+		isset($relation['alias']) && $criteria->alias = $relation['alias'];
 
 		switch ($relation[0]) {
 			case 'CBelongsToRelation':

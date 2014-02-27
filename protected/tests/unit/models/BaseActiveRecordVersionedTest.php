@@ -24,6 +24,14 @@ class BaseActiveRecordVersionedTest extends CDbTestCase
 		'user_versions' => ':user_version',
 		'specialty' => 'Specialty',
 		'specialty_versions' => ':specialty_version',
+		'service_subspecialty_assignment' => 'ServiceSubspecialtyAssignment',
+		'service_subspecialty_assignment_versions' => ':service_subspecialty_assignment_version',
+		'patient' => 'Patient',
+		'patient_versions' => ':patient_version',
+		'episode' => 'Episode',
+		'episode_versions' => ':episode_version',
+		'patient_allergy_assignment' => 'PatientAllergyAssignment',
+		'allergy' => 'Allergy',
 	);
 
 	protected function setUp()
@@ -451,7 +459,7 @@ class BaseActiveRecordVersionedTest extends CDbTestCase
 		$this->assertEquals('Current: by Joe Bloggs on 1 Jan 1900 at 00:00', $transaction_list[0]);
 	}
 
-	public function testGetRelated_BelongsToNotFromVersion()
+	public function testGetRelated_BelongsTo_NotFromVersion()
 	{
 		$user = User::model()->findByPk(1);
 
@@ -461,7 +469,7 @@ class BaseActiveRecordVersionedTest extends CDbTestCase
 		$this->assertEquals('Enoch', $contact->first_name);
 	}
 
-	public function testGetRelated_BelongsToFromVersion()
+	public function testGetRelated_BelongsTo_FromVersion()
 	{
 		$user = User::model()->findByPk(1);
 
@@ -471,5 +479,75 @@ class BaseActiveRecordVersionedTest extends CDbTestCase
 
 		$this->assertEquals(2, $contact->id);
 		$this->assertEquals('User', $contact->first_name);
+	}
+
+	public function testGetRelated_HasOne_NotFromVersion()
+	{
+		$subspecialty = Subspecialty::model()->findByPk(1);
+
+		$ssa = $subspecialty->serviceSubspecialtyAssignment;
+
+		$this->assertEquals(1, $ssa->id);
+		$this->assertEquals(1, $ssa->service_id);
+		$this->assertEquals(1, $ssa->subspecialty_id);
+	}
+
+	public function testGetRelated_HasOne_FromVersion()
+	{
+		$subspecialty = Subspecialty::model()->findByPk(1);
+
+		$ssa = $subspecialty->serviceSubspecialtyAssignment->getPreviousVersion();
+
+		$this->assertEquals(1, $ssa->id);
+		$this->assertEquals(2, $ssa->service_id);
+		$this->assertEquals(1, $ssa->subspecialty_id);
+	}
+
+	public function testGetRelated_HasMany_NotFromVersion()
+	{
+		$patient = Patient::model()->findByPk(1);
+
+		$episodes = $patient->episodes;
+
+		$this->assertCount(2, $episodes);
+
+		$this->assertEquals(1, $episodes[0]->id);
+		$this->assertEquals(2, $episodes[1]->id);
+	}
+
+	public function testGetRelated_HasMany_FromVersion()
+	{
+		$patient = Patient::model()->findByPk(1)->getPreviousVersion();
+
+		$episodes = $patient->episodes;
+
+		$this->assertCount(1, $episodes);
+		$this->assertEquals(1, $episodes[0]->id);
+	}
+
+	public function testGetRelated_ManyMany_NotFromVersion()
+	{
+		$patient = Patient::model()->findByPk(1);
+
+		$allergies = $patient->allergies;
+
+		$this->assertCount(3, $allergies);
+
+		$this->assertEquals(1, $allergies[0]->id);
+		$this->assertEquals(2, $allergies[1]->id);
+		$this->assertEquals(3, $allergies[2]->id);
+	}
+
+	public function testGetRelated_ManyMany_FromVersion()
+	{
+		$patient = Patient::model()->findByPk(1)->getPreviousVersion();
+
+		$allergies = $patient->allergies;
+
+		$this->assertCount(3, $allergies);
+
+		$this->assertEquals(1, $allergies[0]->id);
+		$this->assertEquals(2, $allergies[1]->id);
+		$this->assertEquals(3, $allergies[2]->id);
 	}
 }

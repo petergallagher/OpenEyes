@@ -16,29 +16,17 @@
  * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
  * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
  */
-
-
 return array(
-	'servicespecialtyassignment1' => array(
-		'id' => 1,
-		'service_id' => 1,
-		'subspecialty_id' => 1,
+	0 => array(
+		'patient_id' => 1,
+		'allergy_id' => 1,
 	),
-	'servicespecialtyassignment2' => array(
-		'id' => 2,
-		'service_id' => 2,
-		'subspecialty_id' => 2,
+	1 => array(
+		'patient_id' => 1,
+		'allergy_id' => 2,
 	),
-	'servicespecialtyassignment3' => array(
-		'id' => 3,
-		'service_id' => 3,
-		'specialty_id' => 3,
-		'subspecialty_id' => 3,
-	),
-	'servicespecialtyassignment4' => array(
-		'id' => 4,
-		'service_id' => 4,
-		'subspecialty_id' => 4,
+	2 => array(
+		'patient_id' => 1,
+		'allergy_id' => 3,
 	),
 );
-
