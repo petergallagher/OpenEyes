@@ -279,9 +279,17 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 			$transaction = Yii::app()->db->beginTransaction();
 		}
 
-		$this->transaction_id = Yii::app()->db->transaction->id;
+		if ($this->transaction_id == Yii::app()->db->transaction->id) {
+			// Don't create a new version row if save is called again in the same transaction
 
-		$result = parent::save($runValidation, $attributes, $allow_overriding);
+			$this->noVersion();
+			$result = parent::save($runValidation, $attributes, $allow_overriding);
+			$this->withVersion();
+		} else {
+			$this->transaction_id = Yii::app()->db->transaction->id;
+
+			$result = parent::save($runValidation, $attributes, $allow_overriding);
+		}
 
 		if (isset($transaction)) {
 			try {
