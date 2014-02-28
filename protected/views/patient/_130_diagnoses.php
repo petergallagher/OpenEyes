@@ -17,6 +17,7 @@
  * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
  */
 ?>
+<?php echo CHtml::dropDownList('transaction_id',@$_GET['transaction_id'],$this->patient->getFullTransactionListForRelation('ophthalmicDiagnoses'),array('style' => 'width: 25em;'))?>
 <section class="box patient-info associated-data js-toggle-container">
 
 	<header class="box-header">
@@ -42,7 +43,13 @@
 			</tr>
 			</thead>
 			<tbody>
-			<?php foreach ($this->patient->ophthalmicDiagnoses as $diagnosis) {?>
+			<?php
+			if (@$_GET['transaction_id']) {
+				$diagnoses = $this->patient->getRelated('ophthalmicDiagnoses',false,array(),@$_GET['transaction_id']);
+			} else {
+				$diagnoses = $this->patient->ophthalmicDiagnoses;
+			}?>
+			<?php foreach ($diagnoses as $diagnosis) {?>
 				<tr>
 					<td><?php echo $diagnosis->dateText?></td>
 					<td><?php echo $diagnosis->eye->adjective?> <?php echo $diagnosis->disorder->term?></td>
@@ -188,5 +195,9 @@
 			return false;
 		});
 
+		$('#transaction_id').change(function() {
+			var uri = window.location.href;
+			window.location.href = uri.replace(/\?.*$/,'') + '?transaction_id=' + $(this).val();
+		});
 	</script>
 <?php } ?>
