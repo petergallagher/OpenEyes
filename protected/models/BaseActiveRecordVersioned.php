@@ -184,15 +184,17 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 		return new OECommandBuilder($this->getDbConnection()->getSchema());
 	}
 
-	public function updateByPk($pk,$attributes,$condition='',$params=array())
+	private function handleTransaction($callback_method, $callback_params, $version_method, $version_params=array())
 	{
-		$table = $this->getTableSchema();
+		empty($version_params) && $version_params = $callback_params;
 
 		$transaction = Yii::app()->db->getCurrentTransaction() === null ? Yii::app()->db->beginTransaction() : false;
 
+		Yii::app()->db->transaction->addTable($this->tableName());
+
 		try {
-			if (!$this->enable_version || $this->versionToTableByPk($pk,$condition,$params)) {
-				$result = parent::updateByPk($pk,$attributes,$condition,$params);
+			if (!$this->enable_version || call_user_func_array(array($this,$version_method),$version_params)) {
+				$result = call_user_func_array('parent::'.$callback_method, $callback_params);
 
 				if ($transaction) {
 					// No big deal if $result is 0, it just means the row was unchanged so no new version row is required
@@ -215,35 +217,32 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 		return false;
 	}
 
-	public function updateAll($attributes,$condition='',$params=array())
+	public function updateByPk($pk,$attributes,$condition='',$params=array())
 	{
-		$transaction = Yii::app()->db->getCurrentTransaction() === null ? Yii::app()->db->beginTransaction() : false;
-
-		try {
-			if (!$this->enable_version || $this->versionAllToTable($condition,$params)) {
-				$result = parent::updateAll($attributes,$condition,$params);
-
-				if ($transaction && $result) {
-					$transaction->commit();
-				}
-
-				return $result;
-			}
-		} catch (Exception $e) {
-			if ($transaction) {
-				$transaction->rollback();
-			}
-			throw $e;
-		}
-
-		if ($transaction) {
-			$transaction->rollback();
-		}
-
-		return false;
+		return $this->handleTransaction('updateByPk',array($pk,$attributes,$condition,$params),'versionToTableByPk',array($pk,$condition,$params));
 	}
 
-	private function versionToTableByPk($pk, $condition, $params=array())
+	public function updateAll($attributes,$condition='',$params=array())
+	{
+		return $this->handleTransaction('updateAll',array($attributes,$condition,$params),'versionAllToTable',array($condition,$params));
+	}
+
+	public function deleteByPk($pk,$condition='',$params=array())
+	{
+		return $this->handleTransaction('deleteByPk',array($pk,$condition,$params),'versionToTableByPk');
+	}
+
+	public function deleteAll($condition='',$params=array())
+	{
+		return $this->handleTransaction('deleteAll',array($condition,$params),'versionAllToTable');
+	}
+
+	public function deleteAllByAttributes($attributes,$condition='',$params=array())
+	{
+		return $this->handleTransaction('deleteAllByAttributes',array($attributes,$condition,$params),'versionAllToTableByAttributes');
+	}
+
+	private function versionToTableByPk($pk, $condition='', $params=array())
 	{
 		$builder = $this->getCommandBuilder();
 		$table = $this->getTableSchema();
@@ -269,6 +268,19 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 		return $command->execute();
 	}
 
+	private function versionAllToTableByAttributes($attributes, $condition, $params=array())
+	{
+		$builder = $this->getCommandBuilder();
+		$table = $this->getTableSchema();
+		$table_version = $this->getVersionTableSchema();
+
+		$criteria = $builder->createColumnCriteria($table,$attributes,$condition,$params);
+
+		$command = $builder->createInsertFromTableCommand($table_version,$table,$criteria);
+
+		return $command->execute();
+	}
+
 	public function save($runValidation=true, $attributes=null, $allow_overriding=false)
 	{
 		if ($this->version_id) {
@@ -279,10 +291,13 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 			$transaction = Yii::app()->db->beginTransaction();
 		}
 
+		$this->hash = $this->generateHash();
+
 		if ($this->transaction_id == Yii::app()->db->transaction->id) {
 			// Don't create a new version row if save is called again in the same transaction
 
 			$this->noVersion();
+
 			$result = parent::save($runValidation, $attributes, $allow_overriding);
 			$this->withVersion();
 		} else {
@@ -301,6 +316,25 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 		}
 
 		return $result;
+	}
+
+	/**
+	 * Generates a SHA1 hash of all data items in the model excluding created_date, created_user_id, last_modified_date, last_modified_user_id
+	 * @return string
+	 */
+	public function generateHash()
+	{
+		$attributes = $this->getAttributes();
+
+		unset($attributes['id']);
+		unset($attributes['hash']);
+		unset($attributes['transaction_id']);
+		unset($attributes['last_modified_user_id']);
+		unset($attributes['last_modified_date']);
+		unset($attributes['created_user_id']);
+		unset($attributes['created_date']);
+
+		return sha1(implode('',$attributes));
 	}
 
 	public function delete()
@@ -499,7 +533,7 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 					$criteria->params[':transaction_id'] = $transaction_id;
 
 					$version_criteria = clone $criteria;
-					$version_criteria->addCondition('t.deleted_transaction_id > :transaction_id');
+					$version_criteria->addCondition('t.deleted_transaction_id is null');//> :transaction_id');
 
 					return array_merge(
 						$relation[1]::model()->fromVersion()->findAll($version_criteria),

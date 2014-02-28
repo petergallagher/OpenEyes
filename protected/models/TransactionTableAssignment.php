@@ -18,56 +18,20 @@
  */
 
 /**
- * This is the model class for table "transaction".
+ * This is the model class for table "transaction_table_assignment".
  *
- * The followings are the available columns in table 'transaction':
+ * The followings are the available columns in table 'transaction_table_assignment':
  * @property integer $id
+ * @property integer $transaction_id
+ * @property integer $table_id
  */
-class Transaction extends BaseActiveRecord
+class TransactionTableAssignment extends BaseActiveRecord
 {
-	private $order = 1;
-
 	/**
 	 * @return string the associated database table name
 	 */
 	public function tableName()
 	{
-		return 'transaction';
-	}
-
-	/**
-	* @return array relational rules.
-	*/
-	public function relations()
-	{
-		return array(
-			'table_assignments' => array(self::HAS_MANY, 'TransactionTableAssignment', 'transaction_id', 'order' => 'display_order asc'),
-		);
-	}
-
-	/**
-	 * Add the specified table to the transaction if it's not already associated
-	 */
-	public function addTable($table)
-	{
-		if (!$_table = TransactionTable::model()->find('name=?',array($table))) {
-			$_table = new TransactionTable;
-			$_table->name = $table;
-
-			if (!$_table->save()) {
-				throw new Exception("Unable to save transaction_table: ".print_r($_table->getErrors(),true));
-			}
-		}
-
-		if (!$tta = TransactionTableAssignment::model()->find('transaction_id=? and table_id=?',array($this->id,$_table->id))) {
-			$tta = new TransactionTableAssignment;
-			$tta->transaction_id = $this->id;
-			$tta->table_id = $_table->id;
-			$tta->display_order = $this->order++;
-
-			if (!$tta->save()) {
-				throw new Exception("Unable to save transaction table assignment: ".print_r($tta->getErrors(),true));
-			}
-		}
+		return 'transaction_table_assignment';
 	}
 }

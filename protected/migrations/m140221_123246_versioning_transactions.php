@@ -6,6 +6,20 @@ class m140221_123246_versioning_transactions extends CDbMigration
 
 	public function up()
 	{
+		$this->createTable('transaction_table', array(
+				'id' => 'int(10) unsigned NOT NULL AUTO_INCREMENT',
+				'name' => 'varchar(64) not null',
+				'last_modified_user_id' => 'int(10) unsigned NOT NULL DEFAULT 1',
+				'last_modified_date' => 'datetime NOT NULL DEFAULT \'1901-01-01 00:00:00\'',
+				'created_user_id' => 'int(10) unsigned NOT NULL DEFAULT 1',
+				'created_date' => 'datetime NOT NULL DEFAULT \'1901-01-01 00:00:00\'',
+				'PRIMARY KEY (`id`)',
+				'KEY `transaction_table_last_modified_user_id_fk` (`last_modified_user_id`)',
+				'KEY `transaction_table_created_user_id_fk` (`created_user_id`)',
+				'CONSTRAINT `transaction_table_last_modified_user_id_fk` FOREIGN KEY (`last_modified_user_id`) REFERENCES `user` (`id`)',
+				'CONSTRAINT `transaction_table_created_user_id_fk` FOREIGN KEY (`created_user_id`) REFERENCES `user` (`id`)',
+			), 'ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci');
+
 		$this->createTable('transaction', array(
 				'id' => 'int(10) unsigned NOT NULL AUTO_INCREMENT',
 				'last_modified_user_id' => 'int(10) unsigned NOT NULL DEFAULT 1',
@@ -17,6 +31,26 @@ class m140221_123246_versioning_transactions extends CDbMigration
 				'KEY `transaction_created_user_id_fk` (`created_user_id`)',
 				'CONSTRAINT `transaction_last_modified_user_id_fk` FOREIGN KEY (`last_modified_user_id`) REFERENCES `user` (`id`)',
 				'CONSTRAINT `transaction_created_user_id_fk` FOREIGN KEY (`created_user_id`) REFERENCES `user` (`id`)',
+			), 'ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci');
+
+		$this->createTable('transaction_table_assignment', array(
+				'id' => 'int(10) unsigned NOT NULL AUTO_INCREMENT',
+				'transaction_id' => 'int(10) unsigned not null',
+				'table_id' => 'int(10) unsigned not null',
+				'display_order' => 'tinyint(1) unsigned not null',
+				'last_modified_user_id' => 'int(10) unsigned NOT NULL DEFAULT 1',
+				'last_modified_date' => 'datetime NOT NULL DEFAULT \'1901-01-01 00:00:00\'',
+				'created_user_id' => 'int(10) unsigned NOT NULL DEFAULT 1',
+				'created_date' => 'datetime NOT NULL DEFAULT \'1901-01-01 00:00:00\'',
+				'PRIMARY KEY (`id`)',
+				'KEY `transaction_ta_last_modified_user_id_fk` (`last_modified_user_id`)',
+				'KEY `transaction_ta_created_user_id_fk` (`created_user_id`)',
+				'KEY `transaction_ta_transaction_id_fk` (`transaction_id`)',
+				'KEY `transaction_ta_table_id_fk` (`table_id`)',
+				'CONSTRAINT `transaction_ta_last_modified_user_id_fk` FOREIGN KEY (`last_modified_user_id`) REFERENCES `user` (`id`)',
+				'CONSTRAINT `transaction_ta_created_user_id_fk` FOREIGN KEY (`created_user_id`) REFERENCES `user` (`id`)',
+				'CONSTRAINT `transaction_ta_transaction_id_fk` FOREIGN KEY (`transaction_id`) REFERENCES `transaction` (`id`)',
+				'CONSTRAINT `transaction_ta_table_id_fk` FOREIGN KEY (`table_id`) REFERENCES `transaction_table` (`id`)',
 			), 'ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci');
 
 		foreach ($this->tables as $table) {
@@ -52,6 +86,8 @@ class m140221_123246_versioning_transactions extends CDbMigration
 			$this->dropColumn($table.'_version','deleted_transaction_id');
 		}
 
+		$this->dropTable('transaction_table_assignment');
 		$this->dropTable('transaction');
+		$this->dropTable('transaction_table');
 	}
 }
