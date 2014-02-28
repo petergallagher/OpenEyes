@@ -441,12 +441,12 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 		switch ($relation[0]) {
 			case 'CBelongsToRelation':
 				$criteria->addCondition($relation[1]::model()->tableSchema->primaryKey.' = :pk');
-				$criteria->params[':pk'] = $this->{$this->tableSchema->primaryKey};
+				$criteria->params[':pk'] = $this->{$relation[2]};
 				break;
 
 			case 'CHasOneRelation':
 				$criteria->addCondition($relation[2].' = :pk');
-				$criteria->params[':pk'] = $this->{$relation[2]};
+				$criteria->params[':pk'] = $this->{$this->tableSchema->primaryKey};
 				break;
 
 			case 'CHasManyRelation':

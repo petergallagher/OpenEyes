@@ -31,7 +31,9 @@
 		<?php } ?>
 	</ul>
 
-	<?php echo CHtml::dropDownList('transaction_id',@$_GET['transaction_id'],$this->event->getFullTransactionList(),array('style' => 'width: 25em;'))?>
+	<?php if ($this->event) {
+		echo CHtml::dropDownList('transaction_id',@$_GET['transaction_id'],$this->event->getFullTransactionList(),array('style' => 'width: 25em;'));
+	}?>
 
 	<?php
 	// Event actions
