@@ -141,6 +141,20 @@ class Patient extends BaseActiveRecordVersioned
 			'commissioningbodies' => array(self::MANY_MANY, 'CommissioningBody', 'commissioning_body_patient_assignment(patient_id, commissioning_body_id)'),
 			'referrals' => array(self::HAS_MANY, 'Referral', 'patient_id'),
 			'lastReferral' => array(self::HAS_ONE, 'Referral', 'patient_id', 'order' => 'received_date desc'),
+			'ophthalmicDiagnoses' => array(self::HAS_MANY, 'SecondaryDiagnosis', 'patient_id', 'with' => array(
+					'disorder' => array(
+						'with' => 'specialty',
+					),
+				),
+				'condition' => 'specialty.code = 130',
+				'order' => 'date asc',
+			),
+			'systemicDiagnoses' => array(self::HAS_MANY, 'SecondaryDiagnosis', 'patient_id', 'with' => array(
+					'disorder',
+				),
+				'condition' => 'specialty_id is null',
+				'order' => 'date asc',
+			),
 		);
 	}
 
@@ -837,29 +851,6 @@ class Patient extends BaseActiveRecordVersioned
 			}
 		}
 		return $res;
-	}
-
-	public function getSystemicDiagnoses()
-	{
-		$criteria = new CDbCriteria;
-		$criteria->compare('patient_id', $this->id);
-		$criteria->join = 'join disorder on t.disorder_id = disorder.id and specialty_id is null';
-		$criteria->order = 'date asc';
-
-		return SecondaryDiagnosis::model()->findAll($criteria);
-	}
-
-	public function getOphthalmicDiagnoses()
-	{
-		$criteria = new CDbCriteria;
-		$criteria->compare('patient_id', $this->id);
-
-		$criteria->join = 'join disorder on t.disorder_id = disorder.id join specialty on disorder.specialty_id = specialty.id';
-		$criteria->compare('specialty.code', 130);
-
-		$criteria->order = 'date asc';
-
-		return SecondaryDiagnosis::model()->findAll($criteria);
 	}
 
 	/*

@@ -19,7 +19,7 @@
 
 class OECommandBuilder extends CDbCommandBuilder
 {
-	public function createInsertFromTableCommand($table_version,$table,$criteria)
+	public function createInsertFromTableCommand($table_version,$table,$criteria,$deleted_transaction_id=null)
 	{
 		$this->ensureTable($table);
 		$this->ensureTable($table_version);
@@ -28,12 +28,12 @@ class OECommandBuilder extends CDbCommandBuilder
 		$columns = array();
 
 		foreach (array_keys($table_version->columns) as $column) {
-			if (!in_array($column,array('version_date','version_id'))) {
+			if (!in_array($column,array('version_date','version_id','deleted_transaction_id'))) {
 				$columns[] = $column;
 			}
 		}
 
-		$sql="INSERT INTO {$table_version->rawName} (`".implode("`,`",$columns)."`,`version_date`,`version_id`) SELECT `".implode("`,`",$columns)."`, :oevalue1, :oevalue2 FROM {$table->rawName}";
+		$sql="INSERT INTO {$table_version->rawName} (`".implode("`,`",$columns)."`,`version_date`,`version_id`,`deleted_transaction_id`) SELECT `".implode("`,`",$columns)."`, :oevalue1, :oevalue2, :oevalue3 FROM {$table->rawName}";
 
 		$sql=$this->applyJoin($sql,$criteria->join);
 		$sql=$this->applyCondition($sql,$criteria->condition);
@@ -44,6 +44,8 @@ class OECommandBuilder extends CDbCommandBuilder
 
 		$command->bindValue(':oevalue1',date('Y-m-d H:i:s'));
 		$command->bindValue(':oevalue2',null);
+		$command->bindValue(':oevalue3',$deleted_transaction_id);
+
 		$this->bindValues($command,$criteria->params);
 
 		return $command;
@@ -70,7 +72,7 @@ class OECommandBuilder extends CDbCommandBuilder
 			->limit(1)
 			->queryRow()) {
 
-			$command = $this->createInsertFromTableCommand($table_version,$table,$criteria);
+			$command = $this->createInsertFromTableCommand($table_version,$table,$criteria,Yii::app()->db->transaction->id);
 			if (!$command->execute()) {
 				throw new Exception("Unable to insert version row: ".print_r($command,true));
 			}

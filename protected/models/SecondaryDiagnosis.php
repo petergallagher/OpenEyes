@@ -77,6 +77,7 @@ class SecondaryDiagnosis extends BaseActiveRecordVersioned
 			'disorder' => array(self::BELONGS_TO, 'Disorder', 'disorder_id'),
 			'eye' => array(self::BELONGS_TO, 'Eye', 'eye_id'),
 			'patient' => array(self::BELONGS_TO, 'Patient', 'patient_id'),
+			'specialty' => array(self::BELONGS_TO, 'Specialty', 'specialty_id'),
 		);
 	}
 

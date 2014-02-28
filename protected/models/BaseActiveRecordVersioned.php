@@ -22,6 +22,7 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 	private $enable_version = true;
 	private $fetch_from_version = false;
 	public $version_id = null;
+	public $deleted_transaction_id = null;
 
 	/* Disable archiving on save() */
 
@@ -273,11 +274,11 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 			throw new Exception("save() should not be called on versiond model instances.");
 		}
 
-		if (Yii::app()->db->getCurrentTransaction()) {
-			$this->transaction_id = Yii::app()->db->transaction->id;
-		} else {
+		if (!Yii::app()->db->getCurrentTransaction()) {
 			$transaction = Yii::app()->db->beginTransaction();
 		}
+
+		$this->transaction_id = Yii::app()->db->transaction->id;
 
 		$result = parent::save($runValidation, $attributes, $allow_overriding);
 
@@ -299,7 +300,22 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 			throw new Exception("delete() should not be called on versiond model instances.");
 		}
 
-		return parent::delete();
+		if (!Yii::app()->db->getCurrentTransaction()) {
+			$transaction = Yii::app()->db->beginTransaction();
+		}
+
+		$result = parent::delete();
+
+		if (isset($transaction)) {
+			try {
+				$transaction->commit();
+			} catch (Exception $e) {
+				$transaction->rollback();
+				throw $e;
+			}
+		}
+
+		return $result;
 	}
 
 	public function resetScope($resetDefault=true)
@@ -332,6 +348,39 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 	}
 
 	/**
+	 * Get the list of transactions for items in the relation
+	 */
+	public function getFullTransactionListForRelation($relation)
+	{
+		$transactions = array();
+
+		$ts = array();
+
+		foreach ($this->{$relation} as $item) {
+			if (!isset($transactions[$item->transaction_id])) {
+				$transactions[$item->transaction_id] = 'Edit by '.User::model()->findByPk($item->last_modified_user_id)->fullName.' on '.$item->NHSDate('last_modified_date').' at '.substr($item->last_modified_date,11,5);
+			}
+		}
+
+		foreach ($this->handleVersionRelation($relation, true) as $item) {
+			if (!isset($transactions[$item->transaction_id])) {
+				$transactions[$item->transaction_id] = 'Edit by '.User::model()->findByPk($item->last_modified_user_id)->fullName.' on '.$item->NHSDate('last_modified_date').' at '.substr($item->last_modified_date,11,5);
+			}
+		}
+
+		ksort($transactions);
+
+		$transactions = array_reverse($transactions);
+
+		foreach ($transactions as $i => $transaction) {
+			$transactions[$i] = preg_replace('/^Edit by/','Current version:',$transactions[$i]);
+			break;
+		}
+
+		return $transactions;
+	}
+
+	/**
 	 * Remap relations to version table queries
 	 */
 	public function getRelated($name,$refresh=false,$params=array())
@@ -346,14 +395,14 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 	/**
 	 * Takes a relation defined on the model and returns a query to derive the same data from the version tables
 	 */
-	private function handleVersionRelation($name)
+	private function handleVersionRelation($name, $all_transactions=false)
 	{
 		$relations = $this->relations();
 
 		$relation = $relations[$name];
 
 		foreach ($relation as $i => $value) {
-			if (!is_int($i) && !in_array($i,array('condition','on','params','order','limit','offset','alias'))) {
+			if (!is_int($i) && !in_array($i,array('condition','on','params','order','limit','offset','alias','with'))) {
 				throw new Exception("Unhandled relation property: $i");
 			}
 		}
@@ -402,7 +451,9 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 				$criteria->addCondition($relation[2].' = :'.$relation[2]);
 				$criteria->params[':'.$relation[2]] = $this->{$this->tableSchema->primaryKey};
 
-				if ($relation[1]::model()->hasTransactionID($this->transaction_id)) {
+				if ($all_transactions) {
+					return $relation[1]::model()->fromVersion()->findAll($criteria);
+				} elseif ($relation[1]::model()->hasTransactionID($this->transaction_id)) {
 					$criteria->addCondition('transaction_id = :transaction_id');
 					$criteria->params[':transaction_id'] = $this->transaction_id;
 

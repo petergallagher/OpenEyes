@@ -32,6 +32,8 @@ class BaseActiveRecordVersionedTest extends CDbTestCase
 		'episode_versions' => ':episode_version',
 		'patient_allergy_assignment' => 'PatientAllergyAssignment',
 		'allergy' => 'Allergy',
+		'address' => 'Address',
+		'contact' => 'Contact',
 	);
 
 	protected function setUp()
@@ -466,7 +468,9 @@ class BaseActiveRecordVersionedTest extends CDbTestCase
 		$contact = $user->contact;
 
 		$this->assertEquals(1, $contact->id);
-		$this->assertEquals('Enoch', $contact->first_name);
+		$this->assertEquals('Jim', $contact->first_name);
+		$this->assertEquals('Aylward', $contact->last_name);
+		$this->assertEquals('07123 456789', $contact->primary_phone);
 	}
 
 	public function testGetRelated_BelongsTo_FromVersion()
@@ -478,7 +482,9 @@ class BaseActiveRecordVersionedTest extends CDbTestCase
 		$contact = $previous_version->contact;
 
 		$this->assertEquals(2, $contact->id);
-		$this->assertEquals('User', $contact->first_name);
+		$this->assertEquals('Bob', $contact->first_name);
+		$this->assertEquals('Collin', $contact->last_name);
+		$this->assertEquals('07234 567890', $contact->primary_phone);
 	}
 
 	public function testGetRelated_HasOne_NotFromVersion()
@@ -549,5 +555,89 @@ class BaseActiveRecordVersionedTest extends CDbTestCase
 		$this->assertEquals(1, $allergies[0]->id);
 		$this->assertEquals(2, $allergies[1]->id);
 		$this->assertEquals(3, $allergies[2]->id);
+	}
+
+	public function testSaveCreatesNewVersion()
+	{
+		$address = Address::model()->findByPk(1);
+
+		$this->assertCount(0, Address::model()->fromVersion()->findAll('id=1'));
+
+		$address->save();
+
+		$this->assertCount(1, Address::model()->fromVersion()->findAll('id=1'));
+
+		$previous_version = Address::model()->fromVersion()->find('id=1');
+
+		$this->assertEquals('flat 1', $previous_version->address1);
+		$this->assertEquals('bleakley creek', $previous_version->address2);
+		$this->assertEquals('flitchley', $previous_version->city);
+		$this->assertEquals('ec1v 0dx', $previous_version->postcode);
+		$this->assertEquals('london', $previous_version->county);
+
+		// Cleanup
+		Yii::app()->db->createCommand("delete from address_version where version_id = {$previous_version->version_id}")->query();
+	}
+
+	public function testDeleteCreatesNewVersion()
+	{
+		$address = Address::model()->findByPk(1);
+
+		$this->assertCount(0, Address::model()->fromVersion()->findAll('id=1'));
+
+		$address->delete();
+
+		$this->assertCount(1, Address::model()->fromVersion()->findAll('id=1'));
+
+		$previous_version = Address::model()->fromVersion()->find('id=1');
+
+		$this->assertEquals('flat 1', $previous_version->address1);
+		$this->assertEquals('bleakley creek', $previous_version->address2);
+		$this->assertEquals('flitchley', $previous_version->city);
+		$this->assertEquals('ec1v 0dx', $previous_version->postcode);
+		$this->assertEquals('london', $previous_version->county);
+
+		// Cleanup
+		Yii::app()->db->createCommand("delete from address_version where version_id = {$previous_version->version_id}")->query();
+		Yii::app()->db->createCommand()->insert('address',array(
+			'id' => 1,
+			'address1' => 'flat 1',
+			'address2' => 'bleakley creek',
+			'city' => 'flitchley',
+			'postcode' => 'ec1v 0dx',
+			'county' => 'london',
+			'country_id' => 1,
+			'email' => 'bleakley1@bleakley1.com',
+			'contact_id' => 1,
+		));
+	}
+
+	public function testRealDeleteCreatesDeleteTransaction()
+	{
+		$address = Address::model()->findByPk(1);
+
+		$this->assertCount(0, Address::model()->fromVersion()->findAll('id=1'));
+
+		$address->delete();
+
+		$this->assertCount(1, Address::model()->fromVersion()->findAll('id=1'));
+
+		$previous_version = Address::model()->fromVersion()->find('id=1');
+
+		$this->assertNotNull($previous_version->deleted_transaction_id);
+
+		// Cleanup
+		Yii::app()->db->createCommand("delete from address_version where version_id = {$previous_version->version_id}")->query();
+		Yii::app()->db->createCommand()->insert('address',array(
+			'id' => 1,
+			'address1' => 'flat 1',
+			'address2' => 'bleakley creek',
+			'city' => 'flitchley',
+			'postcode' => 'ec1v 0dx',
+			'county' => 'london',
+			'country_id' => 1,
+			'email' => 'bleakley1@bleakley1.com',
+			'contact_id' => 1,
+		));
 	}
 }
