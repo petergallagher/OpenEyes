@@ -184,7 +184,7 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 		return new OECommandBuilder($this->getDbConnection()->getSchema());
 	}
 
-	private function handleTransaction($callback_method, $callback_params, $version_method, $version_params=array())
+	private function handleTransaction($callback_method, $callback_params, $version_method=null, $version_params=array())
 	{
 		empty($version_params) && $version_params = $callback_params;
 
@@ -193,7 +193,7 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 		Yii::app()->db->transaction->addTable($this->tableName());
 
 		try {
-			if (!$this->enable_version || call_user_func_array(array($this,$version_method),$version_params)) {
+			if (!$this->enable_version || ($version_method === null || call_user_func_array(array($this,$version_method),$version_params))) {
 				$result = call_user_func_array('parent::'.$callback_method, $callback_params);
 
 				if ($transaction) {
@@ -229,17 +229,17 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 
 	public function deleteByPk($pk,$condition='',$params=array())
 	{
-		return $this->handleTransaction('deleteByPk',array($pk,$condition,$params),'versionToTableByPk');
+		return $this->handleTransaction('deleteByPk',array($pk,$condition,$params));
 	}
 
 	public function deleteAll($condition='',$params=array())
 	{
-		return $this->handleTransaction('deleteAll',array($condition,$params),'versionAllToTable');
+		return $this->handleTransaction('deleteAll',array($condition,$params));
 	}
 
 	public function deleteAllByAttributes($attributes,$condition='',$params=array())
 	{
-		return $this->handleTransaction('deleteAllByAttributes',array($attributes,$condition,$params),'versionAllToTableByAttributes');
+		return $this->handleTransaction('deleteAllByAttributes',array($attributes,$condition,$params));
 	}
 
 	private function versionToTableByPk($pk, $condition='', $params=array())
@@ -472,6 +472,8 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 		isset($relation['alias']) && $criteria->alias = $relation['alias'];
 		isset($relation['with']) && $criteria->with = $relation['with'];
 
+		$alias = $criteria->alias ? $criteria->alias : 't';
+
 		switch ($relation[0]) {
 			case 'CBelongsToRelation':
 				$criteria->addCondition($relation[1]::model()->tableSchema->primaryKey.' = :pk');
@@ -494,7 +496,7 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 						$criteria->join = "join `{$m[1]}_version` on `{$m[1]}_version`.`{$m[3]}` = `t`.`".$relation[1]::model()->tableSchema->primaryKey."` and `{$m[1]}_version`.`{$m[2]}` = :pk and `{$m[1]}_version`.`transaction_id` = :transaction_id";
 						$criteria->params[':transaction_id'] = $this->transaction_id;
 					} else {
-						$criteria->join = "join `{$m[1]}` on `{$m[1]}`.`{$m[3]}` = `{$m[1]}`.`".$relation[1]::model()->tableSchema->primaryKey."` and `{$m[1]}`.`{$m[2]}` = :pk";
+						$criteria->join = "join `{$m[1]}` on `{$m[1]}`.`{$m[3]}` = `$alias`.`".$relation[1]::model()->tableSchema->primaryKey."` and `{$m[1]}`.`{$m[2]}` = :pk";
 					}
 				}
 
