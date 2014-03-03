@@ -321,6 +321,10 @@ class PatientController extends BaseController
 			throw new SystemException('Episode not found: '.$id);
 		}
 
+		if (isset($_GET['episode_transaction_id'])) {
+			$this->episode = $this->episode->getPreviousVersionByTransactionID($_GET['episode_transaction_id']);
+		}
+
 		$this->layout = '//layouts/events_and_episodes';
 		$this->patient = $this->episode->patient;
 

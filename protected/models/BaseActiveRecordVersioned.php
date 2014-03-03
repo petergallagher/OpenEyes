@@ -157,7 +157,7 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 
 	/* Return all previous versions ordered by most recent */
 
-	public function getPreviousVersions()
+	public function getPreviousVersions($unique_hash=false, $active_hash=null)
 	{
 		$condition = 'id = :id';
 		$params = array(':id' => $this->id);
@@ -167,11 +167,29 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 			$params[':version_id'] = $this->version_id;
 		}
 
-		return $this->model()->fromVersion()->findAll(array(
-			'condition' => $condition,
-			'params' => $params,
-			'order' => 'version_id desc',
-		));
+		if (!$unique_hash) {
+			return $this->model()->fromVersion()->findAll(array(
+				'condition' => $condition,
+				'params' => $params,
+				'order' => 'version_id desc',
+			));
+		}
+
+		$return = array();
+
+		foreach ($this->model()->fromVersion()->findAll(array(
+				'condition' => $condition,
+				'params' => $params,
+				'order' => 'version_id asc',
+			)) as $item) {
+
+			if ($item->hash != $active_hash) {
+				$return[] = $item;
+				$active_hash = $item->hash;
+			}
+		}
+
+		return array_reverse($return);
 	}
 
 	public function getVersionTableSchema()
@@ -372,7 +390,7 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 	/**
 	 * Get the list of transactions for this object
 	 */
-	public function getFullTransactionList()
+	public function getFullTransactionList($unique_hash=false)
 	{
 		$transactions = array();
 
@@ -381,7 +399,7 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 
 		$transactions[0] = 'Current: by '.User::model()->findByPk($active->last_modified_user_id)->fullName.' on '.$active->NHSDate('last_modified_date').' at '.substr($active->last_modified_date,11,5);
 
-		foreach ($active->getPreviousVersions() as $previous_version) {
+		foreach ($active->getPreviousVersions($unique_hash, $active->hash) as $previous_version) {
 			if ($previous_version->transaction_id) {
 				$transactions[$previous_version->transaction_id] = 'Edit by '.User::model()->findByPk($previous_version->last_modified_user_id)->fullName.' on '.$previous_version->NHSDate('last_modified_date').' at '.substr($previous_version->last_modified_date,11,5);
 			}

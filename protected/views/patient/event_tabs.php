@@ -33,6 +33,8 @@
 
 	<?php if ($this->event) {
 		echo CHtml::dropDownList('transaction_id',@$_GET['transaction_id'],$this->event->getFullTransactionList(),array('style' => 'width: 25em;'));
+	} else {
+		echo CHtml::dropDownList('episode_transaction_id',@$_GET['episode_transaction_id'],$this->episode->getFullTransactionList(true),array('style' => 'width: 25em;'));
 	}?>
 
 	<?php
@@ -48,6 +50,16 @@
 			window.location.href = uri;
 		} else {
 			window.location.href = uri + '?transaction_id=' + $(this).val();
+		}
+	});
+
+	$('#episode_transaction_id').change(function() {
+		var uri = window.location.href.replace(/\?.*$/,'');
+
+		if ($(this).val() == 0) {
+			window.location.href = uri;
+		} else {
+			window.location.href = uri + '?episode_transaction_id=' + $(this).val();
 		}
 	});
 </script>
