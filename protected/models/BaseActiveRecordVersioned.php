@@ -535,12 +535,12 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 					$criteria->params[':transaction_id'] = $transaction_id;
 
 					$version_criteria = clone $criteria;
-					$version_criteria->addCondition('t.deleted_transaction_id is null');//> :transaction_id');
+					$version_criteria->addCondition('t.deleted_transaction_id is null or t.deleted_transaction_id > :transaction_id');
 
-					return array_merge(
+					return $this->deDupeByID(array_merge(
 						$relation[1]::model()->fromVersion()->findAll($version_criteria),
 						$relation[1]::model()->findAll($criteria)
-					);
+					));
 
 				} elseif ($all_transactions) {
 					return $relation[1]::model()->fromVersion()->findAll($criteria);
@@ -561,6 +561,26 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 		}
 
 		return parent::getRelated($name);
+	}
+
+	/**
+	 *
+	 */
+	public function deDupeByID($items)
+	{
+		$return = array();
+
+		foreach ($items as $item) {
+			if (!isset($return[$item->id])) {
+				$return[$item->id] = $item;
+			} else {
+				if ($item->transaction_id > $return[$item->id]->transaction_id) {
+					$return[$item->id] = $item;
+				}
+			}
+		}
+
+		return $return;
 	}
 
 	/**
