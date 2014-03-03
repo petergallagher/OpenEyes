@@ -34,6 +34,9 @@ class BaseActiveRecordVersionedTest extends CDbTestCase
 		'allergy' => 'Allergy',
 		'address' => 'Address',
 		'contact' => 'Contact',
+		'disorder' => 'Disorder',
+		'secondary_diagnosis' => 'SecondaryDiagnosis',
+		'secondary_diagnosis_version' => ':secondary_diagnosis_version',
 	);
 
 	protected function setUp()
@@ -639,5 +642,15 @@ class BaseActiveRecordVersionedTest extends CDbTestCase
 			'email' => 'bleakley1@bleakley1.com',
 			'contact_id' => 1,
 		));
+	}
+
+	public function testMultipleChangesToManyToManyListAreRetrievedFromHistoryCorrectly()
+	{
+		$patient = Patient::model()->noPas()->findByPk(2);
+
+		$this->assertCount(7, $patient->systemicDiagnoses);
+		$this->assertCount(2, $patient->getRelated('systemicDiagnoses',false,array(),99));
+		$this->assertCount(4, $patient->getRelated('systemicDiagnoses',false,array(),98));
+		$this->assertCount(6, $patient->getRelated('systemicDiagnoses',false,array(),97));
 	}
 }
