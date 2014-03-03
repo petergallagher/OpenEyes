@@ -494,7 +494,7 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 						$criteria->join = "join `{$m[1]}_version` on `{$m[1]}_version`.`{$m[3]}` = `t`.`".$relation[1]::model()->tableSchema->primaryKey."` and `{$m[1]}_version`.`{$m[2]}` = :pk and `{$m[1]}_version`.`transaction_id` = :transaction_id";
 						$criteria->params[':transaction_id'] = $this->transaction_id;
 					} else {
-						$criteria->join = "join `{$m[1]}` on `{$m[1]}`.`{$m[3]}` = `t`.`".$relation[1]::model()->tableSchema->primaryKey."` and `{$m[1]}`.`{$m[2]}` = :pk";
+						$criteria->join = "join `{$m[1]}` on `{$m[1]}`.`{$m[3]}` = `{$m[1]}`.`".$relation[1]::model()->tableSchema->primaryKey."` and `{$m[1]}`.`{$m[2]}` = :pk";
 					}
 				}
 
