@@ -437,6 +437,14 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 	}
 
 	/**
+	 * Execute a relation on the current model for a specific transaction ID
+	 */
+	public function relationByTransactionID($relation_name, $transaction_id)
+	{
+		return $this->getRelated($relation_name,false,array(),$transaction_id);
+	}
+
+	/**
 	 * Gets the definition of the specified model relation
 	 */
 	private function getRelationDefinition($name)
@@ -516,6 +524,10 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 		$relation = $this->getRelationDefinition($name);
 		$criteria = $this->getRelationCriteria($relation);
 
+		if (!$transaction_id) {
+			$transaction_id = $this->transaction_id;
+		}
+
 		switch ($relation[0]) {
 			case 'CBelongsToRelation':
 			case 'CHasOneRelation':
@@ -544,7 +556,7 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 
 				} elseif ($all_transactions) {
 					return $relation[1]::model()->fromVersion()->findAll($criteria);
-				} elseif ($relation[1]::model()->hasTransactionID($this->transaction_id)) {
+				} elseif ($relation[1]::model()->hasTransactionID($transaction_id)) {
 					$criteria->addCondition('transaction_id = :transaction_id');
 					$criteria->params[':transaction_id'] = $this->transaction_id;
 

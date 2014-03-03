@@ -44,12 +44,9 @@
 			</thead>
 			<tbody>
 			<?php
-			if (@$_GET['transaction_id']) {
-				$diagnoses = $this->patient->getRelated('ophthalmicDiagnoses',false,array(),@$_GET['transaction_id']);
-			} else {
-				$diagnoses = $this->patient->ophthalmicDiagnoses;
-			}?>
-			<?php foreach ($diagnoses as $diagnosis) {?>
+			$diagnoses = @$_GET['transaction_id'] ? $this->patient->relationByTransactionID('ophthalmicDiagnoses',$_GET['transaction_id']) : $this->patient->ophthalmicDiagnoses;
+
+			foreach ($diagnoses as $diagnosis) {?>
 				<tr>
 					<td><?php echo $diagnosis->dateText?></td>
 					<td><?php echo $diagnosis->eye->adjective?> <?php echo $diagnosis->disorder->term?></td>
