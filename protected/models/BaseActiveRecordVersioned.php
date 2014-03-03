@@ -543,11 +543,13 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 
 			case 'CHasManyRelation':
 				if ($transaction_id) {
-					$criteria->addCondition('t.transaction_id <= :transaction_id');
+					$alias = $criteria->alias ? $criteria->alias : 't';
+
+					$criteria->addCondition($alias.'.transaction_id <= :transaction_id');
 					$criteria->params[':transaction_id'] = $transaction_id;
 
 					$version_criteria = clone $criteria;
-					$version_criteria->addCondition('t.deleted_transaction_id is null or t.deleted_transaction_id > :transaction_id');
+					$version_criteria->addCondition($alias.'.deleted_transaction_id is null or '.$alias.'.deleted_transaction_id > :transaction_id');
 
 					return $this->deDupeByID(array_merge(
 						$relation[1]::model()->fromVersion()->findAll($version_criteria),
@@ -592,7 +594,7 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 			}
 		}
 
-		return $return;
+		return array_values($return);
 	}
 
 	/**
