@@ -103,6 +103,7 @@ class BaseEventTypeController extends BaseModuleController
 	private $action_type_map;
 	private $episodes = array();
 	public $renderPatientPanel = true;
+	public $transaction = null;
 
 	protected $open_elements;
 
@@ -519,8 +520,12 @@ class BaseEventTypeController extends BaseModuleController
 		}
 
 		if (isset($_GET['transaction_id'])) {
-			if (!$this->event = $this->event->getPreviousVersionByTransactionID($_GET['transaction_id'])) {
+			if (!$this->transaction = Transaction::model()->findByPk($_GET['transaction_id'])) {
 				throw new Exception("Transaction not found: ".$_GET['transaction_id']);
+			}
+
+			if (!$this->event = $this->event->getPreviousVersionByTransactionID($this->transaction->id)) {
+				throw new Exception("Transaction isn't for this event: ".$_GET['transaction_id']);
 			}
 		}
 
@@ -724,6 +729,10 @@ class BaseEventTypeController extends BaseModuleController
 		}
 		// Allow elements to override the editable status
 		if ($this->editable && !$this->canUpdate()) {
+			$this->editable = false;
+		}
+
+		if ($this->transaction) {
 			$this->editable = false;
 		}
 

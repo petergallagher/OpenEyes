@@ -570,8 +570,8 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 					$version_criteria->addCondition($alias.'.deleted_transaction_id is null or '.$alias.'.deleted_transaction_id > :transaction_id');
 
 					return $this->deDupeByID(array_merge(
-						$relation[1]::model()->fromVersion()->findAll($version_criteria),
-						$relation[1]::model()->findAll($criteria)
+						$relation[1]::model()->findAll($criteria),
+						$relation[1]::model()->fromVersion()->findAll($version_criteria)
 					));
 
 				} elseif ($all_transactions) {
