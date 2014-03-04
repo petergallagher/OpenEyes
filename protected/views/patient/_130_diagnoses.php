@@ -17,7 +17,7 @@
  * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
  */
 ?>
-<?php echo CHtml::dropDownList('transaction_id',@$_GET['transaction_id'],$this->patient->getFullTransactionListForRelation('ophthalmicDiagnoses'),array('style' => 'width: 25em;'))?>
+<?php echo CHtml::dropDownList('ophthalmic_diagnoses_transaction_id',@$_GET['ophthalmic_diagnoses_transaction_id'],$this->patient->getFullTransactionListForRelation('ophthalmicDiagnoses'),array('style' => 'width: 25em;'))?>
 <section class="box patient-info associated-data js-toggle-container">
 
 	<header class="box-header">
@@ -44,7 +44,7 @@
 			</thead>
 			<tbody>
 			<?php
-			$diagnoses = @$_GET['transaction_id'] ? $this->patient->relationByTransactionID('ophthalmicDiagnoses',$_GET['transaction_id']) : $this->patient->ophthalmicDiagnoses;
+			$diagnoses = @$_GET['ophthalmic_diagnoses_transaction_id'] ? $this->patient->relationByTransactionID('ophthalmicDiagnoses',$_GET['ophthalmic_diagnoses_transaction_id']) : $this->patient->ophthalmicDiagnoses;
 
 			foreach ($diagnoses as $diagnosis) {?>
 				<tr>
@@ -192,9 +192,9 @@
 			return false;
 		});
 
-		$('#transaction_id').change(function() {
+		$('#ophthalmic_diagnoses_transaction_id').change(function() {
 			var uri = window.location.href;
-			window.location.href = uri.replace(/\?.*$/,'') + '?transaction_id=' + $(this).val();
+			window.location.href = uri.replace(/\?.*$/,'') + '?ophthalmic_diagnoses_transaction_id=' + $(this).val();
 		});
 	</script>
 <?php } ?>
