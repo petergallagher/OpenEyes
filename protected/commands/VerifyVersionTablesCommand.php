@@ -113,7 +113,7 @@ class VerifyVersionTablesCommand extends CConsoleCommand {
 		}
 
 		foreach ($_table_version->columns as $column => $properties) {
-			if (!in_array($column,array('version_id','version_date'))) {
+			if (!in_array($column,array('version_id','version_date','deleted_transaction_id'))) {
 				if (!isset($_table->columns[$column])) {
 					echo "$_table_version->name has extra column $column\n";
 				}
@@ -134,7 +134,7 @@ class VerifyVersionTablesCommand extends CConsoleCommand {
 		}
 
 		foreach ($_table_version->foreignKeys as $column => $properties) {
-			if ($column != 'id') {
+			if (!in_array($column,array('id','deleted_transaction_id'))) {
 				if (!isset($_table->foreignKeys[$column])) {
 					echo "$_table_version->name has extra foriegn key on column $column\n";
 				}
