@@ -58,6 +58,24 @@ class VerifyVersionTablesCommand extends CConsoleCommand {
 				}
 			}
 		}
+
+		foreach (Yii::app()->db->getSchema()->getTables() as $table) {
+			if (preg_match('/^(.*?)_version$/',$table->name,$m)) {
+				foreach (array('hash','transaction_id','deleted_transaction_id') as $field) {
+					if (!isset($table->columns[$field])) {
+						echo "Table $table->name is missing column $field\n";
+					}
+				}
+
+				$_table = Yii::app()->db->getSchema()->getTable($m[1]);
+
+				foreach (array('hash','transaction_id') as $field) {
+					if (!isset($_table->columns[$field])) {
+						echo "Table $_table->name is missing column $field\n";
+					}
+				}
+			}
+		}
 	}
 
 	public function scanModels($path)
