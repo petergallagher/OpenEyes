@@ -16,12 +16,17 @@
  * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
  * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
  */
+if (@$relation) {
+	$transaction_list = $model->getFullTransactionListForRelation($relation);
+} else {
+	$transaction_list = $model->getFullTransactionList();
+}
 ?>
-<?php if (count($model->getFullTransactionListForRelation($relation)) >1 || isset($_GET[$field])) {?>
+<?php if (count($transaction_list) >1 || isset($_GET[$field])) {?>
 	<div class="previous-version-container">
 		<a class="show-previous-versions" href="#"<?php if (isset($_GET[$field])) {?> style="display: none"<?php }?>>Show previous versions</a>
 		<div class="previous-versions"<?php if (!isset($_GET[$field])) {?> style="display: none;"<?php }?>>
-			<?php echo CHtml::dropDownList($field,@$_GET[$field],$model->getFullTransactionListForRelation($relation),array('class'=>'previous-versions'))?>
+			<?php echo CHtml::dropDownList($field,@$_GET[$field],$transaction_list,array('class'=>'previous-versions'))?>
 		</div>
 	</div>
 <?php }?>
