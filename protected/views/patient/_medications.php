@@ -19,7 +19,13 @@
 ?>
 
 <section class="box patient-info associated-data js-toggle-container">
-
+	<?php if (Yii::app()->params['show_previous_versions']) {
+		$this->renderPartial('_previous_versions',array(
+			'model' => $this->patient,
+			'field' => 'medications_transaction_id',
+			'relation' => 'medications',
+		));
+	}?>
 	<header class="box-header">
 		<h3 class="box-title">
 			<span class="icon-patient-clinician-hd_flag"></span>
@@ -45,7 +51,7 @@
 			</tr>
 			</thead>
 			<tbody>
-			<?php foreach ($this->patient->medications as $medication) {?>
+			<?php foreach ($this->patient->relationByTransactionIDOrActive('medications',@$_GET['medications_transaction_id']) as $medication) {?>
 				<tr>
 					<td><?php echo $medication->drug->name?></td>
 					<td><?php echo $medication->route->name?></td>

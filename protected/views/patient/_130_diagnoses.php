@@ -17,9 +17,14 @@
  * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
  */
 ?>
-<?php echo CHtml::dropDownList('ophthalmic_diagnoses_transaction_id',@$_GET['ophthalmic_diagnoses_transaction_id'],$this->patient->getFullTransactionListForRelation('ophthalmicDiagnoses'),array('style' => 'width: 25em;'))?>
 <section class="box patient-info associated-data js-toggle-container">
-
+	<?php if (Yii::app()->params['show_previous_versions']) {
+		$this->renderPartial('_previous_versions',array(
+			'model' => $this->patient,
+			'field' => 'ophthalmic_diagnoses_transaction_id',
+			'relation' => 'ophthalmicDiagnoses',
+		));
+	}?>
 	<header class="box-header">
 		<h3 class="box-title">
 			<span class="icon-patient-clinician-hd_flag"></span>
@@ -31,9 +36,7 @@
 			</span>
 		</a>
 	</header>
-
 	<div class="js-toggle-body">
-
 		<table class="plain patient-data">
 			<thead>
 			<tr>
@@ -43,10 +46,7 @@
 			</tr>
 			</thead>
 			<tbody>
-			<?php
-			$diagnoses = @$_GET['ophthalmic_diagnoses_transaction_id'] ? $this->patient->relationByTransactionID('ophthalmicDiagnoses',$_GET['ophthalmic_diagnoses_transaction_id']) : $this->patient->ophthalmicDiagnoses;
-
-			foreach ($diagnoses as $diagnosis) {?>
+			<?php foreach ($this->patient->relationByTransactionIDOrActive('ophthalmicDiagnoses',@$_GET['ophthalmic_diagnoses_transaction_id']) as $diagnosis) {?>
 				<tr>
 					<td><?php echo $diagnosis->dateText?></td>
 					<td><?php echo $diagnosis->eye->adjective?> <?php echo $diagnosis->disorder->term?></td>
@@ -190,11 +190,6 @@
 				}
 			});
 			return false;
-		});
-
-		$('#ophthalmic_diagnoses_transaction_id').change(function() {
-			var uri = window.location.href;
-			window.location.href = uri.replace(/\?.*$/,'') + '?ophthalmic_diagnoses_transaction_id=' + $(this).val();
 		});
 	</script>
 <?php } ?>

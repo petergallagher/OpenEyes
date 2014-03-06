@@ -18,6 +18,13 @@
  */
 ?>
 <section class="box patient-info associated-data js-toggle-container">
+	<?php if (Yii::app()->params['show_previous_versions']) {
+		$this->renderPartial('_previous_versions',array(
+			'model' => $this->patient,
+			'field' => 'allergies_transaction_id',
+			'relation' => 'allergies',
+		));
+	}?>
 	<header class="box-header">
 		<h3 class="box-title">
 			<span class="icon-patient-clinician-hd_flag"></span>
@@ -49,7 +56,7 @@
 					</tr>
 				</thead>
 				<tbody>
-					<?php foreach ($this->patient->allergies as $allergy) { ?>
+					<?php foreach ($this->patient->relationByTransactionIDOrActive('allergies',@$_GET['allergies_transaction_id']) as $allergy) { ?>
 					<tr data-allergy-id="<?php echo $allergy->id ?>" data-allergy-name="<?php echo $allergy->name ?>">
 						<td><?php echo $allergy->name ?></td>
 						<?php if ($this->checkAccess('OprnEditAllergy')) { ?>

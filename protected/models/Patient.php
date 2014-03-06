@@ -155,6 +155,7 @@ class Patient extends BaseActiveRecordVersioned
 				'condition' => 'specialty_id is null',
 				'order' => 'date asc',
 			),
+			'ophinfo' => array(self::HAS_ONE, 'PatientOphInfo', 'patient_id'),
 		);
 	}
 
@@ -523,9 +524,14 @@ class Patient extends BaseActiveRecordVersioned
 	 *
 	 * @return PatientOphInfo
 	 */
-	public function getOphInfo()
+	public function getOphInfo($transaction_id=false)
 	{
-		$info = PatientOphInfo::model()->find('patient_id = ?', array($this->id));
+		if ($transaction_id) {
+			$info = PatientOphInfo::model()->fromVersion()->find('patient_id=? and transaction_id=?',array($this->id,$transaction_id));
+		} else {
+			$info = PatientOphInfo::model()->find('patient_id = ?', array($this->id));
+		}
+
 		if (!$info) {
 			$info = new PatientOphInfo();
 			$info->patient_id = $this->id;

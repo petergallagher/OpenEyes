@@ -19,6 +19,13 @@
 ?>
 
 <section class="box patient-info associated-data js-toggle-container">
+	<?php if (Yii::app()->params['show_previous_versions']) {
+		$this->renderPartial('_previous_versions',array(
+			'model' => $this->patient,
+			'field' => 'cvi_status_transaction_id',
+			'relation' => 'ophinfo',
+		));
+	}?>
 	<header class="box-header">
 		<h3 class="box-title">
 			<span class="icon-patient-clinician-hd_flag"></span>
@@ -40,7 +47,7 @@
 			</thead>
 			<tbody>
 				<?php
-				$info = $this->patient->getOPHInfo();
+				$info = $this->patient->getOPHInfo(@$_GET['cvi_status_transaction_id']);
 				?>
 				<tr>
 					<td><?php echo Helper::formatFuzzyDate($info->cvi_status_date); ?></td>

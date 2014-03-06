@@ -233,6 +233,38 @@ $(document).ready(function(){
 	$('#checkall').click(function() {
 		$('input.'+$(this).attr('class')).attr('checked',$(this).is(':checked') ? 'checked' : false);
 	});
+
+	$('.show-previous-versions').click(function(e) {
+		e.preventDefault();
+		$(this).next('div.previous-versions').show();
+		$(this).hide();
+	});
+
+	$('select.previous-versions').change(function(e) {
+		e.preventDefault();
+
+		if ($(this).val() == 0) {
+			var uri = location.href.replace(new RegExp('[&/?]'+$(this).attr('id')+'=([^&]$|[^&]*)','i'), "");
+			if (!uri.match(/\?/)) {
+				uri = uri.replace('&','?');
+			}
+			location.href = uri;
+		} else {
+			if (location.href.match(new RegExp('[&\?]'+$(this).attr('id')+'='))) {
+				var uri = location.href.replace(new RegExp('[&\?]'+$(this).attr('id')+'=([^&]$|[^&]*)','i'), "&"+$(this).attr('id')+'='+$(this).val());
+				if (!uri.match(/\?/)) {
+					uri = uri.replace('&','?');
+				}
+				location.href = uri;
+			} else {
+				if (location.href.match(/\?/)) {
+					location.href += '&' + $(this).attr('id') + '=' + $(this).val();
+				} else {
+					location.href += '?' + $(this).attr('id') + '=' + $(this).val();
+				}
+			}
+		}
+	});
 });
 
 function changeState(wb,sp) {

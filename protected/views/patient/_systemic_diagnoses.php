@@ -17,8 +17,14 @@
  * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
  */
 ?>
-<?php echo CHtml::dropDownList('systemic_diagnoses_transaction_id',@$_GET['systemic_diagnoses_transaction_id'],$this->patient->getFullTransactionListForRelation('systemicDiagnoses'),array('style' => 'width: 25em;'))?>
 <section class="box patient-info associated-data js-toggle-container">
+	<?php if (Yii::app()->params['show_previous_versions']) {
+		$this->renderPartial('_previous_versions',array(
+			'model' => $this->patient,
+			'field' => 'systemic_diagnoses_transaction_id',
+			'relation' => 'systemicDiagnoses',
+		));
+	}?>
 	<header class="box-header">
 		<h3 class="box-title">
 			<span class="icon-patient-clinician-hd_flag"></span>
@@ -42,10 +48,7 @@
 			</tr>
 			</thead>
 			<tbody>
-			<?php
-			$diagnoses = @$_GET['systemic_diagnoses_transaction_id'] ? $this->patient->relationByTransactionID('systemicDiagnoses',$_GET['systemic_diagnoses_transaction_id']) : $this->patient->systemicDiagnoses;
-
-			foreach ($diagnoses as $diagnosis) {?>
+			<?php foreach ($this->patient->relationByTransactionIDOrActive('systemicDiagnoses',@$_GET['systemic_diagnoses_transaction_id']) as $diagnosis) {?>
 				<tr>
 					<td><?php echo $diagnosis->dateText?></td>
 					<td><?php echo $diagnosis->eye ? $diagnosis->eye->adjective : ''?> <?php echo $diagnosis->disorder->term?></td>
@@ -174,10 +177,6 @@
 				}
 			});
 			return false;
-		});
-		$('#systemic_diagnoses_transaction_id').change(function() {
-			var uri = window.location.href;
-			window.location.href = uri.replace(/\?.*$/,'') + '?systemic_diagnoses_transaction_id=' + $(this).val();
 		});
 	</script>
 <?php } ?>

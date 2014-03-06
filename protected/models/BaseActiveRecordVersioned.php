@@ -414,32 +414,31 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 	public function getFullTransactionListForRelation($relation)
 	{
 		$transactions = array();
-
 		$ts = array();
 
-		foreach ($this->{$relation} as $item) {
-			if (!isset($transactions[$item->transaction_id])) {
-				$transactions[$item->transaction_id] = 'Edit by '.User::model()->findByPk($item->last_modified_user_id)->fullName.' on '.$item->NHSDate('last_modified_date').' at '.substr($item->last_modified_date,11,5);
-			}
-		}
-
-		foreach ($this->handleVersionRelation($relation, true) as $item) {
-			if (!isset($transactions[$item->transaction_id])) {
-				$transactions[$item->transaction_id] = 'Edit by '.User::model()->findByPk($item->last_modified_user_id)->fullName.' on '.$item->NHSDate('last_modified_date').' at '.substr($item->last_modified_date,11,5);
-			}
-			if (!is_null($item->deleted_transaction_id) && !isset($transactions[$item->deleted_transaction_id])) {
-				$transactions[$item->deleted_transaction_id] = 'Edit by '.User::model()->findByPk($item->last_modified_user_id)->fullName.' on '.$item->NHSDate('version_date').' at '.substr($item->version_date,11,5);
-			}
-		}
+		$_relation = $this->getRelationDefinition($relation);
+		$transactions = $this->getVersionHistoryForRelation($relation);
 
 		krsort($transactions);
 
 		foreach ($transactions as $i => $transaction) {
-			$transactions[$i] = preg_replace('/^Edit by/','Current version:',$transactions[$i]);
-			break;
+			if (!isset($current)) {
+				$current = 'Current: '.$transaction;
+				unset($transactions[$i]);
+			} else {
+				$transactions[$i] = 'Edit by '.$transaction;
+			}
 		}
 
-		return $transactions;
+		return array($current) + $transactions;
+	}
+
+	/**
+	 * Get a text description of the transaction item
+	 */
+	public function getTransactionText($user_id, $timestamp)
+	{
+		return User::model()->findByPk($user_id)->fullName.' on '.Helper::convertMySQL2NHS($timestamp).' at '.substr($timestamp,11,5);
 	}
 
 	/**
@@ -448,7 +447,7 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 	public function getRelated($name,$refresh=false,$params=array(),$transaction_id=null)
 	{
 		if (!$this->isActiveVersion() || $transaction_id) {
-			return $this->handleVersionRelation($name, false, $transaction_id);
+			return $this->handleVersionRelation($name, $transaction_id);
 		}
 
 		return parent::getRelated($name,$refresh,$params);
@@ -460,6 +459,14 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 	public function relationByTransactionID($relation_name, $transaction_id)
 	{
 		return $this->getRelated($relation_name,false,array(),$transaction_id);
+	}
+
+	/**
+	 * Execute a relation on the current model for a specific transaction ID, or if the transaction ID is null just return the active relation
+	 */
+	public function relationByTransactionIDOrActive($relation_name, $transaction_id)
+	{
+		return $transaction_id ? $this->relationByTransactionID($relation_name, $transaction_id) : $this->{$relation_name};
 	}
 
 	/**
@@ -517,13 +524,15 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 				break;
 
 			case 'CManyManyRelation':
-				if (preg_match('/^(.*?)\((.*?),[\s\t]*(.*?)\)$/',$relation[2],$m)) {
-					if (Yii::app()->db->getSchema()->getTable($m[1].'_version') && $this->tableHasTransactionID($m[1].'_version', $this->transaction_id)) {
-						$criteria->join = "join `{$m[1]}_version` on `{$m[1]}_version`.`{$m[3]}` = `t`.`".$relation[1]::model()->tableSchema->primaryKey."` and `{$m[1]}_version`.`{$m[2]}` = :pk and `{$m[1]}_version`.`transaction_id` = :transaction_id";
-						$criteria->params[':transaction_id'] = $this->transaction_id;
-					} else {
-						$criteria->join = "join `{$m[1]}` on `{$m[1]}`.`{$m[3]}` = `$alias`.`".$relation[1]::model()->tableSchema->primaryKey."` and `{$m[1]}`.`{$m[2]}` = :pk";
-					}
+				if (!preg_match('/^(.*?)\((.*?),[\s\t]*(.*?)\)$/',$relation[2],$m)) {
+					throw new Exception("Unhandled MANY_MANY relation type: ".print_r($relation,true));
+				}
+
+				if ($this->tableHasTransactionID($m[1].'_version', $this->transaction_id)) {
+					$criteria->join = "join `{$m[1]}_version` on `{$m[1]}_version`.`{$m[3]}` = `$alias`.`".$relation[1]::model()->tableSchema->primaryKey."` and `{$m[1]}_version`.`{$m[2]}` = :pk and `{$m[1]}_version`.`transaction_id` = :transaction_id";
+					$criteria->params[':transaction_id'] = $this->transaction_id;
+				} else {
+					$criteria->join = "join `{$m[1]}` on `{$m[1]}`.`{$m[3]}` = `$alias`.`".$relation[1]::model()->tableSchema->primaryKey."` and `{$m[1]}`.`{$m[2]}` = :pk";
 				}
 
 				$criteria->params[':pk'] = $this->{$this->tableSchema->primaryKey};
@@ -537,7 +546,7 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 	/**
 	 * Takes a relation defined on the model and returns a query to derive the same data from the version tables
 	 */
-	private function handleVersionRelation($name, $all_transactions=false, $transaction_id=null)
+	private function handleVersionRelation($name, $transaction_id=null)
 	{
 		$relation = $this->getRelationDefinition($name);
 		$criteria = $this->getRelationCriteria($relation);
@@ -574,8 +583,6 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 						$relation[1]::model()->fromVersion()->findAll($version_criteria)
 					));
 
-				} elseif ($all_transactions) {
-					return $relation[1]::model()->fromVersion()->findAll($criteria);
 				} elseif ($relation[1]::model()->hasTransactionID($transaction_id)) {
 					$criteria->addCondition('transaction_id = :transaction_id');
 					$criteria->params[':transaction_id'] = $this->transaction_id;
@@ -586,6 +593,24 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 				return $relation[1]::model()->findAll($criteria);
 
 			case 'CManyManyRelation':
+				if ($transaction_id) {
+					if (!preg_match('/^(.*?)\((.*?),[\s\t]*(.*?)\)$/',$relation[2],$m)) {
+						throw new Exception("Unhandled MANY_MANY relation: ".print_r($relation,true));
+					}
+
+					$alias = $criteria->alias ? $criteria->alias : 't';
+					$criteria->join = "join `{$m[1]}` on `{$m[1]}`.`{$m[3]}` = `$alias`.`".$relation[1]::model()->tableSchema->primaryKey."` and `{$m[1]}`.`{$m[2]}` = :pk and `{$m[1]}`.`transaction_id` <= :transaction_id";
+					$criteria->params[':transaction_id'] = $transaction_id;
+
+					$version_criteria = clone $criteria;
+					$version_criteria->join = "join `{$m[1]}_version` on `{$m[1]}_version`.`{$m[3]}` = `$alias`.`".$relation[1]::model()->tableSchema->primaryKey."` and `{$m[1]}_version`.`{$m[2]}` = :pk and (`{$m[1]}_version`.`transaction_id` is null or `{$m[1]}_version`.transaction_id > :transaction_id )";
+
+					return $this->deDupeByID(array_merge(
+						$relation[1]::model()->findAll($criteria),
+						$relation[1]::model()->fromVersion()->findAll($version_criteria)
+					));
+				}
+
 				return $relation[1]::model()->findAll($criteria);
 
 			default:
@@ -593,6 +618,81 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 		}
 
 		return parent::getRelated($name);
+	}
+
+	/**
+	 * Get all version items for a given relation
+	 */
+	public function getVersionHistoryForRelation($relation_name)
+	{
+		$relation = $this->getRelationDefinition($relation_name);
+		$criteria = $this->getRelationCriteria($relation);
+
+		$transactions = array();
+
+		switch ($relation[0]) {
+			case 'CHasOneRelation':
+			case 'CBelongsToRelation':
+				if ($item = $this->{$relation_name}) {
+					$transactions[$item->transaction_id] = $this->getTransactionText($item->last_modified_user_id,$item->last_modified_date);
+				}
+
+				foreach ($relation[1]::model()->fromVersion()->findAll($criteria) as $item) {
+					if (!isset($transactions[$item->transaction_id])) {
+						$transactions[$item->transaction_id] = $this->getTransactionText($item->last_modified_user_id,$item->last_modified_date);
+					}
+					if (!is_null($item->deleted_transaction_id) && !isset($transactions[$item->deleted_transaction_id])) {
+						$transactions[$item->deleted_transaction_id] = $this->getTransactionText($item->last_modified_user_id,$item->version_date);
+					}
+				}
+
+				break;
+
+			case 'CHasManyRelation':
+				foreach ($this->{$relation_name} as $item) {
+					if (!isset($transactions[$item->transaction_id])) {
+						$transactions[$item->transaction_id] = $this->getTransactionText($item->last_modified_user_id,$item->last_modified_date);
+					}
+				}
+
+				foreach ($relation[1]::model()->fromVersion()->findAll($criteria) as $item) {
+					if (!isset($transactions[$item->transaction_id])) {
+						$transactions[$item->transaction_id] = $this->getTransactionText($item->last_modified_user_id,$item->last_modified_date);
+					}
+					if (!is_null($item->deleted_transaction_id) && !isset($transactions[$item->deleted_transaction_id])) {
+						$transactions[$item->deleted_transaction_id] = $this->getTransactionText($item->last_modified_user_id,$item->version_date);
+					}
+				}
+
+				break;
+
+			case 'CManyManyRelation':
+				if (!preg_match('/^(.*?)\((.*?),[\s\t]*(.*?)\)$/',$relation[2],$m)) {
+					throw new Exception("Unhandled MANY_MANY relation: ".print_r($relation,true));
+				}
+
+				$_table = Yii::app()->db->getSchema()->getTable($this->tableName());
+
+				foreach (Yii::app()->db->createCommand()->select("*")->from($m[1])->where("{$m[2]} = :pk",array(":pk" => $this->{$_table->primaryKey}))->queryAll() as $row) {
+					if (!isset($transactions[$row['transaction_id']])) {
+						$transactions[$row['transaction_id']] = $this->getTransactionText($row['last_modified_user_id'],$row['last_modified_date']);
+					}
+				}
+
+				foreach (Yii::app()->db->createCommand()->select("*")->from($m[1].'_version')->where("{$m[2]} = :pk",array(":pk" => $this->{$_table->primaryKey}))->queryAll() as $row) {
+					if (!isset($transactions[$row['transaction_id']])) {
+						$transactions[$row['transaction_id']] = $this->getTransactionText($row['last_modified_user_id'],$row['last_modified_date']);
+					}
+
+					if (!is_null($row['deleted_transaction_id']) && !isset($transactions[$row['deleted_transaction_id']])) {
+						$transactions[$row['deleted_transaction_id']] = $this->getTransactionText($row['last_modified_user_id'],$row['version_date']);
+					}
+				}
+
+				break;
+		}
+
+		return $transactions;
 	}
 
 	/**

@@ -18,6 +18,13 @@
  */
 ?>
 <section class="box patient-info associated-data js-toggle-container">
+	<?php if (Yii::app()->params['show_previous_versions']) {
+		$this->renderPartial('_previous_versions',array(
+			'model' => $this->patient,
+			'field' => 'previous_operations_transaction_id',
+			'relation' => 'previousOperations',
+		));
+	}?>
 	<header class="box-header">
 		<h3 class="box-title">
 			<span class="icon-patient-clinician-hd_flag"></span>
@@ -40,7 +47,7 @@
 			</tr>
 			</thead>
 			<tbody>
-			<?php foreach ($this->patient->previousOperations as $operation) {?>
+			<?php foreach ($this->patient->relationByTransactionIDOrActive('previousOperations',@$_GET['previous_operations_transaction_id']) as $operation) {?>
 				<tr>
 					<td><?php echo $operation->dateText?></td>
 					<td><?php if ($operation->side) { echo $operation->side->adjective.' ';}?><?php echo $operation->operation?></td>
