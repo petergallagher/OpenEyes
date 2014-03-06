@@ -20,8 +20,51 @@ class m140221_123246_versioning_transactions extends CDbMigration
 				'CONSTRAINT `transaction_table_created_user_id_fk` FOREIGN KEY (`created_user_id`) REFERENCES `user` (`id`)',
 			), 'ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci');
 
+		$this->createTable('transaction_operation', array(
+				'id' => 'int(10) unsigned NOT NULL AUTO_INCREMENT',
+				'name' => 'varchar(64) not null',
+				'last_modified_user_id' => 'int(10) unsigned NOT NULL DEFAULT 1',
+				'last_modified_date' => 'datetime NOT NULL DEFAULT \'1901-01-01 00:00:00\'',
+				'created_user_id' => 'int(10) unsigned NOT NULL DEFAULT 1',
+				'created_date' => 'datetime NOT NULL DEFAULT \'1901-01-01 00:00:00\'',
+				'PRIMARY KEY (`id`)',
+				'KEY `transaction_operation_last_modified_user_id_fk` (`last_modified_user_id`)',
+				'KEY `transaction_operation_created_user_id_fk` (`created_user_id`)',
+				'CONSTRAINT `transaction_operation_last_modified_user_id_fk` FOREIGN KEY (`last_modified_user_id`) REFERENCES `user` (`id`)',
+				'CONSTRAINT `transaction_operation_created_user_id_fk` FOREIGN KEY (`created_user_id`) REFERENCES `user` (`id`)',
+			), 'ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci');
+
+		$this->insert('transaction_operation',array('id'=>1,'name'=>'Create'));
+		$this->insert('transaction_operation',array('id'=>2,'name'=>'Update'));
+		$this->insert('transaction_operation',array('id'=>3,'name'=>'Delete'));
+
+		$this->createTable('transaction_object', array(
+				'id' => 'int(10) unsigned NOT NULL AUTO_INCREMENT',
+				'name' => 'varchar(64) not null',
+				'last_modified_user_id' => 'int(10) unsigned NOT NULL DEFAULT 1',
+				'last_modified_date' => 'datetime NOT NULL DEFAULT \'1901-01-01 00:00:00\'',
+				'created_user_id' => 'int(10) unsigned NOT NULL DEFAULT 1',
+				'created_date' => 'datetime NOT NULL DEFAULT \'1901-01-01 00:00:00\'',
+				'PRIMARY KEY (`id`)',
+				'KEY `transaction_object_last_modified_user_id_fk` (`last_modified_user_id`)',
+				'KEY `transaction_object_created_user_id_fk` (`created_user_id`)',
+				'CONSTRAINT `transaction_object_last_modified_user_id_fk` FOREIGN KEY (`last_modified_user_id`) REFERENCES `user` (`id`)',
+				'CONSTRAINT `transaction_object_created_user_id_fk` FOREIGN KEY (`created_user_id`) REFERENCES `user` (`id`)',
+			), 'ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci');
+
+		$this->insert('transaction_object',array('id'=>1,'name'=>'Event'));
+		$this->insert('transaction_object',array('id'=>2,'name'=>'Episode'));
+		$this->insert('transaction_object',array('id'=>3,'name'=>'Diagnosis'));
+		$this->insert('transaction_object',array('id'=>4,'name'=>'Previous operation'));
+		$this->insert('transaction_object',array('id'=>5,'name'=>'Medication'));
+		$this->insert('transaction_object',array('id'=>6,'name'=>'CVI status'));
+		$this->insert('transaction_object',array('id'=>7,'name'=>'Allergy'));
+		$this->insert('transaction_object',array('id'=>8,'name'=>'Family history'));
+
 		$this->createTable('transaction', array(
 				'id' => 'int(10) unsigned NOT NULL AUTO_INCREMENT',
+				'operation_id' => 'int(10) unsigned NULL',
+				'object_id' => 'int(10) unsigned NULL',
 				'last_modified_user_id' => 'int(10) unsigned NOT NULL DEFAULT 1',
 				'last_modified_date' => 'datetime NOT NULL DEFAULT \'1901-01-01 00:00:00\'',
 				'created_user_id' => 'int(10) unsigned NOT NULL DEFAULT 1',
@@ -29,8 +72,12 @@ class m140221_123246_versioning_transactions extends CDbMigration
 				'PRIMARY KEY (`id`)',
 				'KEY `transaction_last_modified_user_id_fk` (`last_modified_user_id`)',
 				'KEY `transaction_created_user_id_fk` (`created_user_id`)',
+				'KEY `transaction_operation_id_fk` (`operation_id`)',
+				'KEY `transaction_object_id_fk` (`object_id`)',
 				'CONSTRAINT `transaction_last_modified_user_id_fk` FOREIGN KEY (`last_modified_user_id`) REFERENCES `user` (`id`)',
 				'CONSTRAINT `transaction_created_user_id_fk` FOREIGN KEY (`created_user_id`) REFERENCES `user` (`id`)',
+				'CONSTRAINT `transaction_operation_id_fk` FOREIGN KEY (`operation_id`) REFERENCES `transaction_operation` (`id`)',
+				'CONSTRAINT `transaction_object_id_fk` FOREIGN KEY (`object_id`) REFERENCES `transaction_object` (`id`)',
 			), 'ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci');
 
 		$this->createTable('transaction_table_assignment', array(
@@ -58,6 +105,7 @@ class m140221_123246_versioning_transactions extends CDbMigration
 			$this->addColumn($table,'transaction_id','int(10) unsigned null');
 			$this->createIndex($table.'_tid',$table,'transaction_id');
 			$this->addForeignKey($table.'_tid',$table,'transaction_id','transaction','id');
+			$this->addColumn($table,'conflicted','tinyint(1) unsigned not null');
 
 			$this->addColumn($table.'_version','hash','varchar(40) not null');
 			$this->addColumn($table.'_version','transaction_id','int(10) unsigned null');
@@ -66,6 +114,7 @@ class m140221_123246_versioning_transactions extends CDbMigration
 			$this->addForeignKey($table.'_vtid',$table.'_version','transaction_id','transaction','id');
 			$this->createIndex($table.'_dtid',$table.'_version','deleted_transaction_id');
 			$this->addForeignKey($table.'_dtid',$table.'_version','deleted_transaction_id','transaction','id');
+			$this->addColumn($table.'_version','conflicted','tinyint(1) unsigned not null');
 		}
 	}
 
@@ -88,6 +137,8 @@ class m140221_123246_versioning_transactions extends CDbMigration
 
 		$this->dropTable('transaction_table_assignment');
 		$this->dropTable('transaction');
+		$this->dropTable('transaction_object');
+		$this->dropTable('transaction_operation');
 		$this->dropTable('transaction_table');
 	}
 }

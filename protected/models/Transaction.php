@@ -41,6 +41,8 @@ class Transaction extends BaseActiveRecord
 	public function relations()
 	{
 		return array(
+			'operation' => array(self::BELONGS_TO, 'TransactionOperation', 'operation_id'),
+			'object' => array(self::BELONGS_TO, 'TransactionObject', 'object_id'),
 			'table_assignments' => array(self::HAS_MANY, 'TransactionTableAssignment', 'transaction_id', 'order' => 'display_order asc'),
 		);
 	}
@@ -68,6 +70,48 @@ class Transaction extends BaseActiveRecord
 			if (!$tta->save()) {
 				throw new Exception("Unable to save transaction table assignment: ".print_r($tta->getErrors(),true));
 			}
+		}
+	}
+
+	/**
+	 * Set the operation of the transaction (eg create/update/delete/etc)
+	 */
+	public function setOperation($operation_name)
+	{
+		if (!$operation = TransactionOperation::model()->find('name=?',array($operation_name))) {
+			$operation = new TransactionOperation;
+			$operation->name = $operation_name;
+
+			if (!$operation->save()) {
+				throw new Exception("Unable to save TransactionOperation: ".print_r($operation->getErrors(),true));
+			}
+		}
+
+		$this->operation_id = $operation->id;
+
+		if (!$this->save()) {
+			throw new Exception("Unable to save transaction: ".print_r($this->getErrors(),true));
+		}
+	}
+
+	/**
+	 * Set the object of the transaction (eg event, diagnosis etc)
+	 */
+	public function setObject($object_name)
+	{
+		if (!$object = TransactionObject::model()->find('name=?',array($object_name))) {
+			$object = new TransactionObject;
+			$object->name = $object_name;
+
+			if (!$object->save()) {
+				throw new Exception("Unable to save TransactionObject: ".print_r($object->getErrors(),true));
+			}
+		}
+
+		$this->object_id = $object->id;
+
+		if (!$this->save()) {
+			throw new Exception("Unable to save transaction: ".print_r($this->getErrors(),true));
 		}
 	}
 }

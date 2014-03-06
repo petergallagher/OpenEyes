@@ -657,6 +657,9 @@ class BaseEventTypeController extends BaseModuleController
 			if (empty($errors)) {
 				$transaction = Yii::app()->db->beginTransaction();
 
+				Yii::app()->db->transaction->setOperation('Create');
+				Yii::app()->db->transaction->setObject('Event');
+
 				try {
 					$success = $this->saveEvent($_POST);
 
@@ -808,6 +811,9 @@ class BaseEventTypeController extends BaseModuleController
 			if (empty($errors)) {
 				$transaction = Yii::app()->db->beginTransaction();
 
+				Yii::app()->db->transaction->setOperation('Update');
+				Yii::app()->db->transaction->setObject('Event');
+
 				try {
 					//TODO: should all the auditing be moved into the saving of the event
 					$success = $this->saveEvent($_POST);
@@ -919,27 +925,27 @@ class BaseEventTypeController extends BaseModuleController
 		// // Render called with processOutput
 		// // TODO: use renderElement for this if we can
 		// try {
-		// 	// look for element specific view file
-		// 	$this->renderPartial($element->create_view, array(
-		// 			'element' => $element,
-		// 			'data' => null,
-		// 			'form' => $form,
-		// 			'child' => null,
-		// 			'previous_parent_id' => $previous_id,
-		// 		), false, true);
+		//	// look for element specific view file
+		//	$this->renderPartial($element->create_view, array(
+		//			'element' => $element,
+		//			'data' => null,
+		//			'form' => $form,
+		//			'child' => null,
+		//			'previous_parent_id' => $previous_id,
+		//		), false, true);
 		// } catch (Exception $e) {
-		// 	if (strpos($e->getMessage(), "cannot find the requested view") === false) {
-		// 		// it's a different, unexpected problem
-		// 		throw $e;
-		// 	}
-		// 	// use the default view file
-		// 	$this->renderPartial('_form', array(
-		// 			'element' => $element,
-		// 			'data' => null,
-		// 			'form' => $form,
-		// 			'child' => ($element_type->parent_element_type_id > 0),
-		// 			'previous_parent_id' => $previous_id,
-		// 		), false, true);
+		//	if (strpos($e->getMessage(), "cannot find the requested view") === false) {
+		//		// it's a different, unexpected problem
+		//		throw $e;
+		//	}
+		//	// use the default view file
+		//	$this->renderPartial('_form', array(
+		//			'element' => $element,
+		//			'data' => null,
+		//			'form' => $form,
+		//			'child' => ($element_type->parent_element_type_id > 0),
+		//			'previous_parent_id' => $previous_id,
+		//		), false, true);
 		// }
 	}
 
@@ -1520,6 +1526,10 @@ class BaseEventTypeController extends BaseModuleController
 
 		if (!empty($_POST)) {
 			$transaction = Yii::app()->db->beginTransaction();
+
+			Yii::app()->db->transaction->setOperation('Delete');
+			Yii::app()->db->transaction->setObject('Event');
+
 			try {
 				$this->event->softDelete();
 

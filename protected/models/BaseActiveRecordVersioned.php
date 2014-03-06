@@ -301,12 +301,15 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 
 	public function save($runValidation=true, $attributes=null, $allow_overriding=false)
 	{
-		if ($this->version_id) {
+		if (!$this->isActiveVersion()) {
 			throw new Exception("save() should not be called on versiond model instances.");
 		}
 
 		if (!Yii::app()->db->getCurrentTransaction()) {
 			$transaction = Yii::app()->db->beginTransaction();
+
+			Yii::app()->db->transaction->setOperation($this->isNewRecord ? 'Create' : 'Update');
+			Yii::app()->db->transaction->setObject(get_class($this));
 		}
 
 		$this->hash = $this->generateHash();
@@ -363,6 +366,9 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 
 		if (!Yii::app()->db->getCurrentTransaction()) {
 			$transaction = Yii::app()->db->beginTransaction();
+
+			Yii::app()->db->transaction->setOperation('Delete');
+			Yii::app()->db->transaction->setObject(get_class($this));
 		}
 
 		$result = parent::delete();
@@ -397,11 +403,11 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 		$model = get_class($this);
 		$active = $model::model()->findByPk($this->id);
 
-		$transactions[0] = 'Current: by '.User::model()->findByPk($active->last_modified_user_id)->fullName.' on '.$active->NHSDate('last_modified_date').' at '.substr($active->last_modified_date,11,5);
+		$transactions[0] = 'Current: by '.$this->getTransactionText($active->last_modified_user_id,$active->last_modified_date);
 
 		foreach ($active->getPreviousVersions($unique_hash, $active->hash) as $previous_version) {
 			if ($previous_version->transaction_id) {
-				$transactions[$previous_version->transaction_id] = 'Edit by '.User::model()->findByPk($previous_version->last_modified_user_id)->fullName.' on '.$previous_version->NHSDate('last_modified_date').' at '.substr($previous_version->last_modified_date,11,5);
+				$transactions[$previous_version->transaction_id] = 'Edit by '.$this->getTransactionText($previous_version->last_modified_user_id,$previous_version->last_modified_date);
 			}
 		}
 
@@ -633,23 +639,12 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 		switch ($relation[0]) {
 			case 'CHasOneRelation':
 			case 'CBelongsToRelation':
-				if ($item = $this->{$relation_name}) {
-					$transactions[$item->transaction_id] = $this->getTransactionText($item->last_modified_user_id,$item->last_modified_date);
-				}
-
-				foreach ($relation[1]::model()->fromVersion()->findAll($criteria) as $item) {
-					if (!isset($transactions[$item->transaction_id])) {
-						$transactions[$item->transaction_id] = $this->getTransactionText($item->last_modified_user_id,$item->last_modified_date);
-					}
-					if (!is_null($item->deleted_transaction_id) && !isset($transactions[$item->deleted_transaction_id])) {
-						$transactions[$item->deleted_transaction_id] = $this->getTransactionText($item->last_modified_user_id,$item->version_date);
-					}
-				}
-
-				break;
+				$items = $this->{$relation_name} ? array($this->{$relation_name}) : array();
 
 			case 'CHasManyRelation':
-				foreach ($this->{$relation_name} as $item) {
+				$items = isset($items) ? $items : $this->{$relation_name};
+
+				foreach ($items as $item) {
 					if (!isset($transactions[$item->transaction_id])) {
 						$transactions[$item->transaction_id] = $this->getTransactionText($item->last_modified_user_id,$item->last_modified_date);
 					}
