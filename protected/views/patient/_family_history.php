@@ -1,4 +1,11 @@
 <section class="box patient-info associated-data js-toggle-container">
+	<?php if (Yii::app()->params['show_previous_versions']) {
+		$this->renderPartial('_previous_versions',array(
+			'model' => $this->patient,
+			'field' => 'family_history_transaction_id',
+			'relation' => 'familyHistory',
+		));
+	}?>
 	<header class="box-header">
 		<h3 class="box-title">
 			<span class="icon-patient-clinician-hd_flag"></span>
@@ -22,7 +29,7 @@
 				</tr>
 			</thead>
 			<tbody>
-				<?php foreach ($this->patient->familyHistory as $history) {?>
+				<?php foreach ($this->patient->relationByTransactionIDOrActive('familyHistory',@$_GET['family_history_transaction_id']) as $history) {?>
 					<tr>
 						<td class="relative"><?php echo $history->relative->name?></td>
 						<td class="side"><?php echo $history->side->name?></td>
