@@ -490,12 +490,16 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 	/**
 	 * Gets the base criteria object for a relation query
 	 */
-	private function getRelationCriteria($relation_name, $relation)
+	public function getRelationCriteria($relation_name, $relation)
 	{
 		foreach ($relation as $i => $value) {
 			if (!is_int($i) && !in_array($i,array('condition','on','params','order','limit','offset','alias','with'))) {
 				throw new Exception("Unhandled relation property: $i");
 			}
+		}
+
+		if (!method_exists($this, 'setRelationCriteria_'.$relation[0])) {
+			throw new Exception("Unknown relation type: {$relation[0]}");
 		}
 
 		$criteria = new CDbCriteria;
@@ -510,40 +514,44 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 		isset($relation['alias']) && $criteria->alias = $relation['alias'];
 		isset($relation['with']) && $criteria->with = $relation['with'];
 
-		$alias = $criteria->alias ? $criteria->alias : 't';
+		return $this->{'setRelationCriteria_'.$relation[0]}($criteria, $relation);
+	}
 
-		switch ($relation[0]) {
-			case 'CBelongsToRelation':
-				$criteria->addCondition($relation[1]::model()->tableSchema->primaryKey.' = :pk');
-				$criteria->params[':pk'] = $this->{$relation[2]};
-				break;
+	public function setRelationCriteria_CBelongsToRelation($criteria, $relation)
+	{
+		$criteria->addCondition($relation[1]::model()->tableSchema->primaryKey.' = :pk');
+		$criteria->params[':pk'] = $this->{$relation[2]};
 
-			case 'CHasOneRelation':
-				$criteria->addCondition($relation[2].' = :pk');
-				$criteria->params[':pk'] = $this->{$this->tableSchema->primaryKey};
-				break;
+		return $criteria;
+	}
 
-			case 'CHasManyRelation':
-				$criteria->addCondition($relation[2].' = :pk');
-				$criteria->params[':pk'] = $this->{$this->tableSchema->primaryKey};
-				break;
+	public function setRelationCriteria_CHasOneRelation($criteria, $relation)
+	{
+		$criteria->addCondition($relation[2].' = :pk');
+		$criteria->params[':pk'] = $this->{$this->tableSchema->primaryKey};
 
-			case 'CManyManyRelation':
-				if (!preg_match('/^(.*?)\((.*?),[\s\t]*(.*?)\)$/',$relation[2],$m)) {
-					throw new Exception("Unhandled MANY_MANY relation type: ".print_r($relation,true));
-				}
+		return $criteria;
+	}
 
-				if ($this->tableHasTransactionID($m[1].'_version', $this->transaction_id)) {
-					$criteria->join = "join `{$m[1]}_version` on `{$m[1]}_version`.`{$m[3]}` = `$alias`.`".$relation[1]::model()->tableSchema->primaryKey."` and `{$m[1]}_version`.`{$m[2]}` = :pk and `{$m[1]}_version`.`transaction_id` = :transaction_id";
-					$criteria->params[':transaction_id'] = $this->transaction_id;
-				} else {
-					$criteria->join = "join `{$m[1]}` on `{$m[1]}`.`{$m[3]}` = `$alias`.`".$relation[1]::model()->tableSchema->primaryKey."` and `{$m[1]}`.`{$m[2]}` = :pk";
-				}
+	public function setRelationCriteria_CHasManyRelation($criteria, $relation)
+	{
+		return $this->setRelationCriteria_CHasOneRelation($criteria, $relation);
+	}
 
-				$criteria->params[':pk'] = $this->{$this->tableSchema->primaryKey};
-
-				break;
+	public function setRelationCriteria_CManyManyRelation($criteria, $relation)
+	{
+		if (!preg_match('/^(.*?)\((.*?),[\s\t]*(.*?)\)$/',$relation[2],$m)) {
+			throw new Exception("Unhandled MANY_MANY relation type: ".print_r($relation,true));
 		}
+
+		if ($this->tableHasTransactionID($m[1].'_version', $this->transaction_id)) {
+			$criteria->join = "join `{$m[1]}_version` on `{$m[1]}_version`.`{$m[3]}` = `$criteria->alias`.`".$relation[1]::model()->tableSchema->primaryKey."` and `{$m[1]}_version`.`{$m[2]}` = :pk and `{$m[1]}_version`.`transaction_id` = :transaction_id";
+			$criteria->params[':transaction_id'] = $this->transaction_id;
+		} else {
+			$criteria->join = "join `{$m[1]}` on `{$m[1]}`.`{$m[3]}` = `$criteria->alias`.`".$relation[1]::model()->tableSchema->primaryKey."` and `{$m[1]}`.`{$m[2]}` = :pk";
+		}
+
+		$criteria->params[':pk'] = $this->{$this->tableSchema->primaryKey};
 
 		return $criteria;
 	}

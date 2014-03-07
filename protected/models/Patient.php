@@ -665,7 +665,8 @@ class Patient extends BaseActiveRecordVersioned
 	public function addAllergy($allergy_id)
 	{
 		if (!PatientAllergyAssignment::model()->find('patient_id=? and allergy_id=?',array($this->id,$allergy_id))) {
-			$transaction = Yii::app()->db->beginTransaction();
+			$transaction = Yii::app()->db->beginTransaction('Patient','AddAllergy');
+
 			try {
 				$paa = new PatientAllergyAssignment;
 				$paa->patient_id = $this->id;

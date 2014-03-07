@@ -757,6 +757,45 @@ class BaseActiveRecordVersionedTest extends CDbTestCase
 		$this->assertEquals(5, $allergies[2]->id);
 	}
 
+	public function testRelationByTransactionID()
+	{
+		$patient = Patient::model()->findByPk(1);
+
+		$allergies = $patient->relationByTransactionID('allergies',200);
+
+		$this->assertCount(3, $allergies);
+
+		$this->assertEquals(1, $allergies[0]->id);
+		$this->assertEquals(3, $allergies[1]->id);
+		$this->assertEquals(5, $allergies[2]->id);
+	}
+
+	public function testRelationByTransactionIDOrActive_WithTransactionID()
+	{
+		$patient = Patient::model()->findByPk(1);
+
+		$allergies = $patient->relationByTransactionIDOrActive('allergies',200);
+
+		$this->assertCount(3, $allergies);
+
+		$this->assertEquals(1, $allergies[0]->id);
+		$this->assertEquals(3, $allergies[1]->id);
+		$this->assertEquals(5, $allergies[2]->id);
+	}
+
+	public function testRelationByTransactionIDOrActive_WithoutTransactionID()
+	{
+		$patient = Patient::model()->findByPk(1);
+
+		$allergies = $patient->relationByTransactionIDOrActive('allergies',null);
+
+		$this->assertCount(3, $allergies);
+
+		$this->assertEquals(1, $allergies[0]->id);
+		$this->assertEquals(2, $allergies[1]->id);
+		$this->assertEquals(3, $allergies[2]->id);
+	}
+
 	public function testSaveCreatesNewVersion()
 	{
 		$address = Address::model()->findByPk(1);
