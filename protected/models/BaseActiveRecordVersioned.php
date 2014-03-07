@@ -252,7 +252,7 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 			throw new Exception("deleteAllByAttributes() called without a transaction");
 		}
 
-		return $this->handleTransaction('deleteAllByAttributes',array($attributes,$condition,$params));
+		return parent::deleteAllByAttributes($attributes,$condition,$params);
 	}
 
 	private function versionToTableByPk($pk, $condition='', $params=array())
