@@ -979,6 +979,83 @@ class BaseActiveRecordVersionedTest extends CDbTestCase
 		$this->assertEquals('patient_allergies.name', $criteria->order);
 	}
 
+	public function testSetRelationCriteria_CBelongsToRelation()
+	{
+		$criteria = User::model()->findByPk(1)
+			->setRelationCriteria_CBelongsToRelation(new CDbCriteria, array(
+			'foo',
+			'User',
+			'id',
+		));
+
+		$this->assertEquals('id = :pk',$criteria->condition);
+		$this->assertEquals(1, $criteria->params[':pk']);
+	}
+
+	public function testSetRelationCriteria_CHasOneRelation()
+	{
+		$criteria = User::model()->findByPk(1)
+			->setRelationCriteria_CHasOneRelation(new CDbCriteria, array(
+			'foo',
+			'bar',
+			'microwave_id',
+		));
+
+		$this->assertEquals('microwave_id = :pk',$criteria->condition);
+		$this->assertEquals(1, $criteria->params[':pk']);
+	}
+
+	public function testSetRelationCriteria_CHasManyRelation()
+	{
+		$criteria = User::model()->findByPk(1)
+			->setRelationCriteria_CHasManyRelation(new CDbCriteria, array(
+			'foo',
+			'bar',
+			'microwave_id',
+		));
+
+		$this->assertEquals('microwave_id = :pk',$criteria->condition);
+		$this->assertEquals(1, $criteria->params[':pk']);
+	}
+
+	public function testSetRelationCriteria_CManyManyRelation()
+	{
+		$criteria = new CDbCriteria;
+		$criteria->alias = 'banana';
+	
+		$criteria = Patient::model()->findByPk(1)
+			->setRelationCriteria_CManyManyRelation($criteria, array(
+			'foo',
+			'Allergy',
+			'patient_allergy_assignment(patient_id, allergy_id)',
+		));
+
+		$this->assertEquals('',$criteria->condition);
+		$this->assertEquals('join `patient_allergy_assignment` on `patient_allergy_assignment`.`allergy_id` = `banana`.`id` and `patient_allergy_assignment`.`patient_id` = :pk',$criteria->join);
+		$this->assertEquals(1, $criteria->params[':pk']);
+	}
+
+	public function testSetRelationCriteria_CManyManyRelation_FromVersion()
+	{
+		$criteria = new CDbCriteria;
+		$criteria->alias = 'fridge';
+
+		$patient = Patient::model()->findByPk(1);
+		$patient->transaction_id = 200;
+		$patient->version_id = 201;
+
+		$criteria = $patient->setRelationCriteria_CManyManyRelation($criteria, array(
+			'foo',
+			'Allergy',
+			'patient_allergy_assignment(patient_id, allergy_id)',
+		));
+
+		$this->assertEquals('',$criteria->condition);
+		$this->assertEquals('join `patient_allergy_assignment_version` on `patient_allergy_assignment_version`.`allergy_id` = `fridge`.`id` and `patient_allergy_assignment_version`.`patient_id` = :pk and `patient_allergy_assignment_version`.`transaction_id` = :transaction_id',$criteria->join);
+		$this->assertEquals(200, $criteria->params[':transaction_id']);
+		$this->assertEquals(1, $criteria->params[':pk']);
+	}
+
 	public function testSaveCreatesNewVersion()
 	{
 		$address = Address::model()->findByPk(1);

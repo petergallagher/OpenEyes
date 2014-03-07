@@ -544,7 +544,7 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 			throw new Exception("Unhandled MANY_MANY relation type: ".print_r($relation,true));
 		}
 
-		if ($this->tableHasTransactionID($m[1].'_version', $this->transaction_id)) {
+		if (!$this->isActiveVersion() && $this->tableHasTransactionID($m[1].'_version', $this->transaction_id)) {
 			$criteria->join = "join `{$m[1]}_version` on `{$m[1]}_version`.`{$m[3]}` = `$criteria->alias`.`".$relation[1]::model()->tableSchema->primaryKey."` and `{$m[1]}_version`.`{$m[2]}` = :pk and `{$m[1]}_version`.`transaction_id` = :transaction_id";
 			$criteria->params[':transaction_id'] = $this->transaction_id;
 		} else {
