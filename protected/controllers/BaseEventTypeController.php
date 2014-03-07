@@ -656,9 +656,8 @@ class BaseEventTypeController extends BaseModuleController
 			// creation
 			if (empty($errors)) {
 				$transaction = Yii::app()->db->beginTransaction();
-
-				Yii::app()->db->transaction->setOperation('Create');
-				Yii::app()->db->transaction->setObject('Event');
+				$transaction->setOperation('Create');
+				$transaction->setObject('Event');
 
 				try {
 					$success = $this->saveEvent($_POST);
@@ -810,9 +809,8 @@ class BaseEventTypeController extends BaseModuleController
 			// update the event
 			if (empty($errors)) {
 				$transaction = Yii::app()->db->beginTransaction();
-
-				Yii::app()->db->transaction->setOperation('Update');
-				Yii::app()->db->transaction->setObject('Event');
+				$transaction->setOperation('Update');
+				$transaction->setObject('Event');
 
 				try {
 					//TODO: should all the auditing be moved into the saving of the event
@@ -1526,9 +1524,8 @@ class BaseEventTypeController extends BaseModuleController
 
 		if (!empty($_POST)) {
 			$transaction = Yii::app()->db->beginTransaction();
-
-			Yii::app()->db->transaction->setOperation('Delete');
-			Yii::app()->db->transaction->setObject('Event');
+			$transaction->setOperation('Delete');
+			$transaction->setObject('Event');
 
 			try {
 				$this->event->softDelete();

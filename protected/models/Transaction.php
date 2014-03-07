@@ -71,6 +71,8 @@ class Transaction extends BaseActiveRecord
 				throw new Exception("Unable to save transaction table assignment: ".print_r($tta->getErrors(),true));
 			}
 		}
+
+		$this->table_assignments = array_merge($this->table_assignments, array($tta));
 	}
 
 	/**
@@ -92,6 +94,8 @@ class Transaction extends BaseActiveRecord
 		if (!$this->save()) {
 			throw new Exception("Unable to save transaction: ".print_r($this->getErrors(),true));
 		}
+
+		$this->operation = $operation;
 	}
 
 	/**
@@ -113,5 +117,7 @@ class Transaction extends BaseActiveRecord
 		if (!$this->save()) {
 			throw new Exception("Unable to save transaction: ".print_r($this->getErrors(),true));
 		}
+
+		$this->object = $object;
 	}
 }

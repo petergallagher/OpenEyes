@@ -72,7 +72,9 @@ class OECommandBuilder extends CDbCommandBuilder
 			->limit(1)
 			->queryRow()) {
 
-			$command = $this->createInsertFromTableCommand($table_version,$table,$criteria,Yii::app()->db->transaction->id);
+			$transaction = Yii::app()->db->getCurrentTransaction();
+
+			$command = $this->createInsertFromTableCommand($table_version,$table,$criteria,$transaction->id);
 			if (!$command->execute()) {
 				throw new Exception("Unable to insert version row: ".print_r($command,true));
 			}

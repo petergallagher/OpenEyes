@@ -208,7 +208,9 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 
 		$transaction = Yii::app()->db->getCurrentTransaction() === null ? Yii::app()->db->beginTransaction() : false;
 
-		Yii::app()->db->transaction->addTable($this->tableName());
+		if ($transaction) {
+			$transaction->addTable($this->tableName());
+		}
 
 		try {
 			if (!$this->enable_version || ($version_method === null || call_user_func_array(array($this,$version_method),$version_params))) {
@@ -305,29 +307,37 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 			throw new Exception("save() should not be called on versiond model instances.");
 		}
 
-		if (!Yii::app()->db->getCurrentTransaction()) {
+		if (!$transaction = Yii::app()->db->getCurrentTransaction()) {
 			$transaction = Yii::app()->db->beginTransaction();
 
-			Yii::app()->db->transaction->setOperation($this->isNewRecord ? 'Create' : 'Update');
-			Yii::app()->db->transaction->setObject(get_class($this));
+			$transaction->setOperation($this->isNewRecord ? 'Create' : 'Update');
+			$transaction->setObject(get_class($this));
+			$transaction->addTable($this->tableName());
+
+			$new_transaction = true;
+
+		} else {
+			$transaction->addTable($this->tableName());
 		}
 
 		$this->hash = $this->generateHash();
 
-		if ($this->transaction_id == Yii::app()->db->transaction->id) {
-			// Don't create a new version row if save is called again in the same transaction
+		if ($this->transaction_id == $transaction->id) {
+			// Don't create a new version row if save is called again on the same object in the same transaction
 
 			$this->noVersion();
 
 			$result = parent::save($runValidation, $attributes, $allow_overriding);
+
 			$this->withVersion();
+
 		} else {
-			$this->transaction_id = Yii::app()->db->transaction->id;
+			$this->transaction_id = $transaction->id;
 
 			$result = parent::save($runValidation, $attributes, $allow_overriding);
 		}
 
-		if (isset($transaction)) {
+		if (isset($new_transaction)) {
 			try {
 				$transaction->commit();
 			} catch (Exception $e) {
@@ -364,16 +374,17 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 			throw new Exception("delete() should not be called on versiond model instances.");
 		}
 
-		if (!Yii::app()->db->getCurrentTransaction()) {
+		if (!$transaction = Yii::app()->db->getCurrentTransaction()) {
 			$transaction = Yii::app()->db->beginTransaction();
+			$transaction->setOperation('Delete');
+			$transaction->setObject(get_class($this));
 
-			Yii::app()->db->transaction->setOperation('Delete');
-			Yii::app()->db->transaction->setObject(get_class($this));
+			$new_transaction = true;
 		}
 
 		$result = parent::delete();
 
-		if (isset($transaction)) {
+		if (isset($new_transaction)) {
 			try {
 				$transaction->commit();
 			} catch (Exception $e) {
@@ -492,7 +503,7 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 	/**
 	 * Gets the base criteria object for a relation query
 	 */
-	private function getRelationCriteria($relation)
+	private function getRelationCriteria($relation_name, $relation)
 	{
 		foreach ($relation as $i => $value) {
 			if (!is_int($i) && !in_array($i,array('condition','on','params','order','limit','offset','alias','with'))) {
@@ -501,6 +512,7 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 		}
 
 		$criteria = new CDbCriteria;
+		$criteria->alias = $relation_name;
 
 		isset($relation['condition']) && $criteria->addCondition($relation['condition']);
 		isset($relation['params']) && $criteria->params = $relation['params'];
@@ -552,10 +564,10 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 	/**
 	 * Takes a relation defined on the model and returns a query to derive the same data from the version tables
 	 */
-	private function handleVersionRelation($name, $transaction_id=null)
+	private function handleVersionRelation($relation_name, $transaction_id=null)
 	{
-		$relation = $this->getRelationDefinition($name);
-		$criteria = $this->getRelationCriteria($relation);
+		$relation = $this->getRelationDefinition($relation_name);
+		$criteria = $this->getRelationCriteria($relation_name, $relation);
 
 		if (!$transaction_id) {
 			$transaction_id = $this->transaction_id;
@@ -576,13 +588,11 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 
 			case 'CHasManyRelation':
 				if ($transaction_id) {
-					$alias = $criteria->alias ? $criteria->alias : 't';
-
-					$criteria->addCondition($alias.'.transaction_id <= :transaction_id');
+					$criteria->addCondition($relation_name.'.transaction_id <= :transaction_id');
 					$criteria->params[':transaction_id'] = $transaction_id;
 
 					$version_criteria = clone $criteria;
-					$version_criteria->addCondition($alias.'.deleted_transaction_id is null or '.$alias.'.deleted_transaction_id > :transaction_id');
+					$version_criteria->addCondition($relation_name.'.deleted_transaction_id is null or '.$relation_name.'.deleted_transaction_id > :transaction_id');
 
 					return $this->deDupeByID(array_merge(
 						$relation[1]::model()->findAll($criteria),
@@ -604,16 +614,15 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 						throw new Exception("Unhandled MANY_MANY relation: ".print_r($relation,true));
 					}
 
-					$alias = $criteria->alias ? $criteria->alias : 't';
-					$criteria->join = "join `{$m[1]}` on `{$m[1]}`.`{$m[3]}` = `$alias`.`".$relation[1]::model()->tableSchema->primaryKey."` and `{$m[1]}`.`{$m[2]}` = :pk and `{$m[1]}`.`transaction_id` <= :transaction_id";
+					$criteria->join = "join `{$m[1]}` on `{$m[1]}`.`{$m[3]}` = `$relation_name`.`".$relation[1]::model()->tableSchema->primaryKey."` and `{$m[1]}`.`{$m[2]}` = :pk and `{$m[1]}`.`transaction_id` <= :transaction_id";
 					$criteria->params[':transaction_id'] = $transaction_id;
 
 					$version_criteria = clone $criteria;
-					$version_criteria->join = "join `{$m[1]}_version` on `{$m[1]}_version`.`{$m[3]}` = `$alias`.`".$relation[1]::model()->tableSchema->primaryKey."` and `{$m[1]}_version`.`{$m[2]}` = :pk and (`{$m[1]}_version`.`transaction_id` is null or `{$m[1]}_version`.transaction_id > :transaction_id )";
+					$version_criteria->join = "join `{$m[1]}_version` on `{$m[1]}_version`.`{$m[3]}` = `$relation_name`.`".$relation[1]::model()->tableSchema->primaryKey."` and `{$m[1]}_version`.`{$m[2]}` = :pk and `{$m[1]}_version`.`transaction_id` <= :transaction_id and (`{$m[1]}_version`.`deleted_transaction_id` is null or `{$m[1]}_version`.deleted_transaction_id > :transaction_id )";
 
 					return $this->deDupeByID(array_merge(
 						$relation[1]::model()->findAll($criteria),
-						$relation[1]::model()->fromVersion()->findAll($version_criteria)
+						$relation[1]::model()->findAll($version_criteria)
 					));
 				}
 
@@ -623,7 +632,7 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 				throw new Exception("Unhandled relation type: ".$relation[0]);
 		}
 
-		return parent::getRelated($name);
+		return parent::getRelated($relation_name);
 	}
 
 	/**
@@ -632,7 +641,7 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 	public function getVersionHistoryForRelation($relation_name)
 	{
 		$relation = $this->getRelationDefinition($relation_name);
-		$criteria = $this->getRelationCriteria($relation);
+		$criteria = $this->getRelationCriteria($relation_name, $relation);
 
 		$transactions = array();
 

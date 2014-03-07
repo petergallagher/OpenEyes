@@ -19,23 +19,24 @@
 
 class OEDbConnection extends CDbConnection
 {
-	public $transaction = null;
+	private $oe_transaction = null;
 
 	public function beginTransaction()
 	{
 		if (Yii::app()->params['enable_transactions']) {
-			$transaction = parent::beginTransaction();
-
-			$this->transaction = new Transaction;
-
-			if (!$this->transaction->save()) {
-				throw new Exception("Unable to save transaction: ".print_r($transaction->getErrors(),true));
-			}
-
-			return $transaction;
+			return ($this->oe_transaction = new OETransaction(parent::beginTransaction()));
 		} else {
-			$stub = new OETransactionStub;
-			return $stub;
+			return ($this->oe_transaction = new OETransactionStub);
 		}
+	}
+
+	public function getCurrentTransaction()
+	{
+		return $this->oe_transaction;
+	}
+
+	public function clearTransaction()
+	{
+		$this->oe_transaction = null;
 	}
 }
