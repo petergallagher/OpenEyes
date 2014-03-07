@@ -796,6 +796,167 @@ class BaseActiveRecordVersionedTest extends CDbTestCase
 		$this->assertEquals(3, $allergies[2]->id);
 	}
 
+	public function testGetRelationCriteria_HasMany()
+	{
+		$patient = Patient::model()->findByPk(1);
+
+		$criteria = $patient->getRelationCriteria('legacyepisodes', array(
+				'CHasManyRelation',
+				'Episode',
+				'patient_id',
+				'condition' => 'legacy=1',
+		));
+
+		$this->assertInstanceOf('CDbCriteria', $criteria);
+
+		$this->assertEquals('*', $criteria->select);
+		$this->assertEquals('(legacy=1) AND (patient_id = :pk)', $criteria->condition);
+		$this->assertEquals(1, $criteria->params[':pk']);
+		$this->assertEquals('legacyepisodes', $criteria->alias);
+	}
+
+	public function testGetRelationCriteria_HasMany_CustomAlias()
+	{
+		$patient = Patient::model()->findByPk(1);
+
+		$criteria = $patient->getRelationCriteria('episodes', array(
+				'CHasManyRelation',
+				'Episode',
+				'patient_id',
+				'condition' => '(patient_episode.legacy=0 or patient_episode.legacy is null)',
+				'alias' => 'patient_episode',
+		));
+
+		$this->assertInstanceOf('CDbCriteria', $criteria);
+
+		$this->assertEquals('*', $criteria->select);
+		$this->assertEquals('((patient_episode.legacy=0 or patient_episode.legacy is null)) AND (patient_id = :pk)', $criteria->condition);
+		$this->assertEquals(1, $criteria->params[':pk']);
+		$this->assertEquals('patient_episode', $criteria->alias);
+	}
+
+	public function testGetRelationCriteria_HasMany_Order()
+	{
+		$patient = Patient::model()->findByPk(1);
+
+		$criteria = $patient->getRelationCriteria('previousOperations', array(
+				'CHasManyRelation',
+				'PreviousOperation',
+				'patient_id',
+				'order' => 'date',
+		));
+
+		$this->assertInstanceOf('CDbCriteria', $criteria);
+
+		$this->assertEquals('*', $criteria->select);
+		$this->assertEquals('patient_id = :pk', $criteria->condition);
+		$this->assertEquals(1, $criteria->params[':pk']);
+		$this->assertEquals('previousOperations', $criteria->alias);
+		$this->assertEquals('date', $criteria->order);
+	}
+
+	public function testGetRelationCriteria_HasMany_With()
+	{
+		$patient = Patient::model()->findByPk(1);
+
+		$criteria = $patient->getRelationCriteria('ophthalmicDiagnoses', array(
+				'CHasManyRelation',
+				'SecondaryDiagnosis',
+				'patient_id',
+				'with' => array(
+					'disorder' => array(
+						'with' => 'specialty',
+					),
+				),
+				'condition' => 'specialty.code = 130',
+				'order' => 'date asc',
+		));
+		
+		$this->assertInstanceOf('CDbCriteria', $criteria);
+		
+		$this->assertEquals('*', $criteria->select);
+		$this->assertEquals('(specialty.code = 130) AND (patient_id = :pk)', $criteria->condition);
+		$this->assertEquals(1, $criteria->params[':pk']);
+		$this->assertEquals('ophthalmicDiagnoses', $criteria->alias);
+		$this->assertEquals('date asc', $criteria->order);
+		$this->assertEquals(array('disorder' => array('with' => 'specialty')), $criteria->with);
+	}
+
+	public function testGetRelationCriteria_BelongsTo()
+	{
+		$patient = Patient::model()->findByPk(1);
+
+		$criteria = $patient->getRelationCriteria('contact', array(
+				'CBelongsToRelation',
+				'Contact',
+				'contact_id',
+		));
+	 
+		$this->assertInstanceOf('CDbCriteria', $criteria);
+	 
+		$this->assertEquals('*', $criteria->select);
+		$this->assertEquals('id = :pk', $criteria->condition);
+		$this->assertEquals(1, $criteria->params[':pk']);
+		$this->assertEquals('contact', $criteria->alias);
+	}
+
+	public function testGetRelationCriteria_BelongsTo_CustomAlias()
+	{
+		$patient = Patient::model()->findByPk(1);
+
+		$criteria = $patient->getRelationCriteria('contact', array(
+				'CBelongsToRelation',
+				'Contact',
+				'contact_id',
+				'alias' => 'foo',
+		));
+	
+		$this->assertInstanceOf('CDbCriteria', $criteria);
+	
+		$this->assertEquals('*', $criteria->select);
+		$this->assertEquals('id = :pk', $criteria->condition);
+		$this->assertEquals(1, $criteria->params[':pk']);
+		$this->assertEquals('foo', $criteria->alias);
+	}
+
+	public function testGetRelationCriteria_HasOne()
+	{
+		$patient = Patient::model()->findByPk(1);
+
+		$criteria = $patient->getRelationCriteria('lastReferral', array(
+				'CHasOneRelation',
+				'Referral',
+				'patient_id',
+		));
+	
+		$this->assertInstanceOf('CDbCriteria', $criteria);
+	
+		$this->assertEquals('*', $criteria->select);
+		$this->assertEquals('patient_id = :pk', $criteria->condition);
+		$this->assertEquals(1, $criteria->params[':pk']);
+		$this->assertEquals('lastReferral', $criteria->alias);
+	}
+
+	public function testGetRelationCriteria_HasOne_Order()
+	{
+		$patient = Patient::model()->findByPk(1);
+
+		$criteria = $patient->getRelationCriteria('lastReferral', array(
+				'CHasOneRelation',
+				'Referral',
+				'patient_id',
+				'order' => 'received_date desc',
+		));
+ 
+		$this->assertInstanceOf('CDbCriteria', $criteria);
+ 
+		$this->assertEquals('*', $criteria->select);
+		$this->assertEquals('patient_id = :pk', $criteria->condition);
+		$this->assertEquals(1, $criteria->params[':pk']);
+		$this->assertEquals('lastReferral', $criteria->alias);
+		$this->assertEquals('received_date desc', $criteria->order);
+	}
+
 	public function testSaveCreatesNewVersion()
 	{
 		$address = Address::model()->findByPk(1);
