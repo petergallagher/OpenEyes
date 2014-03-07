@@ -23,7 +23,7 @@ class OETransaction
 	public $pdo_transaction;
 	public $oe_transaction;
 
-	public function __construct($pdo_transaction)
+	public function __construct($pdo_transaction, $operation_name=null, $object_name=null)
 	{
 		$this->pdo_transaction = $pdo_transaction;
 		$this->oe_transaction = new Transaction;
@@ -33,6 +33,9 @@ class OETransaction
 		}
 
 		$this->id = $this->oe_transaction->id;
+
+		$operation_name && $this->oe_transaction->setOperation($operation_name);
+		$object_name && $this->oe_transaction->setObject($object_name);
 	}
 
 	public function commit()

@@ -17,26 +17,27 @@
  * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
  */
 
-class OEDbConnection extends CDbConnection
-{
-	private $oe_transaction = null;
 
-	public function beginTransaction($operation_name=null, $object_name=null)
-	{
-		if (Yii::app()->params['enable_transactions']) {
-			return ($this->oe_transaction = new OETransaction(parent::beginTransaction(),$operation_name,$object_name));
-		} else {
-			return ($this->oe_transaction = new OETransactionStub);
-		}
-	}
-
-	public function getCurrentTransaction()
-	{
-		return $this->oe_transaction;
-	}
-
-	public function clearTransaction()
-	{
-		$this->oe_transaction = null;
-	}
-}
+return array(
+	0 => array(
+		'id' => 1,
+	),
+	1 => array(
+		'id' => 2,
+	),
+	2 => array(
+		'id' => 3,
+	),
+	3 => array(
+		'id' => 97,
+	),
+	4 => array(
+		'id' => 98,
+	),
+	5 => array(
+		'id' => 99,
+	),
+	6 => array(
+		'id' => 100,
+	),
+);
