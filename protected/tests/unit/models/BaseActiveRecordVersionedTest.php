@@ -957,6 +957,28 @@ class BaseActiveRecordVersionedTest extends CDbTestCase
 		$this->assertEquals('received_date desc', $criteria->order);
 	}
 
+	public function testGetRelationCriteria_ManyMany()
+	{
+		$patient = Patient::model()->findByPk(1);
+
+		$criteria = $patient->getRelationCriteria('allergies', array(
+				'CManyManyRelation',
+				'Allergy',
+				'patient_allergy_assignment(patient_id, allergy_id)',
+				'alias' => 'patient_allergies',
+				'order' => 'patient_allergies.name',
+		));
+ 
+		$this->assertInstanceOf('CDbCriteria', $criteria);
+ 
+		$this->assertEquals('*', $criteria->select);
+		$this->assertEquals('', $criteria->condition);
+		$this->assertEquals('join `patient_allergy_assignment` on `patient_allergy_assignment`.`allergy_id` = `patient_allergies`.`id` and `patient_allergy_assignment`.`patient_id` = :pk', $criteria->join);
+		$this->assertEquals(1, $criteria->params[':pk']);
+		$this->assertEquals('patient_allergies', $criteria->alias);
+		$this->assertEquals('patient_allergies.name', $criteria->order);
+	}
+
 	public function testSaveCreatesNewVersion()
 	{
 		$address = Address::model()->findByPk(1);
