@@ -19,17 +19,18 @@
  */
 class BaseActiveRecordTest extends CDbTestCase
 {
-
 	/**
 	 * @var AddressType
 	 */
 	public $model;
-	/*   public $fixtures = array(
+	/*	 public $fixtures = array(
 		 'alllergies' => 'Allergy',
 		 ); */
 	public $testattributes = array(
 		'name' => 'allergy test'
 	);
+
+	public $_transactions;
 
 	/**
 	 * Sets up the fixture, for example, opens a network connection.
@@ -41,6 +42,12 @@ class BaseActiveRecordTest extends CDbTestCase
 
 		//using allergy model to test the active record
 		$this->model = new Allergy;
+
+		if (!isset($this->_transactions)) {
+			$_transactions = Yii::app()->params['enable_transactions'];
+		}
+
+		Yii::app()->params['enable_transactions'] = false;
 	}
 
 	/**
@@ -49,12 +56,12 @@ class BaseActiveRecordTest extends CDbTestCase
 	 */
 	protected function tearDown()
 	{
-
+		Yii::app()->params['enable_transactions'] = $this->_transactions;
 	}
 
 	/**
 	 * @covers BaseActiveRecord::behaviors
-	 * @todo   Implement testBehaviors().
+	 * @todo	 Implement testBehaviors().
 	 */
 	public function testBehaviors()
 	{
@@ -68,7 +75,7 @@ class BaseActiveRecordTest extends CDbTestCase
 
 	/**
 	 * @covers BaseActiveRecord::save
-	 * @todo   Implement testSave().
+	 * @todo	 Implement testSave().
 	 */
 	public function testSave()
 	{
@@ -88,7 +95,7 @@ class BaseActiveRecordTest extends CDbTestCase
 
 	/**
 	 * @covers BaseActiveRecord::NHSDate
-	 * @todo   Implement testNHSDate().
+	 * @todo	 Implement testNHSDate().
 	 */
 	public function testNHSDate()
 	{
@@ -103,7 +110,7 @@ class BaseActiveRecordTest extends CDbTestCase
 
 	/**
 	 * @covers BaseActiveRecord::NHSDateAsHTML
-	 * @todo   Implement testNHSDateAsHTML().
+	 * @todo	 Implement testNHSDateAsHTML().
 	 */
 	public function testNHSDateAsHTML()
 	{
@@ -118,7 +125,7 @@ class BaseActiveRecordTest extends CDbTestCase
 
 	/**
 	 * @covers BaseActiveRecord::audit
-	 * @todo   Implement testAudit().
+	 * @todo	 Implement testAudit().
 	 */
 	public function testAudit()
 	{

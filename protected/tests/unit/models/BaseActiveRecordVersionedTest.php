@@ -38,6 +38,7 @@ class BaseActiveRecordVersionedTest extends CDbTestCase
 		'secondary_diagnosis' => 'SecondaryDiagnosis',
 		'secondary_diagnosis_version' => ':secondary_diagnosis_version',
 		'transaction' => 'Transaction',
+		'patient_allergy_assignment_version' => ':patient_allergy_assignment_version',
 	);
 
 	protected function setUp()
@@ -45,6 +46,8 @@ class BaseActiveRecordVersionedTest extends CDbTestCase
 		parent::setUp();
 
 		$this->model = new User;
+
+		Yii::app()->params['enable_transactions'] = true;
 	}
 
 	protected function tearDown()
@@ -210,6 +213,42 @@ class BaseActiveRecordVersionedTest extends CDbTestCase
 		$this->assertInstanceOf('OECommandBuilder',$command_builder);
 	}
 
+	public function testUpdateByPk_TransactionsOff_WithoutTransaction()
+	{
+		Yii::app()->params['enable_transactions'] = false;
+
+		$this->model->updateByPk(1, array(
+			'id' => 1,
+		));
+
+		$this->assertTrue(true);
+
+		// Cleanup
+		Yii::app()->params['enable_transactions'] = true;
+	}
+
+	public function testUpdateByPk_TransactionsOn_WithoutTransaction()
+	{
+		$this->setExpectedException('Exception', 'updateByPk() called without a transaction');
+
+		$this->model->updateByPk(1, array(
+			'id' => 1,
+		));
+	}
+
+	public function testUpdateByPk_TransactionsOn_WithTransaction()
+	{
+		$transaction = Yii::app()->db->beginTransaction('Update','User');
+
+		$this->model->updateByPk(1, array(
+			'id' => 1,
+		));
+
+		$transaction->commit();
+
+		$this->assertTrue(true);
+	}
+
 	public function testUpdateByPkWithVersioning()
 	{
 		$transaction = Yii::app()->db->beginTransaction('Update','User');
@@ -271,6 +310,42 @@ class BaseActiveRecordVersionedTest extends CDbTestCase
 
 		// Cleanup
 		Yii::app()->db->createCommand("update user set username = '{$this->users['user1']['username']}', first_name = '{$this->users['user1']['first_name']}', last_name = '{$this->users['user1']['last_name']}', email = '{$this->users['user1']['email']}' where id = 1")->query();
+	}
+
+	public function testUpdateAll_TransactionsOff_WithoutTransaction()
+	{
+		Yii::app()->params['enable_transactions'] = false;
+
+		$this->model->updateAll(array(
+			'active' => 1,
+		));
+
+		$this->assertTrue(true);
+
+		// Cleanup
+		Yii::app()->params['enable_transactions'] = true;
+	}
+
+	public function testUpdateAll_TransactionsOn_WithoutTransaction()
+	{
+		$this->setExpectedException('Exception', 'updateAll() called without a transaction');
+
+		$this->model->updateAll(array(
+			'active' => 1,
+		));
+	}
+
+	public function testUpdateAll_TransactionsOn_WithTransaction()
+	{
+		$transaction = Yii::app()->db->beginTransaction('Update','User');
+
+		$this->model->updateAll(array(
+			'active' => 1,
+		));
+
+		$transaction->commit();
+
+		$this->assertTrue(true);
 	}
 
 	public function testUpdateAllWithVersioning()
@@ -412,6 +487,37 @@ class BaseActiveRecordVersionedTest extends CDbTestCase
 		Yii::app()->db->createCommand("update user set username = '{$this->users['user3']['username']}', first_name = '{$this->users['user3']['first_name']}', last_name = '{$this->users['user3']['last_name']}', email = '{$this->users['user3']['email']}' where id = 3")->query();
 	}
 
+	public function testSave_TransactionsOff_WithoutTransaction()
+	{
+		Yii::app()->params['enable_transactions'] = false;
+
+		$user = User::model()->findByPk(1);
+		$this->assertTrue($user->save());
+
+		// Cleanup
+		Yii::app()->params['enable_transactions'] = true;
+	}
+
+	public function testSave_TransactionsOn_WithoutTransaction()
+	{
+		$this->setExpectedException('Exception', 'save() called without a transaction');
+
+		$user = User::model()->findByPk(1);
+		$user->save();
+	}
+
+	public function testSave_TransactionsOn_WithTransaction()
+	{
+		$transaction = Yii::app()->db->beginTransaction('Update','User');
+
+		$user = User::model()->findByPk(1);
+		$user->save();
+
+		$transaction->commit();
+
+		$this->assertTrue(true);
+	}
+
 	public function testSaveDeniedOnVersionedModels()
 	{
 		$user = User::model()->findByPk(1);
@@ -421,6 +527,41 @@ class BaseActiveRecordVersionedTest extends CDbTestCase
 		$this->setExpectedException('Exception', 'save() should not be called on versiond model instances.');
 
 		$previous_version->save();
+	}
+
+	public function testDelete_TransactionsOff_WithoutTransaction()
+	{
+		Yii::app()->params['enable_transactions'] = false;
+
+		$allergy = new Allergy;
+		$allergy->name = 'testing';
+		$allergy->save();
+
+		$this->assertTrue($allergy->delete());
+
+		// Cleanup
+		Yii::app()->params['enable_transactions'] = true;
+	}
+
+	public function testDelete_TransactionsOn_WithoutTransaction()
+	{
+		$this->setExpectedException('Exception', 'delete() called without a transaction');
+
+		$paa = PatientAllergyAssignment::model()->find();
+		$paa->delete();
+	}
+
+	public function testDelete_TransactionsOn_WithTransaction()
+	{
+		$transaction = Yii::app()->db->beginTransaction('Delete','Allergy');
+
+		$allergy = new Allergy;
+		$allergy->name = 'testing';
+		$allergy->save();
+
+		$this->assertTrue($allergy->delete());
+
+		$transaction->commit();
 	}
 
 	public function testDeleteDeniedOnVersionedModels()
@@ -479,6 +620,45 @@ class BaseActiveRecordVersionedTest extends CDbTestCase
 		$this->assertCount(1, $transaction_list);
 
 		$this->assertEquals('Current: by Joe Bloggs on 1 Jan 1900 at 00:00', $transaction_list[0]);
+	}
+
+	public function testGetFullTransactionListForRelation_HasMany()
+	{
+		$patient = Patient::model()->findByPk(2);
+
+		$transactions = $patient->getFullTransactionListForRelation('systemicDiagnoses');
+
+		$this->assertCount(4, $transactions);
+
+		$this->assertEquals('Current: Joe Bloggs on 1 Jan 1900 at 00:00', $transactions[0]);
+		$this->assertEquals('Edit by Joe Bloggs on 1 Jan 1900 at 00:00', $transactions[99]);
+		$this->assertEquals('Edit by Joe Bloggs on 1 Jan 1900 at 00:00', $transactions[98]);
+		$this->assertEquals('Edit by Joe Bloggs on 1 Jan 1900 at 00:00', $transactions[97]);
+	}
+
+	public function testGetFullTransactionListForRelation_ManyMany()
+	{
+		$patient = Patient::model()->findByPk(1);
+
+		$transactions = $patient->getFullTransactionListForRelation('allergies');
+
+		$this->assertCount(4, $transactions);
+
+		$this->assertEquals('Current: Joe Bloggs on 1 Jan 1901 at 00:00', $transactions[0]);
+		$this->assertEquals('Edit by Joe Bloggs on 29 Jan 2012 at 13:37', $transactions[201]);
+		$this->assertEquals('Edit by Joe Bloggs on 20 Jan 2012 at 13:37', $transactions[200]);
+		$this->assertEquals('Edit by Joe Bloggs on 17 Jan 2012 at 13:37', $transactions[1]);
+	}
+
+	public function testGetTransactionText()
+	{
+		foreach (User::model()->findAll() as $user) {
+			for ($i=0;$i<5;$i++) {
+				$ts = rand();
+
+				$this->assertEquals($user->fullName.' on '.date('j M Y',$ts).' at '.date('H:i',$ts),$user->getTransactionText($user->id,date('Y-m-d H:i:s',$ts)));
+			}
+		}
 	}
 
 	public function testGetRelated_BelongsTo_NotFromVersion()
@@ -564,7 +744,7 @@ class BaseActiveRecordVersionedTest extends CDbTestCase
 		$this->assertEquals(3, $allergies[2]->id);
 	}
 
-/*	public function testGetRelated_ManyMany_FromVersion()
+	public function testGetRelated_ManyMany_FromVersion()
 	{
 		$patient = Patient::model()->findByPk(1)->getPreviousVersion();
 
@@ -573,9 +753,9 @@ class BaseActiveRecordVersionedTest extends CDbTestCase
 		$this->assertCount(3, $allergies);
 
 		$this->assertEquals(1, $allergies[0]->id);
-		$this->assertEquals(2, $allergies[1]->id);
-		$this->assertEquals(3, $allergies[2]->id);
-	}*/
+		$this->assertEquals(3, $allergies[1]->id);
+		$this->assertEquals(5, $allergies[2]->id);
+	}
 
 	public function testSaveCreatesNewVersion()
 	{
@@ -601,6 +781,41 @@ class BaseActiveRecordVersionedTest extends CDbTestCase
 
 		// Cleanup
 		Yii::app()->db->createCommand("delete from address_version where version_id = {$previous_version->version_id}")->query();
+	}
+
+	public function testSaveMoreThanOnceInTheSameTransactionOnlyGeneratesOneNewVersionRow()
+	{
+		$address = Address::model()->findByPk(1);
+
+		$this->assertCount(0, Address::model()->fromVersion()->findAll('id=1'));
+
+		$transaction = Yii::app()->db->beginTransaction('Update','Address');
+
+		$address->save();
+		$address->save();
+		$address->save();
+
+		$transaction->commit();
+
+		$this->assertCount(1, Address::model()->fromVersion()->findAll('id=1'));
+
+		$previous_version = Address::model()->fromVersion()->find('id=1');
+
+		$this->assertEquals('flat 1', $previous_version->address1);
+		$this->assertEquals('bleakley creek', $previous_version->address2);
+		$this->assertEquals('flitchley', $previous_version->city);
+		$this->assertEquals('ec1v 0dx', $previous_version->postcode);
+		$this->assertEquals('london', $previous_version->county);
+
+		// Cleanup
+		Yii::app()->db->createCommand("delete from address_version where version_id = {$previous_version->version_id}")->query();
+	}
+
+	public function testGenerateHash()
+	{
+		$user = User::model()->findByPk(1);
+
+		$this->assertEquals('42b298f8412f05f36086274dfab6f64699d989e3',$user->generateHash());
 	}
 
 	public function testDeleteCreatesNewVersion()
@@ -681,5 +896,113 @@ class BaseActiveRecordVersionedTest extends CDbTestCase
 		$this->assertCount(2, $patient->getRelated('systemicDiagnoses',false,array(),99));
 		$this->assertCount(4, $patient->getRelated('systemicDiagnoses',false,array(),98));
 		$this->assertCount(6, $patient->getRelated('systemicDiagnoses',false,array(),97));
+	}
+
+	public function testDeleteByPk_TransactionsOff_WithoutTransaction()
+	{
+		Yii::app()->params['enable_transactions'] = false;
+
+		$paa = new PatientAllergyAssignment;
+		$paa->patient_id = 1;
+		$paa->allergy_id = 1;
+		$paa->save();
+
+		$this->assertEquals(1, PatientAllergyAssignment::model()->deleteByPk($paa->id));
+
+		// Cleanup
+		Yii::app()->params['enable_transactions'] = true;
+	}
+
+	public function testDeleteByPk_TransactionsOn_WithoutTransaction()
+	{
+		$this->setExpectedException('Exception', 'deleteByPk() called without a transaction');
+
+		PatientAllergyAssignment::model()->deleteByPk(1);
+	}
+
+	public function testDeleteByPk_TransactionsOn_WithTransaction()
+	{
+		$transaction = Yii::app()->db->beginTransaction('Delete','Allergy');
+
+		$paa = new PatientAllergyAssignment;
+		$paa->patient_id = 1;
+		$paa->allergy_id = 1;
+		$paa->save();
+
+		$this->assertEquals(1, PatientAllergyAssignment::model()->deleteByPk($paa->id));
+
+		$transaction->commit();
+	}
+
+	public function testDeleteAll_TransactionsOff_WithoutTransaction()
+	{
+		Yii::app()->params['enable_transactions'] = false;
+
+		$paa = new PatientAllergyAssignment;
+		$paa->patient_id = 1;
+		$paa->allergy_id = 1;
+		$paa->save();
+
+		$this->assertEquals(1, PatientAllergyAssignment::model()->deleteAll('id=:id',array(':id' => $paa->id)));
+
+		// Cleanup
+		Yii::app()->params['enable_transactions'] = true;
+	}
+
+	public function testDeleteAll_TransactionsOn_WithoutTransaction()
+	{
+		$this->setExpectedException('Exception', 'deleteAll() called without a transaction');
+
+		PatientAllergyAssignment::model()->deleteAll();
+	}
+
+	public function testDeleteAll_TransactionsOn_WithTransaction()
+	{
+		$transaction = Yii::app()->db->beginTransaction('Delete','Allergy');
+
+		$paa = new PatientAllergyAssignment;
+		$paa->patient_id = 1;
+		$paa->allergy_id = 1;
+		$paa->save();
+
+		$this->assertEquals(1, PatientAllergyAssignment::model()->deleteAll('id=:id',array(':id'=>$paa->id)));
+
+		$transaction->commit();
+	}
+
+	public function testDeleteAllByAttributes_TransactionsOff_WithoutTransaction()
+	{
+		Yii::app()->params['enable_transactions'] = false;
+
+		$paa = new PatientAllergyAssignment;
+		$paa->patient_id = 1;
+		$paa->allergy_id = 1;
+		$paa->save();
+
+		$this->assertEquals(1, PatientAllergyAssignment::model()->deleteAllByAttributes(array('id' => $paa->id)));
+
+		// Cleanup
+		Yii::app()->params['enable_transactions'] = true;
+	}
+
+	public function testDeleteAllByAttributes_TransactionsOn_WithoutTransaction()
+	{
+		$this->setExpectedException('Exception', 'deleteAllByAttributes() called without a transaction');
+
+		PatientAllergyAssignment::model()->deleteAllByAttributes(array('id'=>1));
+	}
+
+	public function testDeleteAllByAttributes_TransactionsOn_WithTransaction()
+	{
+		$transaction = Yii::app()->db->beginTransaction('Delete','Allergy');
+
+		$paa = new PatientAllergyAssignment;
+		$paa->patient_id = 1;
+		$paa->allergy_id = 1;
+		$paa->save();
+
+		$this->assertEquals(1, PatientAllergyAssignment::model()->deleteAllByAttributes(array('id'=>$paa->id)));
+
+		$transaction->commit();
 	}
 }

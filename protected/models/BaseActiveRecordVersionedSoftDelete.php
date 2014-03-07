@@ -23,6 +23,14 @@ class BaseActiveRecordVersionedSoftDelete extends BaseActiveRecordVersioned
 
 	public function delete()
 	{
+		if (Yii::app()->params['enable_transactions']) {
+			if (!$transaction = Yii::app()->db->getCurrentTransaction()) {
+				throw new Exception("delete() called without a transaction");
+			}
+
+			$transaction->addTable($this->tableName());
+		}
+
 		if (isset($this->notDeletedField)) {
 			$this->{$this->notDeletedField} = 0;
 		} else {
@@ -34,6 +42,14 @@ class BaseActiveRecordVersionedSoftDelete extends BaseActiveRecordVersioned
 
 	public function deleteByPk($pk,$condition='',$params=array())
 	{
+		if (Yii::app()->params['enable_transactions']) {
+			if (!$transaction = Yii::app()->db->getCurrentTransaction()) {
+				throw new Exception("deleteByPk() called without a transaction");
+			}
+
+			$transaction->addTable($this->tableName());
+		}
+
 		if (isset($this->notDeletedField)) {
 			$attributes = array(
 				$this->notDeletedField => 0,
@@ -49,6 +65,14 @@ class BaseActiveRecordVersionedSoftDelete extends BaseActiveRecordVersioned
 
 	public function deleteAll($condition='',$params=array())
 	{
+		if (Yii::app()->params['enable_transactions']) {
+			if (!$transaction = Yii::app()->db->getCurrentTransaction()) {
+				throw new Exception("deleteAll() called without a transaction");
+			}
+
+			$transaction->addTable($this->tableName());
+		}
+
 		if (isset($this->notDeletedField)) {
 			$attributes = array(
 				$this->notDeletedField => 0,
@@ -64,6 +88,14 @@ class BaseActiveRecordVersionedSoftDelete extends BaseActiveRecordVersioned
 
 	public function deleteAllByAttributes($attributes,$condition='',$params=array())
 	{
+		if (Yii::app()->params['enable_transactions']) {
+			if (!$transaction = Yii::app()->db->getCurrentTransaction()) {
+				throw new Exception("deleteAllByAttributes() called without a transaction");
+			}
+
+			$transaction->addTable($this->tableName());
+		}
+
 		if (is_object($condition)) {
 			foreach ($attributes as $key => $value) {
 				$condition->addCondition("key = :__$key");

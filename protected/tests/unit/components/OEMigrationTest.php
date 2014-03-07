@@ -45,7 +45,13 @@ class OEMigrationTest extends CDbTestCase
 		$this->oeMigration->initialiseData($this->fixturePath,	null, 'oeMigrationData');
 		$this->compareFixtureWithResultSet($this->event_type, $eventTypeResultSet);
 
+		$transactions = Yii::app()->params['enable_transactions'];
+
+		Yii::app()->params['enable_transactions'] = false;
+
 		EventType::model()->deleteAll('id >= 1000');
+
+		Yii::app()->params['enable_transactions'] = $transactions;
 	}
 
 	public function testGetMigrationPath(){

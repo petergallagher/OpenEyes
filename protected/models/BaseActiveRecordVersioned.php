@@ -204,8 +204,12 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 
 	public function updateByPk($pk,$attributes,$condition='',$params=array())
 	{
-		if (!$transaction = Yii::app()->db->getCurrentTransaction()) {
-			throw new Exception("updateByPk() called without a transaction");
+		if (Yii::app()->params['enable_transactions']) {
+			if (!$transaction = Yii::app()->db->getCurrentTransaction()) {
+				throw new Exception("updateByPk() called without a transaction");
+			}
+
+			$transaction->addTable($this->tableName());
 		}
 
 		if (!$this->enable_version || $this->versionToTableByPk($pk, $condition, $params)) {
@@ -217,8 +221,12 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 
 	public function updateAll($attributes,$condition='',$params=array())
 	{
-		if (!$transaction = Yii::app()->db->getCurrentTransaction()) {
-			throw new Exception("updateAll() called without a transaction");
+		if (Yii::app()->params['enable_transactions']) {
+			if (!$transaction = Yii::app()->db->getCurrentTransaction()) {
+				throw new Exception("updateAll() called without a transaction");
+			}
+
+			$transaction->addTable($this->tableName());
 		}
 
 		if (!$this->enable_version || $this->versionAllToTable($condition, $params)) {
@@ -230,8 +238,12 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 
 	public function deleteByPk($pk,$condition='',$params=array())
 	{
-		if (!$transaction = Yii::app()->db->getCurrentTransaction()) {
-			throw new Exception("deleteByPk() called without a transaction");
+		if (Yii::app()->params['enable_transactions']) {
+			if (!$transaction = Yii::app()->db->getCurrentTransaction()) {
+				throw new Exception("deleteByPk() called without a transaction");
+			}
+
+			$transaction->addTable($this->tableName());
 		}
 
 		return parent::deleteByPk($pk,$condition,$params);
@@ -239,8 +251,12 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 
 	public function deleteAll($condition='',$params=array())
 	{
-		if (!$transaction = Yii::app()->db->getCurrentTransaction()) {
-			throw new Exception("deleteAll() called without a transaction");
+		if (Yii::app()->params['enable_transactions']) {
+			if (!$transaction = Yii::app()->db->getCurrentTransaction()) {
+				throw new Exception("deleteAll() called without a transaction");
+			}
+
+			$transaction->addTable($this->tableName());
 		}
 
 		return parent::deleteAll($condition,$params);
@@ -248,8 +264,12 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 
 	public function deleteAllByAttributes($attributes,$condition='',$params=array())
 	{
-		if (!$transaction = Yii::app()->db->getCurrentTransaction()) {
-			throw new Exception("deleteAllByAttributes() called without a transaction");
+		if (Yii::app()->params['enable_transactions']) {
+			if (!$transaction = Yii::app()->db->getCurrentTransaction()) {
+				throw new Exception("deleteAllByAttributes() called without a transaction");
+			}
+
+			$transaction->addTable($this->tableName());
 		}
 
 		return parent::deleteAllByAttributes($attributes,$condition,$params);
@@ -300,11 +320,13 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 			throw new Exception("save() should not be called on versiond model instances.");
 		}
 
-		if (!$transaction = Yii::app()->db->getCurrentTransaction()) {
-			throw new Exception("save() called on a version'd model without a transaction");
-		}
+		if (Yii::app()->params['enable_transactions']) {
+			if (!$transaction = Yii::app()->db->getCurrentTransaction()) {
+				throw new Exception("save() called without a transaction");
+			}
 
-		$transaction->addTable($this->tableName());
+			$transaction->addTable($this->tableName());
+		}
 
 		$this->hash = $this->generateHash();
 
@@ -351,11 +373,13 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 			throw new Exception("delete() should not be called on versiond model instances.");
 		}
 
-		if (!$transaction = Yii::app()->db->getCurrentTransaction()) {
-			throw new Exception("delete() called on a version'd model without a transaction");
-		}
+		if (Yii::app()->params['enable_transactions']) {
+			if (!$transaction = Yii::app()->db->getCurrentTransaction()) {
+				throw new Exception("delete() called without a transaction");
+			}
 
-		$transaction->addTable($this->tableName());
+			$transaction->addTable($this->tableName());
+		}
 
 		return parent::delete();
 	}
@@ -397,7 +421,6 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 		$transactions = array();
 		$ts = array();
 
-		$_relation = $this->getRelationDefinition($relation);
 		$transactions = $this->getVersionHistoryForRelation($relation);
 
 		krsort($transactions);

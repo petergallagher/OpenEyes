@@ -25,6 +25,8 @@ class PatientTest extends CDbTestCase
 		'addresses' => 'Address'
 	);
 
+	public $_transactions;
+
 	public function dataProvider_Search()
 	{
 		return array(
@@ -52,12 +54,24 @@ class PatientTest extends CDbTestCase
 	protected function setUp()
 	{
 		parent::setUp();
+
 		$this->model = new Patient;
+
+		if (!isset($this->_transactions)) {
+			$_transactions = Yii::app()->params['enable_transactions'];
+		}
+
+		Yii::app()->params['enable_transactions'] = false;
+	}
+
+	protected function tearDown()
+	{
+		Yii::app()->params['enable_transactions'] = $this->_transactions;
 	}
 
 	/**
 	 * @covers Patient::model
-	 * @todo   Implement testModel().
+	 * @todo	 Implement testModel().
 	 */
 	public function testModel()
 	{
@@ -66,7 +80,7 @@ class PatientTest extends CDbTestCase
 
 	/**
 	 * @covers Patient::behaviors
-	 * @todo   Implement testBehaviors().
+	 * @todo	 Implement testBehaviors().
 	 */
 	public function testBehaviors()
 	{
@@ -78,7 +92,7 @@ class PatientTest extends CDbTestCase
 
 	/**
 	 * @covers Patient::noPas
-	 * @todo   Implement testNoPas().
+	 * @todo	 Implement testNoPas().
 	 */
 	public function testNoPas()
 	{
@@ -90,7 +104,7 @@ class PatientTest extends CDbTestCase
 
 	/**
 	 * @covers Patient::tableName
-	 * @todo   Implement testTableName().
+	 * @todo	 Implement testTableName().
 	 */
 	public function testTableName()
 	{
@@ -102,7 +116,7 @@ class PatientTest extends CDbTestCase
 
 	/**
 	 * @covers Patient::rules
-	 * @todo   Implement testRules().
+	 * @todo	 Implement testRules().
 	 */
 	public function testRules()
 	{
@@ -114,7 +128,7 @@ class PatientTest extends CDbTestCase
 
 	/**
 	 * @covers Patient::relations
-	 * @todo   Implement testRelations().
+	 * @todo	 Implement testRelations().
 	 */
 	public function testRelations()
 	{
@@ -126,7 +140,7 @@ class PatientTest extends CDbTestCase
 
 	/**
 	 * @covers Patient::attributeLabels
-	 * @todo   Implement testAttributeLabels().
+	 * @todo	 Implement testAttributeLabels().
 	 */
 	public function testAttributeLabels()
 	{
@@ -147,7 +161,7 @@ class PatientTest extends CDbTestCase
 
 	/**
 	 * @covers Patient::search_nr
-	 * @todo   Implement testSearch_nr().
+	 * @todo	 Implement testSearch_nr().
 	 */
 	public function testSearch_nr()
 	{
@@ -159,7 +173,7 @@ class PatientTest extends CDbTestCase
 
 	/**
 	 * @covers Patient::search
-	 * @todo   Implement testSearch().
+	 * @todo	 Implement testSearch().
 	 */
 	public function testSearch()
 	{
@@ -196,7 +210,7 @@ class PatientTest extends CDbTestCase
 
 	/**
 	 * @covers Patient::beforeSave
-	 * @todo   Implement testBeforeSave().
+	 * @todo	 Implement testBeforeSave().
 	 */
 	public function testBeforeSave()
 	{
@@ -208,7 +222,7 @@ class PatientTest extends CDbTestCase
 
 	/**
 	 * @covers Patient::getOrderedEpisodes
-	 * @todo   Implement testGetOrderedEpisodes().
+	 * @todo	 Implement testGetOrderedEpisodes().
 	 */
 	public function testGetOrderedEpisodes()
 	{
@@ -220,7 +234,7 @@ class PatientTest extends CDbTestCase
 
 	/**
 	 * @covers Patient::getAge
-	 * @todo   Implement testGetAge().
+	 * @todo	 Implement testGetAge().
 	 */
 	public function testGetAge()
 	{
@@ -270,7 +284,7 @@ class PatientTest extends CDbTestCase
 
 	/**
 	 * @covers Patient::isChild
-	 * @todo   Implement testIsChild().
+	 * @todo	 Implement testIsChild().
 	 */
 	public function testIsChild()
 	{
@@ -282,7 +296,7 @@ class PatientTest extends CDbTestCase
 
 	/**
 	 * @covers Patient::hasAllergy
-	 * @todo   Implement testHasAllergy().
+	 * @todo	 Implement testHasAllergy().
 	 */
 	public function testHasAllergy()
 	{
@@ -294,7 +308,7 @@ class PatientTest extends CDbTestCase
 
 	/**
 	 * @covers Patient::isDeceased
-	 * @todo   Implement testIsDeceased().
+	 * @todo	 Implement testIsDeceased().
 	 */
 	public function testIsDeceased()
 	{
@@ -306,7 +320,7 @@ class PatientTest extends CDbTestCase
 
 	/**
 	 * @covers Patient::getAddressName
-	 * @todo   Implement testGetAddressName().
+	 * @todo	 Implement testGetAddressName().
 	 */
 	public function testGetAddressName()
 	{
@@ -318,7 +332,7 @@ class PatientTest extends CDbTestCase
 
 	/**
 	 * @covers Patient::getSalutationName
-	 * @todo   Implement testGetSalutationName().
+	 * @todo	 Implement testGetSalutationName().
 	 */
 	public function testGetSalutationName()
 	{
@@ -330,7 +344,7 @@ class PatientTest extends CDbTestCase
 
 	/**
 	 * @covers Patient::getFullName
-	 * @todo   Implement testGetFullName().
+	 * @todo	 Implement testGetFullName().
 	 */
 	public function testGetFullName()
 	{
@@ -342,7 +356,7 @@ class PatientTest extends CDbTestCase
 
 	/**
 	 * @covers Patient::getDisplayName
-	 * @todo   Implement testGetDisplayName().
+	 * @todo	 Implement testGetDisplayName().
 	 */
 	public function testGetDisplayName()
 	{
@@ -354,7 +368,7 @@ class PatientTest extends CDbTestCase
 
 	/**
 	 * @covers Patient::getEpisodeForCurrentSubspecialty
-	 * @todo   Implement testGetEpisodeForCurrentSubspecialty().
+	 * @todo	 Implement testGetEpisodeForCurrentSubspecialty().
 	 */
 	public function testGetEpisodeForCurrentSubspecialty()
 	{
@@ -366,7 +380,7 @@ class PatientTest extends CDbTestCase
 
 	/**
 	 * @covers Patient::getOphInfo
-	 * @todo   Implement testGetOphInfo().
+	 * @todo	 Implement testGetOphInfo().
 	 */
 	public function testGetOphInfo()
 	{
@@ -378,7 +392,7 @@ class PatientTest extends CDbTestCase
 
 	/**
 	 * @covers Patient::getSub
-	 * @todo   Implement testGetSub().
+	 * @todo	 Implement testGetSub().
 	 */
 	public function testGetSub()
 	{
@@ -390,7 +404,7 @@ class PatientTest extends CDbTestCase
 
 	/**
 	 * @covers Patient::getPro
-	 * @todo   Implement testGetPro().
+	 * @todo	 Implement testGetPro().
 	 */
 	public function testGetPro()
 	{
@@ -402,7 +416,7 @@ class PatientTest extends CDbTestCase
 
 	/**
 	 * @covers Patient::getEpd
-	 * @todo   Implement testGetEpd().
+	 * @todo	 Implement testGetEpd().
 	 */
 	public function testGetEpd()
 	{
@@ -414,7 +428,7 @@ class PatientTest extends CDbTestCase
 
 	/**
 	 * @covers Patient::getEps
-	 * @todo   Implement testGetEps().
+	 * @todo	 Implement testGetEps().
 	 */
 	public function testGetEps()
 	{
@@ -426,7 +440,7 @@ class PatientTest extends CDbTestCase
 
 	/**
 	 * @covers Patient::getGenderString
-	 * @todo   Implement testGetGenderString().
+	 * @todo	 Implement testGetGenderString().
 	 */
 	public function testGetGenderString()
 	{
@@ -438,7 +452,7 @@ class PatientTest extends CDbTestCase
 
 	/**
 	 * @covers Patient::getEthnicGroupString
-	 * @todo   Implement testGetEthnicGroupString().
+	 * @todo	 Implement testGetEthnicGroupString().
 	 */
 	public function testGetEthnicGroupString()
 	{
@@ -450,7 +464,7 @@ class PatientTest extends CDbTestCase
 
 	/**
 	 * @covers Patient::getObj
-	 * @todo   Implement testGetObj().
+	 * @todo	 Implement testGetObj().
 	 */
 	public function testGetObj()
 	{
@@ -462,7 +476,7 @@ class PatientTest extends CDbTestCase
 
 	/**
 	 * @covers Patient::getOpl
-	 * @todo   Implement testGetOpl().
+	 * @todo	 Implement testGetOpl().
 	 */
 	public function testGetOpl()
 	{
@@ -474,7 +488,7 @@ class PatientTest extends CDbTestCase
 
 	/**
 	 * @covers Patient::getOpr
-	 * @todo   Implement testGetOpr().
+	 * @todo	 Implement testGetOpr().
 	 */
 	public function testGetOpr()
 	{
@@ -486,7 +500,7 @@ class PatientTest extends CDbTestCase
 
 	/**
 	 * @covers Patient::getOps
-	 * @todo   Implement testGetOps().
+	 * @todo	 Implement testGetOps().
 	 */
 	public function testGetOps()
 	{
@@ -498,7 +512,7 @@ class PatientTest extends CDbTestCase
 
 	/**
 	 * @covers Patient::getPos
-	 * @todo   Implement testGetPos().
+	 * @todo	 Implement testGetPos().
 	 */
 	public function testGetPos()
 	{
@@ -510,7 +524,7 @@ class PatientTest extends CDbTestCase
 
 	/**
 	 * @covers Patient::getTitle
-	 * @todo   Implement testGetTitle().
+	 * @todo	 Implement testGetTitle().
 	 */
 	public function testGetTitle()
 	{
@@ -522,7 +536,7 @@ class PatientTest extends CDbTestCase
 
 	/**
 	 * @covers Patient::getFirst_name
-	 * @todo   Implement testGetFirst_name().
+	 * @todo	 Implement testGetFirst_name().
 	 */
 	public function testGetFirst_name()
 	{
@@ -534,7 +548,7 @@ class PatientTest extends CDbTestCase
 
 	/**
 	 * @covers Patient::getLast_name
-	 * @todo   Implement testGetLast_name().
+	 * @todo	 Implement testGetLast_name().
 	 */
 	public function testGetLast_name()
 	{
@@ -546,7 +560,7 @@ class PatientTest extends CDbTestCase
 
 	/**
 	 * @covers Patient::getNick_name
-	 * @todo   Implement testGetNick_name().
+	 * @todo	 Implement testGetNick_name().
 	 */
 	public function testGetNick_name()
 	{
@@ -558,7 +572,7 @@ class PatientTest extends CDbTestCase
 
 	/**
 	 * @covers Patient::getPrimary_phone
-	 * @todo   Implement testGetPrimary_phone().
+	 * @todo	 Implement testGetPrimary_phone().
 	 */
 	public function testGetPrimary_phone()
 	{
@@ -570,7 +584,7 @@ class PatientTest extends CDbTestCase
 
 	/**
 	 * @covers Patient::getPre
-	 * @todo   Implement testGetPre().
+	 * @todo	 Implement testGetPre().
 	 */
 	public function testGetPre()
 	{
@@ -582,7 +596,7 @@ class PatientTest extends CDbTestCase
 
 	/**
 	 * @covers Patient::getSummaryAddress
-	 * @todo   Implement testGetSummaryAddress().
+	 * @todo	 Implement testGetSummaryAddress().
 	 */
 	public function testGetSummaryAddress()
 	{
@@ -594,7 +608,7 @@ class PatientTest extends CDbTestCase
 
 	/**
 	 * @covers Patient::getAllergiesString
-	 * @todo   Implement testGetAllergiesString().
+	 * @todo	 Implement testGetAllergiesString().
 	 */
 	public function testGetAllergiesString()
 	{
@@ -606,7 +620,7 @@ class PatientTest extends CDbTestCase
 
 	/**
 	 * @covers Patient::addAllergy
-	 * @todo   Implement testAddAllergy().
+	 * @todo	 Implement testAddAllergy().
 	 */
 	public function testAddAllergy()
 	{
@@ -618,7 +632,7 @@ class PatientTest extends CDbTestCase
 
 	/**
 	 * @covers Patient::removeAllergy
-	 * @todo   Implement testRemoveAllergy().
+	 * @todo	 Implement testRemoveAllergy().
 	 */
 	public function testRemoveAllergy()
 	{
@@ -630,7 +644,7 @@ class PatientTest extends CDbTestCase
 
 	/**
 	 * @covers Patient::assignAllergies
-	 * @todo   Implement testAssignAllergies().
+	 * @todo	 Implement testAssignAllergies().
 	 */
 	public function testAssignAllergies()
 	{
@@ -642,7 +656,7 @@ class PatientTest extends CDbTestCase
 
 	/**
 	 * @covers Patient::getAdm
-	 * @todo   Implement testGetAdm().
+	 * @todo	 Implement testGetAdm().
 	 */
 	public function testGetAdm()
 	{
@@ -654,7 +668,7 @@ class PatientTest extends CDbTestCase
 
 	/**
 	 * @covers Patient::getSystemicDiagnoses
-	 * @todo   Implement testGetSystemicDiagnoses().
+	 * @todo	 Implement testGetSystemicDiagnoses().
 	 */
 	public function testGetSystemicDiagnoses()
 	{
@@ -666,7 +680,7 @@ class PatientTest extends CDbTestCase
 
 	/**
 	 * @covers Patient::getOphthalmicDiagnoses
-	 * @todo   Implement testGetOphthalmicDiagnoses().
+	 * @todo	 Implement testGetOphthalmicDiagnoses().
 	 */
 	public function testGetOphthalmicDiagnoses()
 	{
@@ -678,7 +692,7 @@ class PatientTest extends CDbTestCase
 
 	/**
 	 * @covers Patient::getSpecialtyCodes
-	 * @todo   Implement testGetSpecialtyCodes().
+	 * @todo	 Implement testGetSpecialtyCodes().
 	 */
 	public function testGetSpecialtyCodes()
 	{
@@ -690,7 +704,7 @@ class PatientTest extends CDbTestCase
 
 	/**
 	 * @covers Patient::addDiagnosis
-	 * @todo   Implement testAddDiagnosis().
+	 * @todo	 Implement testAddDiagnosis().
 	 */
 	public function testAddDiagnosis()
 	{
@@ -702,7 +716,7 @@ class PatientTest extends CDbTestCase
 
 	/**
 	 * @covers Patient::removeDiagnosis
-	 * @todo   Implement testRemoveDiagnosis().
+	 * @todo	 Implement testRemoveDiagnosis().
 	 */
 	public function testRemoveDiagnosis()
 	{
@@ -714,7 +728,7 @@ class PatientTest extends CDbTestCase
 
 	/**
 	 * @covers Patient::editOphInfo
-	 * @todo   Implement testEditOphInfo().
+	 * @todo	 Implement testEditOphInfo().
 	 */
 	public function testEditOphInfo()
 	{
@@ -726,7 +740,7 @@ class PatientTest extends CDbTestCase
 
 	/**
 	 * @covers Patient::getHpc
-	 * @todo   Implement testGetHpc().
+	 * @todo	 Implement testGetHpc().
 	 */
 	public function testGetHpc()
 	{
@@ -738,7 +752,7 @@ class PatientTest extends CDbTestCase
 
 	/**
 	 * @covers Patient::getIpb
-	 * @todo   Implement testGetIpb().
+	 * @todo	 Implement testGetIpb().
 	 */
 	public function testGetIpb()
 	{
@@ -750,7 +764,7 @@ class PatientTest extends CDbTestCase
 
 	/**
 	 * @covers Patient::getIpl
-	 * @todo   Implement testGetIpl().
+	 * @todo	 Implement testGetIpl().
 	 */
 	public function testGetIpl()
 	{
@@ -762,7 +776,7 @@ class PatientTest extends CDbTestCase
 
 	/**
 	 * @covers Patient::getIpp
-	 * @todo   Implement testGetIpp().
+	 * @todo	 Implement testGetIpp().
 	 */
 	public function testGetIpp()
 	{
@@ -774,7 +788,7 @@ class PatientTest extends CDbTestCase
 
 	/**
 	 * @covers Patient::getIpr
-	 * @todo   Implement testGetIpr().
+	 * @todo	 Implement testGetIpr().
 	 */
 	public function testGetIpr()
 	{
@@ -786,7 +800,7 @@ class PatientTest extends CDbTestCase
 
 	/**
 	 * @covers Patient::getAsb
-	 * @todo   Implement testGetAsb().
+	 * @todo	 Implement testGetAsb().
 	 */
 	public function testGetAsb()
 	{
@@ -798,7 +812,7 @@ class PatientTest extends CDbTestCase
 
 	/**
 	 * @covers Patient::getAsl
-	 * @todo   Implement testGetAsl().
+	 * @todo	 Implement testGetAsl().
 	 */
 	public function testGetAsl()
 	{
@@ -810,7 +824,7 @@ class PatientTest extends CDbTestCase
 
 	/**
 	 * @covers Patient::getAsp
-	 * @todo   Implement testGetAsp().
+	 * @todo	 Implement testGetAsp().
 	 */
 	public function testGetAsp()
 	{
@@ -822,7 +836,7 @@ class PatientTest extends CDbTestCase
 
 	/**
 	 * @covers Patient::getAsr
-	 * @todo   Implement testGetAsr().
+	 * @todo	 Implement testGetAsr().
 	 */
 	public function testGetAsr()
 	{
@@ -834,7 +848,7 @@ class PatientTest extends CDbTestCase
 
 	/**
 	 * @covers Patient::getPsb
-	 * @todo   Implement testGetPsb().
+	 * @todo	 Implement testGetPsb().
 	 */
 	public function testGetPsb()
 	{
@@ -846,7 +860,7 @@ class PatientTest extends CDbTestCase
 
 	/**
 	 * @covers Patient::getPsl
-	 * @todo   Implement testGetPsl().
+	 * @todo	 Implement testGetPsl().
 	 */
 	public function testGetPsl()
 	{
@@ -858,7 +872,7 @@ class PatientTest extends CDbTestCase
 
 	/**
 	 * @covers Patient::getPsp
-	 * @todo   Implement testGetPsp().
+	 * @todo	 Implement testGetPsp().
 	 */
 	public function testGetPsp()
 	{
@@ -870,7 +884,7 @@ class PatientTest extends CDbTestCase
 
 	/**
 	 * @covers Patient::getPsr
-	 * @todo   Implement testGetPsr().
+	 * @todo	 Implement testGetPsr().
 	 */
 	public function testGetPsr()
 	{
@@ -882,7 +896,7 @@ class PatientTest extends CDbTestCase
 
 	/**
 	 * @covers Patient::getVbb
-	 * @todo   Implement testGetVbb().
+	 * @todo	 Implement testGetVbb().
 	 */
 	public function testGetVbb()
 	{
@@ -894,7 +908,7 @@ class PatientTest extends CDbTestCase
 
 	/**
 	 * @covers Patient::getVbl
-	 * @todo   Implement testGetVbl().
+	 * @todo	 Implement testGetVbl().
 	 */
 	public function testGetVbl()
 	{
@@ -906,7 +920,7 @@ class PatientTest extends CDbTestCase
 
 	/**
 	 * @covers Patient::getVbp
-	 * @todo   Implement testGetVbp().
+	 * @todo	 Implement testGetVbp().
 	 */
 	public function testGetVbp()
 	{
@@ -918,7 +932,7 @@ class PatientTest extends CDbTestCase
 
 	/**
 	 * @covers Patient::getVbr
-	 * @todo   Implement testGetVbr().
+	 * @todo	 Implement testGetVbr().
 	 */
 	public function testGetVbr()
 	{
@@ -930,7 +944,7 @@ class PatientTest extends CDbTestCase
 
 	/**
 	 * @covers Patient::getCon
-	 * @todo   Implement testGetCon().
+	 * @todo	 Implement testGetCon().
 	 */
 	public function testGetCon()
 	{
@@ -942,7 +956,7 @@ class PatientTest extends CDbTestCase
 
 	/**
 	 * @covers Patient::getMan
-	 * @todo   Implement testGetMan().
+	 * @todo	 Implement testGetMan().
 	 */
 	public function testGetMan()
 	{
@@ -954,7 +968,7 @@ class PatientTest extends CDbTestCase
 
 	/**
 	 * @covers Patient::getContactAddress
-	 * @todo   Implement testGetContactAddress().
+	 * @todo	 Implement testGetContactAddress().
 	 */
 	public function testGetContactAddress()
 	{
@@ -966,7 +980,7 @@ class PatientTest extends CDbTestCase
 
 	/**
 	 * @covers Patient::getNhsnum
-	 * @todo   Implement testGetNhsnum().
+	 * @todo	 Implement testGetNhsnum().
 	 */
 	public function testGetNhsnum()
 	{
@@ -978,7 +992,7 @@ class PatientTest extends CDbTestCase
 
 	/**
 	 * @covers Patient::hasLegacyLetters
-	 * @todo   Implement testHasLegacyLetters().
+	 * @todo	 Implement testHasLegacyLetters().
 	 */
 	public function testHasLegacyLetters()
 	{
@@ -990,7 +1004,7 @@ class PatientTest extends CDbTestCase
 
 	/**
 	 * @covers Patient::getAdd
-	 * @todo   Implement testGetAdd().
+	 * @todo	 Implement testGetAdd().
 	 */
 	public function testGetAdd()
 	{
@@ -1002,7 +1016,7 @@ class PatientTest extends CDbTestCase
 
 	/**
 	 * @covers Patient::getAdl
-	 * @todo   Implement testGetAdl().
+	 * @todo	 Implement testGetAdl().
 	 */
 	public function testGetAdl()
 	{
@@ -1014,7 +1028,7 @@ class PatientTest extends CDbTestCase
 
 	/**
 	 * @covers Patient::audit
-	 * @todo   Implement testAudit().
+	 * @todo	 Implement testAudit().
 	 */
 	public function testAudit()
 	{
@@ -1026,7 +1040,7 @@ class PatientTest extends CDbTestCase
 
 	/**
 	 * @covers Patient::getChildPrefix
-	 * @todo   Implement testGetChildPrefix().
+	 * @todo	 Implement testGetChildPrefix().
 	 */
 	public function testGetChildPrefix()
 	{
@@ -1038,7 +1052,7 @@ class PatientTest extends CDbTestCase
 
 	/**
 	 * @covers Patient::getSdl
-	 * @todo   Implement testGetSdl().
+	 * @todo	 Implement testGetSdl().
 	 */
 	public function testGetSdl()
 	{
@@ -1050,7 +1064,7 @@ class PatientTest extends CDbTestCase
 
 	/**
 	 * @covers Patient::addPreviousOperation
-	 * @todo   Implement testAddPreviousOperation().
+	 * @todo	 Implement testAddPreviousOperation().
 	 */
 	public function testAddPreviousOperation()
 	{
@@ -1062,7 +1076,7 @@ class PatientTest extends CDbTestCase
 
 	/**
 	 * @covers Patient::addFamilyHistory
-	 * @todo   Implement testAddFamilyHistory().
+	 * @todo	 Implement testAddFamilyHistory().
 	 */
 	public function testAddFamilyHistory()
 	{
@@ -1074,7 +1088,7 @@ class PatientTest extends CDbTestCase
 
 	/**
 	 * @covers Patient::currentContactLocationIDS
-	 * @todo   Implement testCurrentContactLocationIDS().
+	 * @todo	 Implement testCurrentContactLocationIDS().
 	 */
 	public function testCurrentContactLocationIDS()
 	{
@@ -1086,7 +1100,7 @@ class PatientTest extends CDbTestCase
 
 	/**
 	 * @covers Patient::getPrefix
-	 * @todo   Implement testGetPrefix().
+	 * @todo	 Implement testGetPrefix().
 	 */
 	public function testGetPrefix()
 	{
@@ -1098,7 +1112,7 @@ class PatientTest extends CDbTestCase
 
 	/**
 	 * @covers Patient::getEpc
-	 * @todo   Implement testGetEpc().
+	 * @todo	 Implement testGetEpc().
 	 */
 	public function testGetEpc()
 	{
@@ -1110,7 +1124,7 @@ class PatientTest extends CDbTestCase
 
 	/**
 	 * @covers Patient::getEpv
-	 * @todo   Implement testGetEpv().
+	 * @todo	 Implement testGetEpv().
 	 */
 	public function testGetEpv()
 	{
@@ -1122,7 +1136,7 @@ class PatientTest extends CDbTestCase
 
 	/**
 	 * @covers Patient::updateMedication
-	 * @todo   Implement testUpdateMedication().
+	 * @todo	 Implement testUpdateMedication().
 	 */
 	public function testUpdateMedication()
 	{
@@ -1134,7 +1148,7 @@ class PatientTest extends CDbTestCase
 
 	/**
 	 * @covers Patient::addMedication
-	 * @todo   Implement testAddMedication().
+	 * @todo	 Implement testAddMedication().
 	 */
 	public function testAddMedication()
 	{

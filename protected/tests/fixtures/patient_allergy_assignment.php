@@ -20,13 +20,16 @@ return array(
 	0 => array(
 		'patient_id' => 1,
 		'allergy_id' => 1,
+		'transaction_id' => 202,
 	),
 	1 => array(
 		'patient_id' => 1,
 		'allergy_id' => 2,
+		'transaction_id' => 202,
 	),
 	2 => array(
 		'patient_id' => 1,
 		'allergy_id' => 3,
+		'transaction_id' => 202,
 	),
 );

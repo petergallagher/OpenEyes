@@ -11,6 +11,7 @@ return array(
 				'created_date' => '1900-01-01 00:00:00',
 				'hash' => '',
 				'transaction_id' => null,
+				'conflicted' => 0,
 		),
 		'psa2' => array(
 				'id' => '2',
@@ -23,5 +24,6 @@ return array(
 				'created_date' => '1900-01-01 00:00:00',
 				'hash' => '',
 				'transaction_id' => null,
+				'conflicted' => 0,
 		)
 );

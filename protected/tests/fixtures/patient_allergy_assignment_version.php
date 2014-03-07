@@ -1,5 +1,4 @@
 <?php
-
 /**
  * OpenEyes
  *
@@ -18,24 +17,44 @@
  * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
  */
 return array(
-	'allergy1' => array(
+	0 => array(
 		'id' => 1,
-		'name' => 'allergy 1'
+		'patient_id' => 1,
+		'allergy_id' => 4,
+		'version_id' => 200,
+		'transaction_id' => 201,
+		'last_modified_date' => '2012-01-29 13:37:00',
 	),
-	'allergy2' => array(
+	1 => array(
 		'id' => 2,
-		'name' => 'allergy 2'
+		'patient_id' => 1,
+		'allergy_id' => 5,
+		'version_id' => 201,
+		'transaction_id' => 200,
+		'last_modified_date' => '2012-01-20 13:37:00',
 	),
-	'allergy3' => array(
+	2 => array(
 		'id' => 3,
-		'name' => 'allergy 3'
+		'patient_id' => 1,
+		'allergy_id' => 5,
+		'version_id' => 202,
+		'transaction_id' => 1,
+		'last_modified_date' => '2012-01-17 13:37:00',
 	),
-	'allergy4' => array(
+	3 => array(
 		'id' => 4,
-		'name' => 'allergy 4',
+		'patient_id' => 1,
+		'allergy_id' => 1,
+		'version_id' => 203,
+		'transaction_id' => 1,
+		'last_modified_date' => '2013-01-17 13:37:00',
 	),
-	'allergy5' => array(
+	4 => array(
 		'id' => 5,
-		'name' => 'allergy 5',
+		'patient_id' => 1,
+		'allergy_id' => 3,
+		'version_id' => 204,
+		'transaction_id' => 1,
+		'last_modified_date' => '2011-01-17 13:37:00',
 	),
 );
