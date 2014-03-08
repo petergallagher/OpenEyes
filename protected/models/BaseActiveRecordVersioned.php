@@ -448,13 +448,86 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 	/**
 	 * Remap relations to version table queries
 	 */
-	public function getRelated($name,$refresh=false,$params=array(),$transaction_id=null)
+	public function getRelated($relation_name,$refresh=false,$params=array(),$transaction_id=null)
 	{
-		if (!$this->isActiveVersion() || $transaction_id) {
-			return $this->handleVersionRelation($name, $transaction_id);
+		if ($this->isActiveVersion() && !$transaction_id) {
+			return parent::getRelated($relation_name,$refresh,$params);
 		}
 
-		return parent::getRelated($name,$refresh,$params);
+		$relation = $this->getRelationDefinition($relation_name);
+		$criteria = $this->getRelationCriteria($relation_name, $relation);
+
+		!$transaction_id && $transaction_id = $this->transaction_id;
+
+		if (!method_exists($this, 'getRelated_'.$relation[0])) {
+			throw new Exception("Unhandled relation type: ".$relation[0]);
+		}
+
+		return $this->{'getRelated_'.$relation[0]}($relation, $criteria, $transaction_id);
+	}
+
+	public function getRelated_CBelongsToRelation($relation, $criteria, $transaction_id)
+	{
+		$related = $relation[1]::model()->find($criteria);
+
+		if (method_exists($related,'getPreviousVersionByTransactionID')) {
+			if ($previous_version = $related->getPreviousVersionByTransactionID($transaction_id)) {
+				return $previous_version;
+			}
+		}
+
+		return $related;
+	}
+
+	public function getRelated_CHasOneRelation($relation, $criteria, $transaction_id)
+	{
+		return $this->getRelated_CBelongsToRelation($relation, $criteria, $transaction_id);
+	}
+
+	public function getRelated_CHasManyRelation($relation, $criteria, $transaction_id)
+	{
+		if ($transaction_id) {
+			$criteria->addCondition($criteria->alias.'.transaction_id <= :transaction_id');
+			$criteria->params[':transaction_id'] = $transaction_id;
+
+			$version_criteria = clone $criteria;
+			$version_criteria->addCondition($criteria->alias.'.deleted_transaction_id is null or '.$criteria->alias.'.deleted_transaction_id > :transaction_id');
+
+			return $this->deDupeByID(array_merge(
+				$relation[1]::model()->findAll($criteria),
+				$relation[1]::model()->fromVersion()->findAll($version_criteria)
+			));
+
+		} elseif ($relation[1]::model()->hasTransactionID($transaction_id)) {
+			$criteria->addCondition('transaction_id = :transaction_id');
+			$criteria->params[':transaction_id'] = $this->transaction_id;
+
+			return $relation[1]::model()->fromVersion()->findAll($criteria);
+		}
+
+		return $relation[1]::model()->findAll($criteria);
+	}
+
+	public function getRelated_CManyManyRelation($relation, $criteria, $transaction_id)
+	{
+		if ($transaction_id) {
+			if (!preg_match('/^(.*?)\((.*?),[\s\t]*(.*?)\)$/',$relation[2],$m)) {
+				throw new Exception("Unhandled MANY_MANY relation: ".print_r($relation,true));
+			}
+
+			$criteria->join = "join `{$m[1]}` on `{$m[1]}`.`{$m[3]}` = `$criteria->alias`.`".$relation[1]::model()->tableSchema->primaryKey."` and `{$m[1]}`.`{$m[2]}` = :pk and `{$m[1]}`.`transaction_id` <= :transaction_id";
+			$criteria->params[':transaction_id'] = $transaction_id;
+
+			$version_criteria = clone $criteria;
+			$version_criteria->join = "join `{$m[1]}_version` on `{$m[1]}_version`.`{$m[3]}` = `$criteria->alias`.`".$relation[1]::model()->tableSchema->primaryKey."` and `{$m[1]}_version`.`{$m[2]}` = :pk and `{$m[1]}_version`.`transaction_id` <= :transaction_id and (`{$m[1]}_version`.`deleted_transaction_id` is null or `{$m[1]}_version`.deleted_transaction_id > :transaction_id )";
+
+			return $this->deDupeByID(array_merge(
+				$relation[1]::model()->findAll($criteria),
+				$relation[1]::model()->findAll($version_criteria)
+			));
+		}
+
+		return $relation[1]::model()->findAll($criteria);
 	}
 
 	/**
@@ -554,80 +627,6 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 		$criteria->params[':pk'] = $this->{$this->tableSchema->primaryKey};
 
 		return $criteria;
-	}
-
-	/**
-	 * Takes a relation defined on the model and returns a query to derive the same data from the version tables
-	 */
-	private function handleVersionRelation($relation_name, $transaction_id=null)
-	{
-		$relation = $this->getRelationDefinition($relation_name);
-		$criteria = $this->getRelationCriteria($relation_name, $relation);
-
-		if (!$transaction_id) {
-			$transaction_id = $this->transaction_id;
-		}
-
-		switch ($relation[0]) {
-			case 'CBelongsToRelation':
-			case 'CHasOneRelation':
-				$related = $relation[1]::model()->find($criteria);
-
-				if (method_exists($related,'getPreviousVersionByTransactionID')) {
-					if ($previous_version = $related->getPreviousVersionByTransactionID($this->transaction_id)) {
-						return $previous_version;
-					}
-				}
-
-				return $related;
-
-			case 'CHasManyRelation':
-				if ($transaction_id) {
-					$criteria->addCondition($criteria->alias.'.transaction_id <= :transaction_id');
-					$criteria->params[':transaction_id'] = $transaction_id;
-
-					$version_criteria = clone $criteria;
-					$version_criteria->addCondition($criteria->alias.'.deleted_transaction_id is null or '.$criteria->alias.'.deleted_transaction_id > :transaction_id');
-
-					return $this->deDupeByID(array_merge(
-						$relation[1]::model()->findAll($criteria),
-						$relation[1]::model()->fromVersion()->findAll($version_criteria)
-					));
-
-				} elseif ($relation[1]::model()->hasTransactionID($transaction_id)) {
-					$criteria->addCondition('transaction_id = :transaction_id');
-					$criteria->params[':transaction_id'] = $this->transaction_id;
-
-					return $relation[1]::model()->fromVersion()->findAll($criteria);
-				}
-
-				return $relation[1]::model()->findAll($criteria);
-
-			case 'CManyManyRelation':
-				if ($transaction_id) {
-					if (!preg_match('/^(.*?)\((.*?),[\s\t]*(.*?)\)$/',$relation[2],$m)) {
-						throw new Exception("Unhandled MANY_MANY relation: ".print_r($relation,true));
-					}
-
-					$criteria->join = "join `{$m[1]}` on `{$m[1]}`.`{$m[3]}` = `$criteria->alias`.`".$relation[1]::model()->tableSchema->primaryKey."` and `{$m[1]}`.`{$m[2]}` = :pk and `{$m[1]}`.`transaction_id` <= :transaction_id";
-					$criteria->params[':transaction_id'] = $transaction_id;
-
-					$version_criteria = clone $criteria;
-					$version_criteria->join = "join `{$m[1]}_version` on `{$m[1]}_version`.`{$m[3]}` = `$criteria->alias`.`".$relation[1]::model()->tableSchema->primaryKey."` and `{$m[1]}_version`.`{$m[2]}` = :pk and `{$m[1]}_version`.`transaction_id` <= :transaction_id and (`{$m[1]}_version`.`deleted_transaction_id` is null or `{$m[1]}_version`.deleted_transaction_id > :transaction_id )";
-
-					return $this->deDupeByID(array_merge(
-						$relation[1]::model()->findAll($criteria),
-						$relation[1]::model()->findAll($version_criteria)
-					));
-				}
-
-				return $relation[1]::model()->findAll($criteria);
-
-			default:
-				throw new Exception("Unhandled relation type: ".$relation[0]);
-		}
-
-		return parent::getRelated($relation_name);
 	}
 
 	/**

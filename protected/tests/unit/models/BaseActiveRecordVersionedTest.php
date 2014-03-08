@@ -882,6 +882,82 @@ class BaseActiveRecordVersionedTest extends CDbTestCase
 		$this->assertEquals(array('disorder' => array('with' => 'specialty')), $criteria->with);
 	}
 
+	public function testGetRelationCriteria_HasMany_Params()
+	{
+		$patient = Patient::model()->findByPk(1);
+
+		$criteria = $patient->getRelationCriteria('ophthalmicDiagnoses', array(
+				'CHasManyRelation',
+				'SecondaryDiagnosis',
+				'patient_id',
+				'params' => array(':foo' => 'bar'),
+		));
+
+		$this->assertInstanceOf('CDbCriteria', $criteria);
+
+		$this->assertEquals('*', $criteria->select);
+		$this->assertEquals(1, $criteria->params[':pk']);
+		$this->assertEquals('ophthalmicDiagnoses', $criteria->alias);
+		$this->assertEquals('bar', $criteria->params[':foo']);
+	}
+
+	public function testGetRelationCriteria_HasMany_On()
+	{
+		$patient = Patient::model()->findByPk(1);
+		
+		$criteria = $patient->getRelationCriteria('ophthalmicDiagnoses', array(
+				'CHasManyRelation',
+				'SecondaryDiagnosis',
+				'patient_id',
+				'on' => 'rockpaper = :scissors',
+		));
+
+		$this->assertInstanceOf('CDbCriteria', $criteria);
+
+		$this->assertEquals('*', $criteria->select);
+		$this->assertEquals(1, $criteria->params[':pk']);
+		$this->assertEquals('ophthalmicDiagnoses', $criteria->alias);
+		$this->assertEquals('(rockpaper = :scissors) AND (patient_id = :pk)', $criteria->condition);
+	}
+
+	public function testGetRelationCriteria_HasMany_Limit()
+	{
+		$patient = Patient::model()->findByPk(1);
+		
+		$criteria = $patient->getRelationCriteria('ophthalmicDiagnoses', array(
+				'CHasManyRelation',
+				'SecondaryDiagnosis',
+				'patient_id',
+				'limit' => '123',
+		));
+
+		$this->assertInstanceOf('CDbCriteria', $criteria);
+
+		$this->assertEquals('*', $criteria->select);
+		$this->assertEquals(1, $criteria->params[':pk']);
+		$this->assertEquals('ophthalmicDiagnoses', $criteria->alias);
+		$this->assertEquals('123', $criteria->limit);
+	}
+
+	public function testGetRelationCriteria_HasMany_Offset()
+	{
+		$patient = Patient::model()->findByPk(1);
+		
+		$criteria = $patient->getRelationCriteria('ophthalmicDiagnoses', array(
+				'CHasManyRelation',
+				'SecondaryDiagnosis',
+				'patient_id',
+				'offset' => '987',
+		));
+
+		$this->assertInstanceOf('CDbCriteria', $criteria);
+
+		$this->assertEquals('*', $criteria->select);
+		$this->assertEquals(1, $criteria->params[':pk']);
+		$this->assertEquals('ophthalmicDiagnoses', $criteria->alias);
+		$this->assertEquals('987', $criteria->offset);
+	}
+
 	public function testGetRelationCriteria_BelongsTo()
 	{
 		$patient = Patient::model()->findByPk(1);
