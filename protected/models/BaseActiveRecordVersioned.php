@@ -497,12 +497,6 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 				$relation[1]::model()->findAll($criteria),
 				$relation[1]::model()->fromVersion()->findAll($version_criteria)
 			));
-
-		} elseif ($relation[1]::model()->hasTransactionID($transaction_id)) {
-			$criteria->addCondition('transaction_id = :transaction_id');
-			$criteria->params[':transaction_id'] = $this->transaction_id;
-
-			return $relation[1]::model()->fromVersion()->findAll($criteria);
 		}
 
 		return $relation[1]::model()->findAll($criteria);
@@ -517,6 +511,7 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 
 			$criteria->join = "join `{$m[1]}` on `{$m[1]}`.`{$m[3]}` = `$criteria->alias`.`".$relation[1]::model()->tableSchema->primaryKey."` and `{$m[1]}`.`{$m[2]}` = :pk and `{$m[1]}`.`transaction_id` <= :transaction_id";
 			$criteria->params[':transaction_id'] = $transaction_id;
+			$criteria->params[':pk'] = $this->{$this->tableSchema->primaryKey};
 
 			$version_criteria = clone $criteria;
 			$version_criteria->join = "join `{$m[1]}_version` on `{$m[1]}_version`.`{$m[3]}` = `$criteria->alias`.`".$relation[1]::model()->tableSchema->primaryKey."` and `{$m[1]}_version`.`{$m[2]}` = :pk and `{$m[1]}_version`.`transaction_id` <= :transaction_id and (`{$m[1]}_version`.`deleted_transaction_id` is null or `{$m[1]}_version`.deleted_transaction_id > :transaction_id )";

@@ -39,6 +39,7 @@ class BaseActiveRecordVersionedTest extends CDbTestCase
 		'secondary_diagnosis_version' => ':secondary_diagnosis_version',
 		'transaction' => 'Transaction',
 		'patient_allergy_assignment_version' => ':patient_allergy_assignment_version',
+		'firm_user_assignment' => 'FirmUserAssignment',
 	);
 
 	protected function setUp()
@@ -755,6 +756,232 @@ class BaseActiveRecordVersionedTest extends CDbTestCase
 		$this->assertEquals(1, $allergies[0]->id);
 		$this->assertEquals(3, $allergies[1]->id);
 		$this->assertEquals(5, $allergies[2]->id);
+	}
+
+	public function testGetRelated_CBelongsToRelation_NotVersionedModel()
+	{
+		$criteria = new CDbCriteria;
+		$criteria->addCondition('name = :name');
+		$criteria->params[':name'] = 'Female';
+
+		$object = User::model()->getRelated_CBelongsToRelation(array(
+				'blah',
+				'Gender',
+			),
+			$criteria,
+			123456
+		);
+
+		$this->assertInstanceOf('Gender', $object);
+		$this->assertEquals(2, $object->id);
+		$this->assertEquals('Female', $object->name);
+	}
+
+	public function testGetRelated_CBelongsToRelation_VersionedModel()
+	{
+		$criteria = new CDbCriteria;
+		$criteria->addCondition('id = :id');
+		$criteria->params[':id'] = 1;
+
+		$object = User::model()->getRelated_CBelongsToRelation(array(
+				'blah',
+				'User',
+			),
+			$criteria,
+			null
+		);
+
+		$this->assertInstanceOf('User', $object);
+		$this->assertEquals(1, $object->id);
+		$this->assertEquals('Joe', $object->first_name);
+		$this->assertEquals('Bloggs', $object->last_name);
+	}
+
+	public function testGetRelated_CBelongsToRelation_VersionedModel_OldVersion()
+	{
+		$criteria = new CDbCriteria;
+		$criteria->addCondition('id = :id');
+		$criteria->params[':id'] = 1;
+
+		$object = User::model()->getRelated_CBelongsToRelation(array(
+				'blah',
+				'User',
+			),
+			$criteria,
+			3
+		);
+
+		$this->assertInstanceOf('User', $object);
+		$this->assertEquals(1, $object->id);
+		$this->assertEquals('Joe3', $object->first_name);
+		$this->assertEquals('Bloggs3', $object->last_name);
+	}
+
+	public function testGetRelated_CHasOneRelation_NotVersionedModel()
+	{
+		$criteria = new CDbCriteria;
+		$criteria->addCondition('name = :name');
+		$criteria->params[':name'] = 'Female';
+
+		$object = User::model()->getRelated_CHasOneRelation(array(
+				'blah',
+				'Gender',
+			),
+			$criteria,
+			123456
+		);
+
+		$this->assertInstanceOf('Gender', $object);
+		$this->assertEquals(2, $object->id);
+		$this->assertEquals('Female', $object->name);
+	}
+
+	public function testGetRelated_CHasOneRelation_VersionedModel()
+	{
+		$criteria = new CDbCriteria;
+		$criteria->addCondition('id = :id');
+		$criteria->params[':id'] = 1;
+
+		$object = User::model()->getRelated_CHasOneRelation(array(
+				'blah',
+				'User',
+			),
+			$criteria,
+			null
+		);
+
+		$this->assertInstanceOf('User', $object);
+		$this->assertEquals(1, $object->id);
+		$this->assertEquals('Joe', $object->first_name);
+		$this->assertEquals('Bloggs', $object->last_name);
+	}
+
+	public function testGetRelated_CHasOneRelation_VersionedModel_OldVersion()
+	{
+		$criteria = new CDbCriteria;
+		$criteria->addCondition('id = :id');
+		$criteria->params[':id'] = 1;
+
+		$object = User::model()->getRelated_CHasOneRelation(array(
+				'blah',
+				'User',
+			),
+			$criteria,
+			3
+		);
+
+		$this->assertInstanceOf('User', $object);
+		$this->assertEquals(1, $object->id);
+		$this->assertEquals('Joe3', $object->first_name);
+		$this->assertEquals('Bloggs3', $object->last_name);
+	}
+
+	public function testGetRelated_CHasManyRelation()
+	{
+		$criteria = new CDbCriteria;
+		$criteria->alias = 't';
+
+		$objects = User::model()->getRelated_CHasManyRelation(array(
+				'blah',
+				'User',
+			),
+			$criteria,
+			3
+		);
+
+		$this->assertCount(1, $objects);
+		$this->assertEquals(1, $objects[0]->id);
+		$this->assertEquals('Joe3', $objects[0]->first_name);
+		$this->assertEquals('Bloggs3', $objects[0]->last_name);
+	}
+
+	public function testGetRelated_CHasManyRelation_NoTransaction()
+	{
+		$criteria = new CDbCriteria;
+		$criteria->alias = 't';
+
+		$objects = User::model()->getRelated_CHasManyRelation(array(
+				'blah',
+				'User',
+			),
+			$criteria,
+			null
+		);
+
+		$this->assertCount(4, $objects);
+		$this->assertEquals(1, $objects[0]->id);
+		$this->assertEquals('Joe', $objects[0]->first_name);
+		$this->assertEquals('Bloggs', $objects[0]->last_name);
+		$this->assertEquals(2, $objects[1]->id);
+		$this->assertEquals('Jane', $objects[1]->first_name);
+		$this->assertEquals('Bloggs', $objects[1]->last_name);
+		$this->assertEquals(3, $objects[2]->id);
+		$this->assertEquals('icabod', $objects[2]->first_name);
+		$this->assertEquals('icabod', $objects[2]->last_name);
+		$this->assertEquals(4, $objects[3]->id);
+		$this->assertEquals('Admin', $objects[3]->first_name);
+		$this->assertEquals('User', $objects[3]->last_name);
+	}
+
+	public function testGetRelated_CManyManyRelation_VersionedModel_WithTransaction()
+	{
+		$criteria = new CDbCriteria;
+		$criteria->alias = 't';
+
+		$objects = Patient::model()->findByPk(1)->getRelated_CManyManyRelation(array(
+				'allergies',
+				'Allergy',
+				'patient_allergy_assignment(patient_id, allergy_id)',
+			),
+			$criteria,
+			200
+		);
+
+		$this->assertCount(3, $objects);
+
+		$this->assertInstanceOf('Allergy', $objects[0]);
+		$this->assertEquals(1, $objects[0]->id);
+		$this->assertEquals('allergy 1', $objects[0]->name);
+
+		$this->assertInstanceOf('Allergy', $objects[1]);
+		$this->assertEquals(3, $objects[1]->id);
+		$this->assertEquals('allergy 3', $objects[1]->name);
+
+		$this->assertInstanceOf('Allergy', $objects[2]);
+		$this->assertEquals(5, $objects[2]->id);
+		$this->assertEquals('allergy 5', $objects[2]->name);
+	}
+
+	public function testGetRelated_CManyManyRelation_VersionedModel_NoTransaction()
+	{
+		$criteria = new CDbCriteria;
+		$criteria->alias = 't';
+
+		$objects = User::model()->getRelated_CManyManyRelation(array(
+				'firms',
+				'Firm',
+				'firm_user_assignment(firm_id, user_id)',
+			),
+			$criteria,
+			null
+		);
+
+		$this->assertCount(4, $objects);
+		$this->assertInstanceOf('Firm', $objects[0]);
+		$this->assertEquals(1, $objects[0]->id);
+		$this->assertEquals('Aylward Firm', $objects[0]->name);
+
+		$this->assertInstanceOf('Firm', $objects[1]);
+		$this->assertEquals(2, $objects[1]->id);
+		$this->assertEquals('Collin Firm', $objects[1]->name);
+
+		$this->assertInstanceOf('Firm', $objects[2]);
+		$this->assertEquals(3, $objects[2]->id);
+		$this->assertEquals('Allan Firm', $objects[2]->name);
+
+		$this->assertInstanceOf('Firm', $objects[3]);
+		$this->assertEquals(4, $objects[3]->id);
+		$this->assertEquals('Support Services Firm', $objects[3]->name);
 	}
 
 	public function testRelationByTransactionID()
