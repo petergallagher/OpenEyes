@@ -547,7 +547,7 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 	/**
 	 * Gets the definition of the specified model relation
 	 */
-	private function getRelationDefinition($name)
+	public function getRelationDefinition($name)
 	{
 		$relations = $this->relations();
 
@@ -633,59 +633,93 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 	public function getVersionHistoryForRelation($relation_name)
 	{
 		$relation = $this->getRelationDefinition($relation_name);
+
+		if (!method_exists($this, 'getVersionHistoryForRelation_'.$relation[0])) {
+			throw new Exception("Unhandled relation type: ".$relation[0]);
+		}
+
+		return $this->{'getVersionHistoryForRelation_'.$relation[0]}($relation_name, $relation);
+	}
+
+	public function getVersionHistoryForRelation_CBelongsToRelation($relation_name, $relation)
+	{
 		$criteria = $this->getRelationCriteria($relation_name, $relation);
 
 		$transactions = array();
 
-		switch ($relation[0]) {
-			case 'CHasOneRelation':
-			case 'CBelongsToRelation':
-				$items = $this->{$relation_name} ? array($this->{$relation_name}) : array();
+		$items = $this->{$relation_name} ? array($this->{$relation_name}) : array();
 
-			case 'CHasManyRelation':
-				$items = isset($items) ? $items : $this->{$relation_name};
+		foreach ($items as $item) {
+			if (!isset($transactions[$item->transaction_id])) {
+				$transactions[$item->transaction_id] = $this->getTransactionText($item->last_modified_user_id,$item->last_modified_date);
+			}
+		}
 
-				foreach ($items as $item) {
-					if (!isset($transactions[$item->transaction_id])) {
-						$transactions[$item->transaction_id] = $this->getTransactionText($item->last_modified_user_id,$item->last_modified_date);
-					}
-				}
+		foreach ($relation[1]::model()->fromVersion()->findAll($criteria) as $item) {
+			if (!isset($transactions[$item->transaction_id])) {
+				$transactions[$item->transaction_id] = $this->getTransactionText($item->last_modified_user_id,$item->last_modified_date);
+			}
+			if (!is_null($item->deleted_transaction_id) && !isset($transactions[$item->deleted_transaction_id])) {
+				$transactions[$item->deleted_transaction_id] = $this->getTransactionText($item->last_modified_user_id,$item->version_date);
+			}
+		}
 
-				foreach ($relation[1]::model()->fromVersion()->findAll($criteria) as $item) {
-					if (!isset($transactions[$item->transaction_id])) {
-						$transactions[$item->transaction_id] = $this->getTransactionText($item->last_modified_user_id,$item->last_modified_date);
-					}
-					if (!is_null($item->deleted_transaction_id) && !isset($transactions[$item->deleted_transaction_id])) {
-						$transactions[$item->deleted_transaction_id] = $this->getTransactionText($item->last_modified_user_id,$item->version_date);
-					}
-				}
+		return $transactions;
+	}
 
-				break;
+	public function getVersionHistoryForRelation_CHasOneRelation($relation_name, $relation)
+	{
+		return $this->getVersionHistoryForRelation_CBelongsToRelation($relation_name, $relation);
+	}
 
-			case 'CManyManyRelation':
-				if (!preg_match('/^(.*?)\((.*?),[\s\t]*(.*?)\)$/',$relation[2],$m)) {
-					throw new Exception("Unhandled MANY_MANY relation: ".print_r($relation,true));
-				}
+	public function getVersionHistoryForRelation_CHasManyRelation($relation_name, $relation)
+	{
+		$criteria = $this->getRelationCriteria($relation_name, $relation);
 
-				$_table = Yii::app()->db->getSchema()->getTable($this->tableName());
+		$transactions = array();
 
-				foreach (Yii::app()->db->createCommand()->select("*")->from($m[1])->where("{$m[2]} = :pk",array(":pk" => $this->{$_table->primaryKey}))->queryAll() as $row) {
-					if (!isset($transactions[$row['transaction_id']])) {
-						$transactions[$row['transaction_id']] = $this->getTransactionText($row['last_modified_user_id'],$row['last_modified_date']);
-					}
-				}
+		foreach ($this->{$relation_name} as $item) {
+			if (!isset($transactions[$item->transaction_id])) {
+				$transactions[$item->transaction_id] = $this->getTransactionText($item->last_modified_user_id,$item->last_modified_date);
+			}
+		}
 
-				foreach (Yii::app()->db->createCommand()->select("*")->from($m[1].'_version')->where("{$m[2]} = :pk",array(":pk" => $this->{$_table->primaryKey}))->queryAll() as $row) {
-					if (!isset($transactions[$row['transaction_id']])) {
-						$transactions[$row['transaction_id']] = $this->getTransactionText($row['last_modified_user_id'],$row['last_modified_date']);
-					}
+		foreach ($relation[1]::model()->fromVersion()->findAll($criteria) as $item) {
+			if (!isset($transactions[$item->transaction_id])) {
+				$transactions[$item->transaction_id] = $this->getTransactionText($item->last_modified_user_id,$item->last_modified_date);
+			}
+			if (!is_null($item->deleted_transaction_id) && !isset($transactions[$item->deleted_transaction_id])) {
+				$transactions[$item->deleted_transaction_id] = $this->getTransactionText($item->last_modified_user_id,$item->version_date);
+			}
+		}
 
-					if (!is_null($row['deleted_transaction_id']) && !isset($transactions[$row['deleted_transaction_id']])) {
-						$transactions[$row['deleted_transaction_id']] = $this->getTransactionText($row['last_modified_user_id'],$row['version_date']);
-					}
-				}
+		return $transactions;
+	}
 
-				break;
+	public function getVersionHistoryForRelation_CManyManyRelation($relation_name, $relation)
+	{
+		$transactions = array();
+
+		if (!preg_match('/^(.*?)\((.*?),[\s\t]*(.*?)\)$/',$relation[2],$m)) {
+			throw new Exception("Unhandled MANY_MANY relation: ".print_r($relation,true));
+		}
+
+		$_table = Yii::app()->db->getSchema()->getTable($this->tableName());
+
+		foreach (Yii::app()->db->createCommand()->select("*")->from($m[1])->where("{$m[2]} = :pk",array(":pk" => $this->{$_table->primaryKey}))->queryAll() as $row) {
+			if (!isset($transactions[$row['transaction_id']])) {
+				$transactions[$row['transaction_id']] = $this->getTransactionText($row['last_modified_user_id'],$row['last_modified_date']);
+			}
+		}
+
+		foreach (Yii::app()->db->createCommand()->select("*")->from($m[1].'_version')->where("{$m[2]} = :pk",array(":pk" => $this->{$_table->primaryKey}))->queryAll() as $row) {
+			if (!isset($transactions[$row['transaction_id']])) {
+				$transactions[$row['transaction_id']] = $this->getTransactionText($row['last_modified_user_id'],$row['last_modified_date']);
+			}
+
+			if (!is_null($row['deleted_transaction_id']) && !isset($transactions[$row['deleted_transaction_id']])) {
+				$transactions[$row['deleted_transaction_id']] = $this->getTransactionText($row['last_modified_user_id'],$row['version_date']);
+			}
 		}
 
 		return $transactions;

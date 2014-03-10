@@ -35,12 +35,15 @@ class BaseActiveRecordVersionedTest extends CDbTestCase
 		'allergy' => 'Allergy',
 		'address' => 'Address',
 		'contact' => 'Contact',
+		'contact_version' => ':contact_version',
 		'disorder' => 'Disorder',
 		'secondary_diagnosis' => 'SecondaryDiagnosis',
 		'secondary_diagnosis_version' => ':secondary_diagnosis_version',
 		'transaction' => 'Transaction',
 		'patient_allergy_assignment_version' => ':patient_allergy_assignment_version',
 		'firm_user_assignment' => 'FirmUserAssignment',
+		'patient_oph_info' => 'PatientOphInfo',
+		'patient_oph_info_version' => ':patient_oph_info_version',
 	);
 
 	protected function setUp()
@@ -1020,6 +1023,23 @@ class BaseActiveRecordVersionedTest extends CDbTestCase
 		$this->assertEquals(3, $allergies[2]->id);
 	}
 
+	public function testGetRelationDefinition()
+	{
+		$user = User::model();
+
+		foreach ($user->relations() as $relation_name => $relation_definition) {
+			$this->assertEquals($relation_definition, $user->getRelationDefinition($relation_name));
+		}
+	}
+
+	public function testGetRelationDefinition_NotFound()
+	{
+		$user = User::model();
+
+		$this->setExpectedException('Exception', 'Relation not found: sfihj23f8hewio');
+		$user->getRelationDefinition('sfihj23f8hewio');
+	}
+
 	public function testGetRelationCriteria_HasMany()
 	{
 		$patient = Patient::model()->findByPk(1);
@@ -1356,6 +1376,195 @@ class BaseActiveRecordVersionedTest extends CDbTestCase
 		$this->assertEquals(1, $criteria->params[':pk']);
 	}
 
+	public function testGetVersionHistoryForRelation_BelongsTo()
+	{
+		$user = $this->getMock('User', array('getVersionHistoryForRelation_CBelongsToRelation'), array(), '', false);
+
+		$relations = $user->relations();
+
+		$user->expects($this->once())
+			->method('getVersionHistoryForRelation_CBelongsToRelation')
+			->with('contact', $relations['contact'])
+			->will($this->returnValue(123));
+
+		$this->assertEquals(123, $user->getVersionHistoryForRelation('contact'));
+	}
+
+	public function testGetVersionHistoryForRelation_HasOne()
+	{
+		$patient = $this->getMock('Patient', array('getVersionHistoryForRelation_CHasOneRelation'), array(), '', false);
+		
+		$relations = $patient->relations();
+
+		$patient->expects($this->once())
+			->method('getVersionHistoryForRelation_CHasOneRelation')
+			->with('lastReferral', $relations['lastReferral'])
+			->will($this->returnValue(1337));
+
+		$this->assertEquals(1337, $patient->getVersionHistoryForRelation('lastReferral'));
+	}
+
+	public function testGetVersionHistoryForRelation_HasMany()
+	{
+		$patient = $this->getMock('Patient', array('getVersionHistoryForRelation_CHasManyRelation'), array(), '', false);
+		
+		$relations = $patient->relations();
+
+		$patient->expects($this->once())
+			->method('getVersionHistoryForRelation_CHasManyRelation')
+			->with('episodes', $relations['episodes'])
+			->will($this->returnValue(808));
+
+		$this->assertEquals(808, $patient->getVersionHistoryForRelation('episodes'));
+	}
+
+	public function testGetVersionHistoryForRelation_ManyMany()
+	{
+		$patient = $this->getMock('Patient', array('getVersionHistoryForRelation_CManyManyRelation'), array(), '', false);
+		
+		$relations = $patient->relations();
+
+		$patient->expects($this->once())
+			->method('getVersionHistoryForRelation_CManyManyRelation')
+			->with('allergies', $relations['allergies'])
+			->will($this->returnValue(1010));
+
+		$this->assertEquals(1010, $patient->getVersionHistoryForRelation('allergies'));
+	}
+
+	public function testGetVersionHistoryForRelation_UnhandledRelationType()
+	{
+		$this->setExpectedException('Exception', 'Unhandled relation type: ');
+
+		$patient = $this->getMock('Patient', array('getRelationDefinition'), array(), '', false);
+
+		$patient->expects($this->once())
+			->method('getRelationDefinition')
+			->with('contact')
+			->will($this->returnValue(array(
+					'CNotRealRelation',
+					'Contact',
+					'contact_id',
+			)));
+
+		$patient->getVersionHistoryForRelation('contact');
+	}
+
+	public function testGetVersionHistoryForRelation_CBelongsToRelation()
+	{
+		$patient = Patient::model()->findByPk(1);
+
+		$relations = $patient->relations();
+
+		$transactions = $patient->getVersionHistoryForRelation_CBelongsToRelation('contact',$relations['contact']);
+
+		$this->assertCount(3, $transactions);
+
+		$this->assertEquals('Joe Bloggs on 1 Jan 1900 at 00:00', $transactions['']);
+		$this->assertEquals('Joe Bloggs on 1 Jan 2013 at 13:37', $transactions[302]);
+		$this->assertEquals('Joe Bloggs on 14 Jul 2012 at 13:37', $transactions[301]);
+	}
+
+	public function testGetVersionHistoryForRelation_CHasOneRelation()
+	{
+		$patient = Patient::model()->findByPk(1);
+
+		$relations = $patient->relations();
+
+		$transactions = $patient->getVersionHistoryForRelation_CHasOneRelation('ophinfo',$relations['ophinfo']);
+
+		$this->assertCount(2, $transactions);
+
+		$this->assertEquals('Joe Bloggs on 1 Jan 1900 at 00:00', $transactions['']);
+		$this->assertEquals('Joe Bloggs on 2 Mar 2013 at 12:07', $transactions[400]);
+	}
+
+	public function testGetVersionHistoryForRelation_CHasManyRelation()
+	{
+		$patient = Patient::model()->findByPk(1);
+
+		$relations = $patient->relations();
+
+		$transactions = $patient->getVersionHistoryForRelation_CHasManyRelation('episodes',$relations['episodes']);
+
+		$this->assertCount(2, $transactions);
+
+		$this->assertEquals('Joe Bloggs on 1 Jan 1900 at 00:00', $transactions['']);
+		$this->assertEquals('Joe Bloggs on 1 Jan 1900 at 00:00', $transactions[1]);
+	}
+
+	public function testGetVersionHistoryForRelation_CManyManyRelation()
+	{
+		$patient = Patient::model()->findByPk(1);
+
+		$relations = $patient->relations();
+
+		$transactions = $patient->getVersionHistoryForRelation_CManyManyRelation('allergies',$relations['allergies']);
+
+		$this->assertCount(4, $transactions);
+
+		$this->assertEquals('Joe Bloggs on 1 Jan 1901 at 00:00', $transactions[202]);
+		$this->assertEquals('Joe Bloggs on 29 Jan 2012 at 13:37', $transactions[201]);
+		$this->assertEquals('Joe Bloggs on 20 Jan 2012 at 13:37', $transactions[200]);
+		$this->assertEquals('Joe Bloggs on 17 Jan 2012 at 13:37', $transactions[1]);
+	}
+
+	public function testDeDupeByID_DeDupe()
+	{
+		$user1 = new User;
+		$user1->id = 1;
+		$user1->transaction_id = 1;
+		$user1->username = 'test1';
+
+		$user2 = new User;
+		$user2->id = 1;
+		$user2->transaction_id = 1;
+		$user2->username = 'test2';
+
+		$user3 = new User;
+		$user3->id = 3;
+		$user3->transaction_id = 1;
+		$user3->username = 'test3';
+
+		$items = User::model()->deDupeByID(array($user1,$user2,$user3));
+
+		$this->assertCount(2, $items);
+
+		$this->assertEquals(1, $items[0]->id);
+		$this->assertEquals('test1', $items[0]->username);
+
+		$this->assertEquals(3, $items[1]->id);
+		$this->assertEquals('test3', $items[1]->username);
+	}
+
+	public function testDeDupeByID_PreferLaterTransactions()
+	{
+		$user1 = new User;
+		$user1->id = 1;
+		$user1->transaction_id = 1;
+		$user1->username = 'test1';
+
+		$user2 = new User;
+		$user2->id = 1;
+		$user2->transaction_id = 2;
+		$user2->username = 'test2';
+
+		$user3 = new User;
+		$user3->id = 3;
+		$user3->transaction_id = 1;
+		$user3->username = 'test3';
+
+		$items = User::model()->deDupeByID(array($user1,$user2,$user3));
+
+		$this->assertCount(2, $items);
+
+		$this->assertEquals(1, $items[0]->id);
+		$this->assertEquals('test2', $items[0]->username);
+
+		$this->assertEquals(3, $items[1]->id);
+		$this->assertEquals('test3', $items[1]->username);
+	}
+
 	public function testSaveCreatesNewVersion()
 	{
 		$address = Address::model()->findByPk(1);
@@ -1603,5 +1812,16 @@ class BaseActiveRecordVersionedTest extends CDbTestCase
 		$this->assertEquals(1, PatientAllergyAssignment::model()->deleteAllByAttributes(array('id'=>$paa->id)));
 
 		$transaction->commit();
+	}
+
+	public function testTableHasTransactionID()
+	{
+		for ($i=290; $i<=320; $i++) {
+			if (in_array($i, array(301,302))) {
+				$this->assertTrue(User::model()->tableHasTransactionID('contact_version',$i));
+			} else {
+				$this->assertFalse(User::model()->tableHasTransactionID('contact_version',$i));
+			}
+		}
 	}
 }
