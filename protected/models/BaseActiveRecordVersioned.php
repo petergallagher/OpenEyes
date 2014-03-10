@@ -504,11 +504,11 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 
 	public function getRelated_CManyManyRelation($relation, $criteria, $transaction_id)
 	{
-		if ($transaction_id) {
-			if (!preg_match('/^(.*?)\((.*?),[\s\t]*(.*?)\)$/',$relation[2],$m)) {
-				throw new Exception("Unhandled MANY_MANY relation: ".print_r($relation,true));
-			}
+		if (!preg_match('/^(.*?)\((.*?),[\s\t]*(.*?)\)$/',$relation[2],$m)) {
+			throw new Exception("Unhandled MANY_MANY relation: ".print_r($relation,true));
+		}
 
+		if ($transaction_id) {
 			$criteria->join = "join `{$m[1]}` on `{$m[1]}`.`{$m[3]}` = `$criteria->alias`.`".$relation[1]::model()->tableSchema->primaryKey."` and `{$m[1]}`.`{$m[2]}` = :pk and `{$m[1]}`.`transaction_id` <= :transaction_id";
 			$criteria->params[':transaction_id'] = $transaction_id;
 			$criteria->params[':pk'] = $this->{$this->tableSchema->primaryKey};
@@ -521,6 +521,9 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 				$relation[1]::model()->findAll($version_criteria)
 			));
 		}
+
+		$criteria->join = "join `{$m[1]}` on `{$m[1]}`.`{$m[3]}` = `$criteria->alias`.`".$relation[1]::model()->tableSchema->primaryKey."` and `{$m[1]}`.`{$m[2]}` = :pk";
+		$criteria->params[':pk'] = $this->{$this->tableSchema->primaryKey};
 
 		return $relation[1]::model()->findAll($criteria);
 	}

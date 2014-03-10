@@ -20,6 +20,7 @@
 class BaseActiveRecordVersionedTest extends CDbTestCase
 {
 	public $fixtures = array(
+		'firms' => 'Firm',
 		'users' => 'User',
 		'user_versions' => ':user_version',
 		'specialty' => 'Specialty',
@@ -957,16 +958,16 @@ class BaseActiveRecordVersionedTest extends CDbTestCase
 		$criteria = new CDbCriteria;
 		$criteria->alias = 't';
 
-		$objects = User::model()->getRelated_CManyManyRelation(array(
+		$objects = User::model()->findByPk(1)->getRelated_CManyManyRelation(array(
 				'firms',
 				'Firm',
-				'firm_user_assignment(firm_id, user_id)',
+				'firm_user_assignment(user_id, firm_id)',
 			),
 			$criteria,
 			null
 		);
 
-		$this->assertCount(4, $objects);
+		$this->assertCount(3, $objects);
 		$this->assertInstanceOf('Firm', $objects[0]);
 		$this->assertEquals(1, $objects[0]->id);
 		$this->assertEquals('Aylward Firm', $objects[0]->name);
@@ -978,10 +979,6 @@ class BaseActiveRecordVersionedTest extends CDbTestCase
 		$this->assertInstanceOf('Firm', $objects[2]);
 		$this->assertEquals(3, $objects[2]->id);
 		$this->assertEquals('Allan Firm', $objects[2]->name);
-
-		$this->assertInstanceOf('Firm', $objects[3]);
-		$this->assertEquals(4, $objects[3]->id);
-		$this->assertEquals('Support Services Firm', $objects[3]->name);
 	}
 
 	public function testRelationByTransactionID()
