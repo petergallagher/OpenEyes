@@ -39,11 +39,18 @@ class SiteAndFirmWidget extends CWidget
 		if (isset($_POST['SiteAndFirmForm'])) {
 			$model->attributes = $_POST['SiteAndFirmForm'];
 			if ($model->validate()) {
+				$transaction = Yii::app()->db->beginTransaction('UserSiteAndFirmPreferences','User');
+
 				$user->changeFirm($model->firm_id);
 				$user->last_site_id = $model->site_id;
+
 				if (!$user->save(false)) {
+					$transaction->rollback();
 					throw new CException('Error saving user');
 				}
+
+				$transaction->commit();
+
 				$user->audit('user', 'change-firm', $user->last_firm_id);
 
 				Yii::app()->session['selected_site_id'] = $model->site_id;

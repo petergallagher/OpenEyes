@@ -25,7 +25,7 @@
  */
 class Transaction extends BaseActiveRecord
 {
-	private $order = 1;
+	public $tables = array();
 
 	/**
 	 * @return string the associated database table name
@@ -52,27 +52,9 @@ class Transaction extends BaseActiveRecord
 	 */
 	public function addTable($table)
 	{
-		if (!$_table = TransactionTable::model()->find('name=?',array($table))) {
-			$_table = new TransactionTable;
-			$_table->name = $table;
-
-			if (!$_table->save()) {
-				throw new Exception("Unable to save transaction_table: ".print_r($_table->getErrors(),true));
-			}
+		if (!in_array($table,$this->tables)) {
+			$this->tables[] = $table;
 		}
-
-		if (!$tta = TransactionTableAssignment::model()->find('transaction_id=? and table_id=?',array($this->id,$_table->id))) {
-			$tta = new TransactionTableAssignment;
-			$tta->transaction_id = $this->id;
-			$tta->table_id = $_table->id;
-			$tta->display_order = $this->order++;
-
-			if (!$tta->save()) {
-				throw new Exception("Unable to save transaction table assignment: ".print_r($tta->getErrors(),true));
-			}
-		}
-
-		$this->table_assignments = array_merge($this->table_assignments, array($tta));
 	}
 
 	/**

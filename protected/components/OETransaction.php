@@ -46,8 +46,28 @@ class OETransaction
 		if (!$this->oe_transaction->object) {
 			throw new Exception("Transaction has no object set and so cannot be committed.");
 		}
-		if (count($this->oe_transaction->table_assignments) <1) {
+		if (count($this->oe_transaction->tables) <1) {
 			throw new Exception("Transaction has no table assignments and so cannot be committed.");
+		}
+
+		foreach ($this->oe_transaction->tables as $i => $table) {
+			if (!$_table = TransactionTable::model()->find('name=?',array($table))) {
+				$_table = new TransactionTable;
+				$_table->name = $table;
+
+				if (!$_table->save()) {
+					throw new Exception("Unable to save TransactionTable: ".print_r($_table->getErrors(),true));
+				}
+			}
+
+			$tta = new TransactionTableAssignment;
+			$tta->transaction_id = $this->oe_transaction->id;
+			$tta->table_id = $_table->id;
+			$tta->display_order = $i + 1;
+
+			if (!$tta->save()) {
+				throw new Exception("Unable to save TransactionTableAssignment: ".print_r($tta->getErrors(),true));
+			}
 		}
 
 		$result = $this->pdo_transaction->commit();
