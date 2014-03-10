@@ -32,7 +32,6 @@
  * @property string $postcode
  * @property string $county
  * @property integer $country_id
- * @property string $email
  *
  * The following are the available model relations:
  * @property Country $country
@@ -64,9 +63,8 @@ class Address extends BaseActiveRecordVersioned
 		return array(
 			array('address1, address2, city, county', 'length', 'max' => 255),
 			array('postcode', 'length', 'max' => 10),
-			array('email', 'length', 'max' => 255),
 			array('country_id, type, date_start, date_end', 'safe'),
-			array('id, address1, address2, city, postcode, county, email, country_id, type, date_start, date_end', 'safe', 'on' => 'search'),
+			array('id, address1, address2, city, postcode, county, country_id, type, date_start, date_end', 'safe', 'on' => 'search'),
 		);
 	}
 
@@ -94,7 +92,6 @@ class Address extends BaseActiveRecordVersioned
 			'postcode' => 'Postcode',
 			'county' => 'County',
 			'country_id' => 'Country',
-			'email' => 'Email',
 		);
 	}
 
@@ -186,7 +183,6 @@ class Address extends BaseActiveRecordVersioned
 		$criteria->compare('postcode',$this->postcode,true);
 		$criteria->compare('county',$this->county,true);
 		$criteria->compare('country_id',$this->country_id,true);
-		$criteria->compare('email',$this->email,true);
 
 		return new CActiveDataProvider(get_class($this), array(
 			'criteria'=>$criteria,
