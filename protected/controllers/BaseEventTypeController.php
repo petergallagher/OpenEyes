@@ -738,7 +738,11 @@ class BaseEventTypeController extends BaseModuleController
 
 		$this->logActivity('viewed event');
 
+		$transaction = Yii::app()->db->beginTransaction('View','Event');
+
 		$this->event->audit('event','view');
+
+		$transaction->commit();
 
 		$this->event_tabs = array(
 			array(

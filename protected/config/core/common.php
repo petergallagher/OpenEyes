@@ -249,6 +249,7 @@ return array(
 		),
 		'admin_email' => '',
 		'enable_transactions' => true,
+		'transaction_free_tables' => array('tbl_audit_trail','tbl_migration','transaction','transaction_object','transaction_operation','transaction_table','transaction_table_assignment','user_session'),
 		'event_lock_days' => 0,
 		'event_lock_disable' => false,
 		'show_previous_versions' => false,

@@ -75,6 +75,18 @@ class BaseActiveRecord extends CActiveRecord
 	 */
 	public function save($runValidation=true, $attributes=null, $allow_overriding=false)
 	{
+		if (Yii::app()->params['enable_transactions']) {
+			if (!in_array($this->tableName(),Yii::app()->params['transaction_free_tables'])) {
+				if (!$transaction = Yii::app()->db->getCurrentTransaction()) {
+					throw new Exception("save() called without a transaction");
+				} else {
+					$transaction->addTable($this->tableName());
+				}
+
+				$this->hash = $this->generateHash();
+			}
+		}
+
 		$user_id = null;
 
 		try {
@@ -117,6 +129,145 @@ class BaseActiveRecord extends CActiveRecord
 		}
 
 		return parent::save($runValidation, $attributes);
+	}
+
+	/**
+	 * Generates a SHA1 hash of all data items in the model excluding created_date, created_user_id, last_modified_date, last_modified_user_id
+	 * @return string
+	 */
+	public function generateHash()
+	{
+		$attributes = $this->getAttributes();
+
+		unset($attributes['id']);
+		unset($attributes['hash']);
+		unset($attributes['transaction_id']);
+		unset($attributes['last_modified_user_id']);
+		unset($attributes['last_modified_date']);
+		unset($attributes['created_user_id']);
+		unset($attributes['created_date']);
+
+		return sha1(implode('',$attributes));
+	}
+
+	/**
+	 * Prevent deletes if there's no transaction where there should be one
+	 */
+	public function delete()
+	{
+		if (Yii::app()->params['enable_transactions']) {
+			if (!in_array($this->tableName(),Yii::app()->params['transaction_free_tables'])) {
+				if (!$transaction = Yii::app()->db->getCurrentTransaction()) {
+					throw new Exception("delete() called without a transaction");
+				} else {
+					$transaction->addTable($this->tableName());
+				}
+
+				$this->hash = $this->generateHash();
+			}
+		}
+
+		return parent::delete();
+	}
+
+	/**
+	 * Prevent updateByPk() if there's no transaction where there should be one
+	 */
+	public function updateByPk($pk,$attributes,$condition='',$params=array())
+	{
+		if (Yii::app()->params['enable_transactions']) {
+			if (!in_array($this->tableName(),Yii::app()->params['transaction_free_tables'])) {
+				if (!$transaction = Yii::app()->db->getCurrentTransaction()) {
+					throw new Exception("updateByPk() called without a transaction");
+				} else {
+					$transaction->addTable($this->tableName());
+				}
+
+				$this->hash = $this->generateHash();
+			}
+		}
+
+		return parent::updateByPk($pk,$attributes,$condition,$params);
+	}
+
+	/**
+	 * Prevent updateAll() if there's no transaction where there should be one
+	 */
+	public function updateAll($attributes,$condition='',$params=array())
+	{
+		if (Yii::app()->params['enable_transactions']) {
+			if (!in_array($this->tableName(),Yii::app()->params['transaction_free_tables'])) {
+				if (!$transaction = Yii::app()->db->getCurrentTransaction()) {
+					throw new Exception("updateAll() called without a transaction");
+				} else {
+					$transaction->addTable($this->tableName());
+				}
+
+				$this->hash = $this->generateHash();
+			}
+		}
+
+		return parent::updateAll($attributes,$condition,$params);
+	}
+
+	/**
+	 * Prevent deleteByPk() if there's no transaction where there should be one
+	 */
+	public function deleteByPk($pk,$condition='',$params=array())
+	{
+		if (Yii::app()->params['enable_transactions']) {
+			if (!in_array($this->tableName(),Yii::app()->params['transaction_free_tables'])) {
+				if (!$transaction = Yii::app()->db->getCurrentTransaction()) {
+					throw new Exception("deleteByPk() called without a transaction");
+				} else {
+					$transaction->addTable($this->tableName());
+				}
+
+				$this->hash = $this->generateHash();
+			}
+		}
+
+		return parent::deleteByPk($pk,$condition,$params);
+	}
+
+	/**
+	 * Prevent deleteAll() if there's no transaction where there should be one
+	 */
+	public function deleteAll($condition='',$params=array())
+	{
+		if (Yii::app()->params['enable_transactions']) {
+			if (!in_array($this->tableName(),Yii::app()->params['transaction_free_tables'])) {
+				if (!$transaction = Yii::app()->db->getCurrentTransaction()) {
+					throw new Exception("deleteAll() called without a transaction");
+				} else {
+					$transaction->addTable($this->tableName());
+				}
+
+				$this->hash = $this->generateHash();
+			}
+		}
+
+		return parent::deleteAll($condition,$params);
+	}
+
+	/**
+	 * Prevent deleteAllByAttributes() if there's no transaction where there should be one
+	 */
+	public function deleteAllByAttributes($attributes,$condition='',$params=array())
+	{
+		if (Yii::app()->params['enable_transactions']) {
+			if (!in_array($this->tableName(),Yii::app()->params['transaction_free_tables'])) {
+				if (!$transaction = Yii::app()->db->getCurrentTransaction()) {
+					throw new Exception("deleteAllByAttributes() called without a transaction");
+				} else {
+					$transaction->addTable($this->tableName());
+				}
+
+				$this->hash = $this->generateHash();
+			}
+		}
+
+		return parent::deleteAllByAttributes($attributes,$condition,$params);
 	}
 
 	/**

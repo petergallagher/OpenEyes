@@ -348,25 +348,6 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 		return $result;
 	}
 
-	/**
-	 * Generates a SHA1 hash of all data items in the model excluding created_date, created_user_id, last_modified_date, last_modified_user_id
-	 * @return string
-	 */
-	public function generateHash()
-	{
-		$attributes = $this->getAttributes();
-
-		unset($attributes['id']);
-		unset($attributes['hash']);
-		unset($attributes['transaction_id']);
-		unset($attributes['last_modified_user_id']);
-		unset($attributes['last_modified_date']);
-		unset($attributes['created_user_id']);
-		unset($attributes['created_date']);
-
-		return sha1(implode('',$attributes));
-	}
-
 	public function delete()
 	{
 		if ($this->version_id) {
