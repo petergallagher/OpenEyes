@@ -25,7 +25,6 @@ class OECommandBuilder extends CDbCommandBuilder
 		$this->ensureTable($table_version);
 
 		$columns = array();
-		$columns = array();
 
 		foreach (array_keys($table_version->columns) as $column) {
 			if (!in_array($column,array('version_date','version_id','deleted_transaction_id'))) {
@@ -72,7 +71,7 @@ class OECommandBuilder extends CDbCommandBuilder
 			->limit(1)
 			->queryRow()) {
 
-			$transaction = Yii::app()->db->getCurrentTransaction();
+			$transaction = $this->getDbConnection()->getCurrentTransaction();
 
 			$command = $this->createInsertFromTableCommand($table_version,$table,$criteria,$transaction->id);
 			if (!$command->execute()) {
