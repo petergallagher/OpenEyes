@@ -24,6 +24,7 @@ class BaseActiveRecordVersionedSoftDeleteTest extends CDbTestCase
 		'users' => 'User',
 		'drugs' => 'Drug',
 		'drug_types' => 'DrugType',
+		'drug_forms' => 'DrugForm',
 		'drug_frequencies' => 'DrugFrequency',
 		'drug_durations' => 'DrugDuration',
 		'drug_routes' => 'DrugRoute',
