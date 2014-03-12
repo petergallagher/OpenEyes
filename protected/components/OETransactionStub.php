@@ -19,6 +19,8 @@
 
 /*
 Fake transaction stub class to facilitate disabling transactions via configuration
+
+This class deliberately does nothing.
 */
 
 class OETransactionStub
@@ -28,6 +30,18 @@ class OETransactionStub
 	}
 
 	public function rollback()
+	{
+	}
+
+	public function setOperation($operation_name)
+	{
+	}
+
+	public function setObject($object_name)
+	{
+	}
+
+	public function addTable($table_name)
 	{
 	}
 }
