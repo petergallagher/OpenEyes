@@ -253,5 +253,7 @@ return array(
 		'event_lock_days' => 0,
 		'event_lock_disable' => false,
 		'show_previous_versions' => false,
+		'lock_expiry' => 120,
+		'lock_wait_timeout' => 30,
 	),
 );
