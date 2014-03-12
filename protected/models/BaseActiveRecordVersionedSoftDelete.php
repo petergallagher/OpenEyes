@@ -21,6 +21,9 @@ class BaseActiveRecordVersionedSoftDelete extends BaseActiveRecordVersioned
 {
 	public $deletedField = 'deleted';
 
+	/**
+	 * Marks the record soft-deleted
+	 */
 	public function delete()
 	{
 		if (Yii::app()->params['enable_transactions']) {
@@ -32,14 +35,55 @@ class BaseActiveRecordVersionedSoftDelete extends BaseActiveRecordVersioned
 		}
 
 		if (isset($this->notDeletedField)) {
+			if ($this->{$this->notDeletedField} == 0) {
+				return true;
+			}
+
 			$this->{$this->notDeletedField} = 0;
 		} else {
+			if ($this->{$this->deletedField} == 1) {
+				return true;
+			}
+
 			$this->{$this->deletedField} = 1;
 		}
 
 		return $this->save();
 	}
 
+	/**
+	 * Undeletes the current model
+	 */
+	public function undelete()
+	{
+		if (Yii::app()->params['enable_transactions']) {
+			if (!$transaction = Yii::app()->db->getCurrentTransaction()) {
+				throw new Exception("undelete() called without a transaction");
+			}
+
+			$transaction->addTable($this->tableName());
+		}
+
+		if (isset($this->notDeletedField)) {
+			if ($this->{$this->notDeletedField} == 1) {
+				return true;
+			}
+
+			$this->{$this->notDeletedField} = 1;
+		} else {
+			if ($this->{$this->deletedField} == 0) {
+				return true;
+			}
+
+			$this->{$this->deletedField} = 0;
+		}
+
+		return $this->save();
+	}
+
+	/**
+	 * Marks the record soft-deleted
+	 */
 	public function deleteByPk($pk,$condition='',$params=array())
 	{
 		if (Yii::app()->params['enable_transactions']) {
@@ -63,6 +107,9 @@ class BaseActiveRecordVersionedSoftDelete extends BaseActiveRecordVersioned
 		return $this->updateByPk($pk,$attributes,$condition,$params);
 	}
 
+	/**
+	 * Marks the records soft-deleted
+	 */
 	public function deleteAll($condition='',$params=array())
 	{
 		if (Yii::app()->params['enable_transactions']) {
@@ -86,6 +133,9 @@ class BaseActiveRecordVersionedSoftDelete extends BaseActiveRecordVersioned
 		return $this->updateAll($attributes,$condition,$params);
 	}
 
+	/**
+	 * Marks the records soft-deleted
+	 */
 	public function deleteAllByAttributes($attributes,$condition='',$params=array())
 	{
 		if (Yii::app()->params['enable_transactions']) {
@@ -98,7 +148,7 @@ class BaseActiveRecordVersionedSoftDelete extends BaseActiveRecordVersioned
 
 		if (is_object($condition)) {
 			foreach ($attributes as $key => $value) {
-				$condition->addCondition("key = :__$key");
+				$condition->addCondition("$key = :__$key");
 				$condition->params[":__$key"] = $value;
 			}
 		} else {
