@@ -2065,7 +2065,7 @@ class BaseEventTypeController extends BaseModuleController
 				$this->event->requestDeletion($_POST['delete_reason']);
 
 				if (Yii::app()->params['admin_email']) {
-					mail(Yii::app()->params['admin_email'],"Request to delete an event","A request to delete an event has been submitted.  Please log in to the admin system to review the request.","From: OpenEyes");
+					OEMail::mail(Yii::app()->params['admin_email'],"Request to delete an event","A request to delete an event has been submitted.  Please log in to the admin system to review the request.","From: OpenEyes","E-mail failed to send: Please log in to the admin system to review the request.");
 				}
 
 				Yii::app()->user->setFlash('success', "Your request to delete this event has been submitted.");
