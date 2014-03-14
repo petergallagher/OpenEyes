@@ -1,9 +1,9 @@
-/* Stereo Pair Event */
+/* Glaucoma Episode DEMO */
 
 /* risk percentage */
-#patientRiskScore .curvybox.risk		{ background: #ffffff; }
+#patientRiskScore .curvybox.risk		{ background: #eeeeee; width:78%; padding:2px 5px; margin-bottom:10px; }
 #patientRiskScore .curvybox.risk.high	{ background: #f06c6c; }
-#patientRiskScore .curvybox.risk.ok		{ background: #d3ebd2; }
+#patientRiskScore .curvybox.risk.ok		{ background: #f6d759; }
 #patientRiskScore .curvybox.risk.high h3 { color:#fff; }
 
 /* for the demo override main styling for view mode */
@@ -13,4 +13,29 @@
 .demo-content .edetail.showsplit:hover { background-color:#dee0e2; }
 
 
+/* colour inactive buttons to link in with chart colours - overrides default grey */
+#demo-view-RE.classy.inactive {
+background: -moz-linear-gradient(#90b0b6, #809da2);
+background: -ms-linear-gradient(#90b0b6, #809da2);
+background: -webkit-linear-gradient(#90b0b6, #809da2);
+-ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr='#90b0b6', endColorstr='#809da2')";
+background: linear-gradient(#90b0b6, #809da2);
+border-bottom:2px solid #809da2;
+}
 
+#demo-view-LE.classy.inactive {
+background: -moz-linear-gradient(#d79340, #c8883c);
+background: -ms-linear-gradient(#d79340, #c8883c);
+background: -webkit-linear-gradient(#d79340, #c8883c);
+-ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr='#d79340', endColorstr='#c8883c')";
+background: linear-gradient(#d79340, #c8883c);
+border-bottom:2px solid #c8883c;
+}
+
+
+.showhideinfo { border:1px solid #999; background-color:#f3f3f3; padding:5px; margin-bottom:5px; }
+.showhideinfo h4 { display:inline-block; padding:5px 10px 5px 10px; margin-bottom:0; font-size:12px; font-weight:500; color:#333; background:#fff; -webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px; -webkit-border-bottom-right-radius: 0; -moz-border-radius-bottomright: 0;  border-bottom-right-radius: 0;  }
+
+/* actions: Edit and Hide/Show  */
+.useractions { position:absolute; top:0; right:0; }
+.useractions .tabbtn { margin-right:8px; }

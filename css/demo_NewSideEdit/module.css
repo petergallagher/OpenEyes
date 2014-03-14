@@ -1,0 +1,21 @@
+/* 
+	New - Historical Data Child Element
+	The design of the Child Elements is under review.
+	This CSS is a hack to make IDG look like the current live OpenEyes.
+	For actual implentation please talk to OE Dev team - Richard Willis.
+
+ */
+
+/* create new outline design */
+
+.cols .smallthird { float: left; width:20%; margin-right:4%; }
+.cols .bigthird { float: left; width:37%; }]
+.cols .bigthird.marginright { margin-right:2%; }
+
+/*
+.currentchildelement { border:1px #fff solid; margin-top:10px; }
+.currentchildelement .eventDetail { padding:5px; }
+.eventcontent.edit .currentchildelement h4 { border-top:none; padding:6px; background:#fff; color:#666; }
+.eventcontent .edetail .elementactions { right:5px;}
+*/
+
