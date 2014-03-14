@@ -11,7 +11,6 @@ class m140311_092218_transactions_on_non_versioned_tables extends CDbMigration
 			$this->addColumn($table,'transaction_id','int(10) unsigned null');
 			$this->createIndex($table.'_transaction_id_fk',$table,'transaction_id');
 			$this->addForeignKey($table.'_transaction_id_fk',$table,'transaction_id','transaction','id');
-			$this->addColumn($table,'conflicted','tinyint(1) unsigned not null');
 		}
 	}
 
@@ -22,7 +21,6 @@ class m140311_092218_transactions_on_non_versioned_tables extends CDbMigration
 			$this->dropForeignKey($table.'_transaction_id_fk',$table);
 			$this->dropIndex($table.'_transaction_id_fk',$table);
 			$this->dropColumn($table,'transaction_id');
-			$this->dropColumn($table,'conflicted');
 		}
 	}
 }

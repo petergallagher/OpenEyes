@@ -30,8 +30,6 @@ if ($episode->diagnosis) {
 	$diagnosis = 'No diagnosis';
 }
 
-$episode->audit('episode summary','view');
-
 $form = $this->beginWidget('BaseEventTypeCActiveForm', array(
 		'id'=>'update-episode',
 		'enableAjaxValidation'=>false,

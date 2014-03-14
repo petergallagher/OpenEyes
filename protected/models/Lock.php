@@ -44,12 +44,23 @@ class Lock extends BaseActiveRecord
 		return 'lock';
 	}
 
+	/**
+	 * Automatically release the lock when all memory references are gone
+	 * We don't need a transaction for this as the locks are local (non-synced) and exclusive
+	 */
 	public function __destruct()
 	{
-		$this->delete();
+		if (!$this->getIsNewRecord()) {
+			$transactions = Yii::app()->params['enable_transactions'];
+			Yii::app()->params['enable_transactions'] = false;
+
+			$this->delete();
+
+			Yii::app()->params['enable_transactions'] = $transactions;
+		}
 	}
 
-	static public function obtain($table, $id, $block=false, $timeout=null, $request_timestamp=null)
+	static public function obtain($table, $id, $block=true, $timeout=null, $request_timestamp=null)
 	{
 		if (is_null($timeout)) {
 			$timeout = Yii::app()->params['lock_wait_timeout'];

@@ -26,8 +26,6 @@ if (!empty($episode)) {
 		$eye = 'No diagnosis';
 		$diagnosis = 'No diagnosis';
 	}
-
-	$episode->audit('episode summary','view');
 	?>
 
 	<div class="element-data">

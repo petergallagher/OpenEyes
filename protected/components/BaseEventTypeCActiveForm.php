@@ -19,6 +19,14 @@
 
 class BaseEventTypeCActiveForm extends FormLayout
 {
+	public $transaction_id;
+
+	public function init()
+	{
+		parent::init();
+		echo CHtml::hiddenField('transaction_id',$this->transaction_id);
+	}
+
 	public function dropDownList($model, $field, $data, $htmlOptions=array(), $hidden=false, $layoutColumns=array())
 	{
 		$this->widget('application.widgets.DropDownList', array(

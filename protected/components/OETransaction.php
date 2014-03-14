@@ -22,6 +22,9 @@ class OETransaction
 	public $id;
 	public $pdo_transaction;
 	public $oe_transaction;
+	public $conflicted_with_transaction_id = null;
+	public $conflict_resolved_transaction_id = null;
+	public $append_to_conflict = null;
 
 	public function __construct($pdo_transaction, $operation_name=null, $object_name=null)
 	{
@@ -41,21 +44,29 @@ class OETransaction
 	public function commit()
 	{
 		if (!$this->oe_transaction->operation) {
+			$this->rollback();
+
 			throw new Exception("Transaction has no operation set and so cannot be committed.");
 		}
 		if (!$this->oe_transaction->object) {
+			$this->rollback();
+
 			throw new Exception("Transaction has no object set and so cannot be committed.");
 		}
 		if (count($this->oe_transaction->tables) <1) {
+			$this->rollback();
+
 			throw new Exception("Transaction has no table assignments and so cannot be committed.");
 		}
 
-		foreach ($this->oe_transaction->tables as $i => $table) {
+		foreach ($this->oe_transaction->tables as $table) {
 			if (!$_table = TransactionTable::model()->find('name=?',array($table))) {
 				$_table = new TransactionTable;
 				$_table->name = $table;
 
 				if (!$_table->save()) {
+					$this->rollback();
+
 					throw new Exception("Unable to save TransactionTable: ".print_r($_table->getErrors(),true));
 				}
 			}
@@ -66,7 +77,61 @@ class OETransaction
 			$tta->display_order = $i + 1;
 
 			if (!$tta->save()) {
+				$this->rollback();
+
 				throw new Exception("Unable to save TransactionTableAssignment: ".print_r($tta->getErrors(),true));
+			}
+		}
+
+		// Handle conflict
+		if ($this->conflicted_with_transaction_id) {
+			if ($this->append_to_conflict) {
+				$conflict = $this->append_to_conflict;
+			} else {
+				$conflict = new Conflict;
+
+				if (!$conflict->save()) {
+					$this->rollback();
+
+					throw new Exception("Unable to save conflict: ".print_r($conflict->getErrors(),true));
+				}
+			}
+
+			$conflicted_transaction_ids = array();
+
+			foreach ($this->oe_transaction->tables as $table) {
+				foreach (Yii::app()->db->createCommand()
+					->selectDistinct("transaction_id")
+					->from($table)
+					->where("transaction_id >= :transaction_from and transaction_id <= :transaction_to",array(
+						":transaction_from" => $this->conflicted_with_transaction_id,
+						":transaction_to" => $this->oe_transaction->id,
+					))
+					->queryAll() as $row) {
+
+					if (!in_array($row['transaction_id'],$conflicted_transaction_ids)) {
+						$tca = new TransactionConflictAssignment;
+						$tca->transaction_id = $row['transaction_id'];
+						$tca->conflict_id = $conflict->id;
+
+						if (!$tca->save()) {
+							throw new Exception("Unable to save TransactionConflictAssignment: ".print_r($tca->getErrors(),true));
+						}
+
+						$conflicted_transaction_ids[] = $row['transaction_id'];
+					}
+				}
+			}
+		}
+
+		// Handle resolution of conflict
+		if ($this->conflict_resolved_transaction_id) {
+			$transaction = Transaction::model()->with('conflict')->findByPk($this->conflict_resolved_transaction_id);
+
+			$transaction->conflict->resolved_transaction_id = $this->oe_transaction->id;
+
+			if (!$transaction->conflict->save()) {
+				throw new Exception("Unable to mark conflict resolved: ".print_r($transaction->conflict->getErrors(),true));
 			}
 		}
 
@@ -99,5 +164,32 @@ class OETransaction
 	public function addTable($table_name)
 	{
 		return $this->oe_transaction->addTable($table_name);
+	}
+
+	/**
+	 * Mark the transaction and associated saved rows as conflicted with the specified $transaction_id and any other transactions that have occured
+	 * since $transaction_id and this transaction's id
+	 */
+	public function raiseConflict($transaction_id)
+	{
+		$this->conflicted_with_transaction_id = $transaction_id;
+	}
+
+	/**
+	 * Append transactions to an existing conflict
+	 */
+	public function addToConflict($conflict, $transaction_id)
+	{
+		$this->append_to_conflict = $conflict;
+
+		$this->raiseConflict($transaction_id);
+	}
+
+	/**
+	 * Indicates that the conflict related to the passed transaction_id is being resolved with this commit
+	 */
+	public function resolveConflict($transaction_id)
+	{
+		$this->conflict_resolved_transaction_id = $transaction_id;
 	}
 }

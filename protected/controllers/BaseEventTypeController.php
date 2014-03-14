@@ -806,41 +806,53 @@ class BaseEventTypeController extends BaseModuleController
 				$this->redirect(array('default/view/'.$this->event->id));
 			}
 
-			$errors = $this->setAndValidateElementsFromData($_POST);
+			if ($lock = Lock::obtain('event',$id)) {
+				// Determine whether the event has been modified since the user loaded the form
+				$errors = $this->setAndValidateElementsFromData($_POST);
 
-			// update the event
-			if (empty($errors)) {
-				$transaction = Yii::app()->db->beginTransaction('Update','Event');
+				// update the event
+				if (empty($errors)) {
+					$transaction = Yii::app()->db->beginTransaction('Update','Event');
 
-				try {
-					//TODO: should all the auditing be moved into the saving of the event
-					$success = $this->saveEvent($_POST);
+					try {
+						//TODO: should all the auditing be moved into the saving of the event
+						$success = $this->saveEvent($_POST);
 
-					if ($success) {
-						//TODO: should not be pasing event?
-						$this->afterUpdateElements($this->event);
-						$this->logActivity('updated event');
+						if ($success) {
+							//TODO: should not be pasing event?
+							$this->afterUpdateElements($this->event);
+							$this->logActivity('updated event');
 
-						$this->event->audit('event','update');
+							$this->event->audit('event','update');
 
-						OELog::log("Updated event {$this->event->id}");
-						$transaction->commit();
-						$this->redirect(array('default/view/'.$this->event->id));
+							OELog::log("Updated event {$this->event->id}");
+
+							/*if ($this->event->conflicted) {
+								Yii::app()->user->setFlash('warning.warning', "This event was modified by someone else while you were editing it and is now in a conflicted state.");
+							}*/
+
+							$transaction->commit();
+
+							$this->redirect(array('default/view/'.$this->event->id));
+						}
+						else {
+							$transaction->rollback();
+
+							throw new Exception("Unable to save edits to event");
+						}
 					}
-					else {
-						throw new Exception("Unable to save edits to event");
+					catch (Exception $e) {
+						$transaction->rollback();
+						throw $e;
 					}
 				}
-				catch (Exception $e) {
-					$transaction->rollback();
-					throw $e;
-				}
+			} else {
+				Yii::app()->user->setFlash('warning.error', "The event couldn't be locked for editing, it may be locked by another user.  If the problem persists please contact support.");
 			}
 		}
-		else {
-			// get the elements
-			$this->setOpenElementsFromCurrentEvent('update');
-		}
+
+		// get the elements
+		$this->setOpenElementsFromCurrentEvent('update');
 
 		$this->editing = true;
 		$this->event_tabs = array(
@@ -1121,7 +1133,14 @@ class BaseEventTypeController extends BaseModuleController
 			}
 		}
 		$this->event->info = $info_text;
-		$this->event->save();
+
+		if (@$_POST['resolved_conflict']) {
+			$this->event = $this->event->resolvesConflictWithTransactionID($_POST['transaction_id']);
+		}
+
+		if (!$this->event->basedOnTransactionID($_POST['transaction_id'])->save()) {
+			throw new Exception("Unable to save event: ".print_r($this->event->getErrors(),true));
+		}
 	}
 
 	/**

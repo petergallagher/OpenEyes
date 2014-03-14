@@ -1192,6 +1192,8 @@ class Patient extends BaseActiveRecordVersioned
 		}
 		$episode->start_date = date("Y-m-d H:i:s");
 
+		$transaction = Yii::app()->db->beginTransaction('Create','Episode');
+
 		if (!$episode->save()) {
 			OELog::log("Unable to create new episode for patient_id=$episode->patient_id, firm_id=$episode->firm_id, start_date='$episode->start_date'");
 			throw new Exception('Unable to create create episode: '.print_r($episode->getErrors(),true));
@@ -1200,6 +1202,8 @@ class Patient extends BaseActiveRecordVersioned
 		OELog::log("New episode created for patient_id=$episode->patient_id, firm_id=$episode->firm_id, start_date='$episode->start_date'");
 
 		$episode->audit('episode','create');
+
+		$transaction->commit();
 
 		Yii::app()->event->dispatch('episode_after_create', array('episode' => $episode));
 

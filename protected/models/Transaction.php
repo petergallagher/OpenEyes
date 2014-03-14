@@ -44,6 +44,9 @@ class Transaction extends BaseActiveRecord
 			'operation' => array(self::BELONGS_TO, 'TransactionOperation', 'operation_id'),
 			'object' => array(self::BELONGS_TO, 'TransactionObject', 'object_id'),
 			'table_assignments' => array(self::HAS_MANY, 'TransactionTableAssignment', 'transaction_id', 'order' => 'display_order asc'),
+			'conflict_assignments' => array(self::HAS_MANY, 'TransactionConflictAssignment', 'transaction_id'),
+			'conflict' => array(self::HAS_ONE, 'Conflict', 'transaction_id', 'through' => 'conflict_assignments'),
+			'unresolvedConflict' => array(self::HAS_ONE, 'Conflict', 'transaction_id', 'through' => 'conflict_assignments', 'condition' => 'resolved_transaction_id is null'),
 		);
 	}
 

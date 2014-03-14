@@ -304,7 +304,11 @@ class UserIdentity extends CUserIdentity
 			throw new CException('Cannot find default site');
 		}
 
+		$transaction = Yii::app()->db->beginTransaction('Login','User');
+
 		$user->audit('login','login-successful',null,"User ".strtoupper($this->username)." logged in");
+
+		$transaction->commit();
 
 		return true;
 	}

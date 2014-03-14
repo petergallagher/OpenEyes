@@ -122,7 +122,11 @@ class PatientController extends BaseController
 		// NOTE that this is not being used in the render
 		$supportserviceepisodes = $this->patient->supportserviceepisodes;
 
+		$transaction = Yii::app()->db->beginTransaction('View','Patient summary');
+
 		Audit::add('patient summary','view',$id);
+
+		$transaction->commit();
 
 		$this->logActivity('viewed patient');
 
@@ -308,6 +312,14 @@ class PatientController extends BaseController
 		$this->current_episode = $current_episode;
 		$this->title = 'Episode summary';
 
+		if ($current_episode) {
+			$transaction = Yii::app()->db->beginTransaction('View','Episode summary');
+
+			$current_episode->audit('episode summary','view');
+
+			$transaction->commit();
+		}
+
 		$this->render('episodes', array(
 			'title' => empty($episodes) ? '' : 'Episode summary',
 			'episodes' => $episodes,
@@ -377,16 +389,28 @@ class PatientController extends BaseController
 			} else {
 				if (@$_POST['eye_id'] && @$_POST['DiagnosisSelection']['disorder_id']) {
 					if ($_POST['eye_id'] != $this->episode->eye_id || $_POST['DiagnosisSelection']['disorder_id'] != $this->episode->disorder_id) {
+						$transaction = Yii::app()->db->beginTransaction('Update','Episode');
+
 						$this->episode->setPrincipalDiagnosis($_POST['DiagnosisSelection']['disorder_id'],$_POST['eye_id']);
 					}
 				}
 
 				if ($_POST['episode_status_id'] != $this->episode->episode_status_id) {
+					if (!isset($transaction)) {
+						$transaction = Yii::app()->db->beginTransaction('Update','Episode');
+					}
+
 					$this->episode->episode_status_id = $_POST['episode_status_id'];
 
 					if (!$this->episode->save()) {
+						$transaction->rollback();
+
 						throw new Exception('Unable to update status for episode '.$this->episode->id.' '.print_r($this->episode->getErrors(),true));
 					}
+				}
+
+				if (isset($transaction)) {
+					$transaction->commit();
 				}
 
 				$this->redirect(array('patient/episode/'.$this->episode->id));
@@ -420,6 +444,12 @@ class PatientController extends BaseController
 		Yii::app()->session['episode_hide_status'] = $status;
 
 		$this->editing = true;
+
+		$transaction = Yii::app()->db->beginTransaction('View','Episode');
+
+		$this->episode->audit('episode summary','view');
+
+		$transaction->commit();
 
 		$this->render('episodes', array(
 			'title' => empty($episodes) ? '' : 'Episode summary',

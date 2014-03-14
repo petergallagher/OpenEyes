@@ -24,9 +24,10 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 	public $version_id = null;
 	public $version_date	= null;
 	public $deleted_transaction_id = null;
+	private $based_on_transaction_id = null;
+	private $resolves_conflict_based_on_transaction_id = null;
 
 	/* Disable archiving on save() */
-
 	public function noVersion()
 	{
 		$this->enable_version = false;
@@ -35,7 +36,6 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 	}
 
 	/* Re-enable archiving on save() */
-
 	public function withVersion()
 	{
 		$this->enable_version = true;
@@ -52,7 +52,6 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 	}
 
 	/* Fetch from version */
-
 	public function fromVersion()
 	{
 		// Clone to avoid singleton problems
@@ -63,7 +62,6 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 	}
 
 	/* Disable fetch from version */
-
 	public function notFromVersion()
 	{
 		// Clone to avoid singleton problems
@@ -71,6 +69,27 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 		$model->fetch_from_version = false;
 
 		return $model;
+	}
+
+	/**
+	 * Method to indicate prior to a save() that the edit being made is based on a given transaction ID
+	 * If at the point of saving the transaction ID on the locked object is different we raise a conflict
+	 */
+	public function basedOnTransactionID($transaction_id)
+	{
+		$this->based_on_transaction_id = $transaction_id;
+
+		return $this;
+	}
+
+	/**
+	 * Indicate that the current transaction will resolve the conflict with the specified transaction_id
+	 */
+	public function resolvesConflictWithTransactionID($transaction_id)
+	{
+		$this->resolves_conflict_based_on_transaction_id = $transaction_id;
+
+		return $this;
 	}
 
 	/**
@@ -329,6 +348,16 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 		}
 
 		$this->hash = $this->generateHash();
+
+		if ($this->based_on_transaction_id !== null && $this->transaction_id != $this->based_on_transaction_id) {
+			if ($this->conflict) {
+				$transaction->addToConflict($this->conflict, $this->transaction_id);
+			} else {
+				$transaction->raiseConflict($this->transaction_id);
+			}
+		} elseif ($this->resolves_conflict_based_on_transaction_id) {
+			$transaction->resolveConflict($this->resolves_conflict_based_on_transaction_id);
+		}
 
 		if ($this->transaction_id == $transaction->id) {
 			// Don't create a new version row if save is called again on the same object in the same transaction

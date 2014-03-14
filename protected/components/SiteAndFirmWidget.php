@@ -49,9 +49,9 @@ class SiteAndFirmWidget extends CWidget
 					throw new CException('Error saving user');
 				}
 
-				$transaction->commit();
-
 				$user->audit('user', 'change-firm', $user->last_firm_id);
+
+				$transaction->commit();
 
 				Yii::app()->session['selected_site_id'] = $model->site_id;
 				$this->controller->selectedSiteId = $model->site_id;
