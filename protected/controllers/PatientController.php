@@ -363,6 +363,10 @@ class PatientController extends BaseController
 		$status[$id] = true;
 		Yii::app()->session['episode_hide_status'] = $status;
 
+		if ($conflict = $this->episode->conflict) {
+			Yii::app()->user->setFlash('warning.warning', "This episode is in conflict, ".$conflict->versionCount." conflicting changes have been made.");
+		}
+
 		$this->render('episodes', array(
 			'title' => empty($episodes) ? '' : 'Episode summary',
 			'episodes' => $episodes,
@@ -453,6 +457,10 @@ class PatientController extends BaseController
 		$this->episode->audit('episode summary','view');
 
 		$transaction->commit();
+
+		if ($conflict = $this->episode->conflict) {
+			Yii::app()->user->setFlash('warning.warning', "This episode is in conflict, ".$conflict->versionCount." conflicting changes have been made.");
+		}
 
 		$this->render('episodes', array(
 			'title' => empty($episodes) ? '' : 'Episode summary',

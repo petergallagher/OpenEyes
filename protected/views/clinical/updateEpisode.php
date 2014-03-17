@@ -47,6 +47,8 @@ $form = $this->beginWidget('BaseEventTypeCActiveForm', array(
 		<h3><?php echo $episode->firm->serviceSubspecialtyAssignment->subspecialty->name?></h3>
 	</div>
 
+	<?php $this->renderPartial('//base/_messages'); ?>
+
 	<?php if ($error) {?>
 		<div id="clinical-create_es_" class="alert-box alert with-icon">
 			<p>Please fix the following input errors:</p>

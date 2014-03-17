@@ -831,10 +831,6 @@ class BaseEventTypeController extends BaseModuleController
 
 							OELog::log("Updated event {$this->event->id}");
 
-							/*if ($this->event->conflicted) {
-								Yii::app()->user->setFlash('warning.warning', "This event was modified by someone else while you were editing it and is now in a conflicted state.");
-							}*/
-
 							$transaction->commit();
 
 							$this->redirect(array('default/view/'.$this->event->id));
