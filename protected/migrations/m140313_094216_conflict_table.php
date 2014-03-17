@@ -36,6 +36,7 @@ CREATE TABLE `transaction_conflict_assignment` (
 	KEY `tca_last_modified_user_id_fk` (`last_modified_user_id`),
 	KEY `tca_transaction_id_fk` (`transaction_id`),
 	KEY `tca_conflict_id_fk` (`conflict_id`),
+	UNIQUE KEY `tca_transaction_conflict_id_fk` (`transaction_id`,`conflict_id`),
 	CONSTRAINT `tca_created_user_id_fk` FOREIGN KEY (`created_user_id`) REFERENCES `user` (`id`),
 	CONSTRAINT `tca_last_modified_user_id_fk` FOREIGN KEY (`last_modified_user_id`) REFERENCES `user` (`id`),
 	CONSTRAINT `tca_transaction_id_fk` FOREIGN KEY (`transaction_id`) REFERENCES `transaction` (`id`),

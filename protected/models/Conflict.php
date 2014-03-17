@@ -95,4 +95,26 @@ class Conflict extends BaseActiveRecord
 			'criteria'=>$criteria,
 		));
 	}
+
+	public function getVersionCount()
+	{
+		return (integer)Yii::app()->db->createCommand()
+			->select("count(id)")
+			->from("transaction_conflict_assignment")
+			->where("conflict_id = :conflict_id",array(":conflict_id" => $this->id))
+			->queryScalar();
+	}
+
+	public function addTransactionID($transaction_id)
+	{
+		if (!$tca = TransactionConflictAssignment::model()->find('conflict_id=? and transaction_id=?',array($this->id,$transaction_id))) {
+			$tca = new TransactionConflictAssignment;
+			$tca->conflict_id = $this->id;
+			$tca->transaction_id = $transaction_id;
+
+			if (!$tca->save()) {
+				throw new Exception("Unable to save TransactionConflictAssignment: ".print_r($tca->getErrors(),true));
+			}
+		}
+	}
 }

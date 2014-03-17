@@ -777,6 +777,10 @@ class BaseEventTypeController extends BaseModuleController
 			}
 		}
 
+		if ($conflict = $this->event->conflict) {
+			Yii::app()->user->setFlash('warning.warning', "This event is in conflict, ".$conflict->versionCount." conflicting changes have been made.");
+		}
+
 		$viewData = array_merge(array(
 			'elements' => $this->open_elements,
 			'eventId' => $id,
@@ -847,7 +851,7 @@ class BaseEventTypeController extends BaseModuleController
 					}
 				}
 			} else {
-				Yii::app()->user->setFlash('warning.error', "The event couldn't be locked for editing, it may be locked by another user.  If the problem persists please contact support.");
+				Yii::app()->user->setFlash('warning.error', "The event couldn't be locked for editing, it may be locked by another user.	If the problem persists please contact support.");
 			}
 		}
 
@@ -872,6 +876,10 @@ class BaseEventTypeController extends BaseModuleController
 						array('level' => 'cancel')
 				)
 		);
+
+		if ($conflict = $this->event->conflict) {
+			Yii::app()->user->setFlash('warning.warning', "This event is in conflict, ".$conflict->versionCount." conflicting changes have been made.");
+		}
 
 		$this->render($this->action->id, array(
 			'errors' => @$errors
@@ -1134,7 +1142,7 @@ class BaseEventTypeController extends BaseModuleController
 		}
 		$this->event->info = $info_text;
 
-		if (@$_POST['resolved_conflict']) {
+		if (@$_POST['resolve_conflict']) {
 			$this->event = $this->event->resolvesConflictWithTransactionID($_POST['transaction_id']);
 		}
 

@@ -97,41 +97,34 @@ class OETransaction
 				}
 			}
 
-			$conflicted_transaction_ids = array();
-
 			foreach ($this->oe_transaction->tables as $table) {
-				foreach (Yii::app()->db->createCommand()
-					->selectDistinct("transaction_id")
-					->from($table)
-					->where("transaction_id >= :transaction_from and transaction_id <= :transaction_to",array(
-						":transaction_from" => $this->conflicted_with_transaction_id,
-						":transaction_to" => $this->oe_transaction->id,
-					))
-					->queryAll() as $row) {
+				foreach (array($table,$table.'_version') as $_table) {
+					if (Yii::app()->db->getSchema()->getTable($_table)) {
+						foreach (Yii::app()->db->createCommand()
+							->select("transaction_id")
+							->from($_table)
+							->where("transaction_id >= :transaction_from and transaction_id < :transaction_to",array(
+								":transaction_from" => $this->conflicted_with_transaction_id,
+								":transaction_to" => $this->oe_transaction->id,
+							))
+							->queryAll() as $row) {
 
-					if (!in_array($row['transaction_id'],$conflicted_transaction_ids)) {
-						$tca = new TransactionConflictAssignment;
-						$tca->transaction_id = $row['transaction_id'];
-						$tca->conflict_id = $conflict->id;
-
-						if (!$tca->save()) {
-							throw new Exception("Unable to save TransactionConflictAssignment: ".print_r($tca->getErrors(),true));
+							$conflict->addTransactionID($row['transaction_id']);
 						}
-
-						$conflicted_transaction_ids[] = $row['transaction_id'];
 					}
 				}
 			}
+
+			$conflict->addTransactionID($this->oe_transaction->id);
 		}
 
 		// Handle resolution of conflict
 		if ($this->conflict_resolved_transaction_id) {
-			$transaction = Transaction::model()->with('conflict')->findByPk($this->conflict_resolved_transaction_id);
+			$conflict = Transaction::model()->findByPk($this->conflict_resolved_transaction_id)->conflict;
+			$conflict->resolved_transaction_id = $this->oe_transaction->id;
 
-			$transaction->conflict->resolved_transaction_id = $this->oe_transaction->id;
-
-			if (!$transaction->conflict->save()) {
-				throw new Exception("Unable to mark conflict resolved: ".print_r($transaction->conflict->getErrors(),true));
+			if (!$conflict->save()) {
+				throw new Exception("Unable to mark conflict resolved: ".print_r($conflict->getErrors(),true));
 			}
 		}
 
@@ -172,7 +165,9 @@ class OETransaction
 	 */
 	public function raiseConflict($transaction_id)
 	{
-		$this->conflicted_with_transaction_id = $transaction_id;
+		if ($transaction_id != $this->conflict_resolved_transaction_id) {
+			$this->conflicted_with_transaction_id = $transaction_id;
+		}
 	}
 
 	/**
@@ -191,5 +186,9 @@ class OETransaction
 	public function resolveConflict($transaction_id)
 	{
 		$this->conflict_resolved_transaction_id = $transaction_id;
+
+		if ($transaction_id == $this->conflicted_with_transaction_id) {
+			$this->conflicted_with_transaction_id = null;
+		}
 	}
 }

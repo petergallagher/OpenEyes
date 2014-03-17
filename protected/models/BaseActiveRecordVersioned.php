@@ -349,14 +349,25 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 
 		$this->hash = $this->generateHash();
 
-		if ($this->based_on_transaction_id !== null && $this->transaction_id != $this->based_on_transaction_id) {
-			if ($this->conflict) {
-				$transaction->addToConflict($this->conflict, $this->transaction_id);
+		if ($this->based_on_transaction_id && $this->transaction_id != $this->based_on_transaction_id) {
+			// Object was changed while being edited, the save POST'd in the form was based on a version prior to the current latest version
+			// so this new transaction is now in conflict with any transactions made since $this->based_on_transaction_id which is the transaction_id
+			// the edit was based on.
+			if ($this->unresolvedConflict) {
+				// Object is already in a conflicted state so we simply append this transaction to the conflict
+				$transaction->addToConflict($this->unresolvedConflict, $this->transaction_id);
 			} else {
+				// Raise a new conflict
 				$transaction->raiseConflict($this->transaction_id);
 			}
-		} elseif ($this->resolves_conflict_based_on_transaction_id) {
-			$transaction->resolveConflict($this->resolves_conflict_based_on_transaction_id);
+		} else if ($this->unresolvedConflict) {
+			if ($this->resolves_conflict_based_on_transaction_id) {
+				// Object was not changed while being edited and the user specified that they are resolving the conflict so we mark the conflict as resolved
+				$transaction->resolveConflict($this->resolves_conflict_based_on_transaction_id);
+			} else {
+				// Object is conflicted and the user did not explicitly mark it resolved with the POST'd edit so we add this transaction to the conflict
+				$transaction->addToConflict($this->unresolvedConflict, $this->transaction_id);
+			}
 		}
 
 		if ($this->transaction_id == $transaction->id) {
@@ -375,6 +386,37 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 		}
 
 		return $result;
+	}
+
+	public function getTransaction()
+	{
+		return Transaction::model()->findByPk($this->transaction_id);
+	}
+
+	public function getConflict()
+	{
+		if ($transaction = $this->transaction) {
+			return $transaction->conflict;
+		}
+
+		return false;
+	}
+
+	public function getUnresolvedConflict()
+	{
+		if ($transaction = $this->transaction) {
+			return $transaction->unresolvedConflict;
+		}
+
+		return false;
+	}
+
+	/**
+	 * Resolves true if this object's related transaction attempted to resolve a conflict (regardless of whether it was successful)
+	 */
+	public function getResolvedConflict()
+	{
+		return $this->transaction_id && Conflict::model()->find('resolved_transaction_id=?',array($this->transaction_id));
 	}
 
 	public function delete()
@@ -414,9 +456,25 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 
 		$transactions[0] = 'Current: by '.$this->getTransactionText($active->last_modified_user_id,$active->last_modified_date);
 
+		if ($this->conflict) {
+			$transactions[0] .= ' [C]';
+		}
+
+		if ($this->resolvedConflict) {
+			$transactions[0] .= ' [R]';
+		}
+
 		foreach ($active->getPreviousVersions($unique_hash, $active->hash) as $previous_version) {
 			if ($previous_version->transaction_id) {
 				$transactions[$previous_version->transaction_id] = 'Edit by '.$this->getTransactionText($previous_version->last_modified_user_id,$previous_version->last_modified_date);
+
+				if ($previous_version->conflict) {
+					$transactions[$previous_version->transaction_id] .= ' [C]';
+				}
+
+				if ($previous_version->resolvedConflict) {
+					$transactions[$previous_version->transaction_id] .= ' [R]';
+				}
 			}
 		}
 

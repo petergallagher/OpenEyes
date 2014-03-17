@@ -25,6 +25,7 @@ class BaseEventTypeCActiveForm extends FormLayout
 	{
 		parent::init();
 		echo CHtml::hiddenField('transaction_id',$this->transaction_id);
+		echo CHtml::hiddenField('resolve_conflict',0);
 	}
 
 	public function dropDownList($model, $field, $data, $htmlOptions=array(), $hidden=false, $layoutColumns=array())
