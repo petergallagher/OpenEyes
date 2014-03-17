@@ -53,7 +53,7 @@ class PatientController extends BaseController
 				'roles' => array('OprnCreateEpisode'),
 			),
 			array('allow',
-				'actions' => array('updateepisode'),  // checked in action
+				'actions' => array('updateepisode'),	// checked in action
 				'users' => array('@'),
 			),
 			array('allow',
@@ -387,31 +387,34 @@ class PatientController extends BaseController
 			} elseif (!@$_POST['eye_id'] && @$_POST['DiagnosisSelection']['disorder_id']) {
 				$error = "Please select an eye for the principal diagnosis";
 			} else {
+				$transaction = Yii::app()->db->beginTransaction('Update','Episode');
+
 				if (@$_POST['eye_id'] && @$_POST['DiagnosisSelection']['disorder_id']) {
 					if ($_POST['eye_id'] != $this->episode->eye_id || $_POST['DiagnosisSelection']['disorder_id'] != $this->episode->disorder_id) {
-						$transaction = Yii::app()->db->beginTransaction('Update','Episode');
+						$this->episode->disorder_id = $_POST['DiagnosisSelection']['disorder_id'];
+						$this->episode->eye_id = $_POST['eye_id'];
 
-						$this->episode->setPrincipalDiagnosis($_POST['DiagnosisSelection']['disorder_id'],$_POST['eye_id']);
+						$this->episode->audit('episode','set-principal-diagnosis');
 					}
 				}
 
 				if ($_POST['episode_status_id'] != $this->episode->episode_status_id) {
-					if (!isset($transaction)) {
-						$transaction = Yii::app()->db->beginTransaction('Update','Episode');
-					}
-
 					$this->episode->episode_status_id = $_POST['episode_status_id'];
-
-					if (!$this->episode->save()) {
-						$transaction->rollback();
-
-						throw new Exception('Unable to update status for episode '.$this->episode->id.' '.print_r($this->episode->getErrors(),true));
-					}
 				}
 
-				if (isset($transaction)) {
-					$transaction->commit();
+				$this->episode->audit('episode','update');
+
+				if (@$_POST['resolve_conflict']) {
+					$this->episode = $this->episode->resolvesConflictWithTransactionID($_POST['transaction_id']);
 				}
+
+				if (!$this->episode->basedOnTransactionID($_POST['transaction_id'])->save()) {
+					$transaction->rollback();
+
+					throw new Exception('Unable to update status for episode '.$this->episode->id.' '.print_r($this->episode->getErrors(),true));
+				}
+
+				$transaction->commit();
 
 				$this->redirect(array('patient/episode/'.$this->episode->id));
 			}
@@ -652,7 +655,7 @@ class PatientController extends BaseController
 			if (@$_POST['no_allergies']) {
 				$patient->setNoAllergies();
 			}
-			else  {
+			else	{
 				if (!isset($_POST['allergy_id']) || !$allergy_id = $_POST['allergy_id']) {
 					throw new Exception('Allergy ID required');
 				}

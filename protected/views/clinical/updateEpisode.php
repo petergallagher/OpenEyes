@@ -22,6 +22,10 @@
 $this->event_actions[] = EventAction::link('Cancel', Yii::app()->createUrl('/patient/episode/'.$episode->id), array('level' => 'cancel'));
 $this->event_actions[] = EventAction::button('Save', 'save', array('id' => 'episode_save', 'level' => 'save'));
 
+if ($episode->conflict) {
+	$this->event_actions[] = EventAction::button('Save and resolve conflict', 'save_resolve', array('level' => 'save'), array('form'=>'update-episode'));
+}
+
 if ($episode->diagnosis) {
 	$eye = $episode->eye ? $episode->eye->name : 'None';
 	$diagnosis = $episode->diagnosis ? $episode->diagnosis->term : 'none';
@@ -34,6 +38,7 @@ $form = $this->beginWidget('BaseEventTypeCActiveForm', array(
 		'id'=>'update-episode',
 		'enableAjaxValidation'=>false,
 		'action'=>array('patient/updateepisode/'.$episode->id),
+		'transaction_id'=>$episode->transaction_id,
 ));
 ?>
 
@@ -239,6 +244,11 @@ $form = $this->beginWidget('BaseEventTypeCActiveForm', array(
 		});
 
 		handleButton($('#et_save'),function(e) {
+			$('#update-episode').submit();
+		});
+
+		handleButton($('#et_save_resolve'),function(e) {
+			$('#resolve_conflict').val(1);
 			$('#update-episode').submit();
 		});
 	</script>
