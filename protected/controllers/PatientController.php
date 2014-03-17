@@ -391,36 +391,41 @@ class PatientController extends BaseController
 			} elseif (!@$_POST['eye_id'] && @$_POST['DiagnosisSelection']['disorder_id']) {
 				$error = "Please select an eye for the principal diagnosis";
 			} else {
-				$transaction = Yii::app()->db->beginTransaction('Update','Episode');
+				if ($lock = Lock::obtain('patient',$this->episode->patient_id)) {
+					$transaction = Yii::app()->db->beginTransaction('Update','Episode');
 
-				if (@$_POST['eye_id'] && @$_POST['DiagnosisSelection']['disorder_id']) {
-					if ($_POST['eye_id'] != $this->episode->eye_id || $_POST['DiagnosisSelection']['disorder_id'] != $this->episode->disorder_id) {
-						$this->episode->disorder_id = $_POST['DiagnosisSelection']['disorder_id'];
-						$this->episode->eye_id = $_POST['eye_id'];
+					if (@$_POST['eye_id'] && @$_POST['DiagnosisSelection']['disorder_id']) {
+						if ($_POST['eye_id'] != $this->episode->eye_id || $_POST['DiagnosisSelection']['disorder_id'] != $this->episode->disorder_id) {
+							$this->episode->disorder_id = $_POST['DiagnosisSelection']['disorder_id'];
+							$this->episode->eye_id = $_POST['eye_id'];
 
-						$this->episode->audit('episode','set-principal-diagnosis');
+							$this->episode->audit('episode','set-principal-diagnosis');
+						}
 					}
+
+					if ($_POST['episode_status_id'] != $this->episode->episode_status_id) {
+						$this->episode->episode_status_id = $_POST['episode_status_id'];
+					}
+
+					$this->episode->audit('episode','update');
+
+					if (@$_POST['resolve_conflict']) {
+						$this->episode = $this->episode->resolvesConflictWithTransactionID($_POST['transaction_id']);
+					}
+
+					if (!$this->episode->basedOnTransactionID($_POST['transaction_id'])->save()) {
+						$transaction->rollback();
+
+						throw new Exception('Unable to update status for episode '.$this->episode->id.' '.print_r($this->episode->getErrors(),true));
+					}
+
+					$transaction->commit();
+
+					$this->redirect(array('patient/episode/'.$this->episode->id));
+
+				} else {
+					Yii::app()->user->setFlash('warning.error', "The episode couldn't be locked for editing, it may be locked by another user.  If the problem persists please contact support.");
 				}
-
-				if ($_POST['episode_status_id'] != $this->episode->episode_status_id) {
-					$this->episode->episode_status_id = $_POST['episode_status_id'];
-				}
-
-				$this->episode->audit('episode','update');
-
-				if (@$_POST['resolve_conflict']) {
-					$this->episode = $this->episode->resolvesConflictWithTransactionID($_POST['transaction_id']);
-				}
-
-				if (!$this->episode->basedOnTransactionID($_POST['transaction_id'])->save()) {
-					$transaction->rollback();
-
-					throw new Exception('Unable to update status for episode '.$this->episode->id.' '.print_r($this->episode->getErrors(),true));
-				}
-
-				$transaction->commit();
-
-				$this->redirect(array('patient/episode/'.$this->episode->id));
 			}
 		}
 

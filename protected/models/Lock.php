@@ -50,6 +50,14 @@ class Lock extends BaseActiveRecord
 	 */
 	public function __destruct()
 	{
+		$this->release();
+	}
+
+	/**
+	 * Release the lock
+	 */
+	public function release()
+	{
 		if (!$this->getIsNewRecord()) {
 			$transactions = Yii::app()->params['enable_transactions'];
 			Yii::app()->params['enable_transactions'] = false;

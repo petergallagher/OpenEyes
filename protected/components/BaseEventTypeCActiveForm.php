@@ -20,11 +20,13 @@
 class BaseEventTypeCActiveForm extends FormLayout
 {
 	public $transaction_id;
+	public $episode_transaction_id;
 
 	public function init()
 	{
 		parent::init();
 		echo CHtml::hiddenField('transaction_id',$this->transaction_id);
+		echo CHtml::hiddenField('episode_transaction_id',$this->episode_transaction_id);
 		echo CHtml::hiddenField('resolve_conflict',0);
 	}
 

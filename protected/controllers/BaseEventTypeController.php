@@ -810,7 +810,7 @@ class BaseEventTypeController extends BaseModuleController
 				$this->redirect(array('default/view/'.$this->event->id));
 			}
 
-			if ($lock = Lock::obtain('event',$id)) {
+			if ($lock = Lock::obtain('patient',$this->event->episode->patient_id)) {
 				// Determine whether the event has been modified since the user loaded the form
 				$errors = $this->setAndValidateElementsFromData($_POST);
 
@@ -846,6 +846,9 @@ class BaseEventTypeController extends BaseModuleController
 						throw $e;
 					}
 				}
+
+				$lock->release();
+
 			} else {
 				Yii::app()->user->setFlash('warning.error', "The event couldn't be locked for editing, it may be locked by another user.	If the problem persists please contact support.");
 			}
