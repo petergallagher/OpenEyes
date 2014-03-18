@@ -370,7 +370,7 @@ class PatientController extends BaseController
 		Yii::app()->session['episode_hide_status'] = $status;
 
 		if ($conflict = $this->episode->conflict) {
-			Yii::app()->user->setFlash('warning.warning', "The transaction for this episode is in conflict with ".$conflict->versionCount." other transactions.");
+			Yii::app()->user->setFlash('warning.warning', "The latest transaction for this episode is in conflict with ".($conflict->versionCount-1)." other transaction".(($conflict->versionCount-1)==1 ? '' : 's'));
 		}
 
 		$this->render('episodes', array(

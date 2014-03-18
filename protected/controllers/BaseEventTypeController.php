@@ -784,7 +784,7 @@ class BaseEventTypeController extends BaseModuleController
 		}
 
 		if ($conflict = $this->event->conflict) {
-			Yii::app()->user->setFlash('warning.warning', "The transaction for this event is in conflict with ".$conflict->versionCount." other transactions.");
+			Yii::app()->user->setFlash('warning.warning', "The latest transaction for this event is in conflict with ".($conflict->versionCount-1)." other transaction".(($conflict->versionCount-1)==1 ? '' : 's'));
 		}
 
 		$viewData = array_merge(array(

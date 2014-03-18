@@ -25,7 +25,7 @@
 		));
 	}?>
 	<?php if ($conflict = $this->patient->getUnresolvedConflictForRelation('systemicDiagnoses')) {?>
-		<div class="alert-box alert">The latest transaction is in conflict with <?php echo $conflict->versionCount?> other transactions.</div>
+		<div class="alert-box alert">The latest transaction is in conflict with <?php echo ($conflict->versionCount-1)?> other transaction<?php if (($conflict->versionCount-1) != 1) {?>s<?php }?>.</div>
 	<?php }?>
 	<header class="box-header">
 		<h3 class="box-title">
