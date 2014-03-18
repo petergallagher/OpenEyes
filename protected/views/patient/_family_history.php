@@ -1,9 +1,8 @@
 <section class="box patient-info associated-data js-toggle-container">
 	<?php if (Yii::app()->params['show_previous_versions']) {
 		$this->renderPartial('_previous_versions',array(
-			'model' => $this->patient,
 			'field' => 'family_history_transaction_id',
-			'relation' => 'familyHistory',
+			'transactions' => $this->patient->getFullTransactionListForRelation('familyHistory'),
 		));
 	}?>
 	<header class="box-header">

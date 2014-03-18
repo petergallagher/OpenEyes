@@ -21,9 +21,8 @@
 <section class="box patient-info associated-data js-toggle-container">
 	<?php if (Yii::app()->params['show_previous_versions']) {
 		$this->renderPartial('_previous_versions',array(
-			'model' => $this->patient,
 			'field' => 'medications_transaction_id',
-			'relation' => 'medications',
+			'transactions' => $this->patient->medications,
 		));
 	}?>
 	<header class="box-header">

@@ -104,6 +104,7 @@ class BaseEventTypeController extends BaseModuleController
 	private $episodes = array();
 	public $renderPatientPanel = true;
 	public $transaction = null;
+	public $lock;
 
 	protected $open_elements;
 
@@ -512,25 +513,29 @@ class BaseEventTypeController extends BaseModuleController
 	 */
 	protected function initWithEventId($id)
 	{
-		$criteria = new CDbCriteria();
-		$criteria->addCondition('event_type_id = ?');
-		$criteria->params = array($this->event_type->id);
-		if (!$id || !$this->event = Event::model()->findByPk($id, $criteria)) {
-			throw new CHttpException(404, 'Invalid event id.');
-		}
-
-		if (isset($_GET['transaction_id'])) {
-			if (!$this->transaction = Transaction::model()->findByPk($_GET['transaction_id'])) {
-				throw new Exception("Transaction not found: ".$_GET['transaction_id']);
+		if ($this->lock = Lock::obtain('event',$id)) {
+			$criteria = new CDbCriteria();
+			$criteria->addCondition('event_type_id = ?');
+			$criteria->params = array($this->event_type->id);
+			if (!$id || !$this->event = Event::model()->findByPk($id, $criteria)) {
+				throw new CHttpException(404, 'Invalid event id.');
 			}
 
-			if (!$this->event = $this->event->getPreviousVersionByTransactionID($this->transaction->id)) {
-				throw new Exception("Transaction isn't for this event: ".$_GET['transaction_id']);
-			}
-		}
+			if (isset($_GET['transaction_id'])) {
+				if (!$this->transaction = Transaction::model()->findByPk($_GET['transaction_id'])) {
+					throw new Exception("Transaction not found: ".$_GET['transaction_id']);
+				}
 
-		$this->patient = $this->event->episode->patient;
-		$this->episode = $this->event->episode;
+				if (!$this->event = $this->event->getPreviousVersionByTransactionID($this->transaction->id)) {
+					throw new Exception("Transaction isn't for this event: ".$_GET['transaction_id']);
+				}
+			}
+
+			$this->patient = $this->event->episode->patient;
+			$this->episode = $this->event->episode;
+		} else {
+			throw new Exception("Unable to lock event");
+		}
 	}
 
 	/**
@@ -723,6 +728,7 @@ class BaseEventTypeController extends BaseModuleController
 	public function actionView($id)
 	{
 		$this->setOpenElementsFromCurrentEvent('view');
+
 		// Decide whether to display the 'edit' button in the template
 		if ($this->editable) {
 			$this->editable = $this->checkEditAccess($this->event);
@@ -810,47 +816,40 @@ class BaseEventTypeController extends BaseModuleController
 				$this->redirect(array('default/view/'.$this->event->id));
 			}
 
-			if ($lock = Lock::obtain('patient',$this->event->episode->patient_id)) {
-				// Determine whether the event has been modified since the user loaded the form
-				$errors = $this->setAndValidateElementsFromData($_POST);
+			// Determine whether the event has been modified since the user loaded the form
+			$errors = $this->setAndValidateElementsFromData($_POST);
 
-				// update the event
-				if (empty($errors)) {
-					$transaction = Yii::app()->db->beginTransaction('Update','Event');
+			// update the event
+			if (empty($errors)) {
+				$transaction = Yii::app()->db->beginTransaction('Update','Event');
 
-					try {
-						//TODO: should all the auditing be moved into the saving of the event
-						$success = $this->saveEvent($_POST);
+				try {
+					//TODO: should all the auditing be moved into the saving of the event
+					$success = $this->saveEvent($_POST);
 
-						if ($success) {
-							//TODO: should not be pasing event?
-							$this->afterUpdateElements($this->event);
-							$this->logActivity('updated event');
+					if ($success) {
+						//TODO: should not be pasing event?
+						$this->afterUpdateElements($this->event);
+						$this->logActivity('updated event');
 
-							$this->event->audit('event','update');
+						$this->event->audit('event','update');
 
-							OELog::log("Updated event {$this->event->id}");
+						OELog::log("Updated event {$this->event->id}");
 
-							$transaction->commit();
+						$transaction->commit();
 
-							$this->redirect(array('default/view/'.$this->event->id));
-						}
-						else {
-							$transaction->rollback();
-
-							throw new Exception("Unable to save edits to event");
-						}
+						$this->redirect(array('default/view/'.$this->event->id));
 					}
-					catch (Exception $e) {
+					else {
 						$transaction->rollback();
-						throw $e;
+
+						throw new Exception("Unable to save edits to event");
 					}
 				}
-
-				$lock->release();
-
-			} else {
-				Yii::app()->user->setFlash('warning.error', "The event couldn't be locked for editing, it may be locked by another user.	If the problem persists please contact support.");
+				catch (Exception $e) {
+					$transaction->rollback();
+					throw $e;
+				}
 			}
 		}
 

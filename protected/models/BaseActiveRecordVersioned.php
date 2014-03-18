@@ -505,6 +505,18 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 		return array($current) + $transactions;
 	}
 
+	public function getLatestTransactionForRelation($relation)
+	{
+		$transactions = $this->getVersionHistoryForRelation($relation);
+
+		if (!empty($transactions)) {
+			$transaction = array_shift($transactions);
+			return $transaction->id;
+		}
+
+		return null;
+	}
+
 	/**
 	 * Get a text description of the transaction item
 	 */

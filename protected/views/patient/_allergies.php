@@ -20,9 +20,8 @@
 <section class="box patient-info associated-data js-toggle-container">
 	<?php if (Yii::app()->params['show_previous_versions']) {
 		$this->renderPartial('_previous_versions',array(
-			'model' => $this->patient,
 			'field' => 'allergies_transaction_id',
-			'relation' => 'allergies',
+			'transactions' => $this->patient->getFullTransactionListForRelation('allergies'),
 		));
 	}?>
 	<header class="box-header">

@@ -107,57 +107,63 @@ class PatientController extends BaseController
 	 */
 	public function actionView($id)
 	{
-		Yii::app()->assetManager->registerScriptFile('js/patientSummary.js');
+		if ($lock = Lock::obtain('patient',$id)) {
+			Yii::app()->assetManager->registerScriptFile('js/patientSummary.js');
 
-		$this->patient = $this->loadModel($id);
+			$this->patient = $this->loadModel($id);
 
-		$tabId = !empty($_GET['tabId']) ? $_GET['tabId'] : 0;
-		$eventId = !empty($_GET['eventId']) ? $_GET['eventId'] : 0;
+			$tabId = !empty($_GET['tabId']) ? $_GET['tabId'] : 0;
+			$eventId = !empty($_GET['eventId']) ? $_GET['eventId'] : 0;
 
-		$episodes = $this->patient->episodes;
-		// TODO: verify if ordered_episodes complete supercedes need for unordered $episodes
-		$ordered_episodes = $this->patient->getOrderedEpisodes();
+			$episodes = $this->patient->episodes;
+			// TODO: verify if ordered_episodes complete supercedes need for unordered $episodes
+			$ordered_episodes = $this->patient->getOrderedEpisodes();
 
-		$legacyepisodes = $this->patient->legacyepisodes;
-		// NOTE that this is not being used in the render
-		$supportserviceepisodes = $this->patient->supportserviceepisodes;
+			$legacyepisodes = $this->patient->legacyepisodes;
+			// NOTE that this is not being used in the render
+			$supportserviceepisodes = $this->patient->supportserviceepisodes;
 
-		$transaction = Yii::app()->db->beginTransaction('View','Patient summary');
+			$transaction = Yii::app()->db->beginTransaction('View','Patient summary');
 
-		Audit::add('patient summary','view',$id);
+			Audit::add('patient summary','view',$id);
 
-		$transaction->commit();
+			$transaction->commit();
 
-		$this->logActivity('viewed patient');
+			$this->logActivity('viewed patient');
 
-		$episodes_open = 0;
-		$episodes_closed = 0;
+			$episodes_open = 0;
+			$episodes_closed = 0;
 
-		foreach ($episodes as $episode) {
-			if ($episode->end_date === null) {
-				$episodes_open++;
-			} else {
-				$episodes_closed++;
+			foreach ($episodes as $episode) {
+				if ($episode->end_date === null) {
+					$episodes_open++;
+				} else {
+					$episodes_closed++;
+				}
 			}
+
+			$this->jsVars['currentContacts'] = $this->patient->currentContactIDS();
+
+			$this->breadcrumbs=array(
+				$this->patient->first_name.' '.$this->patient->last_name. '('.$this->patient->hos_num.')',
+			);
+
+			$this->render('view', array(
+				'tab' => $tabId,
+				'event' => $eventId,
+				'episodes' => $episodes,
+				'ordered_episodes' => $ordered_episodes,
+				'legacyepisodes' => $legacyepisodes,
+				'episodes_open' => $episodes_open,
+				'episodes_closed' => $episodes_closed,
+				'firm' => Firm::model()->findByPk(Yii::app()->session['selected_firm_id']),
+				'supportserviceepisodes' => $supportserviceepisodes,
+			));
+
+			$lock->release();
+		} else {
+			throw new Exception("Unable to lock patient");
 		}
-
-		$this->jsVars['currentContacts'] = $this->patient->currentContactIDS();
-
-		$this->breadcrumbs=array(
-			$this->patient->first_name.' '.$this->patient->last_name. '('.$this->patient->hos_num.')',
-		);
-
-		$this->render('view', array(
-			'tab' => $tabId,
-			'event' => $eventId,
-			'episodes' => $episodes,
-			'ordered_episodes' => $ordered_episodes,
-			'legacyepisodes' => $legacyepisodes,
-			'episodes_open' => $episodes_open,
-			'episodes_closed' => $episodes_closed,
-			'firm' => Firm::model()->findByPk(Yii::app()->session['selected_firm_id']),
-			'supportserviceepisodes' => $supportserviceepisodes,
-		));
 	}
 
 	public function actionSearch()
@@ -781,12 +787,22 @@ class PatientController extends BaseController
 
 		$date = $this->processDiagnosisDate();
 
-		if (!$_POST['diagnosis_eye']) {
-			if (!SecondaryDiagnosis::model()->find('patient_id=? and disorder_id=? and date=?',array($patient->id,$disorder->id,$date))) {
-				$patient->addDiagnosis($disorder->id,null,$date);
+		if ($lock = Lock::obtain('patient',$patient->id)) {
+			$transaction = Yii::app()->db->beginTransaction('Add','Diagnosis');
+
+			if (!$_POST['diagnosis_eye']) {
+				if (!SecondaryDiagnosis::model()->find('patient_id=? and disorder_id=? and date=?',array($patient->id,$disorder->id,$date))) {
+					$patient->addDiagnosis($disorder->id,null,$date);
+				}
+			} elseif (!SecondaryDiagnosis::model()->find('patient_id=? and disorder_id=? and eye_id=? and date=?',array($patient->id,$disorder->id,$_POST['diagnosis_eye'],$date))) {
+				$patient->addDiagnosis($disorder->id, $_POST['diagnosis_eye'], $date);
 			}
-		} elseif (!SecondaryDiagnosis::model()->find('patient_id=? and disorder_id=? and eye_id=? and date=?',array($patient->id,$disorder->id,$_POST['diagnosis_eye'],$date))) {
-			$patient->addDiagnosis($disorder->id, $_POST['diagnosis_eye'], $date);
+
+			$transaction->commit();
+			$lock->release();
+		}
+		else {
+			Yii::app()->user->setFlash('warning.warning', 'Unable to lock the patient, please try again');
 		}
 
 		$this->redirect(array('patient/view/'.$patient->id));
@@ -851,7 +867,15 @@ class PatientController extends BaseController
 			throw new Exception('Unable to find patient: '.@$_GET['patient_id']);
 		}
 
-		$patient->removeDiagnosis(@$_GET['diagnosis_id']);
+		if ($lock = Lock::obtain('patient',$patient->id)) {
+			$transaction = Yii::app()->db->beginTransaction('Delete','Diagnosis');
+
+			$patient->removeDiagnosis(@$_GET['diagnosis_id']);
+
+			$transaction->commit();
+		} else {
+			throw new Exception("Unable to obtain patient lock");
+		}
 
 		echo "success";
 	}
@@ -1016,10 +1040,14 @@ class PatientController extends BaseController
 		$po->operation = @$_POST['previous_operation'];
 		$po->date = str_pad(@$_POST['fuzzy_year'],4,'0',STR_PAD_LEFT).'-'.str_pad(@$_POST['fuzzy_month'],2,'0',STR_PAD_LEFT).'-'.str_pad(@$_POST['fuzzy_day'],2,'0',STR_PAD_LEFT);
 
+		$transaction = Yii::app()->db->beginTransaction('Add','Previous operation');
+
 		if (!$po->save()) {
 			echo json_encode($po->getErrors());
 			return;
 		}
+
+		$transaction->commit();
 
 		echo json_encode(array());
 	}

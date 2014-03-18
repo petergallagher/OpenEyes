@@ -20,8 +20,8 @@
 <section class="box patient-info js-toggle-container">
 	<?php if (Yii::app()->params['show_previous_versions']) {
 		$this->renderPartial('_previous_versions',array(
-			'model' => $this->patient,
 			'field' => 'patient_details_transaction_id',
+			'transactions' => $this->patient->getFullTransactionList(),
 		));
 	}?>
 	<h3 class="box-title">Personal Details:</h3>
