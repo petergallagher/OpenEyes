@@ -19,7 +19,8 @@
 
 				<h2 class="event-title"><?php echo $this->title?></h2>
 
-				<?php $this->renderPartial('//base/_messages'); ?>
+				<?php $this->renderPartial('//base/_messages')?>
+				<?php $this->renderPartial('//base/_conflicts',array('object' => $this->event))?>
 
 					<?php echo $content; ?>
 					<?php if ($this->action->id == 'view') {

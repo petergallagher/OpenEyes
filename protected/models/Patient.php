@@ -906,7 +906,11 @@ class Patient extends BaseActiveRecordVersioned
 			}
 
 			$this->audit('patient',$action);
+
+			return true;
 		}
+
+		return false;
 	}
 
 	public function removeDiagnosis($diagnosis_id)

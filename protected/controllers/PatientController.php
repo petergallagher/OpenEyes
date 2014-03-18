@@ -370,7 +370,7 @@ class PatientController extends BaseController
 		Yii::app()->session['episode_hide_status'] = $status;
 
 		if ($conflict = $this->episode->conflict) {
-			Yii::app()->user->setFlash('warning.warning', "This episode is in conflict, ".$conflict->versionCount." conflicting changes have been made.");
+			Yii::app()->user->setFlash('warning.warning', "The transaction for this episode is in conflict with ".$conflict->versionCount." other transactions.");
 		}
 
 		$this->render('episodes', array(
@@ -790,15 +790,20 @@ class PatientController extends BaseController
 		if ($lock = Lock::obtain('patient',$patient->id)) {
 			$transaction = Yii::app()->db->beginTransaction('Add','Diagnosis');
 
-			if (!$_POST['diagnosis_eye']) {
-				if (!SecondaryDiagnosis::model()->find('patient_id=? and disorder_id=? and date=?',array($patient->id,$disorder->id,$date))) {
-					$patient->addDiagnosis($disorder->id,null,$date);
+			$relation = isset($_POST['DiagnosisSelection']['ophthalmic_disorder_id']) ? 'ophthalmicDiagnoses' : 'systemicDiagnoses';
+
+			$latest_transaction_id = $patient->getLatestTransactionIDForRelation($relation);
+
+			!$_POST['diagnosis_eye'] && $_POST['diagnosis_eye'] = null;
+
+			if ($patient->addDiagnosis($disorder->id,$_POST['diagnosis_eye'],$date)) {
+				if ($latest_transaction_id != $_POST['based_on_transaction_id']) {
+					$this->detectDiagnosisConflicts($patient, $relation, $_POST['based_on_transaction_id'], $latest_transaction_id, $disorder->id, $transaction);
 				}
-			} elseif (!SecondaryDiagnosis::model()->find('patient_id=? and disorder_id=? and eye_id=? and date=?',array($patient->id,$disorder->id,$_POST['diagnosis_eye'],$date))) {
-				$patient->addDiagnosis($disorder->id, $_POST['diagnosis_eye'], $date);
+
+				$transaction->commit();
 			}
 
-			$transaction->commit();
 			$lock->release();
 		}
 		else {
@@ -806,6 +811,29 @@ class PatientController extends BaseController
 		}
 
 		$this->redirect(array('patient/view/'.$patient->id));
+	}
+
+	public function detectDiagnosisConflicts($patient, $relation, $based_on_transaction_id, $latest_transaction_id, $disorder_id, $transaction)
+	{
+		$version_history = $patient->getVersionHistoryForRelation($relation);
+		ksort($version_history);
+
+		foreach ($patient->getVersionHistoryForRelation($relation) as $transaction_id => $description) {
+			if (!$based_on_transaction_id || ($transaction_id > $based_on_transaction_id and $transaction_id <= $latest_transaction_id)) {
+				foreach ($patient->relationChangedItemsAsOfTransactionID($relation, $transaction_id) as $secondary_diagnosis) {
+					if ($secondary_diagnosis->disorder_id == $disorder_id) {
+						$conflicted_transaction_id = $transaction_id;
+						break;
+					}
+				}
+			}
+
+			if (isset($conflicted_transaction_id)) break;
+		}
+
+		if (isset($conflicted_transaction_id)) {
+			$transaction->raiseConflict($conflicted_transaction_id);
+		}
 	}
 
 	public function actionValidateAddDiagnosis()

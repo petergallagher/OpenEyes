@@ -988,7 +988,7 @@ class BaseActiveRecordVersionedTest extends CDbTestCase
 	{
 		$patient = Patient::model()->findByPk(1);
 
-		$allergies = $patient->relationByTransactionID('allergies',200);
+		$allergies = $patient->relationAsOfTransactionID('allergies',200);
 
 		$this->assertCount(3, $allergies);
 
@@ -1001,7 +1001,7 @@ class BaseActiveRecordVersionedTest extends CDbTestCase
 	{
 		$patient = Patient::model()->findByPk(1);
 
-		$allergies = $patient->relationByTransactionIDOrActive('allergies',200);
+		$allergies = $patient->relationAsOfTransactionIDOrActive('allergies',200);
 
 		$this->assertCount(3, $allergies);
 
@@ -1014,7 +1014,7 @@ class BaseActiveRecordVersionedTest extends CDbTestCase
 	{
 		$patient = Patient::model()->findByPk(1);
 
-		$allergies = $patient->relationByTransactionIDOrActive('allergies',null);
+		$allergies = $patient->relationAsOfTransactionIDOrActive('allergies',null);
 
 		$this->assertCount(3, $allergies);
 

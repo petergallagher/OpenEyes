@@ -55,7 +55,7 @@
 					</tr>
 				</thead>
 				<tbody>
-					<?php foreach ($this->patient->relationByTransactionIDOrActive('allergies',@$_GET['allergies_transaction_id']) as $allergy) { ?>
+					<?php foreach ($this->patient->relationAsOfTransactionIDOrActive('allergies',@$_GET['allergies_transaction_id']) as $allergy) { ?>
 					<tr data-allergy-id="<?php echo $allergy->id ?>" data-allergy-name="<?php echo $allergy->name ?>">
 						<td><?php echo $allergy->name ?></td>
 						<?php if ($this->checkAccess('OprnEditAllergy')) { ?>

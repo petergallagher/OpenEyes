@@ -33,7 +33,8 @@ if (!empty($episode)) {
 		<h3><?php echo $episode->support_services ? 'Support services' : $episode->firm->getSubspecialtyText()?></h3>
 	</div>
 
-	<?php $this->renderPartial('//base/_messages'); ?>
+	<?php $this->renderPartial('//base/_messages')?>
+	<?php $this->renderPartial('//base/_conflicts',array('object' => $episode))?>
 
 	<section class="element element-data">
 		<h3 class="data-title">Principal diagnosis:</h3>

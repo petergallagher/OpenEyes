@@ -65,6 +65,7 @@ class Conflict extends BaseActiveRecord
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return array(
+			'transactions' => array(self::MANY_MANY, 'Transaction', 'transaction_conflict_assignment(conflict_id, transaction_id)', 'order' => 'transactions.id'),
 		);
 	}
 

@@ -24,6 +24,9 @@
 			'transactions' => $this->patient->getFullTransactionListForRelation('ophthalmicDiagnoses'),
 		));
 	}?>
+	<?php if ($conflict = $this->patient->getUnresolvedConflictForRelation('ophthalmicDiagnoses')) {?>
+		<div class="alert-box alert">The latest transaction is in conflict with <?php echo $conflict->versionCount?> other transactions.</div>
+	<?php }?>
 	<header class="box-header">
 		<h3 class="box-title">
 			<span class="icon-patient-clinician-hd_flag"></span>
@@ -45,7 +48,7 @@
 			</tr>
 			</thead>
 			<tbody>
-			<?php foreach ($this->patient->relationByTransactionIDOrActive('ophthalmicDiagnoses',@$_GET['ophthalmic_diagnoses_transaction_id']) as $diagnosis) {?>
+			<?php foreach ($this->patient->relationAsOfTransactionIDOrActive('ophthalmicDiagnoses',@$_GET['ophthalmic_diagnoses_transaction_id']) as $diagnosis) {?>
 				<tr>
 					<td><?php echo $diagnosis->dateText?></td>
 					<td><?php echo $diagnosis->eye->adjective?> <?php echo $diagnosis->disorder->term?></td>
@@ -80,6 +83,8 @@
 					)
 				))
 				?>
+
+					<?php echo CHtml::hiddenField('based_on_transaction_id',$this->patient->getLatestTransactionIDForRelation('ophthalmicDiagnoses'))?>
 
 					<fieldset class="field-row">
 						<legend><strong>Add ophthalmic diagnosis</strong></legend>

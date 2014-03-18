@@ -46,7 +46,7 @@
 			</tr>
 			</thead>
 			<tbody>
-			<?php foreach ($this->patient->relationByTransactionIDOrActive('previousOperations',@$_GET['previous_operations_transaction_id']) as $operation) {?>
+			<?php foreach ($this->patient->relationAsOfTransactionIDOrActive('previousOperations',@$_GET['previous_operations_transaction_id']) as $operation) {?>
 				<tr>
 					<td><?php echo $operation->dateText?></td>
 					<td><?php if ($operation->side) { echo $operation->side->adjective.' ';}?><?php echo $operation->operation?></td>

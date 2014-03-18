@@ -26,6 +26,7 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 	public $deleted_transaction_id = null;
 	private $based_on_transaction_id = null;
 	private $resolves_conflict_based_on_transaction_id = null;
+	public $was_deleted;
 
 	/* Disable archiving on save() */
 	public function noVersion()
@@ -505,13 +506,29 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 		return array($current) + $transactions;
 	}
 
-	public function getLatestTransactionForRelation($relation)
+	public function getLatestTransactionIDForRelation($relation)
 	{
 		$transactions = $this->getVersionHistoryForRelation($relation);
+		krsort($transactions);
 
 		if (!empty($transactions)) {
-			$transaction = array_shift($transactions);
-			return $transaction->id;
+			foreach ($transactions as $transaction_id => $description) {
+				return $transaction_id;
+			}
+		}
+
+		return null;
+	}
+
+	public function getUnresolvedConflictForRelation($relation)
+	{
+		$transactions = $this->getVersionHistoryForRelation($relation);
+		krsort($transactions);
+
+		if (!empty($transactions)) {
+			foreach ($transactions as $transaction_id => $description) {
+				return Transaction::model()->findByPk($transaction_id)->unresolvedConflict;
+			}
 		}
 
 		return null;
@@ -528,9 +545,9 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 	/**
 	 * Remap relations to version table queries
 	 */
-	public function getRelated($relation_name,$refresh=false,$params=array(),$transaction_id=null)
+	public function getRelated($relation_name,$refresh=false,$params=array(),$transaction_id=null,$touched_by_transaction_id=null)
 	{
-		if ($this->isActiveVersion() && !$transaction_id) {
+		if ($this->isActiveVersion() && !$transaction_id && !$touched_by_transaction_id) {
 			return parent::getRelated($relation_name,$refresh,$params);
 		}
 
@@ -543,10 +560,10 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 			throw new Exception("Unhandled relation type: ".$relation[0]);
 		}
 
-		return $this->{'getRelated_'.$relation[0]}($relation, $criteria, $transaction_id);
+		return $this->{'getRelated_'.$relation[0]}($relation, $criteria, $transaction_id, $touched_by_transaction_id);
 	}
 
-	public function getRelated_CBelongsToRelation($relation, $criteria, $transaction_id)
+	public function getRelated_CBelongsToRelation($relation, $criteria, $transaction_id, $touched_by_transaction_id)
 	{
 		$related = $relation[1]::model()->find($criteria);
 
@@ -559,13 +576,38 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 		return $related;
 	}
 
-	public function getRelated_CHasOneRelation($relation, $criteria, $transaction_id)
+	public function getRelated_CHasOneRelation($relation, $criteria, $transaction_id, $touched_by_transaction_id)
 	{
-		return $this->getRelated_CBelongsToRelation($relation, $criteria, $transaction_id);
+		return $this->getRelated_CBelongsToRelation($relation, $criteria, $transaction_id, $touched_by_transaction_id);
 	}
 
-	public function getRelated_CHasManyRelation($relation, $criteria, $transaction_id)
+	public function getRelated_CHasManyRelation($relation, $criteria, $transaction_id, $touched_by_transaction_id)
 	{
+		if ($touched_by_transaction_id) {
+			$criteria->params[':transaction_id'] = $touched_by_transaction_id;
+
+			$deleted_criteria = clone $criteria;
+
+			$criteria->addCondition($criteria->alias.'.transaction_id = :transaction_id');
+
+			$version_criteria = clone $criteria;
+
+			$deleted_criteria->addCondition($criteria->alias.'.deleted_transaction_id = :transaction_id');
+
+			$results = $this->deDupeByID(array_merge(
+				$relation[1]::model()->findAll($criteria),
+				$relation[1]::model()->fromVersion()->findAll($version_criteria)
+			));
+
+			foreach ($relation[1]::model()->fromVersion()->findAll($deleted_criteria) as $deleted) {
+				$deleted->was_deleted = true;
+
+				$results[] = $deleted;
+			}
+
+			return $results;
+		}
+
 		if ($transaction_id) {
 			$criteria->addCondition($criteria->alias.'.transaction_id <= :transaction_id');
 			$criteria->params[':transaction_id'] = $transaction_id;
@@ -582,10 +624,24 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 		return $relation[1]::model()->findAll($criteria);
 	}
 
-	public function getRelated_CManyManyRelation($relation, $criteria, $transaction_id)
+	public function getRelated_CManyManyRelation($relation, $criteria, $transaction_id, $touched_by_transaction_id)
 	{
 		if (!preg_match('/^(.*?)\((.*?),[\s\t]*(.*?)\)$/',$relation[2],$m)) {
 			throw new Exception("Unhandled MANY_MANY relation: ".print_r($relation,true));
+		}
+
+		if ($touched_by_transaction_id) {
+			$criteria->join = "join `{$m[1]}` on `{$m[1]}`.`{$m[3]}` = `$criteria->alias`.`".$relation[1]::model()->tableSchema->primaryKey."` and `{$m[1]}`.`{$m[2]}` = :pk and `{$m[1]}`.`transaction_id` = :transaction_id";
+			$criteria->params[':transaction_id'] = $touched_by_transaction_id;
+			$criteria->params[':pk'] = $this->{$this->tableSchema->primaryKey};
+
+			$version_criteria = clone $criteria;
+			$version_criteria->join = "join `{$m[1]}_version` on `{$m[1]}_version`.`{$m[3]}` = `$criteria->alias`.`".$relation[1]::model()->tableSchema->primaryKey."` and `{$m[1]}_version`.`{$m[2]}` = :pk and (`{$m[1]}_version`.`transaction_id` = :transaction_id or `{$m[1]}_version`.`deleted_transaction_id` = :transaction_id)";
+
+			return $this->deDupeByID(array_merge(
+				$relation[1]::model()->findAll($criteria),
+				$relation[1]::model()->findAll($version_criteria)
+			));
 		}
 
 		if ($transaction_id) {
@@ -610,8 +666,9 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 
 	/**
 	 * Execute a relation on the current model for a specific transaction ID
+	 * Returns the contents of the relation at the point of the transaction (including changes made by the transaction)
 	 */
-	public function relationByTransactionID($relation_name, $transaction_id)
+	public function relationAsOfTransactionID($relation_name, $transaction_id)
 	{
 		return $this->getRelated($relation_name,false,array(),$transaction_id);
 	}
@@ -619,9 +676,17 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 	/**
 	 * Execute a relation on the current model for a specific transaction ID, or if the transaction ID is null just return the active relation
 	 */
-	public function relationByTransactionIDOrActive($relation_name, $transaction_id)
+	public function relationAsOfTransactionIDOrActive($relation_name, $transaction_id)
 	{
-		return $transaction_id ? $this->relationByTransactionID($relation_name, $transaction_id) : $this->{$relation_name};
+		return $transaction_id ? $this->relationAsOfTransactionID($relation_name, $transaction_id) : $this->{$relation_name};
+	}
+
+	/**
+	 * Return the related items that were changed by the transaction, with a reference to what the change was (eg add/edit/delete)
+	 */
+	public function relationChangedItemsAsOfTransactionID($relation_name, $transaction_id)
+	{
+		return $this->getRelated($relation_name,false,array(),null,$transaction_id);
 	}
 
 	/**

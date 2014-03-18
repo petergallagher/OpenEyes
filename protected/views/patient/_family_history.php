@@ -28,7 +28,7 @@
 				</tr>
 			</thead>
 			<tbody>
-				<?php foreach ($this->patient->relationByTransactionIDOrActive('familyHistory',@$_GET['family_history_transaction_id']) as $history) {?>
+				<?php foreach ($this->patient->relationAsOfTransactionIDOrActive('familyHistory',@$_GET['family_history_transaction_id']) as $history) {?>
 					<tr>
 						<td class="relative"><?php echo $history->relative->name?></td>
 						<td class="side"><?php echo $history->side->name?></td>

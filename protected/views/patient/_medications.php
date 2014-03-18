@@ -50,7 +50,7 @@
 			</tr>
 			</thead>
 			<tbody>
-			<?php foreach ($this->patient->relationByTransactionIDOrActive('medications',@$_GET['medications_transaction_id']) as $medication) {?>
+			<?php foreach ($this->patient->relationAsOfTransactionIDOrActive('medications',@$_GET['medications_transaction_id']) as $medication) {?>
 				<tr>
 					<td><?php echo $medication->drug->name?></td>
 					<td><?php echo $medication->route->name?></td>
