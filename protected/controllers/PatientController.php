@@ -123,7 +123,7 @@ class PatientController extends BaseController
 			// NOTE that this is not being used in the render
 			$supportserviceepisodes = $this->patient->supportserviceepisodes;
 
-			$transaction = Yii::app()->db->beginTransaction('View','Patient summary');
+			$transaction = $this->patient->beginTransaction('View','Patient summary');
 
 			Audit::add('patient summary','view',$id);
 
@@ -319,7 +319,7 @@ class PatientController extends BaseController
 		$this->title = 'Episode summary';
 
 		if ($current_episode) {
-			$transaction = Yii::app()->db->beginTransaction('View','Episode summary');
+			$transaction = $this->patient->beginTransaction('View','Episode summary');
 
 			$current_episode->audit('episode summary','view');
 
@@ -398,7 +398,7 @@ class PatientController extends BaseController
 				$error = "Please select an eye for the principal diagnosis";
 			} else {
 				if ($lock = Lock::obtain('patient',$this->episode->patient_id)) {
-					$transaction = Yii::app()->db->beginTransaction('Update','Episode');
+					$transaction = $this->patient->beginTransaction('Update','Episode');
 
 					if (@$_POST['eye_id'] && @$_POST['DiagnosisSelection']['disorder_id']) {
 						if ($_POST['eye_id'] != $this->episode->eye_id || $_POST['DiagnosisSelection']['disorder_id'] != $this->episode->disorder_id) {
@@ -463,7 +463,7 @@ class PatientController extends BaseController
 
 		$this->editing = true;
 
-		$transaction = Yii::app()->db->beginTransaction('View','Episode');
+		$transaction = $this->patient->beginTransaction('View','Episode');
 
 		$this->episode->audit('episode summary','view');
 
@@ -788,7 +788,7 @@ class PatientController extends BaseController
 		$date = $this->processDiagnosisDate();
 
 		if ($lock = Lock::obtain('patient',$patient->id)) {
-			$transaction = Yii::app()->db->beginTransaction('Add','Diagnosis');
+			$transaction = $patient->beginTransaction('Add','Diagnosis');
 
 			$relation = isset($_POST['DiagnosisSelection']['ophthalmic_disorder_id']) ? 'ophthalmicDiagnoses' : 'systemicDiagnoses';
 
@@ -896,7 +896,7 @@ class PatientController extends BaseController
 		}
 
 		if ($lock = Lock::obtain('patient',$patient->id)) {
-			$transaction = Yii::app()->db->beginTransaction('Delete','Diagnosis');
+			$transaction = $patient->beginTransaction('Delete','Diagnosis');
 
 			$patient->removeDiagnosis(@$_GET['diagnosis_id']);
 
@@ -1068,7 +1068,7 @@ class PatientController extends BaseController
 		$po->operation = @$_POST['previous_operation'];
 		$po->date = str_pad(@$_POST['fuzzy_year'],4,'0',STR_PAD_LEFT).'-'.str_pad(@$_POST['fuzzy_month'],2,'0',STR_PAD_LEFT).'-'.str_pad(@$_POST['fuzzy_day'],2,'0',STR_PAD_LEFT);
 
-		$transaction = Yii::app()->db->beginTransaction('Add','Previous operation');
+		$transaction = $patient->beginTransaction('Add','Previous operation');
 
 		if (!$po->save()) {
 			echo json_encode($po->getErrors());

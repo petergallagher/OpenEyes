@@ -24,7 +24,7 @@ class OEDbConnectionTest extends CDbTestCase
 		$transactions = Yii::app()->params['enable_transactions'];
 		Yii::app()->params['enable_transactions'] = true;
 
-		$transaction = Yii::app()->db->beginTransaction();
+		$transaction = Yii::app()->db->beginTransaction('Do','Something');
 
 		$this->assertInstanceOf('OETransaction', Yii::app()->db->getCurrentTransaction());
 
@@ -38,7 +38,7 @@ class OEDbConnectionTest extends CDbTestCase
 		$transactions = Yii::app()->params['enable_transactions'];
 		Yii::app()->params['enable_transactions'] = false;
 
-		$transaction = Yii::app()->db->beginTransaction();
+		$transaction = Yii::app()->db->beginTransaction('Do','Something');
 
 		$this->assertInstanceOf('OETransactionStub', Yii::app()->db->getCurrentTransaction());
 
@@ -51,7 +51,7 @@ class OEDbConnectionTest extends CDbTestCase
 		$transactions = Yii::app()->params['enable_transactions'];
 		Yii::app()->params['enable_transactions'] = true;
 
-		$transaction = Yii::app()->db->beginTransaction();
+		$transaction = Yii::app()->db->beginTransaction('Do','Something');
 
 		$this->assertInstanceOf('OETransaction', Yii::app()->db->getCurrentTransaction());
 

@@ -80,6 +80,7 @@ class m140221_123246_versioning_transactions extends CDbMigration
 				'server_id' => 'int(10) unsigned NULL',
 				'operation_id' => 'int(10) unsigned NULL',
 				'object_id' => 'int(10) unsigned NULL',
+				'patient_id' => 'int(10) unsigned NULL',
 				'last_modified_user_id' => 'int(10) unsigned NOT NULL DEFAULT 1',
 				'last_modified_date' => 'datetime NOT NULL DEFAULT \'1901-01-01 00:00:00\'',
 				'created_user_id' => 'int(10) unsigned NOT NULL DEFAULT 1',
@@ -90,11 +91,13 @@ class m140221_123246_versioning_transactions extends CDbMigration
 				'KEY `transaction_operation_id_fk` (`operation_id`)',
 				'KEY `transaction_object_id_fk` (`object_id`)',
 				'KEY `transaction_server_id_fk` (`server_id`)',
+				'KEY `transaction_patient_id_fk` (`patient_id`)',
 				'CONSTRAINT `transaction_last_modified_user_id_fk` FOREIGN KEY (`last_modified_user_id`) REFERENCES `user` (`id`)',
 				'CONSTRAINT `transaction_created_user_id_fk` FOREIGN KEY (`created_user_id`) REFERENCES `user` (`id`)',
 				'CONSTRAINT `transaction_operation_id_fk` FOREIGN KEY (`operation_id`) REFERENCES `transaction_operation` (`id`)',
 				'CONSTRAINT `transaction_object_id_fk` FOREIGN KEY (`object_id`) REFERENCES `transaction_object` (`id`)',
 				'CONSTRAINT `transaction_server_id_fk` FOREIGN KEY (`server_id`) REFERENCES `server` (`id`)',
+				'CONSTRAINT `transaction_patient_id_fk` FOREIGN KEY (`patient_id`) REFERENCES `patient` (`id`)',
 			), 'ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci');
 
 		$this->createTable('transaction_table_assignment', array(

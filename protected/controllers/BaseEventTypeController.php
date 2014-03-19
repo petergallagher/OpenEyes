@@ -660,7 +660,7 @@ class BaseEventTypeController extends BaseModuleController
 
 			// creation
 			if (empty($errors)) {
-				$transaction = Yii::app()->db->beginTransaction('Create','Event');
+				$transaction = $this->patient->beginTransaction('Create','Event');
 
 				try {
 					$success = $this->saveEvent($_POST);
@@ -744,7 +744,7 @@ class BaseEventTypeController extends BaseModuleController
 
 		$this->logActivity('viewed event');
 
-		$transaction = Yii::app()->db->beginTransaction('View','Event');
+		$transaction = $this->patient->beginTransaction('View','Event');
 
 		$this->event->audit('event','view');
 
@@ -821,7 +821,7 @@ class BaseEventTypeController extends BaseModuleController
 
 			// update the event
 			if (empty($errors)) {
-				$transaction = Yii::app()->db->beginTransaction('Update','Event');
+				$transaction = $this->patient->beginTransaction('Update','Event');
 
 				try {
 					//TODO: should all the auditing be moved into the saving of the event
@@ -1548,7 +1548,7 @@ class BaseEventTypeController extends BaseModuleController
 		}
 
 		if (!empty($_POST)) {
-			$transaction = Yii::app()->db->beginTransaction('Delete','Event');
+			$transaction = $this->patient->beginTransaction('Delete','Event');
 
 			try {
 				$this->event->softDelete();

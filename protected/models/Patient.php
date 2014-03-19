@@ -665,7 +665,7 @@ class Patient extends BaseActiveRecordVersioned
 	public function addAllergy($allergy_id)
 	{
 		if (!PatientAllergyAssignment::model()->find('patient_id=? and allergy_id=?',array($this->id,$allergy_id))) {
-			$transaction = Yii::app()->db->beginTransaction('Patient','AddAllergy');
+			$transaction = $this->beginTransaction('Patient','AddAllergy');
 
 			try {
 				$paa = new PatientAllergyAssignment;
@@ -756,7 +756,7 @@ class Patient extends BaseActiveRecordVersioned
 	 */
 	public function setNoAllergies()
 	{
-		$transaction = Yii::app()->db->beginTransaction();
+		$transaction = $this->beginTransaction('Set no','Allergies');
 		try {
 			foreach (PatientAllergyAssignment::model()->findAll('patient_id = ?', array($this->id)) as $paa) {
 				if (!$paa->delete()) {
@@ -1196,7 +1196,7 @@ class Patient extends BaseActiveRecordVersioned
 		}
 		$episode->start_date = date("Y-m-d H:i:s");
 
-		$transaction = Yii::app()->db->beginTransaction('Create','Episode');
+		$transaction = $this->beginTransaction('Create','Episode');
 
 		if (!$episode->save()) {
 			OELog::log("Unable to create new episode for patient_id=$episode->patient_id, firm_id=$episode->firm_id, start_date='$episode->start_date'");
@@ -1345,5 +1345,10 @@ class Patient extends BaseActiveRecordVersioned
 		}
 
 		return $res;
+	}
+
+	public function beginTransaction($operation_name, $object_name)
+	{
+		return Yii::app()->db->beginTransaction($operation_name, $object_name, $this->id);
 	}
 }

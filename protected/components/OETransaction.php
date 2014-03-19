@@ -26,10 +26,11 @@ class OETransaction
 	public $conflict_resolved_transaction_id = null;
 	public $append_to_conflict = null;
 
-	public function __construct($pdo_transaction, $operation_name=null, $object_name=null)
+	public function __construct($pdo_transaction, $operation_name=null, $object_name=null, $patient_id=null)
 	{
 		$this->pdo_transaction = $pdo_transaction;
 		$this->oe_transaction = new Transaction;
+		$this->oe_transaction->patient_id = $patient_id;
 
 		if (!$this->oe_transaction->save()) {
 			throw new Exception("Unable to save Transaction: ".print_r($this->oe_transaction->getErrors(),true));
