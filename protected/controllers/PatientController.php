@@ -398,7 +398,7 @@ class PatientController extends BaseController
 				$error = "Please select an eye for the principal diagnosis";
 			} else {
 				if ($lock = Lock::obtain('patient',$this->episode->patient_id)) {
-					$transaction = $this->patient->beginTransaction('Update','Episode');
+					$transaction = $this->episode->patient->beginTransaction('Update','Episode');
 
 					if (@$_POST['eye_id'] && @$_POST['DiagnosisSelection']['disorder_id']) {
 						if ($_POST['eye_id'] != $this->episode->eye_id || $_POST['DiagnosisSelection']['disorder_id'] != $this->episode->disorder_id) {
