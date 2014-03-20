@@ -350,6 +350,28 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 
 		$this->hash = $this->generateHash();
 
+		$this->handleConflictDetectionAndResolution();
+
+		if ($this->transaction_id == $transaction->id) {
+			// Don't create a new version row if save is called again on the same object in the same transaction
+
+			$this->noVersion();
+
+			$result = parent::save($runValidation, $attributes, $allow_overriding);
+
+			$this->withVersion();
+
+		} else {
+			$this->transaction_id = $transaction->id;
+
+			$result = parent::save($runValidation, $attributes, $allow_overriding);
+		}
+
+		return $result;
+	}
+
+	public function handleConflictDetectionAndResolution()
+	{
 		// Patient-associated data is handled differently
 		if ($patient = $this->patient) {
 			if ($this->based_on_transaction_id && $patient->latestTransaction->id != $this->based_on_transaction_id) {
@@ -406,23 +428,6 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 				}
 			}
 		}
-
-		if ($this->transaction_id == $transaction->id) {
-			// Don't create a new version row if save is called again on the same object in the same transaction
-
-			$this->noVersion();
-
-			$result = parent::save($runValidation, $attributes, $allow_overriding);
-
-			$this->withVersion();
-
-		} else {
-			$this->transaction_id = $transaction->id;
-
-			$result = parent::save($runValidation, $attributes, $allow_overriding);
-		}
-
-		return $result;
 	}
 
 	public function getTransaction()
@@ -469,6 +474,8 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 
 			$transaction->addTable($this->tableName());
 		}
+
+		$this->handleConflictDetectionAndResolution();
 
 		return parent::delete();
 	}

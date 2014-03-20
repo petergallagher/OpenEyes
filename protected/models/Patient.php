@@ -939,7 +939,13 @@ class Patient extends BaseActiveRecordVersioned
 			$type = 'sys';
 		}
 
-		if (!$sd->delete()) {
+		if ($this->based_on_transaction_id) {
+			$result = $sd->basedOnTransactionID($this->based_on_transaction_id)->delete();
+		} else {
+			$result = $sd->delete();
+		}
+
+		if (!$result) {
 			throw new Exception('Unable to delete diagnosis: '.print_r($sd->getErrors(),true));
 		}
 
