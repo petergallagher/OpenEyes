@@ -922,21 +922,25 @@ class PatientController extends BaseController
 			throw new Exception('Unable to find patient: '.@$_POST['patient_id']);
 		}
 
-		$cvi_status_date = $this->processDiagnosisDate();
+		if ($lock Lock::obtain('patient',$patient->id)) {
+			$cvi_status_date = $this->processDiagnosisDate();
 
-		if (Yii::app()->request->isAjaxRequest) {
-			$test = new PatientOphInfo();
-			$test->attributes = array(
+			if (Yii::app()->request->isAjaxRequest) {
+				$test = new PatientOphInfo();
+				$test->attributes = array(
 					'cvi_status_date' => $cvi_status_date,
 					'cvi_status_id' => $cvi_status->id,
-					);
+				);
 
-			echo CActiveForm::validate($test, null, false);
-			Yii::app()->end();
+				echo CActiveForm::validate($test, null, false);
+				Yii::app()->end();
+			} else {
+				$patient->editOphInfo($cvi_status, $cvi_status_date);
+
+				$this->redirect(array('patient/view/'.$patient->id));
+			}
 		} else {
-			$patient->editOphInfo($cvi_status, $cvi_status_date);
-
-			$this->redirect(array('patient/view/'.$patient->id));
+			throw new Exception("Unable to lock patient");
 		}
 	}
 

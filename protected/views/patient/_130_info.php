@@ -25,6 +25,9 @@
 			'transactions' => $this->patient->getFullTransactionListForRelation('ophinfo'),
 		));
 	}?>
+	<?php if ($conflict = $this->patient->getUnresolvedConflictForRelation('ophinfo')) {?>
+		<div class="alert-box alert">The latest transaction is in conflict with <?php echo ($conflict->versionCount-1)?> other transaction<?php if (($conflict->versionCount-1) != 1) {?>s<?php }?>.</div>
+	<?php }?>
 	<header class="box-header">
 		<h3 class="box-title">
 			<span class="icon-patient-clinician-hd_flag"></span>
@@ -68,7 +71,7 @@
 				<fieldset class="field-row">
 					<legend><strong>Edit CVI Status</strong></legend>
 					<?php
-				$form = $this->beginWidget('FormLayout', array(
+					$form = $this->beginWidget('FormLayout', array(
 						'id'=>'edit-oph_info',
 						'enableAjaxValidation'=>true,
 						'clientOptions'=>array(
@@ -89,6 +92,8 @@
 							'field' => 9
 						),
 					))?>
+
+					<?php echo CHtml::hiddenField('based_on_transaction_id',$this->patient->latestTransaction->id)?>
 
 					<div class="field-row row">
 						<div class="<?php echo $form->columns('label');?>">
