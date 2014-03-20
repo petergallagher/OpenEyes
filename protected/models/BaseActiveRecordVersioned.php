@@ -24,7 +24,7 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 	public $version_id = null;
 	public $version_date	= null;
 	public $deleted_transaction_id = null;
-	private $based_on_transaction_id = null;
+	public $based_on_transaction_id = null;
 	private $resolves_conflict_based_on_transaction_id = null;
 	public $was_deleted;
 
@@ -353,8 +353,12 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 		// Patient-associated data is handled differently
 		if ($patient = $this->patient) {
 			if ($this->based_on_transaction_id && $patient->latestTransaction->id != $this->based_on_transaction_id) {
-				// Do any of the new transactions touch this model
-				$conflict_transactions = Transaction::searchForModel($this, $this->based_on_transaction_id, $patient->latestTransaction->id, true);
+				if (method_exists($this,'detectTransactionConflicts')) {
+					$conflict_transactions = $this->detectTransactionConflicts($this->based_on_transaction_id+1, $patient->latestTransaction->id);
+				} else {
+					// Do any of the new transactions touch this model
+					$conflict_transactions = Transaction::searchForModel($this, $this->based_on_transaction_id+1, $patient->latestTransaction->id, true);
+				}
 
 				if (!empty($conflict_transactions)) {
 					if (!$conflict = $this->unresolvedConflict) {
@@ -951,5 +955,30 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 		$transaction->setModel($this);
 
 		return $transaction;
+	}
+
+	public function getAllRowsInTableForTransactionID($table,$transaction_id)
+	{
+		return Yii::app()->db->createCommand()
+			->select("*")
+			->from($table)
+			->where("transaction_id = :transaction_id",array(
+				":transaction_id" => $transaction_id
+			))
+			->queryAll() +
+			Yii::app()->db->createCommand()
+				->select("*")
+				->from($table."_version")
+				->where("transaction_id = :transaction_id",array(
+				":transaction_id" => $transaction_id
+			))
+			->queryAll() + 
+			Yii::app()->db->createCommand()
+				->select("*")
+				->from($table."_version")
+				->where("deleted_transaction_id = :transaction_id",array(
+				":transaction_id" => $transaction_id
+			))
+			->queryAll();
 	}
 }

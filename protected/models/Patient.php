@@ -905,7 +905,13 @@ class Patient extends BaseActiveRecordVersioned
 			$sd->eye_id = $eye_id;
 			$sd->date = $date;
 
-			if (!$sd->save()) {
+			if ($this->based_on_transaction_id) {
+				$result = $sd->basedOnTransactionID($this->based_on_transaction_id)->save();
+			} else {
+				$result = $sd->save();
+			}
+
+			if (!$result) {
 				throw new Exception('Unable to save secondary diagnosis: '.print_r($sd->getErrors(),true));
 			}
 

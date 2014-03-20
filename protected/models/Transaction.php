@@ -129,7 +129,7 @@ class Transaction extends BaseActiveRecord
 	{
 		$criteria = new CDbCriteria;
 
-		$criteria->addCondition('id > :transaction_from and id <= :transaction_to');
+		$criteria->addCondition('id >= :transaction_from and id <= :transaction_to');
 		$criteria->params[':transaction_from'] = $transaction_from;
 		$criteria->params[':transaction_to'] = $transaction_to;
 		$criteria->order = 'id asc';
