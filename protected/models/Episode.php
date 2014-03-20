@@ -440,4 +440,12 @@ class Episode extends BaseActiveRecordVersionedSoftDelete
 			}
 		}
 	}
+
+	public function beginTransaction($operation_name)
+	{
+		$transaction = Yii::app()->db->beginTransaction($operation_name, $this->patient_id);
+		$transaction->setModel($this);
+
+		return $transaction;
+	}
 }

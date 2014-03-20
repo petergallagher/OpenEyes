@@ -123,7 +123,7 @@ class PatientController extends BaseController
 			// NOTE that this is not being used in the render
 			$supportserviceepisodes = $this->patient->supportserviceepisodes;
 
-			$transaction = $this->patient->beginTransaction('View','Patient summary');
+			$transaction = $this->patient->beginTransaction('View');
 
 			Audit::add('patient summary','view',$id);
 
@@ -319,7 +319,7 @@ class PatientController extends BaseController
 		$this->title = 'Episode summary';
 
 		if ($current_episode) {
-			$transaction = $this->patient->beginTransaction('View','Episode summary');
+			$transaction = $current_episode->beginTransaction('View');
 
 			$current_episode->audit('episode summary','view');
 
@@ -398,7 +398,7 @@ class PatientController extends BaseController
 				$error = "Please select an eye for the principal diagnosis";
 			} else {
 				if ($lock = Lock::obtain('patient',$this->episode->patient_id)) {
-					$transaction = $this->episode->patient->beginTransaction('Update','Episode');
+					$transaction = $this->episode->beginTransaction('Update');
 
 					if (@$_POST['eye_id'] && @$_POST['DiagnosisSelection']['disorder_id']) {
 						if ($_POST['eye_id'] != $this->episode->eye_id || $_POST['DiagnosisSelection']['disorder_id'] != $this->episode->disorder_id) {
@@ -463,7 +463,7 @@ class PatientController extends BaseController
 
 		$this->editing = true;
 
-		$transaction = $this->patient->beginTransaction('View','Episode');
+		$transaction = $this->episode->beginTransaction('View');
 
 		$this->episode->audit('episode summary','view');
 
@@ -788,7 +788,7 @@ class PatientController extends BaseController
 		$date = $this->processDiagnosisDate();
 
 		if ($lock = Lock::obtain('patient',$patient->id)) {
-			$transaction = $patient->beginTransaction('Add','Diagnosis');
+			$transaction = $patient->beginTransaction('Add');
 
 			$relation = isset($_POST['DiagnosisSelection']['ophthalmic_disorder_id']) ? 'ophthalmicDiagnoses' : 'systemicDiagnoses';
 
@@ -796,11 +796,12 @@ class PatientController extends BaseController
 
 			!$_POST['diagnosis_eye'] && $_POST['diagnosis_eye'] = null;
 
-			if ($patient->addDiagnosis($disorder->id,$_POST['diagnosis_eye'],$date)) {
+			if ($sd = $patient->addDiagnosis($disorder->id,$_POST['diagnosis_eye'],$date)) {
 				if ($latest_transaction_id != $_POST['based_on_transaction_id']) {
 					$this->detectDiagnosisConflicts($patient, $relation, $_POST['based_on_transaction_id'], $latest_transaction_id, $disorder->id, $transaction);
 				}
 
+				$transaction->setModel($sd);
 				$transaction->commit();
 			}
 
@@ -898,8 +899,9 @@ class PatientController extends BaseController
 		if ($lock = Lock::obtain('patient',$patient->id)) {
 			$transaction = $patient->beginTransaction('Delete','Diagnosis');
 
-			$patient->removeDiagnosis(@$_GET['diagnosis_id']);
+			$sd = $patient->removeDiagnosis(@$_GET['diagnosis_id']);
 
+			$transaction->setModel($sd);
 			$transaction->commit();
 		} else {
 			throw new Exception("Unable to obtain patient lock");
@@ -1068,7 +1070,7 @@ class PatientController extends BaseController
 		$po->operation = @$_POST['previous_operation'];
 		$po->date = str_pad(@$_POST['fuzzy_year'],4,'0',STR_PAD_LEFT).'-'.str_pad(@$_POST['fuzzy_month'],2,'0',STR_PAD_LEFT).'-'.str_pad(@$_POST['fuzzy_day'],2,'0',STR_PAD_LEFT);
 
-		$transaction = $patient->beginTransaction('Add','Previous operation');
+		$transaction = $po->beginTransaction('Add');
 
 		if (!$po->save()) {
 			echo json_encode($po->getErrors());

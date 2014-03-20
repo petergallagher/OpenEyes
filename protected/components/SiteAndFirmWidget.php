@@ -39,7 +39,7 @@ class SiteAndFirmWidget extends CWidget
 		if (isset($_POST['SiteAndFirmForm'])) {
 			$model->attributes = $_POST['SiteAndFirmForm'];
 			if ($model->validate()) {
-				$transaction = Yii::app()->db->beginTransaction('UserSiteAndFirmPreferences','User');
+				$transaction = $user->beginTransaction('Set SiteAndFirmPreferences');
 
 				$user->changeFirm($model->firm_id);
 				$user->last_site_id = $model->site_id;

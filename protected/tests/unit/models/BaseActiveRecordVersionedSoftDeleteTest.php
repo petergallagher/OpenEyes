@@ -47,9 +47,10 @@ class BaseActiveRecordVersionedSoftDeleteTest extends CDbTestCase
 
 	public function testDeleteWithNotDeletedField()
 	{
-		$transaction = Yii::app()->db->beginTransaction('Delete','User');
-
 		$user = User::model()->findByPk(2);
+
+		$transaction = $user->beginTransaction('Delete');
+
 		$user->delete();
 
 		$transaction->commit();
@@ -59,7 +60,7 @@ class BaseActiveRecordVersionedSoftDeleteTest extends CDbTestCase
 		$this->assertEquals(0, $user->active);
 
 		// Cleanup
-		$transaction = Yii::app()->db->beginTransaction('Undelete','User');
+		$transaction = $user->beginTransaction('Undelete');
 
 		$user->undelete();
 		Yii::app()->db->createCommand("delete from user_version where id = 2")->query();
@@ -69,9 +70,10 @@ class BaseActiveRecordVersionedSoftDeleteTest extends CDbTestCase
 
 	public function testDeleteWithDeletedField()
 	{
-		$transaction = Yii::app()->db->beginTransaction('Delete','Drug');
-
 		$drug = Drug::model()->findByPk(1);
+
+		$transaction = $drug->beginTransaction('Delete');
+
 		$drug->delete();
 
 		$transaction->commit();
@@ -81,7 +83,7 @@ class BaseActiveRecordVersionedSoftDeleteTest extends CDbTestCase
 		$this->assertEquals(1, $drug->discontinued);
 		
 		// Cleanup
-		$transaction = Yii::app()->db->beginTransaction('Undelete','Drug');
+		$transaction = $drug->beginTransaction('Undelete');
 
 		$drug->undelete();
 		Yii::app()->db->createCommand("delete from drug_version where id = 1")->query();
@@ -91,9 +93,10 @@ class BaseActiveRecordVersionedSoftDeleteTest extends CDbTestCase
 
 	public function testDeleteWithInheritedDeletedField()
 	{
-		$transaction = Yii::app()->db->beginTransaction('Delete','Country');
-
 		$country = Country::model()->findByPk(1);
+
+		$transaction = $country->beginTransaction('Delete');
+
 		$country->delete();
 
 		$transaction->commit();
@@ -103,7 +106,7 @@ class BaseActiveRecordVersionedSoftDeleteTest extends CDbTestCase
 		$this->assertEquals(1, $country->deleted);
 
 		// Cleanup
-		$transaction = Yii::app()->db->beginTransaction('Undelete','Country');
+		$transaction = $country->beginTransaction('Undelete');
 
 		$country->undelete();
 		Yii::app()->db->createCommand("delete from country_version where id = 1")->query();
@@ -121,14 +124,15 @@ class BaseActiveRecordVersionedSoftDeleteTest extends CDbTestCase
 
 	public function testUndelete()
 	{
-		$transaction = Yii::app()->db->beginTransaction('Delete','Country');
-
 		$country = Country::model()->findByPk(1);
+
+		$transaction = $country->beginTransaction('Delete');
+
 		$country->delete();
 
 		$transaction->commit();
 
-		$transaction = Yii::app()->db->beginTransaction('Undelete','Country');
+		$transaction = $country->beginTransaction('Undelete');
 
 		$country->undelete();
 
@@ -150,7 +154,9 @@ class BaseActiveRecordVersionedSoftDeleteTest extends CDbTestCase
 
 	public function testDeleteByPkWithNotDeletedField()
 	{
-		$transaction = Yii::app()->db->beginTransaction('Delete','User');
+		$user = User::model()->findByPk(2);
+
+		$transaction = $user->beginTransaction('Delete');
 
 		$user = User::model()->deleteByPk(2);
 
@@ -161,7 +167,7 @@ class BaseActiveRecordVersionedSoftDeleteTest extends CDbTestCase
 		$this->assertEquals(0, $user->active);
 
 		// Cleanup
-		$transaction = Yii::app()->db->beginTransaction('Undelete','User');
+		$transaction = $user->beginTransaction('Undelete');
 
 		$user->undelete();
 		Yii::app()->db->createCommand("delete from user_version where id = 2")->query();
@@ -171,7 +177,9 @@ class BaseActiveRecordVersionedSoftDeleteTest extends CDbTestCase
 
 	public function testDeleteByPkWithDeletedField()
 	{
-		$transaction = Yii::app()->db->beginTransaction('Delete','Drug');
+		$drug = Drug::model()->findByPk(1);
+
+		$transaction = $drug->beginTransaction('Delete');
 
 		$drug = Drug::model()->deleteByPk(1);
 
@@ -182,7 +190,7 @@ class BaseActiveRecordVersionedSoftDeleteTest extends CDbTestCase
 		$this->assertEquals(1, $drug->discontinued);
 
 		// Cleanup
-		$transaction = Yii::app()->db->beginTransaction('Undelete','Drug');
+		$transaction = $drug->beginTransaction('Undelete');
 
 		$drug->undelete();
 		Yii::app()->db->createCommand("delete from drug_version where id = 1")->query();
@@ -192,7 +200,9 @@ class BaseActiveRecordVersionedSoftDeleteTest extends CDbTestCase
 
 	public function testDeleteByPkWithInheritedDeletedField()
 	{
-		$transaction = Yii::app()->db->beginTransaction('Delete','Country');
+		$country = Country::model()->findByPk(1);
+
+		$transaction = $country->beginTransaction('Delete');
 
 		$country = Country::model()->deleteByPk(1);
 
@@ -203,7 +213,7 @@ class BaseActiveRecordVersionedSoftDeleteTest extends CDbTestCase
 		$this->assertEquals(1, $country->deleted);
 
 		// Cleanup
-		$transaction = Yii::app()->db->beginTransaction('Undelete','Country');
+		$transaction = $country->beginTransaction('Undelete');
 
 		$country->undelete();
 		Yii::app()->db->createCommand("delete from country_version where id = 1")->query();
@@ -220,10 +230,11 @@ class BaseActiveRecordVersionedSoftDeleteTest extends CDbTestCase
 
 	public function testDeleteAllWithNotDeletedField()
 	{
-		$transaction = Yii::app()->db->beginTransaction('Delete','User');
+		$transaction = Yii::app()->db->beginTransaction('Delete');
 
 		$user = User::model()->deleteAll('id = :id1 or id = :id2',array(':id1' => 2, ':id2' => 3));
 
+		$transaction->setModel(new User);
 		$transaction->commit();
 
 		$user1 = User::model()->findByPk(2);
@@ -233,12 +244,13 @@ class BaseActiveRecordVersionedSoftDeleteTest extends CDbTestCase
 		$this->assertEquals(0, $user2->active);
 
 		// Cleanup
-		$transaction = Yii::app()->db->beginTransaction('Undelete','User');
+		$transaction = Yii::app()->db->beginTransaction('Undelete');
 
 		$user1->undelete();
 		$user2->undelete();
 		Yii::app()->db->createCommand("delete from user_version where id in (2,3)")->query();
 
+		$transaction->setModel(new User);
 		$transaction->commit();
 	}
 

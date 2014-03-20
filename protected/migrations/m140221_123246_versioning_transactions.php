@@ -38,7 +38,7 @@ class m140221_123246_versioning_transactions extends CDbMigration
 		$this->insert('transaction_operation',array('id'=>2,'name'=>'Update'));
 		$this->insert('transaction_operation',array('id'=>3,'name'=>'Delete'));
 
-		$this->createTable('transaction_object', array(
+		$this->createTable('transaction_model', array(
 				'id' => 'int(10) unsigned NOT NULL AUTO_INCREMENT',
 				'name' => 'varchar(64) not null',
 				'last_modified_user_id' => 'int(10) unsigned NOT NULL DEFAULT 1',
@@ -46,20 +46,11 @@ class m140221_123246_versioning_transactions extends CDbMigration
 				'created_user_id' => 'int(10) unsigned NOT NULL DEFAULT 1',
 				'created_date' => 'datetime NOT NULL DEFAULT \'1901-01-01 00:00:00\'',
 				'PRIMARY KEY (`id`)',
-				'KEY `transaction_object_last_modified_user_id_fk` (`last_modified_user_id`)',
-				'KEY `transaction_object_created_user_id_fk` (`created_user_id`)',
-				'CONSTRAINT `transaction_object_last_modified_user_id_fk` FOREIGN KEY (`last_modified_user_id`) REFERENCES `user` (`id`)',
-				'CONSTRAINT `transaction_object_created_user_id_fk` FOREIGN KEY (`created_user_id`) REFERENCES `user` (`id`)',
+				'KEY `transaction_model_last_modified_user_id_fk` (`last_modified_user_id`)',
+				'KEY `transaction_model_created_user_id_fk` (`created_user_id`)',
+				'CONSTRAINT `transaction_model_last_modified_user_id_fk` FOREIGN KEY (`last_modified_user_id`) REFERENCES `user` (`id`)',
+				'CONSTRAINT `transaction_model_created_user_id_fk` FOREIGN KEY (`created_user_id`) REFERENCES `user` (`id`)',
 			), 'ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci');
-
-		$this->insert('transaction_object',array('id'=>1,'name'=>'Event'));
-		$this->insert('transaction_object',array('id'=>2,'name'=>'Episode'));
-		$this->insert('transaction_object',array('id'=>3,'name'=>'Diagnosis'));
-		$this->insert('transaction_object',array('id'=>4,'name'=>'Previous operation'));
-		$this->insert('transaction_object',array('id'=>5,'name'=>'Medication'));
-		$this->insert('transaction_object',array('id'=>6,'name'=>'CVI status'));
-		$this->insert('transaction_object',array('id'=>7,'name'=>'Allergy'));
-		$this->insert('transaction_object',array('id'=>8,'name'=>'Family history'));
 
 		$this->createTable('server', array(
 				'id' => 'int(10) unsigned NOT NULL AUTO_INCREMENT',
@@ -79,8 +70,10 @@ class m140221_123246_versioning_transactions extends CDbMigration
 				'id' => 'int(10) unsigned NOT NULL AUTO_INCREMENT',
 				'server_id' => 'int(10) unsigned NULL',
 				'operation_id' => 'int(10) unsigned NULL',
-				'object_id' => 'int(10) unsigned NULL',
+				'model_class_id' => 'int(10) unsigned NULL',
+				'model_id' => 'int(10) unsigned NULL',
 				'patient_id' => 'int(10) unsigned NULL',
+				'modified_data' => 'tinyint(1) unsigned NOT NULL',
 				'last_modified_user_id' => 'int(10) unsigned NOT NULL DEFAULT 1',
 				'last_modified_date' => 'datetime NOT NULL DEFAULT \'1901-01-01 00:00:00\'',
 				'created_user_id' => 'int(10) unsigned NOT NULL DEFAULT 1',
@@ -89,13 +82,13 @@ class m140221_123246_versioning_transactions extends CDbMigration
 				'KEY `transaction_last_modified_user_id_fk` (`last_modified_user_id`)',
 				'KEY `transaction_created_user_id_fk` (`created_user_id`)',
 				'KEY `transaction_operation_id_fk` (`operation_id`)',
-				'KEY `transaction_object_id_fk` (`object_id`)',
+				'KEY `transaction_model_class_id_fk` (`model_class_id`)',
 				'KEY `transaction_server_id_fk` (`server_id`)',
 				'KEY `transaction_patient_id_fk` (`patient_id`)',
 				'CONSTRAINT `transaction_last_modified_user_id_fk` FOREIGN KEY (`last_modified_user_id`) REFERENCES `user` (`id`)',
 				'CONSTRAINT `transaction_created_user_id_fk` FOREIGN KEY (`created_user_id`) REFERENCES `user` (`id`)',
 				'CONSTRAINT `transaction_operation_id_fk` FOREIGN KEY (`operation_id`) REFERENCES `transaction_operation` (`id`)',
-				'CONSTRAINT `transaction_object_id_fk` FOREIGN KEY (`object_id`) REFERENCES `transaction_object` (`id`)',
+				'CONSTRAINT `transaction_model_class_id_fk` FOREIGN KEY (`model_class_id`) REFERENCES `transaction_model` (`id`)',
 				'CONSTRAINT `transaction_server_id_fk` FOREIGN KEY (`server_id`) REFERENCES `server` (`id`)',
 				'CONSTRAINT `transaction_patient_id_fk` FOREIGN KEY (`patient_id`) REFERENCES `patient` (`id`)',
 			), 'ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci');
@@ -156,7 +149,7 @@ class m140221_123246_versioning_transactions extends CDbMigration
 		$this->dropTable('transaction_table_assignment');
 		$this->dropTable('transaction');
 		$this->dropTable('server');
-		$this->dropTable('transaction_object');
+		$this->dropTable('transaction_model');
 		$this->dropTable('transaction_operation');
 		$this->dropTable('transaction_table');
 	}

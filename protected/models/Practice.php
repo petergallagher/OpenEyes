@@ -202,7 +202,7 @@ class Practice extends BaseActiveRecordVersioned
 	{
 		// perform this process in a transaction if one has not been created
 		$transaction = Yii::app()->db->getCurrentTransaction() === null
-			? Yii::app()->db->beginTransaction('Delete','Practice')
+			? $this->beginTransaction('Delete')
 			: false;
 
 		try {

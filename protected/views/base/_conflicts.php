@@ -34,7 +34,7 @@
 				</td>
 				<td>
 					<?php echo $transaction->operation->name?>
-					<?php echo $transaction->object->name?>
+					<?php echo $transaction->model_class->name?>
 				</td>
 			</tr>
 		<?php }?>

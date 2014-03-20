@@ -156,6 +156,8 @@ class Patient extends BaseActiveRecordVersioned
 				'order' => 'date asc',
 			),
 			'ophinfo' => array(self::HAS_ONE, 'PatientOphInfo', 'patient_id'),
+			'transactions' => array(self::HAS_MANY, 'Transaction', 'patient_id', 'order' => 'id desc'),
+			'latestTransaction' => array(self::HAS_ONE, 'Transaction', 'patient_id', 'order' => 'id desc'),
 		);
 	}
 
@@ -665,7 +667,7 @@ class Patient extends BaseActiveRecordVersioned
 	public function addAllergy($allergy_id)
 	{
 		if (!PatientAllergyAssignment::model()->find('patient_id=? and allergy_id=?',array($this->id,$allergy_id))) {
-			$transaction = $this->beginTransaction('Patient','AddAllergy');
+			$transaction = $this->beginTransaction('Add');
 
 			try {
 				$paa = new PatientAllergyAssignment;
@@ -674,6 +676,8 @@ class Patient extends BaseActiveRecordVersioned
 				if (!$paa->save()) {
 					throw new Exception('Unable to add patient allergy assignment: '.print_r($paa->getErrors(),true));
 				}
+
+				$transaction->setModel($paa);
 
 				$this->audit('patient','add-allergy');
 				if ($this->no_allergies_date) {
@@ -756,7 +760,7 @@ class Patient extends BaseActiveRecordVersioned
 	 */
 	public function setNoAllergies()
 	{
-		$transaction = $this->beginTransaction('Set no','Allergies');
+		$transaction = $this->beginTransaction('Set no allergies');
 		try {
 			foreach (PatientAllergyAssignment::model()->findAll('patient_id = ?', array($this->id)) as $paa) {
 				if (!$paa->delete()) {
@@ -907,7 +911,7 @@ class Patient extends BaseActiveRecordVersioned
 
 			$this->audit('patient',$action);
 
-			return true;
+			return $sd;
 		}
 
 		return false;
@@ -934,6 +938,8 @@ class Patient extends BaseActiveRecordVersioned
 		}
 
 		$this->audit('patient',"remove-$type-diagnosis");
+
+		return $sd;
 	}
 
 	/**
@@ -1196,12 +1202,14 @@ class Patient extends BaseActiveRecordVersioned
 		}
 		$episode->start_date = date("Y-m-d H:i:s");
 
-		$transaction = $this->beginTransaction('Create','Episode');
+		$transaction = $this->beginTransaction('Create');
 
 		if (!$episode->save()) {
 			OELog::log("Unable to create new episode for patient_id=$episode->patient_id, firm_id=$episode->firm_id, start_date='$episode->start_date'");
 			throw new Exception('Unable to create create episode: '.print_r($episode->getErrors(),true));
 		}
+
+		$transaction->setModel($episode);
 
 		OELog::log("New episode created for patient_id=$episode->patient_id, firm_id=$episode->firm_id, start_date='$episode->start_date'");
 
@@ -1347,8 +1355,8 @@ class Patient extends BaseActiveRecordVersioned
 		return $res;
 	}
 
-	public function beginTransaction($operation_name, $object_name)
+	public function beginTransaction($operation_name)
 	{
-		return Yii::app()->db->beginTransaction($operation_name, $object_name, $this->id);
+		return Yii::app()->db->beginTransaction($operation_name, $this->id);
 	}
 }

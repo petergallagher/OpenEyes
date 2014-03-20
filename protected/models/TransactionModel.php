@@ -18,19 +18,19 @@
  */
 
 /**
- * This is the model class for table "transaction_object".
+ * This is the model class for table "transaction_model".
  *
- * The followings are the available columns in table 'transaction_object':
+ * The followings are the available columns in table 'transaction_model':
  * @property integer $id
  * @property integer $name
  */
-class TransactionObject extends BaseActiveRecord
+class TransactionModel extends BaseActiveRecord
 {
 	/**
 	 * @return string the associated database table name
 	 */
 	public function tableName()
 	{
-		return 'transaction_object';
+		return 'transaction_model';
 	}
 }

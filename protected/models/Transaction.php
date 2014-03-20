@@ -42,7 +42,7 @@ class Transaction extends BaseActiveRecord
 	{
 		return array(
 			'operation' => array(self::BELONGS_TO, 'TransactionOperation', 'operation_id'),
-			'object' => array(self::BELONGS_TO, 'TransactionObject', 'object_id'),
+			'model_class' => array(self::BELONGS_TO, 'TransactionModel', 'model_class_id'),
 			'table_assignments' => array(self::HAS_MANY, 'TransactionTableAssignment', 'transaction_id', 'order' => 'display_order asc'),
 			'conflict_assignments' => array(self::HAS_MANY, 'TransactionConflictAssignment', 'transaction_id'),
 		);
@@ -102,25 +102,51 @@ class Transaction extends BaseActiveRecord
 	}
 
 	/**
-	 * Set the object of the transaction (eg event, diagnosis etc)
+	 * Set the model class of the transaction (eg event, diagnosis etc)
 	 */
-	public function setObject($object_name)
+	public function setModel($object)
 	{
-		if (!$object = TransactionObject::model()->find('name=?',array($object_name))) {
-			$object = new TransactionObject;
-			$object->name = $object_name;
+		if (!$model = TransactionModel::model()->find('name=?',array(get_class($object)))) {
+			$model = new TransactionModel;
+			$model->name = get_class($object);
 
-			if (!$object->save()) {
-				throw new Exception("Unable to save TransactionObject: ".print_r($object->getErrors(),true));
+			if (!$model->save()) {
+				throw new Exception("Unable to save TransactionModel: ".print_r($model->getErrors(),true));
 			}
 		}
 
-		$this->object_id = $object->id;
+		$this->model_class_id = $model->id;
+		$this->model_id = $object->id;
 
 		if (!$this->save()) {
 			throw new Exception("Unable to save transaction: ".print_r($this->getErrors(),true));
 		}
 
-		$this->object = $object;
+		$this->model = $object;
+	}
+
+	public static function searchForModel($model, $transaction_from, $transaction_to, $modified_only=false)
+	{
+		$criteria = new CDbCriteria;
+
+		$criteria->addCondition('id > :transaction_from and id <= :transaction_to');
+		$criteria->params[':transaction_from'] = $transaction_from;
+		$criteria->params[':transaction_to'] = $transaction_to;
+		$criteria->order = 'id asc';
+
+		if ($modified_only) {
+			$criteria->addCondition('modified_data = :one');
+			$criteria->params[':one'] = 1;
+		}
+
+		$transactions = array();
+
+		foreach (Transaction::model()->findAll($criteria) as $transaction) {
+			if ($transaction->model_class->name == get_class($model) && $transaction->model_id == $model->id) {
+				$transactions[] = $transaction;
+			}
+		}
+
+		return $transactions;
 	}
 }

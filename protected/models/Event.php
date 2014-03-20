@@ -336,7 +336,7 @@ class Event extends BaseActiveRecordVersionedSoftDelete
 	{
 		// perform this process in a transaction if one has not been created
 		$transaction = Yii::app()->db->getCurrentTransaction() === null
-			? $this->episode->patient->beginTransaction('Delete','Event')
+			? $this->beginTransaction('Delete')
 			: false;
 
 		try {
@@ -496,5 +496,13 @@ class Event extends BaseActiveRecordVersionedSoftDelete
 				'limit' => 1,
 			)
 		);
+	}
+
+	public function beginTransaction($operation_name)
+	{
+		$transaction = Yii::app()->db->beginTransaction($operation_name, $this->episode->patient_id);
+		$transaction->setModel($this);
+
+		return $transaction;
 	}
 }

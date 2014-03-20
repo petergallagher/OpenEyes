@@ -21,10 +21,10 @@ class OEDbConnection extends CDbConnection
 {
 	private $oe_transaction = null;
 
-	public function beginTransaction($operation_name=null, $object_name=null, $patient_id=null)
+	public function beginTransaction($operation_name=null, $patient_id=null)
 	{
 		if (Yii::app()->params['enable_transactions']) {
-			return ($this->oe_transaction = new OETransaction(parent::beginTransaction(),$operation_name,$object_name,$patient_id));
+			return ($this->oe_transaction = new OETransaction(parent::beginTransaction(),$operation_name,$patient_id));
 		} else {
 			return ($this->oe_transaction = new OETransactionStub);
 		}

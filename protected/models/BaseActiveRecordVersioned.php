@@ -350,24 +350,56 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 
 		$this->hash = $this->generateHash();
 
-		if ($this->based_on_transaction_id && $this->transaction_id != $this->based_on_transaction_id) {
-			// Object was changed while being edited, the save POST'd in the form was based on a version prior to the current latest version
-			// so this new transaction is now in conflict with any transactions made since $this->based_on_transaction_id which is the transaction_id
-			// the edit was based on.
-			if ($this->unresolvedConflict) {
-				// Object is already in a conflicted state so we simply append this transaction to the conflict
-				$transaction->addToConflict($this->unresolvedConflict, $this->transaction_id);
-			} else {
-				// Raise a new conflict
-				$transaction->raiseConflict($this->transaction_id);
+		// Patient-associated data is handled differently
+		if ($patient = $this->patient) {
+			if ($this->based_on_transaction_id && $patient->latestTransaction->id != $this->based_on_transaction_id) {
+				// Do any of the new transactions touch this model
+				$conflict_transactions = Transaction::searchForModel($this, $this->based_on_transaction_id, $patient->latestTransaction->id, true);
+
+				if (!empty($conflict_transactions)) {
+					if (!$conflict = $this->unresolvedConflict) {
+						$conflict_transaction = array_shift($conflict_transactions);
+
+						$conflict = $transaction->raiseConflict($conflict_transaction->id);
+					}
+
+					foreach ($conflict_transactions as $conflict_transaction) {
+						$transaction->addToConflict($conflict, $conflict_transaction->id);
+					}
+				} else if ($this->unresolvedConflict) {
+					if ($this->resolves_conflict_based_on_transaction_id) {
+						$transaction->resolveConflict($this->unresolvedConflict, $this->resolves_conflict_based_on_transaction_id);
+					} else {
+						$transaction->addToConflict($this->unresolvedConflict, $this->transaction_id);
+					}
+				}
+			} else if ($this->unresolvedConflict) {
+				if ($this->resolves_conflict_based_on_transaction_id) {
+					$transaction->resolveConflict($this->unresolvedConflict, $this->resolves_conflict_based_on_transaction_id);
+				} else {
+					$transaction->addToConflict($this->unresolvedConflict, $this->transaction_id);
+				}
 			}
-		} else if ($this->unresolvedConflict) {
-			if ($this->resolves_conflict_based_on_transaction_id) {
-				// Object was not changed while being edited and the user specified that they are resolving the conflict so we mark the conflict as resolved
-				$transaction->resolveConflict($this->resolves_conflict_based_on_transaction_id);
-			} else {
-				// Object is conflicted and the user did not explicitly mark it resolved with the POST'd edit so we add this transaction to the conflict
-				$transaction->addToConflict($this->unresolvedConflict, $this->transaction_id);
+		} else {
+			if ($this->based_on_transaction_id && $this->transaction_id != $this->based_on_transaction_id) {
+				// Object was changed while being edited, the save POST'd in the form was based on a version prior to the current latest version
+				// so this new transaction is now in conflict with any transactions made since $this->based_on_transaction_id which is the transaction_id
+				// the edit was based on.
+				if ($this->unresolvedConflict) {
+					// Object is already in a conflicted state so we simply append this transaction to the conflict
+					$transaction->addToConflict($this->unresolvedConflict, $this->transaction_id);
+				} else {
+					// Raise a new conflict
+					$transaction->raiseConflict($this->transaction_id);
+				}
+			} else if ($this->unresolvedConflict) {
+				if ($this->resolves_conflict_based_on_transaction_id) {
+					// Object was not changed while being edited and the user specified that they are resolving the conflict so we mark the conflict as resolved
+					$transaction->resolveConflict($this->resolves_conflict_based_on_transaction_id);
+				} else {
+					// Object is conflicted and the user did not explicitly mark it resolved with the POST'd edit so we add this transaction to the conflict
+					$transaction->addToConflict($this->unresolvedConflict, $this->transaction_id);
+				}
 			}
 		}
 
@@ -902,5 +934,22 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 				":transaction_id" => $transaction_id,
 			))
 			->queryScalar();
+	}
+
+	public function getPatient()
+	{
+		if (isset($this->event)) return $this->event->episode->patient;
+		if (isset($this->episode)) return $this->episode->patient;
+		if (isset($this->patient)) return $this->patient;
+
+		return null;
+	}
+
+	public function beginTransaction($operation_name)
+	{
+		$transaction = Yii::app()->db->beginTransaction($operation_name, ($this->patient ? $this->patient->id : null));
+		$transaction->setModel($this);
+
+		return $transaction;
 	}
 }

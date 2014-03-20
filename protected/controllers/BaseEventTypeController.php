@@ -660,7 +660,7 @@ class BaseEventTypeController extends BaseModuleController
 
 			// creation
 			if (empty($errors)) {
-				$transaction = $this->patient->beginTransaction('Create','Event');
+				$transaction = $this->patient->beginTransaction('Create');
 
 				try {
 					$success = $this->saveEvent($_POST);
@@ -678,6 +678,8 @@ class BaseEventTypeController extends BaseModuleController
 						$this->event->audit('event','create');
 
 						Yii::app()->user->setFlash('success', "{$this->event_type->name} created.");
+
+						$transaction->setModel($this->event);
 
 						$transaction->commit();
 
@@ -744,7 +746,7 @@ class BaseEventTypeController extends BaseModuleController
 
 		$this->logActivity('viewed event');
 
-		$transaction = $this->patient->beginTransaction('View','Event');
+		$transaction = $this->event->beginTransaction('View');
 
 		$this->event->audit('event','view');
 
@@ -821,7 +823,7 @@ class BaseEventTypeController extends BaseModuleController
 
 			// update the event
 			if (empty($errors)) {
-				$transaction = $this->patient->beginTransaction('Update','Event');
+				$transaction = $this->event->beginTransaction('Update');
 
 				try {
 					//TODO: should all the auditing be moved into the saving of the event
@@ -1141,10 +1143,10 @@ class BaseEventTypeController extends BaseModuleController
 		$this->event->info = $info_text;
 
 		if (@$_POST['resolve_conflict']) {
-			$this->event = $this->event->resolvesConflictWithTransactionID($_POST['transaction_id']);
+			$this->event = $this->event->resolvesConflictWithTransactionID($_POST['based_on_transaction_id']);
 		}
 
-		if (!$this->event->basedOnTransactionID($_POST['transaction_id'])->save()) {
+		if (!$this->event->basedOnTransactionID($_POST['based_on_transaction_id'])->save()) {
 			throw new Exception("Unable to save event: ".print_r($this->event->getErrors(),true));
 		}
 	}
@@ -1548,7 +1550,7 @@ class BaseEventTypeController extends BaseModuleController
 		}
 
 		if (!empty($_POST)) {
-			$transaction = $this->patient->beginTransaction('Delete','Event');
+			$transaction = $this->event->beginTransaction('Delete');
 
 			try {
 				$this->event->softDelete();

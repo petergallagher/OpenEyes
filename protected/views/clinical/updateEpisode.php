@@ -38,7 +38,7 @@ $form = $this->beginWidget('BaseEventTypeCActiveForm', array(
 		'id'=>'update-episode',
 		'enableAjaxValidation'=>false,
 		'action'=>array('patient/updateepisode/'.$episode->id),
-		'transaction_id'=>$episode->transaction_id,
+		'transaction_id' => $this->patient->latestTransaction->id,
 ));
 ?>
 

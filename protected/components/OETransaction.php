@@ -22,11 +22,10 @@ class OETransaction
 	public $id;
 	public $pdo_transaction;
 	public $oe_transaction;
-	public $conflicted_with_transaction_id = null;
+	public $conflict = null;
 	public $conflict_resolved_transaction_id = null;
-	public $append_to_conflict = null;
 
-	public function __construct($pdo_transaction, $operation_name=null, $object_name=null, $patient_id=null)
+	public function __construct($pdo_transaction, $operation_name=null, $patient_id=null)
 	{
 		$this->pdo_transaction = $pdo_transaction;
 		$this->oe_transaction = new Transaction;
@@ -39,7 +38,6 @@ class OETransaction
 		$this->id = $this->oe_transaction->id;
 
 		$operation_name && $this->oe_transaction->setOperation($operation_name);
-		$object_name && $this->oe_transaction->setObject($object_name);
 	}
 
 	public function commit()
@@ -48,11 +46,6 @@ class OETransaction
 			$this->rollback();
 
 			throw new Exception("Transaction has no operation set and so cannot be committed.");
-		}
-		if (!$this->oe_transaction->object) {
-			$this->rollback();
-
-			throw new Exception("Transaction has no object set and so cannot be committed.");
 		}
 		if (count($this->oe_transaction->tables) <1) {
 			$this->rollback();
@@ -84,20 +77,15 @@ class OETransaction
 			}
 		}
 
-		// Handle conflict
-		if ($this->conflicted_with_transaction_id) {
-			if ($this->append_to_conflict) {
-				$conflict = $this->append_to_conflict;
-			} else {
-				$conflict = new Conflict;
+		// Handle resolution of conflict
+		if ($this->conflict_resolved_transaction_id) {
+			$this->conflict->resolved_transaction_id = $this->oe_transaction->id;
 
-				if (!$conflict->save()) {
-					$this->rollback();
-
-					throw new Exception("Unable to save conflict: ".print_r($conflict->getErrors(),true));
-				}
+			if (!$this->conflict->save()) {
+				throw new Exception("Unable to mark conflict resolved: ".print_r($this->conflict->getErrors(),true));
 			}
-
+		} elseif ($this->conflict) {
+			// Handle conflict
 			foreach ($this->oe_transaction->tables as $table) {
 				foreach (array($table,$table.'_version') as $_table) {
 					if (Yii::app()->db->getSchema()->getTable($_table)) {
@@ -110,22 +98,20 @@ class OETransaction
 							))
 							->queryAll() as $row) {
 
-							$conflict->addTransactionID($row['transaction_id']);
+							$this->conflict->addTransactionID($row['transaction_id']);
 						}
 					}
 				}
 			}
 
-			$conflict->addTransactionID($this->oe_transaction->id);
+			$this->conflict->addTransactionID($this->oe_transaction->id);
 		}
 
-		// Handle resolution of conflict
-		if ($this->conflict_resolved_transaction_id) {
-			$conflict = Transaction::model()->findByPk($this->conflict_resolved_transaction_id)->conflict;
-			$conflict->resolved_transaction_id = $this->oe_transaction->id;
+		if ($this->oe_transaction->tables != array('audit')) {
+			$this->oe_transaction->modified_data = 1;
 
-			if (!$conflict->save()) {
-				throw new Exception("Unable to mark conflict resolved: ".print_r($conflict->getErrors(),true));
+			if (!$this->oe_transaction->save()) {
+				throw new Exception("Unable to save Transaction: ".print_r($this->oe_transaction->getErrors(),true));
 			}
 		}
 
@@ -166,9 +152,18 @@ class OETransaction
 	 */
 	public function raiseConflict($transaction_id)
 	{
-		if ($transaction_id != $this->conflict_resolved_transaction_id) {
-			$this->conflicted_with_transaction_id = $transaction_id;
+		if ($this->conflict) {
+			throw new Exception("Attempt to create a new conflict for a transaction that already has one");
 		}
+
+		$this->conflict = new Conflict;
+		if (!$this->conflict->save()) {
+			throw new Exception("Unable to save conflict: ".print_r($this->conflict->getErrors(),true));
+		}
+
+		$this->conflict->addTransactionID($transaction_id);
+
+		return $this->conflict;
 	}
 
 	/**
@@ -176,20 +171,27 @@ class OETransaction
 	 */
 	public function addToConflict($conflict, $transaction_id)
 	{
-		$this->append_to_conflict = $conflict;
+		if (!$this->conflict) {
+			$this->conflict = $conflict;
+		}
 
-		$this->raiseConflict($transaction_id);
+		$this->conflict->addTransactionID($transaction_id);
 	}
 
 	/**
 	 * Indicates that the conflict related to the passed transaction_id is being resolved with this commit
 	 */
-	public function resolveConflict($transaction_id)
+	public function resolveConflict($conflict, $transaction_id)
 	{
-		$this->conflict_resolved_transaction_id = $transaction_id;
-
-		if ($transaction_id == $this->conflicted_with_transaction_id) {
-			$this->conflicted_with_transaction_id = null;
+		if (!$this->conflict) {
+			$this->conflict = $conflict;
 		}
+
+		$this->conflict_resolved_transaction_id = $transaction_id;
+	}
+
+	public function setModel($object)
+	{
+		$this->oe_transaction->setModel($object);
 	}
 }
