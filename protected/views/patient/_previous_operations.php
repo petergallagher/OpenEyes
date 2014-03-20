@@ -24,6 +24,9 @@
 			'transactions' => $this->patient->getFullTransactionListForRelation('previousOperations'),
 		));
 	}?>
+	<?php if ($conflict = $this->patient->getUnresolvedConflictForRelation('previousOperations')) {?>
+		<div class="alert-box alert">The latest transaction is in conflict with <?php echo ($conflict->versionCount-1)?> other transaction<?php if (($conflict->versionCount-1) != 1) {?>s<?php }?>.</div>
+	<?php }?>
 	<header class="box-header">
 		<h3 class="box-title">
 			<span class="icon-patient-clinician-hd_flag"></span>
@@ -81,6 +84,8 @@
 							'field' => 9
 						),
 					))?>
+
+					<?php echo CHtml::hiddenField('based_on_transaction_id',$this->patient->latestTransaction->id)?>
 
 				<fieldset class="field-row">
 
@@ -257,7 +262,7 @@
 			'url': baseUrl+'/patient/removePreviousOperation?patient_id=<?php echo $this->patient->id?>&operation_id='+$('#operation_id').val(),
 			'success': function(html) {
 				if (html == 'success') {
-					$('a.removeOperation[rel="'+$('#operation_id').val()+'"]').parent().parent().remove();
+					window.location.reload();
 				} else {
 					new OpenEyes.UI.Dialog.Alert({
 						content: "Sorry, an internal error occurred and we were unable to remove the operation.\n\nPlease contact support for assistance."

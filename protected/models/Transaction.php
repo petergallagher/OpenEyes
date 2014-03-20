@@ -125,13 +125,31 @@ class Transaction extends BaseActiveRecord
 		$this->model = $object;
 	}
 
-	public static function searchForModel($model, $transaction_from, $transaction_to, $modified_only=false)
+	public function searchForModel($model, $transaction_from, $transaction_to, $modified_only=false)
+	{
+		$transactions = array();
+
+		foreach ($this->findAllBetween($transaction_from, $transaction_to, $modified_only) as $transaction) {
+			if ($transaction->model_class->name == get_class($model) && $transaction->model_id == $model->id) {
+				$transactions[] = $transaction;
+			}
+		}
+
+		return $transactions;
+	}
+
+	public function findAllBetween($transaction_from, $transaction_to, $modified_only=false)
 	{
 		$criteria = new CDbCriteria;
 
-		$criteria->addCondition('id >= :transaction_from and id <= :transaction_to');
-		$criteria->params[':transaction_from'] = $transaction_from;
+		if ($transaction_from) {
+			$criteria->addCondition('id >= :transaction_from');
+			$criteria->params[':transaction_from'] = $transaction_from;
+		}
+
+		$criteria->addCondition('id <= :transaction_to');
 		$criteria->params[':transaction_to'] = $transaction_to;
+
 		$criteria->order = 'id asc';
 
 		if ($modified_only) {
@@ -139,14 +157,6 @@ class Transaction extends BaseActiveRecord
 			$criteria->params[':one'] = 1;
 		}
 
-		$transactions = array();
-
-		foreach (Transaction::model()->findAll($criteria) as $transaction) {
-			if ($transaction->model_class->name == get_class($model) && $transaction->model_id == $model->id) {
-				$transactions[] = $transaction;
-			}
-		}
-
-		return $transactions;
+		return Transaction::model()->findAll($criteria);
 	}
 }

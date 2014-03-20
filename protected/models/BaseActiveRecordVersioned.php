@@ -350,7 +350,7 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 
 		$this->hash = $this->generateHash();
 
-		$this->handleConflictDetectionAndResolution();
+		$this->handleConflictDetectionAndResolution($transaction);
 
 		if ($this->transaction_id == $transaction->id) {
 			// Don't create a new version row if save is called again on the same object in the same transaction
@@ -370,16 +370,16 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 		return $result;
 	}
 
-	public function handleConflictDetectionAndResolution()
+	public function handleConflictDetectionAndResolution($transaction)
 	{
 		// Patient-associated data is handled differently
 		if ($patient = $this->patient) {
 			if ($this->based_on_transaction_id && $patient->latestTransaction->id != $this->based_on_transaction_id) {
 				if (method_exists($this,'detectTransactionConflicts')) {
-					$conflict_transactions = $this->detectTransactionConflicts($this->based_on_transaction_id+1, $patient->latestTransaction->id);
+					$conflict_transactions = $this->detectTransactionConflicts(Transaction::model()->findAllBetween($this->based_on_transaction_id+1, $patient->latestTransaction->id));
 				} else {
 					// Do any of the new transactions touch this model
-					$conflict_transactions = Transaction::searchForModel($this, $this->based_on_transaction_id+1, $patient->latestTransaction->id, true);
+					$conflict_transactions = Transaction::model()->searchForModel($this, $this->based_on_transaction_id+1, $patient->latestTransaction->id, true);
 				}
 
 				if (!empty($conflict_transactions)) {
@@ -475,7 +475,7 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 			$transaction->addTable($this->tableName());
 		}
 
-		$this->handleConflictDetectionAndResolution();
+		$this->handleConflictDetectionAndResolution($transaction);
 
 		return parent::delete();
 	}

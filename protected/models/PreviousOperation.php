@@ -116,4 +116,21 @@ class PreviousOperation extends BaseActiveRecordVersioned
 	{
 		return Helper::formatFuzzyDate($this->date);
 	}
+
+	public function detectTransactionConflicts($transactions)
+	{
+		$conflicted_transactions = array();
+
+		foreach ($transactions as $transaction) {
+			if ($transaction->model_class->name == get_class($this)) {
+				foreach ($this->getAllRowsInTableForTransactionID($this->tableName(),$transaction->id) as $row) {
+					if ($row['patient_id'] == $this->patient_id && $row['operation'] == $this->operation) {
+						$conflicted_transactions[] = $transaction;
+					}
+				}
+			}
+		}
+
+		return $conflicted_transactions;
+	}
 }

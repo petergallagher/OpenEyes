@@ -84,7 +84,7 @@
 				))
 				?>
 
-					<?php echo CHtml::hiddenField('based_on_transaction_id',$this->patient->getLatestTransactionIDForRelation('ophthalmicDiagnoses'))?>
+					<?php echo CHtml::hiddenField('based_on_transaction_id',$this->patient->latestTransaction->id)?>
 
 					<fieldset class="field-row">
 						<legend><strong>Add ophthalmic diagnosis</strong></legend>

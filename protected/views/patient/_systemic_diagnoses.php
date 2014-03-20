@@ -85,7 +85,7 @@
 						)
 					))?>
 
-					<?php echo CHtml::hiddenField('based_on_transaction_id',$this->patient->getLatestTransactionIDForRelation('systemicDiagnoses'))?>
+					<?php echo CHtml::hiddenField('based_on_transaction_id',$this->patient->latestTransaction->id)?>
 
 				<fieldset class="field-row">
 

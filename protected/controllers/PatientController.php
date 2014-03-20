@@ -430,7 +430,7 @@ class PatientController extends BaseController
 					$this->redirect(array('patient/episode/'.$this->episode->id));
 
 				} else {
-					Yii::app()->user->setFlash('warning.error', "The episode couldn't be locked for editing, it may be locked by another user.  If the problem persists please contact support.");
+					Yii::app()->user->setFlash('warning.error', "The episode couldn't be locked for editing, it may be locked by another user.	If the problem persists please contact support.");
 				}
 			}
 		}
@@ -792,7 +792,7 @@ class PatientController extends BaseController
 
 			$relation = isset($_POST['DiagnosisSelection']['ophthalmic_disorder_id']) ? 'ophthalmicDiagnoses' : 'systemicDiagnoses';
 
-			$latest_transaction_id = $patient->getLatestTransactionIDForRelation($relation);
+			$latest_transaction_id = $patient->latestTransaction->id;
 
 			!$_POST['diagnosis_eye'] && $_POST['diagnosis_eye'] = null;
 
@@ -819,7 +819,7 @@ class PatientController extends BaseController
 		$version_history = $patient->getVersionHistoryForRelation($relation);
 		ksort($version_history);
 
-		foreach ($patient->getVersionHistoryForRelation($relation) as $transaction_id => $description) {
+		foreach ($version_history as $transaction_id => $description) {
 			if (!$based_on_transaction_id || ($transaction_id > $based_on_transaction_id and $transaction_id <= $latest_transaction_id)) {
 				foreach ($patient->relationChangedItemsAsOfTransactionID($relation, $transaction_id) as $secondary_diagnosis) {
 					if ($secondary_diagnosis->disorder_id == $disorder_id) {
@@ -1057,29 +1057,63 @@ class PatientController extends BaseController
 			throw new Exception("Missing previous operation text");
 		}
 
-		if (@$_POST['edit_operation_id']) {
-			if (!$po = PreviousOperation::model()->findByPk(@$_POST['edit_operation_id'])) {
+		if ($lock = Lock::obtain('patient',$patient->id)) {
+			if (@$_POST['edit_operation_id']) {
+				if (!$po = PreviousOperation::model()->findByPk(@$_POST['edit_operation_id'])) {
+					$po = new PreviousOperation;
+				}
+			} else {
 				$po = new PreviousOperation;
 			}
+
+			$po->patient_id = $patient->id;
+			$po->side_id = @$_POST['previous_operation_side'] ? @$_POST['previous_operation_side'] : null;
+			$po->operation = @$_POST['previous_operation'];
+			$po->date = str_pad(@$_POST['fuzzy_year'],4,'0',STR_PAD_LEFT).'-'.str_pad(@$_POST['fuzzy_month'],2,'0',STR_PAD_LEFT).'-'.str_pad(@$_POST['fuzzy_day'],2,'0',STR_PAD_LEFT);
+
+			$latest_transaction_id = $patient->latestTransaction->id;
+
+			$transaction = $patient->beginTransaction('Add');
+
+			if (!$po->save()) {
+				echo json_encode($po->getErrors());
+				return;
+			}
+
+			if ($latest_transaction_id != $_POST['based_on_transaction_id']) {
+				$this->detectPreviousOperationConflicts($patient,$_POST['based_on_transaction_id'],$latest_transaction_id,$po->operation,$transaction);
+			}
+
+			$transaction->setModel($po);
+			$transaction->commit();
+
+			echo json_encode(array());
 		} else {
-			$po = new PreviousOperation;
+			throw new Exception("Unable to lock patient");
+		}
+	}
+
+	public function detectPreviousOperationConflicts($patient, $based_on_transaction_id, $latest_transaction_id, $operation, $transaction)
+	{
+		$version_history = $patient->getVersionHistoryForRelation('previousOperations');
+		ksort($version_history);
+
+		foreach ($version_history as $transaction_id => $description) {
+			if (!$based_on_transaction_id || ($transaction_id > $based_on_transaction_id && $transaction_id <= $latest_transaction_id)) {
+				foreach ($patient->relationChangedItemsAsOfTransactionID('previousOperations', $transaction_id) as $previous_operation) {
+					if ($previous_operation->operation == $operation) {
+						$conflicted_transaction_id = $transaction_id;
+						break;
+					}
+				}
+			}
+
+			if (isset($conflicted_transaction_id)) break;
 		}
 
-		$po->patient_id = $patient->id;
-		$po->side_id = @$_POST['previous_operation_side'] ? @$_POST['previous_operation_side'] : null;
-		$po->operation = @$_POST['previous_operation'];
-		$po->date = str_pad(@$_POST['fuzzy_year'],4,'0',STR_PAD_LEFT).'-'.str_pad(@$_POST['fuzzy_month'],2,'0',STR_PAD_LEFT).'-'.str_pad(@$_POST['fuzzy_day'],2,'0',STR_PAD_LEFT);
-
-		$transaction = $po->beginTransaction('Add');
-
-		if (!$po->save()) {
-			echo json_encode($po->getErrors());
-			return;
+		if (isset($conflicted_transaction_id)) {
+			$transaction->raiseConflict($conflicted_transaction_id);
 		}
-
-		$transaction->commit();
-
-		echo json_encode(array());
 	}
 
 	public function actionAddMedication()
@@ -1181,9 +1215,13 @@ class PatientController extends BaseController
 			throw new Exception("Previous operation not found: ".@$_GET['operation_id']);
 		}
 
+		$transaction = $po->beginTransaction('Delete');
+
 		if (!$po->delete()) {
 			throw new Exception("Failed to remove previous operation: ".print_r($po->getErrors(),true));
 		}
+
+		$transaction->commit();
 
 		echo 'success';
 	}
