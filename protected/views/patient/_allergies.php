@@ -203,13 +203,7 @@
 				'url': baseUrl+'/patient/removeAllergy?patient_id=<?php echo $this->patient->id?>&allergy_id='+$('#remove_allergy_id').val(),
 				'success': function(html) {
 					if (html == 'success') {
-						var allergy_id = $('#remove_allergy_id').val();
-						var row = $('#currentAllergies tr[data-allergy-id="' + allergy_id + '"]');
-						var allergy_name = row.data('allergy-name');
-						row.remove();
-						$('#allergy_id').append('<option value="'+allergy_id+'">'+allergy_name+'</option>');
-						sort_selectbox($('#allergy_id'));
-
+						window.location.reload();
 					} else {
 						new OpenEyes.UI.Dialog.Alert({
 							content: "Sorry, an internal error occurred and we were unable to remove the allergy.\n\nPlease contact support for assistance."

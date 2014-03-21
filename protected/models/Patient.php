@@ -157,7 +157,6 @@ class Patient extends BaseActiveRecordVersioned
 			),
 			'ophinfo' => array(self::HAS_ONE, 'PatientOphInfo', 'patient_id'),
 			'transactions' => array(self::HAS_MANY, 'Transaction', 'patient_id', 'order' => 'id desc'),
-			'latestTransaction' => array(self::HAS_ONE, 'Transaction', 'patient_id', 'order' => 'id desc'),
 		);
 	}
 
@@ -191,7 +190,6 @@ class Patient extends BaseActiveRecordVersioned
 
 
 		return $this->count($criteria);
-
 	}
 
 	/**
@@ -714,11 +712,23 @@ class Patient extends BaseActiveRecordVersioned
 	public function removeAllergy($allergy_id)
 	{
 		if ($paa = PatientAllergyAssignment::model()->find('patient_id=? and allergy_id=?',array($this->id,$allergy_id))) {
-			if (!$paa->delete()) {
+			if (!Yii::app()->db->getCurrentTransaction()) {
+				$transaction = $paa->patient->beginTransaction('Remove allergy');
+			}
+
+			if ($this->based_on_transaction_id) {
+				$result = $paa->basedOnTransactionID($this->based_on_transaction_id)->delete();
+			} else {
+				$result = $paa->delete();
+			}
+
+			if (!$result) {
 				throw new Exception('Unable to delete patient allergy assignment: '.print_r($paa->getErrors(),true));
 			}
 
 			$this->audit('patient','remove-allergy');
+
+			@$transaction && $transaction->commit();
 		}
 	}
 
@@ -779,7 +789,7 @@ class Patient extends BaseActiveRecordVersioned
 			}
 			$this->no_allergies_date = date('Y-m-d H:i:s');
 			if (!$this->save()) {
-				throw new Exception('Unable to set no allergy date:' .  print_r($this->getErrors(), true));
+				throw new Exception('Unable to set no allergy date:' .	print_r($this->getErrors(), true));
 			}
 			$this->audit('patient', 'set-noallergydate');
 			$transaction->commit();
@@ -794,7 +804,7 @@ class Patient extends BaseActiveRecordVersioned
 	 * returns all disorder ids for the patient, aggregating the principal diagnosis for each patient episode, and any secondary diagnosis on the patient
 	*
 	* FIXME: some of this can be abstracted to a relation when we upgrade from yii 1.1.8, which has some problems with yii relations:
-	* 	http://www.yiiframework.com/forum/index.php/topic/26806-relations-through-problem-wrong-on-clause-in-sql-generated/
+	*		http://www.yiiframework.com/forum/index.php/topic/26806-relations-through-problem-wrong-on-clause-in-sql-generated/
 	*
 	* @returns array() of disorder ids
 	*/
@@ -824,7 +834,7 @@ class Patient extends BaseActiveRecordVersioned
 	 * returns all disorders for the patient.
 	 *
 	 * FIXME: some of this can be abstracted to a relation when we upgrade from yii 1.1.8, which has some problems with yii relations:
-	 * 	http://www.yiiframework.com/forum/index.php/topic/26806-relations-through-problem-wrong-on-clause-in-sql-generated/
+	 *	http://www.yiiframework.com/forum/index.php/topic/26806-relations-through-problem-wrong-on-clause-in-sql-generated/
 	 *
 	 * @returns array() of disorders
 	 */
@@ -1211,7 +1221,7 @@ class Patient extends BaseActiveRecordVersioned
 	 */
 	public function hasOpenEpisodeOfSubspecialty($subspecialty_id)
 	{
-		return  $this->getOpenEpisodeOfSubspecialty($subspecialty_id) ? true : false;
+		return	$this->getOpenEpisodeOfSubspecialty($subspecialty_id) ? true : false;
 	}
 
 	/**
@@ -1388,5 +1398,61 @@ class Patient extends BaseActiveRecordVersioned
 	public function beginTransaction($operation_name)
 	{
 		return Yii::app()->db->beginTransaction($operation_name, $this->id);
+	}
+
+	/**
+	 * Changes to allergy assignments potentially conflict with setting no_allergy_date on the patient model
+	 */
+	public function detectTransactionConflicts($transactions)
+	{
+		$conflicted_transactions = array();
+
+		foreach ($transactions as $transaction) {
+			if ($transaction->modified_data && $transaction->model_class->name == get_class($this) && $transaction->model_id == $this->id) {
+				$conflicted_transactions[] = $transaction;
+			} else if ($transaction->model_class->name == 'PatientAllergyAssignment' && $this->didSetNoAllergies()) {
+				foreach ($this->getAllRowsInTableForTransactionID('patient_allergy_assignment',$transaction->id) as $row) {
+					if ($this->detectConflictForRow($row, $transaction->id)) {
+						$conflicted_transactions[] = $transaction;
+					}
+				}
+			} 
+		}
+
+		return $conflicted_transactions;
+	}
+
+	// If an allergy was added and this model has no allergies indicated, then it's a conflict
+	public function detectConflictForRow($row, $transaction_id)
+	{
+		return ($row['patient_id'] == $this->patient_id && @$row['deleted_transaction_id'] != $transaction_id);
+	}
+
+	// Return true if the current instance of this model changed the 'no allergies' property from null to !null
+	public function didSetNoAllergies()
+	{
+		return $this->no_allergies_date !== null &&
+			((!$previous_version = $this->getPreviousVersion()) || $previous_version->no_allergies_date === null);
+	}
+
+	/**
+	 * Get the latest transaction for the patient that has been committed to the database
+	 * ie ignore a pending transaction that hasn't yet been committed
+	 */
+	public function getLatestTransaction()
+	{
+		$criteria = new CDbCriteria;
+
+		$criteria->addCondition('patient_id = :patient_id');
+		$criteria->params[':patient_id'] = $this->id;
+
+		if ($transaction = Yii::app()->db->getCurrentTransaction()) {
+			$criteria->addCondition('id != :id');
+			$criteria->params[':id'] = $transaction->oe_transaction->id;
+		}
+
+		$criteria->order = 'id desc';
+
+		return Transaction::model()->find($criteria);
 	}
 }

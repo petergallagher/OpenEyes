@@ -671,26 +671,6 @@ class PatientController extends BaseController
 			if (!$patient = Patient::model()->findByPk($patient_id)) {
 				throw new Exception('Patient not found: '.$patient_id);
 			}
-/*
-		if ($lock = Lock::obtain('patient',$patient->id)) {
-			$cvi_status_date = $this->processDiagnosisDate();
-
-			$transaction = $patient->beginTransaction('Update OphInfo');
-
-			$ophinfo = $patient->basedOnTransactionID($_POST['based_on_transaction_id'])->editOphInfo($cvi_status, $cvi_status_date);
-
-			if (empty($ophinfo->errors)) {
-				$transaction->setModel($ophinfo);
-				$transaction->commit();
-
-				echo json_encode(true);
-			} else {
-				echo json_encode($ophinfo->errors);
-			}
-		} else {
-			echo json_encode(array(array("Couldn't lock the patient for editing, please try again or contact support for assistance")));
-		}
-*/
 
 			if ($lock = Lock::obtain('patient',$patient->id)) {
 				if (@$_POST['no_allergies']) {
@@ -732,9 +712,14 @@ class PatientController extends BaseController
 		if (!$allergy = Allergy::model()->findByPk($allergy_id)) {
 			throw new Exception('Allergy not found: '.$allergy_id);
 		}
-		$patient->removeAllergy($allergy_id);
 
-		echo 'success';
+		if ($lock = Lock::obtain('patient',$patient->id)) {
+			$patient->basedOnTransactionID($_POST['based_on_transaction_id'])->removeAllergy($allergy_id);
+
+			echo 'success';
+		} else {
+			throw new Exception("Unable to lock patient");
+		}
 	}
 
 	/**

@@ -5,6 +5,9 @@
 			'transactions' => $this->patient->getFullTransactionListForRelation('familyHistory'),
 		));
 	}?>
+	<?php if ($conflict = $this->patient->getUnresolvedConflictForRelation('familyHistory')) {?>
+		<div class="alert-box alert">The latest transaction is in conflict with <?php echo ($conflict->versionCount-1)?> other transaction<?php if (($conflict->versionCount-1) != 1) {?>s<?php }?>.</div>
+	<?php }?>
 	<header class="box-header">
 		<h3 class="box-title">
 			<span class="icon-patient-clinician-hd_flag"></span>
