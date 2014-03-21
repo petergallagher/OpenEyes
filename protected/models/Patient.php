@@ -667,17 +667,26 @@ class Patient extends BaseActiveRecordVersioned
 	public function addAllergy($allergy_id)
 	{
 		if (!PatientAllergyAssignment::model()->find('patient_id=? and allergy_id=?',array($this->id,$allergy_id))) {
-			$transaction = $this->beginTransaction('Add');
+			if (!Yii::app()->db->getCurrentTransaction()) {
+				$transaction = $this->beginTransaction('Add');
+			}
 
 			try {
 				$paa = new PatientAllergyAssignment;
 				$paa->patient_id = $this->id;
 				$paa->allergy_id = $allergy_id;
-				if (!$paa->save()) {
+
+				if ($this->based_on_transaction_id) {
+					$result = $paa->basedOnTransactionID($this->based_on_transaction_id)->save();
+				} else {
+					$result = $paa->save();
+				}
+
+				if (!$result) {
 					throw new Exception('Unable to add patient allergy assignment: '.print_r($paa->getErrors(),true));
 				}
 
-				$transaction->setModel($paa);
+				@$transaction && $transaction->setModel($paa);
 
 				$this->audit('patient','add-allergy');
 				if ($this->no_allergies_date) {
@@ -687,10 +696,10 @@ class Patient extends BaseActiveRecordVersioned
 					};
 				}
 				$this->audit('patient','remove-noallergydate');
-				$transaction->commit();
+				@$transaction && $transaction->commit();
 			}
 			catch (Exception $e) {
-				$transaction->rollback();
+				@$transaction && $transaction->rollback();
 				throw $e;
 			}
 		}

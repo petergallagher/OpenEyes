@@ -375,7 +375,7 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 		// Patient-associated data is handled differently
 		if ($patient = $this->patient) {
 			if ($this->based_on_transaction_id && $patient->latestTransaction->id != $this->based_on_transaction_id) {
-				if (method_exists($this,'detectTransactionConflicts')) {
+				if (method_exists($this,'detectConflictForRow')) {
 					$conflict_transactions = $this->detectTransactionConflicts(Transaction::model()->findAllBetween($this->based_on_transaction_id+1, $patient->latestTransaction->id));
 				} else {
 					// Do any of the new transactions touch this model
