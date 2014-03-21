@@ -372,14 +372,8 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 
 	public function handleConflictDetectionAndResolution($transaction)
 	{
-		if (get_class($this) == 'Patient') {
-			$patient = $this;
-		} else {
-			$patient = $this->patient;
-		}
-
 		// Patient-associated data is handled differently
-		if ($patient) {
+		if ($patient = (get_class($this) == 'Patient') ? $this : $this->patient) {
 			if ($this->based_on_transaction_id && $patient->latestTransaction->id != $this->based_on_transaction_id) {
 				if (method_exists($this,'detectConflictForRow')) {
 					$conflict_transactions = $this->detectTransactionConflicts(Transaction::model()->findAllBetween($this->based_on_transaction_id+1, $patient->latestTransaction->id));

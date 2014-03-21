@@ -1202,6 +1202,39 @@ class Patient extends BaseActiveRecordVersioned
 		$this->updateMedication(new Medication, $params);
 	}
 
+	public function setMedication($params, $medication_id=null)
+	{
+		if ($medication_id) {
+			if (!$medication = Medication::model()->findByPk($medication_id)) {
+				throw new Exception("Medication not found: $medication_id");
+			}
+			if ($medication->patient_id != $this->id) {
+				throw new Exception("Cowardly refusing to mangle your data");
+			}
+		} else {
+			$medication = new Medication;
+			$medication->patient_id = $this->id;
+		}
+
+		$medication->drug_id = $params['drug_id'];
+		$medication->route_id = $params['route_id'];
+		$medication->option_id = $params['option_id'];
+		$medication->frequency_id = $params['frequency_id'];
+		$medication->start_date = date('Y-m-d',strtotime($params['start_date']));
+
+		if ($this->based_on_transaction_id) {
+			$result = $medication->basedOnTransactionID($this->based_on_transaction_id)->save();
+		} else {
+			$result = $medication->save();
+		}
+
+		if (!$result) {
+			throw new Exception("Unable to save medication: ".print_r($medication->errors,true));
+		}
+
+		return $medication;
+	}
+
 	/**
 	 * return the open episode of the given subspecialty if there is one, null otherwise
 	 *

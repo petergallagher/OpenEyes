@@ -1101,28 +1101,28 @@ class PatientController extends BaseController
 			throw new Exception("Invalid date: ".@$_POST['start_date']);
 		}
 
-		if (@$_POST['edit_medication_id']) {
-			if (!$m = Medication::model()->findByPk(@$_POST['edit_medication_id'])) {
-				throw new Exception("Medication not found: ".@$_POST['edit_medication_id']);
+		if ($lock = Lock::obtain('patient',$patient->id)) {
+			if (@$_POST['edit_medication_id']) {
+				$transaction = $patient->beginTransaction('Edit medication');
+			} else {
+				$transaction = $patient->beginTransaction('Add medication');
 			}
-			$patient->updateMedication($m,array(
-				'drug_id' => $drug->id,
-				'route_id' => $route->id,
-				'option_id' => @$option ? $option->id : null,
-				'frequency_id' => $frequency->id,
-				'start_date' => $_POST['start_date'],
-			));
-		} else {
-			$patient->addMedication(array(
-				'drug_id' => $drug->id,
-				'route_id' => $route->id,
-				'option_id' => @$option ? $option->id : null,
-				'frequency_id' => $frequency->id,
-				'start_date' => $_POST['start_date'],
-			));
-		}
 
-		$this->redirect(array('/patient/view/'.$patient->id));
+			$medication = $patient->basedOnTransactionID($_POST['based_on_transaction_id'])->setMedication(array(
+				'drug_id' => $drug->id,
+				'route_id' => $route->id,
+				'option_id' => @$option ? $option->id : null,
+				'frequency_id' => $frequency->id,
+				'start_date' => $_POST['start_date'],
+			),@$_POST['edit_medication_id']);
+
+			$transaction->setModel($medication);
+			$transaction->commit();
+
+			$this->redirect(array('/patient/view/'.$patient->id));
+		} else {
+			throw new Exception("Unable to lock patient");
+		}
 	}
 
 	public function actionAddFamilyHistory()
@@ -1210,10 +1210,17 @@ class PatientController extends BaseController
 			throw new Exception("Medication not found: ".@$_GET['medication_id']);
 		}
 
-		$m->end_date = date('Y-m-d');
+		if ($lock = Lock::obtain('patient',$patient->id)) {
+			$transaction = $patient->beginTransaction('Remove medication');
 
-		if (!$m->save()) {
-			throw new Exception("Failed to remove medication: ".print_r($m->getErrors(),true));
+			$m->end_date = date('Y-m-d');
+
+			if (!$m->save()) {
+				throw new Exception("Failed to remove medication: ".print_r($m->getErrors(),true));
+			}
+
+			$transaction->setModel($m);
+			$transaction->commit();
 		}
 
 		echo 'success';

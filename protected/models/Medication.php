@@ -74,6 +74,7 @@ class Medication extends BaseActiveRecordVersionedSoftDelete
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return array(
+			'patient' => array(self::BELONGS_TO, 'Patient', 'patient_id'),
 			'drug' => array(self::BELONGS_TO, 'Drug', 'drug_id'),
 			'route' => array(self::BELONGS_TO, 'DrugRoute', 'route_id'),
 			'option' => array(self::BELONGS_TO, 'DrugRouteOption', 'option_id'),
@@ -109,5 +110,14 @@ class Medication extends BaseActiveRecordVersionedSoftDelete
 		return new CActiveDataProvider(get_class($this), array(
 			'criteria'=>$criteria,
 		));
+	}
+
+	public function detectConflictForRow($row)
+	{
+		return ($row['patient_id'] == $this->patient_id && $row['drug_id'] == $this->drug_id &&
+			($row['route_id'] != $this->route_id ||
+			$row['option_id'] != $this->option_id ||
+			$row['frequency_id'] != $this->frequency_id ||
+			$row['start_date'] != $this->start_date));
 	}
 }
