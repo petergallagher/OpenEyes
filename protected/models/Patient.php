@@ -1410,7 +1410,7 @@ class Patient extends BaseActiveRecordVersioned
 		foreach ($transactions as $transaction) {
 			if ($transaction->modified_data && $transaction->model_class->name == get_class($this) && $transaction->model_id == $this->id) {
 				$conflicted_transactions[] = $transaction;
-			} else if ($transaction->model_class->name == 'PatientAllergyAssignment' && $this->didSetNoAllergies()) {
+			} else if ($transaction->model_class->name == 'PatientAllergyAssignment' && $this->no_allergies_date !== null) {
 				foreach ($this->getAllRowsInTableForTransactionID('patient_allergy_assignment',$transaction->id) as $row) {
 					if ($this->detectConflictForRow($row, $transaction->id)) {
 						$conflicted_transactions[] = $transaction;
@@ -1425,14 +1425,7 @@ class Patient extends BaseActiveRecordVersioned
 	// If an allergy was added and this model has no allergies indicated, then it's a conflict
 	public function detectConflictForRow($row, $transaction_id)
 	{
-		return ($row['patient_id'] == $this->patient_id && @$row['deleted_transaction_id'] != $transaction_id);
-	}
-
-	// Return true if the current instance of this model changed the 'no allergies' property from null to !null
-	public function didSetNoAllergies()
-	{
-		return $this->no_allergies_date !== null &&
-			((!$previous_version = $this->getPreviousVersion()) || $previous_version->no_allergies_date === null);
+		return ($row['patient_id'] == $this->id && @$row['deleted_transaction_id'] != $transaction_id);
 	}
 
 	/**

@@ -676,7 +676,7 @@ class PatientController extends BaseController
 				if (@$_POST['no_allergies']) {
 					$patient->basedOnTransactionID($_POST['based_on_transaction_id'])->setNoAllergies();
 				}
-				else	{
+				else {
 					if (!isset($_POST['allergy_id']) || !$allergy_id = $_POST['allergy_id']) {
 						throw new Exception('Allergy ID required');
 					}
