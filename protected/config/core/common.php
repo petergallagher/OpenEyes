@@ -67,7 +67,6 @@ return array(
 		),
 		'cache' => array(
 			'class' => 'system.caching.CFileCache',
-			'cachePath' => 'cache',
 			'directoryLevel' => 1
 		),
 		'cacheBuster' => array(
@@ -219,9 +218,6 @@ return array(
 		'google_analytics_account' => '',
 		'local_users' => array(),
 		'log_events' => true,
-		'urgent_booking_notify_hours' => 24,
-		'urgent_booking_notify_email' => array(),
-		'urgent_booking_notify_email_from' => 'OpenEyes <helpdesk@example.com>',
 		'default_site_code' => '',
 		'institution_code' => 'RP6',
 		'erod_lead_time_weeks' => 3,
