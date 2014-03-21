@@ -112,12 +112,25 @@ class Medication extends BaseActiveRecordVersionedSoftDelete
 		));
 	}
 
-	public function detectConflictForRow($row)
+	public function detectConflictForRow($operation, $row, $row_was_deleted)
 	{
-		return ($row['patient_id'] == $this->patient_id && $row['drug_id'] == $this->drug_id &&
-			($row['route_id'] != $this->route_id ||
-			$row['option_id'] != $this->option_id ||
-			$row['frequency_id'] != $this->frequency_id ||
-			$row['start_date'] != $this->start_date));
+		if ($this->end_date == date('Y-m-d')) {
+			$operation = 'delete';
+		}
+
+		if ($operation == 'save') {
+			if ($row_was_deleted && $row['patient_id'] == $this->patient_id && $row['drug_id'] == $this->drug_id) {
+				return true;
+			}
+
+			return ($row['patient_id'] == $this->patient_id && $row['drug_id'] == $this->drug_id &&
+				($row['route_id'] != $this->route_id ||
+				$row['option_id'] != $this->option_id ||
+				$row['frequency_id'] != $this->frequency_id ||
+				$row['start_date'] != $this->start_date));
+
+		} else if ($operation == 'delete') {
+			return ($row['patient_id'] == $this->patient_id && $row['drug_id'] == $this->drug_id && !$row_was_deleted);
+		}
 	}
 }

@@ -350,7 +350,7 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 
 		$this->hash = $this->generateHash();
 
-		$this->handleConflictDetectionAndResolution($transaction);
+		$this->handleConflictDetectionAndResolution('save',$transaction);
 
 		if ($this->transaction_id == $transaction->id) {
 			// Don't create a new version row if save is called again on the same object in the same transaction
@@ -370,13 +370,13 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 		return $result;
 	}
 
-	public function handleConflictDetectionAndResolution($transaction)
+	public function handleConflictDetectionAndResolution($operation, $transaction)
 	{
 		// Patient-associated data is handled differently
 		if ($patient = (get_class($this) == 'Patient') ? $this : $this->patient) {
 			if ($this->based_on_transaction_id && $patient->latestTransaction->id != $this->based_on_transaction_id) {
 				if (method_exists($this,'detectConflictForRow')) {
-					$conflict_transactions = $this->detectTransactionConflicts(Transaction::model()->findAllBetween($this->based_on_transaction_id+1, $patient->latestTransaction->id));
+					$conflict_transactions = $this->detectTransactionConflicts($operation, Transaction::model()->findAllBetween($this->based_on_transaction_id+1, $patient->latestTransaction->id));
 				} else {
 					// Do any of the new transactions touch this model
 					$conflict_transactions = Transaction::model()->searchForModel($this, $this->based_on_transaction_id+1, $patient->latestTransaction->id, true);
@@ -430,14 +430,14 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 		}
 	}
 
-	public function detectTransactionConflicts($transactions)
+	public function detectTransactionConflicts($operation, $transactions)
 	{
 		$conflicted_transactions = array();
 
 		foreach ($transactions as $transaction) {
 			if ($transaction->model_class->name == get_class($this)) {
 				foreach ($this->getAllRowsInTableForTransactionID($this->tableName(),$transaction->id) as $row) {
-					if ($this->detectConflictForRow($row)) {
+					if ($this->detectConflictForRow($operation, $row, @$row['deleted_transaction_id'] == $transaction->id)) {
 						$conflicted_transactions[] = $transaction;
 					}
 				}
@@ -492,7 +492,7 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 			$transaction->addTable($this->tableName());
 		}
 
-		$this->handleConflictDetectionAndResolution($transaction);
+		$this->handleConflictDetectionAndResolution('delete',$transaction);
 
 		return parent::delete();
 	}

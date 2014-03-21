@@ -115,7 +115,7 @@ class SecondaryDiagnosis extends BaseActiveRecordVersioned
 		return Helper::formatFuzzyDate($this->date);
 	}
 
-	public function detectConflictForRow($row)
+	public function detectConflictForRow($operation, $row, $row_was_deleted)
 	{
 		return ($row['patient_id'] == $this->patient_id && $row['disorder_id'] == $this->disorder_id);
 	}

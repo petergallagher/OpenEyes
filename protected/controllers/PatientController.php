@@ -1206,20 +1206,20 @@ class PatientController extends BaseController
 			throw new Exception("Patient not found: ".@$_GET['patient_id']);
 		}
 
-		if (!$m = Medication::model()->find('patient_id=? and id=?',array($patient->id,@$_GET['medication_id']))) {
+		if (!$medication = Medication::model()->find('patient_id=? and id=?',array($patient->id,@$_GET['medication_id']))) {
 			throw new Exception("Medication not found: ".@$_GET['medication_id']);
 		}
 
 		if ($lock = Lock::obtain('patient',$patient->id)) {
 			$transaction = $patient->beginTransaction('Remove medication');
 
-			$m->end_date = date('Y-m-d');
+			$medication->end_date = date('Y-m-d');
 
-			if (!$m->save()) {
-				throw new Exception("Failed to remove medication: ".print_r($m->getErrors(),true));
+			if (!$medication->basedOnTransactionID($_GET['based_on_transaction_id'])->save()) {
+				throw new Exception("Failed to remove medication: ".print_r($medication->getErrors(),true));
 			}
 
-			$transaction->setModel($m);
+			$transaction->setModel($medication);
 			$transaction->commit();
 		}
 

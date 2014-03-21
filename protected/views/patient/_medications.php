@@ -359,7 +359,7 @@
 
 		$.ajax({
 			'type': 'GET',
-			'url': baseUrl+'/patient/removeMedication?patient_id=<?php echo $this->patient->id?>&medication_id='+$('#medication_id').val(),
+			'url': baseUrl+'/patient/removeMedication?patient_id=<?php echo $this->patient->id?>&medication_id='+$('#medication_id').val()+'&based_on_transaction_id='+$('#based_on_transaction_id').val(),
 			'success': function(html) {
 				if (html == 'success') {
 					window.location.reload();

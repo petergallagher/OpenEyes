@@ -121,7 +121,7 @@ class PatientOphInfo extends BaseActiveRecordVersioned
 		));
 	}
 
-	public function detectConflictForRow($row)
+	public function detectConflictForRow($operation, $row, $row_was_deleted)
 	{
 		return ($row['patient_id'] == $this->patient_id && ($row['cvi_status_date'] != $this->cvi_status_date || $row['cvi_status_id'] != $this->cvi_status_id));
 	}

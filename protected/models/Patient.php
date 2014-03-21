@@ -1436,7 +1436,7 @@ class Patient extends BaseActiveRecordVersioned
 	/**
 	 * Changes to allergy assignments potentially conflict with setting no_allergy_date on the patient model
 	 */
-	public function detectTransactionConflicts($transactions)
+	public function detectTransactionConflicts($operation, $transactions)
 	{
 		$conflicted_transactions = array();
 
@@ -1445,7 +1445,7 @@ class Patient extends BaseActiveRecordVersioned
 				$conflicted_transactions[] = $transaction;
 			} else if ($transaction->model_class->name == 'PatientAllergyAssignment' && $this->no_allergies_date !== null) {
 				foreach ($this->getAllRowsInTableForTransactionID('patient_allergy_assignment',$transaction->id) as $row) {
-					if ($this->detectConflictForRow($row, $transaction->id)) {
+					if ($this->detectConflictForRow($operation, $row, @$row['deleted_transaction_id'] == $transaction->id)) {
 						$conflicted_transactions[] = $transaction;
 					}
 				}
@@ -1456,9 +1456,9 @@ class Patient extends BaseActiveRecordVersioned
 	}
 
 	// If an allergy was added and this model has no allergies indicated, then it's a conflict
-	public function detectConflictForRow($row, $transaction_id)
+	public function detectConflictForRow($operation, $row, $row_was_deleted)
 	{
-		return ($row['patient_id'] == $this->id && @$row['deleted_transaction_id'] != $transaction_id);
+		return ($row['patient_id'] == $this->id && !$row_was_deleted);
 	}
 
 	/**

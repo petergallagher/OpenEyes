@@ -117,7 +117,7 @@ class PreviousOperation extends BaseActiveRecordVersioned
 		return Helper::formatFuzzyDate($this->date);
 	}
 
-	public function detectConflictForRow($row)
+	public function detectConflictForRow($operation, $row, $row_was_deleted)
 	{
 		return ($row['patient_id'] == $this->patient_id && $row['operation'] == $this->operation);
 	}
