@@ -195,8 +195,7 @@ class VerifyVersionTablesCommand extends CConsoleCommand {
 
 	public function nuke_cache()
 	{
-		$this->wipe_files("../cache/");
-		$this->wipe_files("cache/");
+		$this->wipe_files("runtime/cache/");
 	}
 
 	public function wipe_files($dir, $root = true)
