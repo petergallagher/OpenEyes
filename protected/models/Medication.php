@@ -131,6 +131,8 @@ class Medication extends BaseActiveRecordVersionedSoftDelete
 
 		} else if ($operation == 'delete') {
 			return ($row['patient_id'] == $this->patient_id && $row['drug_id'] == $this->drug_id && !$row_was_deleted);
+		} else {
+			throw new Exception("Unhandled operation: $operation");
 		}
 	}
 }

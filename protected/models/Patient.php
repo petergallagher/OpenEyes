@@ -1128,21 +1128,36 @@ class Patient extends BaseActiveRecordVersioned
 		}
 	}
 
-	public function addFamilyHistory($relative_id,$side_id,$condition_id,$comments)
+	public function setFamilyHistory($params, $family_history_id=null)
 	{
-		if (!$fh = FamilyHistory::model()->find('patient_id=? and relative_id=? and side_id=? and condition_id=?',array($this->id,$relative_id,$side_id,$condition_id))) {
-			$fh = new FamilyHistory;
-			$fh->patient_id = $this->id;
-			$fh->relative_id = $relative_id;
-			$fh->side_id = $side_id;
-			$fh->condition_id = $condition_id;
+		if ($family_history_id) {
+			if (!$family_history = FamilyHistory::model()->findByPk($family_history_id)) {
+				throw new Exception("Family history not found: $family_history_id");
+			}
+			if ($family_history->patient_id != $this->id) {
+				throw new Exception("Cowardly refusing to mangle your data");
+			}
+		} else {
+			$family_history = new FamilyHistory;
+			$family_history->patient_id = $this->id;
 		}
 
-		$fh->comments = $comments;
+		$family_history->relative_id = $params['relative_id'];
+		$family_history->side_id = $params['side_id'];
+		$family_history->condition_id = $params['condition_id'];
+		$family_history->comments = $params['comments'];
 
-		if (!$fh->save()) {
-			throw new Exception("Unable to save family history: ".print_r($fh->getErrors(),true));
+		if ($this->based_on_transaction_id) {
+			$result = $family_history->basedOnTransactionID($this->based_on_transaction_id)->save();
+		} else {
+			$result = $family_history->save();
 		}
+
+		if (!$result) {
+			throw new Exception("Unable to save family history: ".print_r($family_history->errors,true));
+		}
+
+		return $family_history;
 	}
 
 	public function currentContactIDS()

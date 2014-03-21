@@ -67,6 +67,7 @@ class FamilyHistory extends BaseActiveRecordVersioned
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return array(
+			'patient' => array(self::BELONGS_TO, 'Patient', 'patient_id'),
 			'relative' => array(self::BELONGS_TO, 'FamilyHistoryRelative', 'relative_id'),
 			'side' => array(self::BELONGS_TO, 'FamilyHistorySide', 'side_id'),
 			'condition' => array(self::BELONGS_TO, 'FamilyHistoryCondition', 'condition_id'),
@@ -101,5 +102,23 @@ class FamilyHistory extends BaseActiveRecordVersioned
 		return new CActiveDataProvider(get_class($this), array(
 			'criteria'=>$criteria,
 		));
+	}
+
+	public function detectConflictForRow($operation, $row, $row_was_deleted)
+	{
+		if ($operation == 'save') {
+			if ($row_was_deleted && $row['patient_id'] == $this->patient_id && $row['condition_id'] == $this->condition_id) {
+				return true;
+			}
+
+			return ($row['patient_id'] == $this->patient_id && $row['condition_id'] == $this->condition_id &&
+				($row['relative_id'] != $this->relative_id ||
+				$row['side_id'] != $this->side_id ||
+				$row['comments'] != $this->comments));
+		} else if ($operation == 'delete') {
+			return ($row['patient_id'] == $this->patient_id && $row['condition_id'] == $this->condition_id && !$row_was_deleted);
+		} else {
+			throw new Exception("Unhandled operation: $operation");
+		}
 	}
 }

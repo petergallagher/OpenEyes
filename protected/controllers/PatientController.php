@@ -1143,20 +1143,22 @@ class PatientController extends BaseController
 			throw new Exception("Unknown condition: ".@$_POST['condition_id']);
 		}
 
-		if (@$_POST['edit_family_history_id']) {
-			if (!$fh = FamilyHistory::model()->findByPk(@$_POST['edit_family_history_id'])) {
-				throw new Exception("Family history not found: ".@$_POST['edit_family_history_id']);
-			}
-			$fh->relative_id = $relative->id;
-			$fh->side_id = $side->id;
-			$fh->condition_id = $condition->id;
-			$fh->comments = @$_POST['comments'];
+		if ($lock = Lock::obtain('patient',$patient->id)) {
+			$transaction = $patient->beginTransaction(@$_POST['edit_family_history_id'] ? 'Edit family history' : 'Add family history');
 
-			if (!$fh->save()) {
-				throw new Exception("Unable to save family history: ".print_r($fh->getErrors(),true));
-			}
+			$family_history = $patient->basedOnTransactionID($_POST['based_on_transaction_id'])->setFamilyHistory(array(
+					'relative_id' => $relative->id,
+					'side_id' => $side->id,
+					'condition_id' => $condition->id,
+					'comments' => @$_POST['comments'],
+				),
+				@$_POST['edit_family_history_id']);
+
+			$transaction->setModel($family_history);
+			$transaction->commit();
+
 		} else {
-			$patient->addFamilyHistory($relative->id,$side->id,$condition->id,@$_POST['comments']);
+			throw new Exception("Unable to lock patient");
 		}
 
 		$this->redirect(array('patient/view/'.$patient->id));
@@ -1232,12 +1234,22 @@ class PatientController extends BaseController
 			throw new Exception("Patient not found: ".@$_GET['patient_id']);
 		}
 
-		if (!$m = FamilyHistory::model()->find('patient_id=? and id=?',array($patient->id,@$_GET['family_history_id']))) {
+		if (!$family_history = FamilyHistory::model()->find('patient_id=? and id=?',array($patient->id,@$_GET['family_history_id']))) {
 			throw new Exception("Family history not found: ".@$_GET['family_history_id']);
 		}
 
-		if (!$m->delete()) {
-			throw new Exception("Failed to remove family history: ".print_r($m->getErrors(),true));
+		if ($lock = Lock::obtain('patient',$patient->id)) {
+			$transaction = $patient->beginTransaction('Remove family history');
+
+			if (!$family_history->basedOnTransactionID($_POST['based_on_transaction_id'])->delete()) {
+				throw new Exception("Failed to remove family history: ".print_r($family_history->getErrors(),true));
+			}
+
+			$transaction->setModel($family_history);
+			$transaction->commit();
+
+		} else {
+			throw new Exception("Unable to lock patient");
 		}
 
 		echo 'success';
