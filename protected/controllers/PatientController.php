@@ -922,7 +922,7 @@ class PatientController extends BaseController
 			throw new Exception('Unable to find patient: '.@$_POST['patient_id']);
 		}
 
-		if ($lock Lock::obtain('patient',$patient->id)) {
+		if ($lock = Lock::obtain('patient',$patient->id)) {
 			$cvi_status_date = $this->processDiagnosisDate();
 
 			$result = $patient->editOphInfo($cvi_status, $cvi_status_date);
