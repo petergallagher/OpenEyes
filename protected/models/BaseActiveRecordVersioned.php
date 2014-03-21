@@ -430,6 +430,23 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 		}
 	}
 
+	public function detectTransactionConflicts($transactions)
+	{
+		$conflicted_transactions = array();
+
+		foreach ($transactions as $transaction) {
+			if ($transaction->model_class->name == get_class($this)) {
+				foreach ($this->getAllRowsInTableForTransactionID($this->tableName(),$transaction->id) as $row) {
+					if ($this->detectConflictForRow($row)) {
+						$conflicted_transactions[] = $transaction;
+					}
+				}
+			}
+		}
+
+		return $conflicted_transactions;
+	}
+
 	public function getTransaction()
 	{
 		return Transaction::model()->findByPk($this->transaction_id);

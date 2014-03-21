@@ -23,9 +23,9 @@
  *
  * The followings are the available columns in table 'patient_oph_info':
  * @property integer	$id
- * @property integer  $patient_id
+ * @property integer	$patient_id
  * @property string  $cvi_status_date
- * @property integer  $cvi_status_id
+ * @property integer	$cvi_status_id
  * @property datetime  $created_date
  * @property datetime  $last_modified_date
  * @property integer	$created_user_id
@@ -121,4 +121,8 @@ class PatientOphInfo extends BaseActiveRecordVersioned
 		));
 	}
 
+	public function detectConflictForRow($row)
+	{
+		return ($row['patient_id'] == $this->patient_id && ($row['cvi_status_date'] != $this->cvi_status_date || $row['cvi_status_id'] != $this->cvi_status_id));
+	}
 }

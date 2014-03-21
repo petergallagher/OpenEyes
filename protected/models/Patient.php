@@ -973,13 +973,17 @@ class Patient extends BaseActiveRecordVersioned
 		$oph_info->cvi_status_id = $cvi_status->id;
 		$oph_info->cvi_status_date = $cvi_status_date;
 
-		if (!$oph_info->save()) {
-			return $oph_info->errors;
+		if ($this->based_on_transaction_id) {
+			$result = $oph_info->basedOnTransactionID($this->based_on_transaction_id)->save();
+		} else {
+			$result = $oph_info->save();
 		}
 
-		$this->audit('patient', $action);
+		if ($result) {
+			$this->audit('patient', $action);
+		}
 
-		return true;
+		return $oph_info;
 	}
 
 	public function getContactAddress($contact_id, $location_type=false, $location_id=false)

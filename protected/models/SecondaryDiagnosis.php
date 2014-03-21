@@ -115,20 +115,8 @@ class SecondaryDiagnosis extends BaseActiveRecordVersioned
 		return Helper::formatFuzzyDate($this->date);
 	}
 
-	public function detectTransactionConflicts($transactions)
+	public function detectConflictForRow($row)
 	{
-		$conflicted_transactions = array();
-
-		foreach ($transactions as $transaction) {
-			if ($transaction->model_class->name == get_class($this)) {
-				foreach ($this->getAllRowsInTableForTransactionID($this->tableName(),$transaction->id) as $row) {
-					if ($row['patient_id'] == $this->patient_id && $row['disorder_id'] == $this->disorder_id) {
-						$conflicted_transactions[] = $transaction;
-					}
-				}
-			}
-		}
-
-		return $conflicted_transactions;
+		return ($row['patient_id'] == $this->patient_id && $row['disorder_id'] == $this->disorder_id);
 	}
 }

@@ -796,11 +796,7 @@ class PatientController extends BaseController
 
 			!$_POST['diagnosis_eye'] && $_POST['diagnosis_eye'] = null;
 
-			if ($sd = $patient->addDiagnosis($disorder->id,$_POST['diagnosis_eye'],$date)) {
-				if ($latest_transaction_id != $_POST['based_on_transaction_id']) {
-					$this->detectDiagnosisConflicts($patient, $relation, $_POST['based_on_transaction_id'], $latest_transaction_id, $disorder->id, $transaction);
-				}
-
+			if ($sd = $patient->basedOnTransactionID($_POST['based_on_transaction_id'])->addDiagnosis($disorder->id,$_POST['diagnosis_eye'],$date)) {
 				$transaction->setModel($sd);
 				$transaction->commit();
 			}
@@ -812,29 +808,6 @@ class PatientController extends BaseController
 		}
 
 		$this->redirect(array('patient/view/'.$patient->id));
-	}
-
-	public function detectDiagnosisConflicts($patient, $relation, $based_on_transaction_id, $latest_transaction_id, $disorder_id, $transaction)
-	{
-		$version_history = $patient->getVersionHistoryForRelation($relation);
-		ksort($version_history);
-
-		foreach ($version_history as $transaction_id => $description) {
-			if (!$based_on_transaction_id || ($transaction_id > $based_on_transaction_id and $transaction_id <= $latest_transaction_id)) {
-				foreach ($patient->relationChangedItemsAsOfTransactionID($relation, $transaction_id) as $secondary_diagnosis) {
-					if ($secondary_diagnosis->disorder_id == $disorder_id) {
-						$conflicted_transaction_id = $transaction_id;
-						break;
-					}
-				}
-			}
-
-			if (isset($conflicted_transaction_id)) break;
-		}
-
-		if (isset($conflicted_transaction_id)) {
-			$transaction->raiseConflict($conflicted_transaction_id);
-		}
 	}
 
 	public function actionValidateAddDiagnosis()
@@ -897,7 +870,7 @@ class PatientController extends BaseController
 		}
 
 		if ($lock = Lock::obtain('patient',$patient->id)) {
-			$transaction = $patient->beginTransaction('Delete','Diagnosis');
+			$transaction = $patient->beginTransaction('Delete diagnosis');
 
 			$sd = $patient->removeDiagnosis(@$_GET['diagnosis_id']);
 
@@ -925,9 +898,20 @@ class PatientController extends BaseController
 		if ($lock = Lock::obtain('patient',$patient->id)) {
 			$cvi_status_date = $this->processDiagnosisDate();
 
-			$result = $patient->editOphInfo($cvi_status, $cvi_status_date);
+			$transaction = $patient->beginTransaction('Update OphInfo');
 
-			echo json_encode($result);
+			$ophinfo = $patient->basedOnTransactionID($_POST['based_on_transaction_id'])->editOphInfo($cvi_status, $cvi_status_date);
+
+			if (empty($ophinfo->errors)) {
+				$transaction->setModel($ophinfo);
+				$transaction->commit();
+
+				echo json_encode(true);
+			} else {
+				echo json_encode($ophinfo->errors);
+			}
+		} else {
+			echo json_encode(array(array("Couldn't lock the patient for editing, please try again or contact support for assistance")));
 		}
 	}
 
@@ -1066,13 +1050,9 @@ class PatientController extends BaseController
 
 			$transaction = $patient->beginTransaction('Add');
 
-			if (!$po->save()) {
+			if (!$po->basedOnTransactionID($_POST['based_on_transaction_id'])->save()) {
 				echo json_encode($po->getErrors());
 				return;
-			}
-
-			if ($latest_transaction_id != $_POST['based_on_transaction_id']) {
-				$this->detectPreviousOperationConflicts($patient,$_POST['based_on_transaction_id'],$latest_transaction_id,$po->operation,$transaction);
 			}
 
 			$transaction->setModel($po);
@@ -1081,29 +1061,6 @@ class PatientController extends BaseController
 			echo json_encode(array());
 		} else {
 			throw new Exception("Unable to lock patient");
-		}
-	}
-
-	public function detectPreviousOperationConflicts($patient, $based_on_transaction_id, $latest_transaction_id, $operation, $transaction)
-	{
-		$version_history = $patient->getVersionHistoryForRelation('previousOperations');
-		ksort($version_history);
-
-		foreach ($version_history as $transaction_id => $description) {
-			if (!$based_on_transaction_id || ($transaction_id > $based_on_transaction_id && $transaction_id <= $latest_transaction_id)) {
-				foreach ($patient->relationChangedItemsAsOfTransactionID('previousOperations', $transaction_id) as $previous_operation) {
-					if ($previous_operation->operation == $operation) {
-						$conflicted_transaction_id = $transaction_id;
-						break;
-					}
-				}
-			}
-
-			if (isset($conflicted_transaction_id)) break;
-		}
-
-		if (isset($conflicted_transaction_id)) {
-			$transaction->raiseConflict($conflicted_transaction_id);
 		}
 	}
 
