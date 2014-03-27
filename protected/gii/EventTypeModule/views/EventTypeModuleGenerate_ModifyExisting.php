@@ -1,6 +1,13 @@
 		<?php if ($this->target_class) {?>
 			<input type="hidden" id="target_event_class" value="<?php echo $this->target_class?>" />
 		<?php }?>
+		<h3>Upload a Template</h3>
+		<div class="row">
+		<?php
+		$model = new GiiTemplate();
+		echo CHtml::activeFileField($model, 'template'); ?>
+		<input type="submit" value="Upload File">
+		</div>
 		<h3>Select an event type:</h3>
 		<select class="EventTypeModuleEventType" name="EventTypeModuleEventType">
 			<option value="">- Please select -</option>
@@ -27,6 +34,8 @@
 					}
 					?>
 				</div>
+
+
 
 				<input type="submit" class="add_element" name="add" value="add element" />
 				<input type="submit" class="add_field"name="add_field" value="add field to element" /><br/>

@@ -60,6 +60,7 @@ class EventTypeModuleCode extends BaseModuleCode // CCodeModel
 
 	public function prepare()
 	{
+
 		if ($this->mode == 'create') {
 			$this->initialise(array(
 				'moduleID' => ucfirst(strtolower(Specialty::model()->findByPk($_REQUEST['Specialty']['id'])->abbreviation)) .
@@ -181,6 +182,9 @@ class EventTypeModuleCode extends BaseModuleCode // CCodeModel
 				}
 			}
 		}
+
+		$this->files[]=new CCodeFile($this->modulePath.'\template.gii', json_encode($_POST));
+
 	}
 
 	function changeAllInstancesOfString($path, $from, $to)
