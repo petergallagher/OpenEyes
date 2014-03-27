@@ -20,10 +20,4 @@ class EventTypeModuleGenerator extends ModuleGenerator // CCodeGenerator
 
 		parent::actionIndex();
 	}
-
-
-
-
-
-
 }
