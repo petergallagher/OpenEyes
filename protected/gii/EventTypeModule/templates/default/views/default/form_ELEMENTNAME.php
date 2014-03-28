@@ -33,7 +33,7 @@
 	if(isset($element) && $element['split_element']) {
 		?>
 	<div class="element-fields element-eyes row">
-		<?php // echo $form->hiddenInput($element, 'eye_id', false, array('class' => 'sideField')); ?>
+		<?php echo '<?php $form->hiddenInput($element, \'eye_id\', false, array(\'class\' => \'sideField\'));'?><?php echo '?>'?>
 		<div class="element-eye right-eye left side column <?php echo '<?php'?> if (!$element->hasRight()) { ?> inactive <?php echo '<?php } ?>'?>"
 				 data-side="right">
 			<div class="active-form">

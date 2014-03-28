@@ -88,7 +88,23 @@ class m<?php if (isset($migrationid)) { echo $migrationid; } ?>_event_type_<?php
 				'event_id' => 'int(10) unsigned NOT NULL',
 <?php
 					$number = $element['number']; $count = 1;
-					foreach ($element['fields'] as $field => $value) {
+
+				if (isset($element) && $element['split_element']){
+					$number = $number * 2;
+					$splitElementFields = array();
+					foreach($element['fields'] as $elementField){
+						$originalFieldName = $elementField['name'];
+						$elementField['name']=$originalFieldName.'_left';
+						$splitElementFields[] = $elementField;
+						$elementField['name']=$originalFieldName.'_right';
+						$splitElementFields[] = $elementField;
+					}
+					array_unshift($splitElementFields, "woot");
+					unset($splitElementFields[0]);
+					$element['fields']=$splitElementFields;
+				}
+
+				foreach ($element['fields'] as $field => $value) {
 						$field_name = $element['fields'][$count]['name'];
 						$field_label = $element['fields'][$count]['label'];
 						$field_type = $this->getDBFieldSQLType($element['fields'][$count]);
@@ -107,6 +123,9 @@ if (isset($field['extra_report'])) {?>
 				'last_modified_date' => 'datetime NOT NULL DEFAULT \'1901-01-01 00:00:00\'',
 				'created_user_id' => 'int(10) unsigned NOT NULL DEFAULT 1',
 				'created_date' => 'datetime NOT NULL DEFAULT \'1901-01-01 00:00:00\'',
+<?php if (isset($element) && $element['split_element']){?>
+					'eye_id' => 'int(10) unsigned NOT NULL DEFAULT \'3\'',
+<?php }?>
 				'PRIMARY KEY (`id`)',
 				'KEY `<?php echo $element['lmui_key']?>` (`last_modified_user_id`)',
 				'KEY `<?php echo $element['cui_key']?>` (`created_user_id`)',
@@ -117,6 +136,9 @@ if (isset($field['extra_report'])) {?>
 				'CONSTRAINT `<?php echo $element['lmui_key']?>` FOREIGN KEY (`last_modified_user_id`) REFERENCES `user` (`id`)',
 				'CONSTRAINT `<?php echo $element['cui_key']?>` FOREIGN KEY (`created_user_id`) REFERENCES `user` (`id`)',
 				'CONSTRAINT `<?php echo $element['ev_key']?>` FOREIGN KEY (`event_id`) REFERENCES `event` (`id`)',
+<?php if (isset($element) && $element['split_element']){?>
+				'CONSTRAINT `<?php echo  $element['table_name']?>_eye_id_fk` FOREIGN KEY (`eye_id`) REFERENCES `eye` (`id`)',
+<?php }?>
 <?php foreach ($element['foreign_keys'] as $foreign_key) {?>
 				'CONSTRAINT `<?php echo $foreign_key['name']?>` FOREIGN KEY (`<?php echo $foreign_key['field']?>`) REFERENCES `<?php echo $foreign_key['table']?>` (`id`)',
 <?php }?>

@@ -21,4 +21,16 @@ class DefaultController extends BaseEventTypeController
 	{
 		parent::actionPrint($id);
 	}
+
+	/**
+	* use the split event type javascript and styling
+	*
+	* @param CAction $action
+	* @return bool
+	*/
+	protected function beforeAction($action)
+	{
+		Yii::app()->assetManager->registerScriptFile('js/spliteventtype.js', null, null, AssetManager::OUTPUT_SCREEN);
+		return parent::beforeAction($action);
+	}
 }
