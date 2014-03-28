@@ -52,16 +52,17 @@
 							?>
 						</div>
 					</div>
-					<div class="inactive-form">
-						<div class="add-side">
-							<a href="#">
-								Add Right side <span class="icon-add-side"></span>
-							</a>
-						</div>
-					</div>
+				</div>
+			</div>
+			<div class="inactive-form">
+				<div class="add-side">
+					<a href="#">
+						Add Right side <span class="icon-add-side"></span>
+					</a>
 				</div>
 			</div>
 		</div>
+
 		<div class="element-eye left-eye right side column <?php echo '<?php'?> if (!$element->hasLeft()) { ?> inactive <?php echo '<?php } ?>'?>"
 				 data-side="left">
 			<div class="active-form">
@@ -79,17 +80,16 @@
 							?>
 						</div>
 					</div>
-					<div class="inactive-form">
-						<div class="add-side">
-							<a href="#">
-								Add Left side <span class="icon-add-side"></span>
-							</a>
-						</div>
-					</div>
+				</div>
+			</div>
+			<div class="inactive-form">
+				<div class="add-side">
+					<a href="#">
+						Add Left side <span class="icon-add-side"></span>
+					</a>
 				</div>
 			</div>
 		</div>
-	</div>
 		<?php } else { ?>
 	<div class="element-fields">
 		<?php
