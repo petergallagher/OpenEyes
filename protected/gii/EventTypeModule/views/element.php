@@ -20,6 +20,7 @@ sort($field_nums);
 		<?php if (isset($this->form_errors['elementShortName'.$element_num])) {?>
 			<span style="color: #f00;"><?php echo $this->form_errors['elementShortName'.$element_num]?></span>
 		<?php }?>
+		<input type="checkbox" name="isSplitElement<?php echo $element_num?>" value="1" <?php if (empty($_POST) || @$_POST['isSplitElement'.$element_num]) {?> checked="checked" <?php }?>/> Split Element Type<br/>
 		<div class="element_fields" style="margin-top: 2em;">
 			<?php foreach ($field_nums as $field_num) {
 				echo $this->renderPartial('element_field',array('element_num'=>$element_num,'field_num'=>$field_num));

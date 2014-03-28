@@ -26,6 +26,70 @@
 	<header class="element-header">
 		<h3 class="element-title"><?php echo '<?php'?> echo $element->elementType->name; <?php echo '?>'?></h3>
 	</header>
+
+	<?php
+
+
+	if(isset($element) && $element['split_element']) {
+		?>
+	<div class="element-fields element-eyes row">
+		<?php // echo $form->hiddenInput($element, 'eye_id', false, array('class' => 'sideField')); ?>
+		<div class="element-eye right-eye left side column <?php echo '<?php'?> if (!$element->hasRight()) { ?> inactive <?php echo '<?php } ?>'?>"
+				 data-side="right">
+			<div class="active-form">
+				<a href="#" class="icon-remove-side remove-side">Remove side</a>
+				<div class="element-fields">
+					<div class="row">
+						<div class="large-12 column">
+							<?php
+							if (isset($element)) {
+								foreach ($element['fields'] as $field) {
+									$field['name'] = $field['name'].'_right';
+									echo "\t".$this->getHTMLField($field,'create')."\n";
+								}
+							}
+							?>
+						</div>
+					</div>
+					<div class="inactive-form">
+						<div class="add-side">
+							<a href="#">
+								Add Right side <span class="icon-add-side"></span>
+							</a>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="element-eye right-eye left side column <?php echo '<?php'?> if (!$element->hasLeft()) { ?> inactive <?php echo '<?php } ?>'?>"
+				 data-side="right">
+			<div class="active-form">
+				<a href="#" class="icon-remove-side remove-side">Remove side</a>
+				<div class="element-fields">
+					<div class="row">
+						<div class="large-12 column">
+							<?php
+							if (isset($element)) {
+								foreach ($element['fields'] as $field) {
+									$field['name'] = $field['name'].'_left';
+									echo "\t".$this->getHTMLField($field,'create')."\n";
+								}
+							}
+							?>
+						</div>
+					</div>
+					<div class="inactive-form">
+						<div class="add-side">
+							<a href="#">
+								Add Left side <span class="icon-add-side"></span>
+							</a>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+		<?php } else { ?>
 	<div class="element-fields">
 		<?php
 			if (isset($element)) {
@@ -35,4 +99,6 @@
 			}
 		?>
 	</div>
+	<?php }?>
+
 </section>
