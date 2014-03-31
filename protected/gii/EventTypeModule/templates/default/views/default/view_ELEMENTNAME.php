@@ -22,6 +22,37 @@
 	<header class="element-header">
 		<h3 class="element-title"><?php echo '<?php'?> echo $element->elementType->name<?php echo '?>'?></h3>
 	</header>
+
+	<?php if(isset($element) && $element['split_element']) { ?>
+		<div class="element-data element-eyes row">
+			<div class="element-eye right-eye column">
+<?php echo '<?php'?> if ($element->hasRight()) {<?php echo '?>'?>
+				<?php	if (isset($element)) {
+						foreach ($element['fields'] as $field) {
+							$field['name'] = $field['name'].'_left';
+							echo $this->getHTMLFieldView($field)."\n";
+						}
+				}
+				?>
+				<?php echo '<?php } else { ?>'?>
+					<div class="data-value">Not recorded</div>
+				<?php echo '<?php } ?>'?>
+			</div>
+			<div class="element-eye left-eye column">
+<?php echo '<?php'?> if ($element->hasLeft()) {<?php echo '?>'?>
+				<?php if (isset($element)) {
+						foreach ($element['fields'] as $field) {
+							$field['name'] = $field['name'].'_left';
+							echo $this->getHTMLFieldView($field)."\n";
+						}
+					}
+				?>
+				<?php echo '<?php } else { ?>'?>
+					<div class="data-value">Not recorded</div>
+				<?php echo '<?php } ?>'?>
+			</div>
+		</div>
+	<?php } else { ?>
 	<div class="element-data">
 		<?php
 		if (isset($element)) {
@@ -30,5 +61,6 @@
 			}
 		}
 		?>
+		<?php } ?>
 	</div>
 </section>
