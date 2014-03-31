@@ -57,10 +57,10 @@ echo "import test sql - delete/create db"
 vagrant ssh -c '/usr/bin/mysql -u openeyes -poe_test openeyes -e "drop database openeyes; create database openeyes;";'
 echo "import test sql - import testdata.sql"
 vagrant ssh -c '/usr/bin/mysql -u openeyes -poe_test openeyes < /var/www/features/testdata.sql;'
-vagrant ssh -c 'cd /var/www;  echo "running cleanup addresses"; /var/www/protected/yiic cleanupaddresses';
+#vagrant ssh -c 'cd /var/www;  echo "running cleanup addresses"; /var/www/protected/yiic cleanupaddresses';
 echo "run migrations"
-vagrant ssh -c 'cd /var/www;  echo "running oe-migrate"; /var/www/protected/yiic migrate --interactive=0; \
-/var/www/protected/yiic migratemodules --interactive=0;exit;'
+vagrant ssh -c 'cd /var/www;  echo "running oe-migrate"; /var/www/protected/yiic migrate --interactive=0 --testdata; \
+/var/www/protected/yiic migratemodules --interactive=0 --testdata;exit;'
 
 #echo "generate sessions for Operation Booking"
 #vagrant ssh -c 'cd /var/www; /var/www/protected/yiic generatesessions;exit;'

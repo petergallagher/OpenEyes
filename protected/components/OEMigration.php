@@ -17,9 +17,14 @@
  * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
  */
 
+
 class OEMigration extends CDbMigration
 {
 	private $migrationPath;
+	private $testdata;
+	private $csvFiles;
+	private $insertsMap = array();
+	private $verbose = true;
 
 	/**
 	 * Executes a SQL statement.
@@ -30,10 +35,10 @@ class OEMigration extends CDbMigration
 	 */
 	public function execute($sql, $params=array(), $message = null) {
 		$message = ($message) ? $message : strtok($sql, "\n").'...';
-		echo "		> execute SQL: $message ...";
+		$this->migrationEcho("		> execute SQL: $message ...");
 		$time=microtime(true);
 		$this->getDbConnection()->createCommand($sql)->execute($params);
-		echo " done (time: ".sprintf('%.3f', microtime(true)-$time)."s)\n";
+		$this->migrationEcho(" done (time: ".sprintf('%.3f', microtime(true)-$time)."s)\n");
 	}
 
 	/**
@@ -55,14 +60,14 @@ class OEMigration extends CDbMigration
 			// Database has existing migrations, so check that last migration step to be consolidated was applied
 			if(count($existing_migrations) == count($consolidated_migrations)) {
 				// All previous migrations were applied, safe to consolidate
-				echo "Consolidating old migration data...";
+				$this->migrationEcho("Consolidating old migration data...");
 				$deleted = $this->getDbConnection()->createCommand()
 					->delete('tbl_migration', array('in', 'version', $consolidated_migrations));
-				echo "removed $deleted rows\n";
+				$this->migrationEcho("removed $deleted rows\n");
 			} else {
 				// Database is not migrated up to the consolidation point, cannot migrate
-				echo "In order to run this migration, you must migrate have migrated up to at least ".end($consolidated_migrations)."\n";
-				echo "This requires a pre-consolidation version of the code\n";
+				$this->migrationEcho("In order to run this migration, you must migrate have migrated up to at least ".end($consolidated_migrations)."\n");
+				$this->migrationEcho("This requires a pre-consolidation version of the code\n");
 				throw new CException('Previous migrations missing or incomplete, migration not possible');
 			}
 		}
@@ -80,9 +85,23 @@ class OEMigration extends CDbMigration
 			$data_directory = get_class($this);
 		}
 		$data_path = $migrations_path . '/data/' . $data_directory . '/';
-		foreach (glob($data_path . "*.csv") as $file_path) {
+		$this->csvFiles  = glob($data_path . "*.csv");
+
+		if($this->testdata){
+			//echo "\nRunning test data import\n";
+			$testdata_path = $migrations_path . '/testdata/' . $data_directory . '/';
+			$testdataCsvFiles = glob($testdata_path . "*.csv");
+			//echo "\nCSV FIles: " . var_export($this->csvFiles,true);
+			//echo "\nCSV TEST FIles: " . var_export($testdataCsvFiles,true);
+			$this->csvFiles = array_udiff($this->csvFiles, $testdataCsvFiles, 'self::compare_file_basenames');
+			//echo "\nCSVFIles after diff : " . var_export($csvFiles,true);
+			$this->csvFiles = array_merge_recursive($this->csvFiles , $testdataCsvFiles );
+			//echo "\nIMPORTING CSVFIles in testdatamode : " . var_export($this->csvFiles,true);
+		}
+
+		foreach ($this->csvFiles as $file_path) {
 			$table = substr(substr(basename($file_path), 0, -4), 3);
-			echo "Importing $table data...\n";
+			$this->migrationEcho("Importing $table data...\n");
 			$fh = fopen($file_path, 'r');
 			$columns = fgetcsv($fh);
 			$lookup_columns = array();
@@ -130,14 +149,18 @@ class OEMigration extends CDbMigration
 						$this->update($table, $data, $update_pk . '= :pk', array(':pk' => $pk));
 					} else {
 						$this->insert($table, $data);
+						$this->insertsMap[$table][$row_count] = $this->getInsertId($table, $data);
 					}
 				} else {
 					$this->insert($table, $data);
+					$this->insertsMap[$table][$row_count] = $this->getInsertId($table, $data);
 				}
 			}
 			fclose($fh);
-			echo "$row_count records, done.\n";
+			$this->migrationEcho("$row_count records, done.\n");
+
 		}
+		//$this->checkRelations();
 	}
 
 	public function exportData($migrationName, $tables)
@@ -173,6 +196,10 @@ class OEMigration extends CDbMigration
 			$path = 'application.migrations';
 		}
 		$this->migrationPath = $path;
+	}
+
+	public function setTestData($val){
+		$this->testdata = $val;
 	}
 
 	/**
@@ -249,6 +276,32 @@ class OEMigration extends CDbMigration
 	}
 
 	/**
+	 * Create a version table for the specified existing OE table
+	 *
+	 * @param string $base_name Base table name
+	 */
+	protected function versionExistingTable($base_name)
+	{
+		$res = $this->dbConnection->createCommand('show create table ' . $this->dbConnection->quoteTableName($base_name))->queryRow();
+		$sql = $res['Create Table'];
+		$start = strpos($sql, '(');
+		$end = strrpos($sql, ')');
+		$defs = explode("\n", trim(substr($sql, $start + 1, $end - $start - 1)));
+		foreach ($defs as $n => &$def) {
+			if (preg_match('/(?:PRIMARY|FOREIGN) KEY/', $def)) {
+				unset($defs[$n]);
+				continue;
+			}
+			$def = rtrim($def, ',');
+			$def = str_replace('AUTO_INCREMENT', '', $def);
+		}
+		$defs[] = 'version_date datetime not null';
+		$defs[] = 'version_id int unsigned not null auto_increment primary key';
+
+		$this->createTable("{$base_name}_version", $defs, 'engine=InnoDB charset=utf8 collate=utf8_unicode_ci');
+	}
+
+	/**
 	 * @description used within subclasses to find out the element_type id based on Class Name
 	 * @param $className - string
 	 * @return mixed - the value of the id. False is returned if there is no value.
@@ -289,7 +342,7 @@ class OEMigration extends CDbMigration
 			->where('class_name = :class_name', array(':class_name' => $eventTypeClass))
 			->queryScalar();
 		if($event_type_id) {
-			echo 'Updating event_type, event_type_name: ' . $eventTypeName . ' event_type_class: ' . $eventTypeClass . ' event_type_group: ' . $eventTypeGroup . "\n";
+			$this->migrationEcho( 'Updating event_type, event_type_name: ' . $eventTypeName . ' event_type_class: ' . $eventTypeClass . ' event_type_group: ' . $eventTypeGroup . "\n");
 			$this->update(
 				'event_type',
 				array(
@@ -300,7 +353,7 @@ class OEMigration extends CDbMigration
 				array(':event_type_id' => $event_type_id)
 			);
 		} else {
-			echo 'Inserting event_type, event_type_name: ' . $eventTypeName . ' event_type_class: ' . $eventTypeClass . ' event_type_group: ' . $eventTypeGroup . "\n";
+			$this->migrationEcho( 'Inserting event_type, event_type_name: ' . $eventTypeName . ' event_type_class: ' . $eventTypeClass . ' event_type_group: ' . $eventTypeGroup . "\n");
 			$this->insert(
 				'event_type',
 				array(
@@ -354,11 +407,12 @@ class OEMigration extends CDbMigration
 				)
 			);
 
-			echo 'Added element type, element_type_class: ' . $element_type_class .
+			$this->migrationEcho( 'Added element type, element_type_class: ' . $element_type_class .
 				' element type properties: ' . var_export(
 					$element_type_data,
 					true
-				) . ' event_type_id: ' . $event_type_id . " \n";
+				) . ' event_type_id: ' . $event_type_id . " \n"
+			);
 
 			// Insert element type id into element type array
 			$element_type_ids[] = $this->dbConnection->createCommand()
@@ -398,16 +452,17 @@ class OEMigration extends CDbMigration
 				$isFirst = false;
 			}
 			$this->delete($tableName, $fieldsList, $fieldsValArrayMap);
-			echo "\nDeleted  in table : $tableName. Fields : " . $fieldsList . ' value: ' . var_export(
+			$this->migrationEcho( "\nDeleted  in table : $tableName. Fields : " . $fieldsList . ' value: ' . var_export(
 					$fieldsValArrayMap,
 					true
-				) . "\n";
+				) . "\n"
+			);
 		}
 	}
 
 	public function createArchiveTable($table)
 	{
-		echo "Creating archive table for $table->name ...\n";
+		$this->migrationEcho( "Creating archive table for $table->name ...\n");
 
 		$a = Yii::app()->db->createCommand("show create table $table->name;")->queryRow();
 
@@ -462,5 +517,99 @@ class OEMigration extends CDbMigration
 		$this->addColumn("{$table->name}_version","version_id","int(10) unsigned NOT NULL");
 		$this->addPrimaryKey("version_id","{$table->name}_version","version_id");
 		$this->alterColumn("{$table->name}_version","version_id","int(10) unsigned NOT NULL AUTO_INCREMENT");
+	}
+
+	private function compare_file_basenames($a,$b){
+		$afile = basename($a);
+		$bfile = basename($b);
+ 		if($afile == $bfile ){
+			return 0;
+		}
+		else if($afile > $bfile){
+			return 1;
+		}
+		return -1;
+	}
+
+	/**
+	 * @description - return csvFiles array of files that will be imported
+	 * @return null|array
+	 */
+	public function getCsvFiles(){
+		return $this->csvFiles? $this->csvFiles : null;
+	}
+
+	public function getInsertId($table){
+		$tableExists = $this->dbConnection->getSchema()->getTable($table);
+		if(!$tableExists)
+			throw new OEMigrationException('Table ' . $table . ' does not exist');
+		$hasId = $this->dbConnection->createCommand('SHOW COLUMNS FROM ' . $table .  ' LIKE \'id\'')->execute();
+		if(!$hasId)
+			return null;
+		return $this->dbConnection->getLastInsertID($table);
+	}
+
+	public function getInsertReferentialObjectValue($object_type, $pointer){
+		if(isset($this->insertsMap[$object_type][$pointer]) )
+			 return $this->insertsMap[$object_type][$pointer];
+
+		return null;
+	}
+
+	private function migrationEcho($msg){
+		if($this->verbose){
+			echo $msg;
+		}
+	}
+
+	private function checkRelations(){
+		$cFileHelper = new CFileHelper();
+		$models = $cFileHelper->findFiles( Yii::getPathOfAlias('application.models'), array('fileTypes' => array('php')) );
+		foreach($models as $model){
+			$modelName = substr($model,strrpos($model, DIRECTORY_SEPARATOR)+1);
+			$modelName = substr($modelName , 0, strpos($modelName, '.php'));
+
+			if(strpos($modelName , 'Base' ) === 0 || !method_exists($modelName, 'model')){
+				echo "\nSkipping $modelName as not Contains base or has not model method";
+				continue;
+			}
+
+			try{
+				$thisModel = $modelName::model();
+				if(!$thisModel instanceof CActiveRecord){
+					echo "\nSkipping $modelName as not CactiveRecord";
+					continue;
+				}
+
+			}
+			catch(CdbException $e){
+				echo "\n skipping : " . $modelName;
+				continue;
+			}
+			catch(Exception $e){
+				echo "\nSomething wrong happened: " . $modelName . " Code: " . $e->getCode()
+					. " Message: " . $e->getMessage() . " Trace: " . $e->getTraceAsString();
+			}
+
+			$rels = $thisModel->relations();
+			$this->migrationEcho("\nChecking Model name : " . $modelName . " rels: " . var_export($rels, true));
+			foreach($rels as $rel => $relProps){
+				if($relProps[0] == 'CBelongsToRelation'){
+					foreach($thisModel->findAll() as $thisRecords){
+						$findBelongs = $thisModel->with($rel)->findByPk($thisRecords->id);
+						if(count($findBelongs) > 0 ){
+							echo "\n$modelName Relation $rel found, tot:" . count($findBelongs);
+						}
+						else{
+							echo "\n$modelName belong Relation $rel  missing \n\n";
+						}
+					}
+				}
+			}
+		}
+	}
+
+	public function setVerbose($verbose = true){
+		$this->verbose = $verbose;
 	}
 }

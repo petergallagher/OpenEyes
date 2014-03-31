@@ -1,5 +1,4 @@
 <?php
-
 /**
  * OpenEyes
  *
@@ -65,8 +64,6 @@ class BaseActiveRecordTest extends CDbTestCase
 	 */
 	public function testBehaviors()
 	{
-
-
 		Yii::app()->params['audit_trail'] = true;
 
 		$result = $this->model->behaviors();
@@ -79,7 +76,6 @@ class BaseActiveRecordTest extends CDbTestCase
 	 */
 	public function testSave()
 	{
-
 		//using allergy model to test the active record
 
 		$testmodel = new Allergy;
@@ -99,7 +95,6 @@ class BaseActiveRecordTest extends CDbTestCase
 	 */
 	public function testNHSDate()
 	{
-
 		$this->model->last_modified_date = '1902-01-01 00:00:00';
 		$result = $this->model->NHSDate('last_modified_date', $empty_string = '-');
 
@@ -114,7 +109,6 @@ class BaseActiveRecordTest extends CDbTestCase
 	 */
 	public function testNHSDateAsHTML()
 	{
-
 		$this->model->last_modified_date = '1902-01-01 00:00:00';
 		$result = $this->model->NHSDateAsHTML('last_modified_date', $empty_string = '-');
 
@@ -131,5 +125,4 @@ class BaseActiveRecordTest extends CDbTestCase
 	{
 		$this->markTestSkipped('this has been already implemented in the audittest model');
 	}
-
 }

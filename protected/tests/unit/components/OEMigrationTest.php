@@ -17,7 +17,6 @@
  * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
  */
 
-//Currently failing as BaseElement doesn't have a db table. Suspect that this file needs replacing
 class OEMigrationTest extends CDbTestCase
 {
 	protected $oeMigration;
@@ -26,11 +25,14 @@ class OEMigrationTest extends CDbTestCase
 
 	public $fixtures = array(
 		'event_type' => 'EventType',
+		'patient' => 'Patient',
+		'disorder' => 'Disorder'
 	);
 
 	public function setUp(){
 		parent::setUp();
 		$this->oeMigration = new OEMigration();
+		$this->oeMigration->setVerbose(false);
 		$this->fixturePath = Yii::getPathOfAlias( 'application.tests.fixtures' );
 	}
 
@@ -52,6 +54,34 @@ class OEMigrationTest extends CDbTestCase
 		EventType::model()->deleteAll('id >= 1000');
 
 		Yii::app()->params['enable_transactions'] = $transactions;
+	}
+
+	/**
+	 * @depends testInitialiseData
+	 */
+	public function testInitialiseDataTestdata(){
+		$eventTypeResultSet = EventType::model()->findAll('id >= 1000');
+
+		Yii::app()->db->createCommand("delete from episode_summary")->query();
+		Yii::app()->db->createCommand("delete from episode_summary_item")->query();
+		Yii::app()->db->createCommand("delete from event_type where id >= 1009")->query();
+
+		$this->oeMigration->setTestData(true);
+
+		$this->assertNull($this->oeMigration->getCsvFiles());
+
+		$this->oeMigration->initialiseData($this->fixturePath,	null, 'oeMigrationData');
+		$this->compareFixtureWithResultSet($this->event_type, $eventTypeResultSet);
+
+		EventType::model()->deleteAll('id >= 1000');
+		$this->assertGreaterThan(0, $this->oeMigration->getCsvFiles());
+
+		$expectedCsvArrayInTestMode = array(
+			$this->fixturePath . DIRECTORY_SEPARATOR . 'testdata' . DIRECTORY_SEPARATOR . 'oeMigrationData' . DIRECTORY_SEPARATOR . '01_episode.csv',
+			$this->fixturePath . DIRECTORY_SEPARATOR . 'testdata' . DIRECTORY_SEPARATOR . 'oeMigrationData' . DIRECTORY_SEPARATOR . '01_event_type.csv',
+			$this->fixturePath . DIRECTORY_SEPARATOR . 'testdata' . DIRECTORY_SEPARATOR . 'oeMigrationData' . DIRECTORY_SEPARATOR . '01_user.csv'
+		);
+		$this->assertEquals($expectedCsvArrayInTestMode , $this->oeMigration->getCsvFiles());
 	}
 
 	public function testGetMigrationPath(){
@@ -97,6 +127,44 @@ class OEMigrationTest extends CDbTestCase
 			$this->assertGreaterThan(0 , strlen($tableName ));
 			$this->assertInternalType('int' , $tableTotalRows );
 		}
+	}
+
+	public function testGetInsertId(){
+		$insertRow = array('name' => 'TestEventType' , 'event_group_id' => '5', 'class_name' => 'OphTrTestclass' , 'support_services' => '0');
+		$this->oeMigration->insert('event_type' , $insertRow);
+		$insertId = $this->oeMigration->getInsertId('event_type' );
+		$this->assertGreaterThan(0, $insertId);
+		$this->assertEquals(1011, $insertId);
+	}
+
+	/**
+	 *  @expectedException OEMigrationException
+	 * @expectedExceptionMessage Table banzai does not exist
+	 */
+	public function testGetInsertIdUnknownTableThrowsException(){
+		$insertId = $this->oeMigration->getInsertId('banzai' );
+	}
+
+	public function testGetInsertIdWhenNoinsertReturnsZero(){
+		$insertId = $this->oeMigration->getInsertId('audit_ipaddr' );
+		$this->assertEquals(0,$insertId);
+	}
+
+	public function testGetInsertIdNoIdColumnInTable(){
+		$insertId = $this->oeMigration->getInsertId('authassignment' );
+		$this->assertNull($insertId);
+	}
+
+	/**
+	 * @depends testInitialiseData
+	 * @depends testGetInsertId
+	 */
+	public function testGetInsertReferentialObjectValue(){
+		Yii::app()->db->createCommand("delete from event_type where id >= 1009")->query();
+		$this->oeMigration->setTestData(true);
+		$this->oeMigration->initialiseData($this->fixturePath,	null, 'oeMigrationData');
+		$episode_id = $this->oeMigration->getInsertReferentialObjectValue('episode', 1);
+		$this->assertGreaterThan(0, (int) $episode_id);
 	}
 
 	/**

@@ -222,116 +222,93 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 		return new OECommandBuilder($this->getDbConnection()->getSchema());
 	}
 
-	public function updateByPk($pk,$attributes,$condition='',$params=array())
+	public function updateByPk($pk, $attributes, $condition='', $params=array())
 	{
-		if (Yii::app()->params['enable_transactions']) {
-			if (!$transaction = Yii::app()->db->getCurrentTransaction()) {
-				throw new Exception("updateByPk() called without a transaction");
-			}
+		$transaction = $this->dbConnection->beginInternalTransaction();
+		$transaction->addTable($this->tableName());
 
-			$transaction->addTable($this->tableName());
+		try {
+			$this->versionToTable($this->commandBuilder->createPkCriteria($this->tableName(), $pk, $condition, $params));
+			$result = parent::updateByPk($pk, $attributes, $condition, $params);
+			$transaction->commit();
+			return $result;
+		} catch (Exception $e) {
+			$transaction->rollback();
+			throw $e;
 		}
-
-		if (!$this->enable_version || $this->versionToTableByPk($pk, $condition, $params)) {
-			return parent::updateByPk($pk,$attributes,$condition,$params);
-		}
-
-		throw new Exception("versionToTableByPk() failed");
 	}
 
 	public function updateAll($attributes,$condition='',$params=array())
 	{
-		if (Yii::app()->params['enable_transactions']) {
-			if (!$transaction = Yii::app()->db->getCurrentTransaction()) {
-				throw new Exception("updateAll() called without a transaction");
-			}
+		$transaction = $this->dbConnection->beginInternalTransaction();
+		$transaction->addTable($this->tableName());
 
-			$transaction->addTable($this->tableName());
+		try {
+			$this->versionToTable($this->commandBuilder->createCriteria($condition, $params));
+			$result = parent::updateAll($attributes,$condition,$params);
+			$transaction->commit();
+			return $result;
+		} catch (Exception $e) {
+			$transaction->rollback();
+			throw $e;
 		}
-
-		if (!$this->enable_version || $this->versionAllToTable($condition, $params)) {
-			return parent::updateAll($attributes,$condition,$params);
-		}
-
-		throw new Exception("versionAllToTable() failed");
 	}
 
 	public function deleteByPk($pk,$condition='',$params=array())
 	{
-		if (Yii::app()->params['enable_transactions']) {
-			if (!$transaction = Yii::app()->db->getCurrentTransaction()) {
-				throw new Exception("deleteByPk() called without a transaction");
-			}
+		$transaction = $this->dbConnection->beginInternalTransaction();
+		$transaction->addTable($this->tableName());
 
-			$transaction->addTable($this->tableName());
+		try {
+			$this->versionToTable($this->commandBuilder->createPkCriteria($this->tableName(), $pk, $condition, $params));
+			$result = parent::deleteByPk($pk, $condition, $params);
+			$transaction->commit();
+			return $result;
+		} catch (Exception $e) {
+			$transaction->rollback();
+			throw $e;
 		}
-
-		return parent::deleteByPk($pk,$condition,$params);
 	}
 
 	public function deleteAll($condition='',$params=array())
 	{
-		if (Yii::app()->params['enable_transactions']) {
-			if (!$transaction = Yii::app()->db->getCurrentTransaction()) {
-				throw new Exception("deleteAll() called without a transaction");
-			}
+		$transaction = $this->dbConnection->beginInternalTransaction();
+		$transaction->addTable($this->tableName());
 
-			$transaction->addTable($this->tableName());
+		try {
+			$this->versionToTable($this->commandBuilder->createCriteria($condition, $params));
+			$result = parent::deleteAll($condition, $params);
+			$transaction->commit();
+			return $result;
+		} catch (Exception $e) {
+			$transaction->rollback();
+			throw $e;
 		}
-
-		return parent::deleteAll($condition,$params);
 	}
 
-	public function deleteAllByAttributes($attributes,$condition='',$params=array())
+	public function deleteAllByAttributes($attributes, $condition = '', $params = array())
 	{
-		if (Yii::app()->params['enable_transactions']) {
-			if (!$transaction = Yii::app()->db->getCurrentTransaction()) {
-				throw new Exception("deleteAllByAttributes() called without a transaction");
-			}
+		$transaction = $this->dbConnection->beginInternalTransaction();
+		$transaction->addTable($this->tableName());
 
-			$transaction->addTable($this->tableName());
+		try {
+			$this->versionToTable($this->commandBuilder->createColumnCriteria($this->tableName(), $attributes, $condition, $params));
+			$result = parent::deleteAllByAttributes($attributes, $condition, $params);
+			$transaction->commit();
+			return $result;
+		} catch (Exception $e) {
+			$transaction->rollback();
+			throw $e;
 		}
-
-		return parent::deleteAllByAttributes($attributes,$condition,$params);
 	}
 
-	private function versionToTableByPk($pk, $condition='', $params=array())
+	protected function versionToTable(CDbCriteria $criteria)
 	{
-		$builder = $this->getCommandBuilder();
-		$table = $this->getTableSchema();
-		$table_version = $this->getVersionTableSchema();
-
-		$criteria = $builder->createPkCriteria($table,$pk,$condition,$params);
-
-		$command = $builder->createInsertFromTableCommand($table_version,$table,$criteria);
-
-		return $command->execute();
-	}
-
-	private function versionAllToTable($condition, $params=array())
-	{
-		$builder = $this->getCommandBuilder();
-		$table = $this->getTableSchema();
-		$table_version = $this->getVersionTableSchema();
-
-		$criteria = $builder->createCriteria($condition, $params);
-
-		$command = $builder->createInsertFromTableCommand($table_version,$table,$criteria);
-
-		return $command->execute();
-	}
-
-	private function versionAllToTableByAttributes($attributes, $condition, $params=array())
-	{
-		$builder = $this->getCommandBuilder();
-		$table = $this->getTableSchema();
-		$table_version = $this->getVersionTableSchema();
-
-		$criteria = $builder->createColumnCriteria($table,$attributes,$condition,$params);
-
-		$command = $builder->createInsertFromTableCommand($table_version,$table,$criteria);
-
-		return $command->execute();
+		if ($this->enable_version) {
+			$this->getCommandBuilder()->createInsertFromTableCommand(
+				$this->getVersionTableSchema(), $this->getTableSchema(), $criteria
+			)->execute();
+		}
 	}
 
 	public function save($runValidation=true, $attributes=null, $allow_overriding=false)

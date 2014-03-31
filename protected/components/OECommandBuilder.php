@@ -32,7 +32,7 @@ class OECommandBuilder extends CDbCommandBuilder
 			}
 		}
 
-		$sql="INSERT INTO {$table_version->rawName} (`".implode("`,`",$columns)."`,`version_date`,`version_id`,`deleted_transaction_id`) SELECT `".implode("`,`",$columns)."`, :oevalue1, :oevalue2, :oevalue3 FROM {$table->rawName}";
+		$sql="INSERT INTO {$table_version->rawName} (`".implode("`,`",$columns)."`,`version_date`,`version_id`,`deleted_transaction_id`) SELECT `".implode("`,`",$columns)."`, ".$this->dbConnection->quoteValue(date('Y-m-d H:i:s')).", NULL, :deleted_transaction_id FROM {$table->rawName}";
 
 		$sql=$this->applyJoin($sql,$criteria->join);
 		$sql=$this->applyCondition($sql,$criteria->condition);
@@ -41,9 +41,7 @@ class OECommandBuilder extends CDbCommandBuilder
 
 		$command=$this->getDbConnection()->createCommand($sql);
 
-		$command->bindValue(':oevalue1',date('Y-m-d H:i:s'));
-		$command->bindValue(':oevalue2',null);
-		$command->bindValue(':oevalue3',$deleted_transaction_id);
+		$command->bindValue(':deleted_transaction_id',$deleted_transaction_id);
 
 		$this->bindValues($command,$criteria->params);
 
@@ -90,4 +88,6 @@ class OECommandBuilder extends CDbCommandBuilder
 		$this->bindValues($command,$criteria->params);
 		return $command;
 	}
+=======
+>>>>>>> develop
 }

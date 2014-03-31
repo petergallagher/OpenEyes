@@ -1,51 +1,152 @@
-h1, h2, h3, h4, h5, h6  {
-	font-weight: 500;
-}
-pre {
-	font-size: .8em;
-	margin: 1em 0 1.5em 0;
-	width: 99%;
-}
-pre.prettyprint {
-	border-color: #ddd;
-	padding: 2px 5px;
-}
-code {
-	font-size: 12px;
-	color: #555;
-}
-hr {
-	margin-top: .5em;
-}
-
-.container.main {
-	margin-top: 1em;
-}
-.box.event {
-	border: 0;
-}
-.example {
-	padding: 10px;
-	border: 1px solid #ddd;
-	border-radius: 5px;
-	margin: 0 0 1em 0;
-}
-.example > header:first-child {
+.ui-dialog .prettyprint {
+	font-size: .8rem;
 	margin-bottom: 1em;
 }
-.view-markup {
-	font-size: 13px;
+.ui-dialog .prettyprint:last-child {
+	margin-bottom: 0;
 }
-
+.view-markup {
+	font-size: .8rem;
+}
+pre.prettyprint {
+	border-color: #bbb;
+}
 .side-nav {
 	margin: 0;
 	padding: 0;
 }
-.side-nav li a {
-	display: inline-block;
+.side-nav ul {
+	margin-top: 6px;
 }
-.side-nav li > ul {
-	margin-top: .5em;
+.side-nav li:last-child {
+	margin: 0;
+}
+
+/* Styleguide sections */
+.container.main.section-tooltips .kss-mod-markup {
+	min-height: 40px;
+}
+.container.main.section-tooltips .tooltip {
+	display: block;
+}
+.container.main.section-quicklook .kss-mod-markup {
+	min-height: 110px;
+}
+.container.main.section-quicklook .quicklook {
+	display: block;
+	position: static;
+}
+.container.main.section-quicklook .quicklook.warning {
+	width: 200px;
+}
+.container.main.section-toggler .toggle-trigger {
+	position: static;
+}
+.container.main.section-panels .panel.specialty {
+	width: 200px;
+}
+.container.main.section-panels .kss-mod-markup > .panel.episode {
+	width: 200px;
+}
+.container.main.section-panels .panel.login {
+	margin-top: 0;
+}
+.container.main.section-panels .panel.error {
+	margin-top: 0;
+}
+
+/* Styleguide */
+
+.kss-footer {
+	background-image: none
+}
+.kss-box {
+	background: #fff;
+	border-radius: 5px;
+	margin: 0 0 1em 0;
+	padding: 1em;
+}
+.kss-box > *:last-child {
+	margin: 0;
+}
+.kss-title {
+	margin-top: 0
+}
+.kss-sub-head {
+	font-size: 1.1em;
+}
+.kss-overview h1,
+.kss-overview h2,
+.kss-overview h3,
+.kss-overview h4,
+.kss-overview h5,
+.kss-overview h6 {
+	font-weight: bold;
+	border-bottom: 1px solid #ccc
+}
+.kss-overview li p {
+	margin: 0;
+	font-size: 1em;
+}
+.kss-overview pre {
+	margin: 1em 0;
+}
+.kss-mod-list {
+	background: #fff;
+	margin-bottom: 1em;
+}
+.kss-mod-description {
+	padding-top: 5px;
+}
+.kss-mod {
+	border: solid 1px #eee;
+	padding: 0 5px 10px 5px;
+	margin-bottom: 1em;
+}
+.kss-mod-name span {
+	background: #eee;
+	border-bottom-left-radius: 5px;
+	border-bottom-right-radius: 5px;
+	border: 1px solid #eee;
+	display: inline-block;
+	font-size: .9em;
+	padding: 5px;
+}
+.kss-mod-overview {
+	padding: 0 0 10px 0
+}
+.kss-mod-overview p {
+	margin: 0;
+	font-style: italic;
+	color: #666;
+}
+.kss-markup {
+	background: #fff;
+	font-size: .95em;
+}
+.kss-depth-1>h1 {
+	font-size: 2.375em
+}
+.kss-depth-2>h1 {
+	font-size: 2.25em
+}
+.kss-depth-3>h1 {
+	font-size: 2.125em
+}
+.kss-depth-4>h1 {
+	font-size: 2em
+}
+.kss-depth-5>h1 {
+	font-size: 1.875em
+}
+.kss-depth-6>h1 {
+	font-size: 1.75em
+}
+.kss-mod-markup {
+	overflow: hidden;
+}
+.kss-mod-markup > *:last-child {
+	margin-bottom: 0;
 }
 
 /** JSDoc Styles */
@@ -71,4 +172,14 @@ hr {
 .jsdoc .sub-tutorials-list li {
 	margin-left: 0;
 	margin-right: 1em;
+}
+
+/* Code styles */
+
+ pre {
+	font-size: 13px;
+	tab-size: 4;
+	background-color: #f8f8f8;
+	border-radius: 3px;
+	padding: 0 5px;
 }

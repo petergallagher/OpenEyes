@@ -27,6 +27,7 @@ $config = array(
 			'connectionString' => "mysql:host=$host;port=$port;dbname=openeyes",
 			'username' => 'openeyes',
 			'password' => 'oe_test',
+			'enableParamLogging' => true
 		),
 		'session' => array(
 			'timeout' => 86400
@@ -93,7 +94,6 @@ $config = array(
 		//'ldap_password' => '',
 		//'ldap_dn' => 'CN=Users,dc=example,dc=com',
 		'environment' => 'dev',
-		//'audit_trail' => false,
 		'watermark' => '',
 		'watermark_admin' => '',
 		//'watermark_description' => '',
