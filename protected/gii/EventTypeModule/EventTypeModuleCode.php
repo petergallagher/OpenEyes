@@ -181,6 +181,7 @@ class EventTypeModuleCode extends BaseModuleCode // CCodeModel
 				}
 			}
 		}
+		$this->files[]=new CCodeFile($this->modulePath.'\template.gii', json_encode($_POST));
 	}
 
 	function changeAllInstancesOfString($path, $from, $to)
