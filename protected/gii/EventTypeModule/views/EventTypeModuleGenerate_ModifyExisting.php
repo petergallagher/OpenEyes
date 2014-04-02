@@ -1,6 +1,13 @@
 		<?php if ($this->target_class) {?>
 			<input type="hidden" id="target_event_class" value="<?php echo $this->target_class?>" />
 		<?php }?>
+		<h3>Upload a Template</h3>
+		<div class="row">
+		<?php
+		$model = new GiiTemplate();
+		echo CHtml::activeFileField($model, 'template'); ?>
+		<input type="submit" value="Upload File">
+		</div>
 		<h3>Select an event type:</h3>
 		<select class="EventTypeModuleEventType" name="EventTypeModuleEventType">
 			<option value="">- Please select -</option>
@@ -27,11 +34,9 @@
 					}
 					?>
 				</div>
-
 				<input type="submit" class="add_element" name="add" value="add element" />
 				<input type="submit" class="add_field"name="add_field" value="add field to element" /><br/>
 				<br/>
-
 				<div class="tooltip">
 					The name should only contain word characters and spaces.	The generated module class will be named based on the specialty, event group, and name of the event type.  EG: 'Ophthalmology', 'Treatment', and 'Operation note' will take the short codes for the specialty and event group to create <code>OphTrOperationnote</code>.
 				</div>

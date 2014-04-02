@@ -12,7 +12,7 @@ closedir($dh);
 
 <p>This generator helps you to generate the skeleton code needed by an OpenEyes event type module.</p>
 
-<?php $form=$this->beginWidget('BaseGiiEventTypeCActiveForm', array('model'=>$model)); ?>
+<?php $form=$this->beginWidget('BaseGiiEventTypeCActiveForm', array('model'=>$model, 'htmlOptions'=>array('enctype' => 'multipart/form-data'))); ?>
 	<input type="radio" id="EventTypeModuleModeRadioGenerateNew" class="EventTypeModuleMode" name="EventTypeModuleMode" value="0"<?php if (empty($_POST) || @$_POST['EventTypeModuleMode'] == 0) {?> checked="checked"<?php }?> /> Generate new&nbsp;&nbsp;
 	<input type="radio" id="EventTypeModuleModeRadioModifyExisting" class="EventTypeModuleMode" name="EventTypeModuleMode" value="1"<?php if (@$_POST['EventTypeModuleMode'] == 1) {?> checked="checked"<?php }?> /> Modify existing
 	<input type="hidden" id="has_errors" value="<?php echo empty($this->form_errors) ? '0' : '1'?>" />

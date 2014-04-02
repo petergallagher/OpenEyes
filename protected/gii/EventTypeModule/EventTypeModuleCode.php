@@ -181,6 +181,7 @@ class EventTypeModuleCode extends BaseModuleCode // CCodeModel
 				}
 			}
 		}
+		$this->files[]=new CCodeFile($this->modulePath.'\template.gii', json_encode($_POST));
 	}
 
 	function changeAllInstancesOfString($path, $from, $to)
@@ -256,6 +257,8 @@ class EventTypeModuleCode extends BaseModuleCode // CCodeModel
 				$elements[$number]['mapping_tables'] = array();
 				$elements[$number]['defaults_methods'] = array();
 				$elements[$number]['after_save'] = array();
+
+				$elements[$number]['split_element']= isset($_POST['isSplitElement'.$number]);
 
 				$elements[$number] = $this->generateKeyNames($elements[$number],array('lmui','cui','ev'));
 

@@ -63,7 +63,8 @@ if (isset($element)) {
 } }?>
  */
 
-class <?php if (isset($element)) echo $element['class_name']; ?> extends BaseEventTypeElement
+class <?php if (isset($element)) echo $element['class_name']; ?>  extends <?php if (isset($element) && $element['split_element']){?> SplitEventTypeElement<?php } else { ?> BaseEventTypeElement<?php }?>
+
 {
 	public $service;
 
@@ -89,6 +90,17 @@ class <?php if (isset($element)) echo $element['class_name']; ?> extends BaseEve
 	 */
 	public function rules()
 	{
+<?php if (isset($element) && $element['split_element']){
+	$splitElementFields = array();
+	foreach($element['fields'] as $elementField){
+		$originalFieldName = $elementField['name'];
+		$elementField['name']=$originalFieldName.'_left';
+		$splitElementFields[] = $elementField;
+		$elementField['name']=$originalFieldName.'_right';
+		$splitElementFields[] = $elementField;
+	}
+	$element['fields']=$splitElementFields;
+}?>
 		return array(
 			array('event_id, <?php if (isset($element)) { foreach ($element['fields'] as $field) { if ($field['type'] != 'Multi select') echo $field['name'] . ", "; if ($field['type'] == 'EyeDraw' && @$field['extra_report']) { echo $field['name'].'2, '; } } } ?>', 'safe'),
 			array('<?php if (isset($element)) { foreach ($element['fields'] as $field) { if ($field['required'] && $field['type'] != 'Multi select') { echo $field['name'] . ", "; } } } ?>', 'required'),
@@ -140,6 +152,9 @@ class <?php if (isset($element)) echo $element['class_name']; ?> extends BaseEve
 			'usermodified' => array(self::BELONGS_TO, 'User', 'last_modified_user_id'),
 <?php if (isset($element)) foreach ($element['relations'] as $relation) {?>
 			'<?php echo $relation['name']?>' => array(self::<?php echo $relation['type']?>, '<?php echo $relation['class']?>', '<?php echo $relation['field']?>'),
+<?php }?>
+<?php if (isset($element) && $element['split_element']){?>
+			'eye' => array(self::BELONGS_TO, 'Eye', 'eye_id'),
 <?php }?>
 		);
 	}
