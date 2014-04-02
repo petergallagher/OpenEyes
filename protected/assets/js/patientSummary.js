@@ -83,14 +83,14 @@ $(document).ready(function() {
 		$('#contactname').focus();
 	});
 
-	$('.patient-info .toggle-edit-patient-details').click(function(e) {
+	$('.patient-info .edit-patient-details').click(function(e) {
 		e.preventDefault();
 
 		if ($('.patient-info .view-mode').is(':visible')) {
 			resetPatientDetailsForm();
 
-			$('.patient-info .view-mode').hide();
-			$('.patient-info .edit-mode').show();
+			$('.patient-details .view-mode').hide();
+			$('.patient-details .edit-mode').show();
 
 			$(this).text('view');
 
@@ -151,6 +151,73 @@ $(document).ready(function() {
 	});
 
 	handleButton($('#btn-create-patient'));
+
+	$('.patient-info .edit-patient-contact-details').click(function(e) {
+		e.preventDefault();
+
+		if ($('.patient-contact-details .view-mode').is(':visible')) {
+			resetContactDetailsForm();
+
+			$('.patient-contact-details .view-mode').hide();
+			$('.patient-contact-details .edit-mode').show();
+
+			$(this).text('view');
+
+		} else {
+			$('.patient-contact-details .edit-mode').hide();
+			$('.patient-contact-details .view-mode').show();
+
+			$(this).text('edit');
+		}
+
+		enableButtons();
+	});
+
+	handleButton($('#btn-cancel-edit-patient-contact-details'),function(e) {
+		e.preventDefault();
+
+		$('.patient-info .edit-patient-contact-details').click();
+	});
+
+	handleButton($('#btn-save-patient-contact-details'),function(e) {
+		e.preventDefault();
+
+		$('#patient-contact-details-edit span.error').val('');
+
+		$.ajax({
+			'type': 'POST',
+			'url': baseUrl+'/patient/validatePatientContactDetails/'+OE_patient_id,
+			'data': $('#patient-contact-details-edit').serialize()+"&YII_CSRF_TOKEN="+YII_CSRF_TOKEN,
+			'dataType': 'json',
+			'success': function(data) {
+				var errors = false;
+
+				for (var field in data) {
+					errors = true;
+
+					$('#'+field+'_error').text(data[field][0]);
+				}
+
+				if (errors) {
+					enableButtons();
+				} else {
+					$.ajax({
+						'type': 'POST',
+						'url': baseUrl+'/patient/updatePatientContactDetails/'+OE_patient_id,
+						'data': $('#patient-contact-details-edit').serialize()+"&YII_CSRF_TOKEN="+YII_CSRF_TOKEN,
+						'success': function(resp) {
+							if (resp != '1') {
+								alert("Something went wrong trying to save the patients contact details, please try again or contact support for assistance.");
+								enableButtons();
+							} else {
+								window.location.reload();
+							}
+						}
+					});
+				}
+			}
+		});
+	});
 });
 
 function resetPatientDetailsForm()
@@ -173,6 +240,12 @@ function resetPatientDetailsForm()
 			$(this).click();
 		}
 	});
+}
+
+function resetContactDetailsForm()
+{
+	$('#primary_phone').val($('#_primary_phone').val());
+	$('#email').val($('#_email').val());
 }
 
 var contactCache = {};

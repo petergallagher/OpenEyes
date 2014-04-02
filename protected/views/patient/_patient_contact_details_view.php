@@ -17,22 +17,29 @@
  * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
  */
 ?>
-<section class="box patient-info js-toggle-container">
-	<h3 class="box-title">Contact details:</h3>
-	<a href="#" class="toggle-trigger toggle-hide js-toggle">
-		<span class="icon-showhide">
-			Show/hide this section
-		</span>
-	</a>
-	<?php if (Yii::app()->params['patient_demographics_editable'] && Yii::app()->user->checkAccess('OprnEditPatientDetails')) {?>
-		<a href="#" class="toggle-edit-patient-details edit-patient-contact-details">
-			edit
-		</a>
-	<?php }?>
-	<div class="js-toggle-body patient-contact-details">
-		<?php echo $this->renderPartial('_patient_contact_details_view')?>
-		<?php if (Yii::app()->params['patient_demographics_editable'] && Yii::app()->user->checkAccess('OprnEditPatientDetails')) {?>
-			<?php echo $this->renderPartial('_patient_contact_details_edit')?>
-		<?php }?>
-	</div>
-</section>
+		<div class="view-mode">
+			<div class="row data-row">
+				<div class="large-4 column">
+					<div class="data-label">Telephone:</div>
+				</div>
+				<div class="large-8 column">
+					<div class="data-value"><?php echo !empty($this->patient->primary_phone) ? $this->patient->primary_phone : 'Unknown'?></div>
+				</div>
+			</div>
+			<div class="row data-row">
+				<div class="large-4 column">
+					<div class="data-label">Email:</div>
+				</div>
+				<div class="large-8 column">
+					<div class="data-value"><?php echo !empty($this->patient->contact->address->email) ? $this->patient->contact->address->email : 'Unknown'?></div>
+				</div>
+			</div>
+			<div class="row data-row">
+				<div class="large-4 column">
+					<div class="data-label">Next of Kin:</div>
+				</div>
+				<div class="large-8 column">
+					<div class="data-value">Unknown</div>
+				</div>
+			</div>
+		</div>

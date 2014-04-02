@@ -85,7 +85,7 @@ class PatientController extends BaseController
 				'roles' => array('OprnEditFamilyHistory')
 			),
 			array('allow',
-				'actions' => array('validatePatientDetails', 'updatePatientDetails', 'create'),
+				'actions' => array('validatePatientDetails', 'updatePatientDetails', 'create', 'validatePatientContactDetails', 'updatePatientContactDetails'),
 				'roles' => array('OprnEditPatientDetails')
 			),
 		);
@@ -1613,6 +1613,72 @@ class PatientController extends BaseController
 			$address = new Address;
 			$address->address_type_id = $address_type->id;
 			$address->contact_id = $contact->id;
+		}
+
+		$address->attributes = $_POST;
+
+		if (!$address->save()) {
+			throw new Exception("Unable to save patient address: ".print_r($address->getErrors(),true));
+		}
+
+		$transaction->commit();
+
+		echo "1";
+	}
+
+	public function actionValidatePatientContactDetails($id)
+	{
+		if (!$patient = Patient::model()->findByPk($id)) {
+			throw new Exception("Patient not found: $id");
+		}
+
+		$errors = array();
+
+		$contact = $patient->contact;
+
+		$contact->attributes = Helper::convertNHS2MySQL($_POST);
+
+		if (!$contact->validate()) {
+			$errors = $contact->getErrors();
+		}
+
+		if (!$address = $contact->address) {
+			$address = new Address;
+		}
+
+		$address->attributes = $_POST;
+
+		if (!$address->validate()) {
+			$errors = array_merge($errors, $address->getErrors());
+		}
+
+		echo json_encode($errors);
+	}
+
+	public function actionUpdatePatientContactDetails($id)
+	{
+		if (!$patient = Patient::model()->findByPk($id)) {
+			throw new Exception("Patient not found: $id");
+		}
+
+		$transaction = Yii::app()->db->beginTransaction();
+
+		$contact = $patient->contact;
+
+		$contact->attributes = Helper::convertNHS2MySQL($_POST);
+
+		if (!$contact->save()) {
+			throw new Exception("Unable to save patient contact: ".print_r($contact->getErrors(),true));
+		}
+
+		if (!$address = $patient->contact->address) {
+			if (!$address_type = AddressType::model()->find('name=?',array('Home'))) {
+				throw new Exception("AddressType 'Home' not found");
+			}
+
+			$address = new Address;
+			$address->address_type_id = $address_type->id;
+			$address->contact_id = $patient->contact->id;
 		}
 
 		$address->attributes = $_POST;
