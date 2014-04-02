@@ -57,7 +57,7 @@ return array(
 					),
 					array(
 							'type' => 'length',
-							'max'  => 11,
+							'max'  => 20,
 					),
 			),
 	),
