@@ -140,3 +140,66 @@
 		}
 	}
 }
+
+// Patient edit box
+.box {
+	&.patient-edit {
+		background: #fafafa;
+		padding: emCalc(12px);
+		.box-title {
+			font-size: emCalc(13px);
+			color: #e49f10;
+			margin: 0;
+			padding: 0 0 emCalc(10px) 0;
+		}
+		.data-row {
+			padding: emCalc(5px) 0;
+			border-top: 1px dotted #ccc;
+			&:last-child {
+				padding-bottom: 0;
+			}
+			&.highlight {
+				background: goldenrod;
+				> .column {
+					padding-left: emCalc(12px);
+					padding-right: emCalc(12px);
+				}
+				.data-label {
+					color: #eee;
+				}
+				.data-value {
+					color: #666;
+				}
+			}
+		}
+		.data-label {
+			margin-top: emCalc(3px);
+		}
+		.field-label {
+			color: #777;
+		}
+		.add-data {
+			> fieldset > legend {
+				margin-bottom: emCalc(25px);
+			}
+			.field-row {
+				padding-bottom: emCalc(12px);
+				&:last-child {
+					padding-bottom: 0;
+				}
+			}
+		}
+		.toggle-trigger {
+			height: 22px;
+			width: 30px;
+			background: #dadada;
+			right: emCalc(12px);
+			&:hover {
+				background: #3665ff;
+			}
+		}
+		.add-data {
+			margin: emCalc(6px) 0 emCalc(12px) 0;
+		}
+	}
+}

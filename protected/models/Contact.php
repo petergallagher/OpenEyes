@@ -44,6 +44,8 @@
  */
 class Contact extends BaseActiveRecord
 {
+	public $is_patient = false;
+
 	/**
 	 * Returns the static model of the specified AR class.
 	 * @return Contact the static model class
@@ -66,11 +68,32 @@ class Contact extends BaseActiveRecord
 	 */
 	public function rules()
 	{
+		if ($this->is_patient) {
+			return array(
+				array('last_name', 'required'),
+				array('nick_name', 'length', 'max' => 80),
+				array('title, first_name, last_name, nick_name, primary_phone, qualifications, contact_label_id', 'safe'),
+				array('id, nick_name, primary_phone, title, first_name, last_name, qualifications', 'safe', 'on' => 'search'),
+			);
+		}
+
 		return array(
 			array('nick_name', 'length', 'max' => 80),
 			array('title, first_name, last_name, nick_name, primary_phone, qualifications, contact_label_id', 'safe'),
 			array('id, nick_name, primary_phone, title, first_name, last_name, qualifications', 'safe', 'on' => 'search'),
 		);
+	}
+
+	public function isPatient()
+	{
+		$this->is_patient = true;
+		return $this;
+	}
+
+	public function isNotPatient()
+	{
+		$this->is_patient = false;
+		return $this;
 	}
 
 	/**

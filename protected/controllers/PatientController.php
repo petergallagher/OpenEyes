@@ -53,7 +53,7 @@ class PatientController extends BaseController
 				'roles' => array('OprnCreateEpisode'),
 			),
 			array('allow',
-				'actions' => array('updateepisode'),  // checked in action
+				'actions' => array('updateepisode'),	// checked in action
 				'users' => array('@'),
 			),
 			array('allow',
@@ -85,7 +85,7 @@ class PatientController extends BaseController
 				'roles' => array('OprnEditFamilyHistory')
 			),
 			array('allow',
-				'actions' => array('validatePatientDetails', 'updatePatientDetails'),
+				'actions' => array('validatePatientDetails', 'updatePatientDetails', 'create'),
 				'roles' => array('OprnEditPatientDetails')
 			),
 		);
@@ -622,7 +622,7 @@ class PatientController extends BaseController
 			if (@$_POST['no_allergies']) {
 				$patient->setNoAllergies();
 			}
-			else  {
+			else	{
 				if (!isset($_POST['allergy_id']) || !$allergy_id = $_POST['allergy_id']) {
 					throw new Exception('Allergy ID required');
 				}
@@ -1576,13 +1576,8 @@ class PatientController extends BaseController
 
 		$transaction = Yii::app()->db->beginTransaction();
 
-		if ($_POST['date_of_death'] == '') {
-			$_POST['date_of_death'] = null;
-		}
-
-		if ($_POST['dob'] == '') {
-			$_POST['dob'] = null;
-		}
+		empty($_POST['date_of_death']) && $_POST['date_of_death'] = null;
+		empty($_POST['dob']) && $_POST['dob'] = null;
 
 		$patient->attributes = Helper::convertNHS2MySQL($_POST);
 
@@ -1629,5 +1624,73 @@ class PatientController extends BaseController
 		$transaction->commit();
 
 		echo "1";
+	}
+
+	public function actionCreate()
+	{
+		Yii::app()->assetManager->registerScriptFile('js/patientSummary.js');
+
+		$patient = new Patient;
+		$contact = new Contact;
+		$address = new Address;
+		$address->country_id = Country::model()->find('name=?',array(Yii::app()->params['default_country']))->id;
+
+		$errors = array();
+
+		if (!empty($_POST)) {
+			empty($_POST['date_of_death']) && $_POST['date_of_death'] = null;
+			empty($_POST['dob']) && $_POST['dob'] = null; 
+
+			$transaction = Yii::app()->db->beginTransaction();
+
+			$patient->attributes = Helper::convertNHS2MySQL($_POST);
+
+			if (!$patient->save()) {
+				$errors = $patient->getErrors();
+			}
+
+			$contact->isPatient();
+			$contact->attributes = $_POST;
+
+			if (!$contact->save()) {
+				$errors = array_merge($errors, $contact->getErrors());
+			}
+
+			if ($patient->id && $contact->id) {
+				$patient->contact_id = $contact->id;
+
+				if (!$patient->save()) {
+					throw new Exception("Unable to set patient contact_id: ".print_r($patient->getErrors(),true));
+				}
+			}
+
+			$address->address_type_id = $address_type->id;
+			$address->contact_id = $contact->id;
+
+			$address->attributes = $_POST;
+
+			if ($patient->id && $contact->id) {
+				if (!$address->save()) {
+					$errors = array_merge($errors, $address->getErrors());
+				} else {
+					$transaction->commit();
+					return $this->redirect(array('/patient/view/'.$patient->id));
+				}
+			} else {
+				if (!$address->validate()) {
+					$errors = array_merge($errors, $address->getErrors());
+				}
+			}
+
+			$transaction->rollback();
+		}
+
+		$this->renderPatientPanel = false;
+		$this->render('create', array(
+			'patient' => $patient,
+			'contact' => $contact,
+			'address' => $address,
+			'errors' => $errors,
+		));
 	}
 }

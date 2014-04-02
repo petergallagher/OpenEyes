@@ -102,6 +102,7 @@ class Patient extends BaseActiveRecord
 	public function rules()
 	{
 		return array(
+			array('hos_num', 'required'),
 			array('pas_key', 'length', 'max' => 10),
 			array('hos_num, nhs_num', 'length', 'max' => 40),
 			array('dob, gender_id, date_of_death, ethnic_group_id, yob', 'safe'),
@@ -151,14 +152,15 @@ class Patient extends BaseActiveRecord
 	{
 		return array(
 			'id' => 'ID',
-			'pas_key' => 'PAS Key',
-			'dob' => 'Date of Birth',
-			'date_of_death' => 'Date of Death',
+			'pas_key' => 'PAS key',
+			'dob' => 'Date of birth',
+			'date_of_death' => 'Date of death',
 			'gender_id' => 'Gender',
-			'ethnic_group_id' => 'Ethnic Group',
-			'hos_num' => 'Hospital Number',
-			'nhs_num' => 'NHS Number',
+			'ethnic_group_id' => 'Ethnic group',
+			'hos_num' => 'Hospital number',
+			'nhs_num' => 'NHS number',
 			'yob' => 'Year of birth',
+			'primary_phone' => 'Telephone',
 		);
 	}
 

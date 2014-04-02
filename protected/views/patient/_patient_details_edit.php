@@ -158,7 +158,7 @@
 					</div>
 					<div class="large-8 column">
 						<div class="data-value">
-							<?php echo CHtml::textField('yob',$this->patient->age,array('style'=>'width: 40px'))?>
+							<?php echo CHtml::textField('yob',$this->patient->yob,array('style'=>'width: 40px'))?>
 							<span class="error" id="age_error"></span>
 						</div>
 					</div>

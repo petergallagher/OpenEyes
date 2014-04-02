@@ -3383,6 +3383,80 @@ tfoot.pagination-container .pagination li {
   color: black;
 }
 
+/* line 146, ../sass/openeyes/components/boxes/_patient-info.scss */
+.box.patient-edit {
+  background: #fafafa;
+  padding: 0.75em;
+}
+/* line 149, ../sass/openeyes/components/boxes/_patient-info.scss */
+.box.patient-edit .box-title {
+  font-size: 0.8125em;
+  color: #e49f10;
+  margin: 0;
+  padding: 0 0 0.625em 0;
+}
+/* line 155, ../sass/openeyes/components/boxes/_patient-info.scss */
+.box.patient-edit .data-row {
+  padding: 0.3125em 0;
+  border-top: 1px dotted #ccc;
+}
+/* line 158, ../sass/openeyes/components/boxes/_patient-info.scss */
+.box.patient-edit .data-row:last-child {
+  padding-bottom: 0;
+}
+/* line 161, ../sass/openeyes/components/boxes/_patient-info.scss */
+.box.patient-edit .data-row.highlight {
+  background: goldenrod;
+}
+/* line 163, ../sass/openeyes/components/boxes/_patient-info.scss */
+.box.patient-edit .data-row.highlight > .column {
+  padding-left: 0.75em;
+  padding-right: 0.75em;
+}
+/* line 167, ../sass/openeyes/components/boxes/_patient-info.scss */
+.box.patient-edit .data-row.highlight .data-label {
+  color: #eee;
+}
+/* line 170, ../sass/openeyes/components/boxes/_patient-info.scss */
+.box.patient-edit .data-row.highlight .data-value {
+  color: #666;
+}
+/* line 175, ../sass/openeyes/components/boxes/_patient-info.scss */
+.box.patient-edit .data-label {
+  margin-top: 0.1875em;
+}
+/* line 178, ../sass/openeyes/components/boxes/_patient-info.scss */
+.box.patient-edit .field-label, .box.patient-edit .data-label {
+  color: #777;
+}
+/* line 182, ../sass/openeyes/components/boxes/_patient-info.scss */
+.box.patient-edit .add-data > fieldset > legend {
+  margin-bottom: 1.5625em;
+}
+/* line 185, ../sass/openeyes/components/boxes/_patient-info.scss */
+.box.patient-edit .add-data .field-row, .box.patient-edit .add-data .eyedraw-row, .box.patient-edit .add-data .data-row {
+  padding-bottom: 0.75em;
+}
+/* line 187, ../sass/openeyes/components/boxes/_patient-info.scss */
+.box.patient-edit .add-data .field-row:last-child, .box.patient-edit .add-data .eyedraw-row:last-child, .box.patient-edit .add-data .data-row:last-child {
+  padding-bottom: 0;
+}
+/* line 192, ../sass/openeyes/components/boxes/_patient-info.scss */
+.box.patient-edit .toggle-trigger {
+  height: 22px;
+  width: 30px;
+  background: #dadada;
+  right: 0.75em;
+}
+/* line 197, ../sass/openeyes/components/boxes/_patient-info.scss */
+.box.patient-edit .toggle-trigger:hover {
+  background: #3665ff;
+}
+/* line 201, ../sass/openeyes/components/boxes/_patient-info.scss */
+.box.patient-edit .add-data {
+  margin: 0.375em 0 0.75em 0;
+}
+
 /* line 20, ../sass/openeyes/components/boxes/_transport.scss */
 .box.transport .csvform {
   margin: 0;
