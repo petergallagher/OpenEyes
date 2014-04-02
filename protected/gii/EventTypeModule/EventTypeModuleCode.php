@@ -258,6 +258,8 @@ class EventTypeModuleCode extends BaseModuleCode // CCodeModel
 				$elements[$number]['defaults_methods'] = array();
 				$elements[$number]['after_save'] = array();
 
+				$elements[$number]['split_element']= isset($_POST['isSplitElement'.$number]);
+
 				$elements[$number] = $this->generateKeyNames($elements[$number],array('lmui','cui','ev'));
 
 				$fields = Array();

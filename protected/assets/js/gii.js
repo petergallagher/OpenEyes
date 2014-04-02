@@ -178,7 +178,7 @@ $(document).ready(function() {
 		var element = m[1];
 		
 		if ($('#elementShortName'+element).val() == '') {
-			var sname = $(this).val().toLowerCase().replace(/ /g, "").substring(0,11);
+			var sname = $(this).val().toLowerCase().replace(/ /g, "").substring(0,20);
 			$('#elementShortName'+element).val(sname);
 		}
 
