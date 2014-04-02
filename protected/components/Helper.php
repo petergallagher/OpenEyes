@@ -135,9 +135,19 @@ class Helper
 	 *
 	 * @return string $age
 	 */
-	public static function getAge($dob, $date_of_death = null, $check_date = null)
+	public static function getAge($dob, $date_of_death = null, $check_date = null, $year_of_birth = null)
 	{
-		if (!$dob) return 'Unknown';
+		if (!$dob) {
+			if (!$year_of_birth) {
+				return 'Unknown';
+			}
+
+			if ($date_of_death) {
+				return date('Y',strtotime($date_of_death)) - $year_of_birth;
+			}
+
+			return date('Y') - $year_of_birth;
+		}
 
 		$dob_datetime = new DateTime($dob);
 		$check_datetime = new DateTime($check_date);

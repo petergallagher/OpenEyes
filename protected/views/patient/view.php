@@ -21,16 +21,12 @@
 
 <?php
 $clinical = $clinical = $this->checkAccess('OprnViewClinical');
-
 $warnings = $this->patient->getWarnings($clinical);
 ?>
 
 <div class="container content">
-
 	<h1 class="badge">Patient summary</h1>
-
 	<div class="messages patient">
-
 		<?php $this->renderPartial('//base/_messages'); ?>
 
 		<?php if ($this->patient->contact->address && !$this->patient->contact->address->isCurrent()) {?>

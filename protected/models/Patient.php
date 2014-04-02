@@ -28,7 +28,7 @@
  * @property string  $last_name
  * @property string  $dob
  * @property string  $date_of_death
- * @property string  $gender
+ * @property string  $gender_id
  * @property string  $hos_num
  * @property string  $nhs_num
  * @property string  $primary_phone
@@ -104,8 +104,7 @@ class Patient extends BaseActiveRecord
 		return array(
 			array('pas_key', 'length', 'max' => 10),
 			array('hos_num, nhs_num', 'length', 'max' => 40),
-			array('gender', 'length', 'max' => 1),
-			array('dob, date_of_death, ethnic_group_id', 'safe'),
+			array('dob, gender_id, date_of_death, ethnic_group_id, yob', 'safe'),
 			array('dob, hos_num, nhs_num, date_of_death', 'safe', 'on' => 'search'),
 		);
 	}
@@ -141,6 +140,7 @@ class Patient extends BaseActiveRecord
 			'commissioningbodies' => array(self::MANY_MANY, 'CommissioningBody', 'commissioning_body_patient_assignment(patient_id, commissioning_body_id)'),
 			'referrals' => array(self::HAS_MANY, 'Referral', 'patient_id'),
 			'lastReferral' => array(self::HAS_ONE, 'Referral', 'patient_id', 'order' => 'received_date desc'),
+			'gender' => array(self::BELONGS_TO, 'Gender', 'gender_id'),
 		);
 	}
 
@@ -154,10 +154,11 @@ class Patient extends BaseActiveRecord
 			'pas_key' => 'PAS Key',
 			'dob' => 'Date of Birth',
 			'date_of_death' => 'Date of Death',
-			'gender' => 'Gender',
+			'gender_id' => 'Gender',
 			'ethnic_group_id' => 'Ethnic Group',
 			'hos_num' => 'Hospital Number',
 			'nhs_num' => 'NHS Number',
+			'yob' => 'Year of birth',
 		);
 	}
 
@@ -168,7 +169,7 @@ class Patient extends BaseActiveRecord
 		$criteria->compare('LOWER(first_name)',strtolower($params['first_name']),false);
 		$criteria->compare('LOWER(last_name)',strtolower($params['last_name']),false);
 		$criteria->compare('dob',$this->dob,false);
-		$criteria->compare('gender',$this->gender,false);
+		$criteria->compare('gender_id',$this->gender_id,false);
 		$criteria->compare('hos_num',$this->hos_num,false);
 		$criteria->compare('nhs_num',$this->nhs_num,false);
 
@@ -293,7 +294,7 @@ class Patient extends BaseActiveRecord
 	 */
 	public function getAge()
 	{
-		return Helper::getAge($this->dob, $this->date_of_death);
+		return Helper::getAge($this->dob, $this->date_of_death, null, $this->yob);
 	}
 
 	/**
@@ -526,16 +527,20 @@ class Patient extends BaseActiveRecord
 
 	public function getSub()
 	{
+		if (!$this->gender) return '?';
+
 		if ($this->isChild()) {
-			return ($this->gender == 'F' ? 'girl' : 'boy');
+			return ($this->gender->name == 'Female' ? 'girl' : 'boy');
 		} else {
-			return ($this->gender == 'M' ? 'man' : 'woman');
+			return ($this->gender->name == 'Male' ? 'man' : 'woman');
 		}
 	}
 
 	public function getPro()
 	{
-		return ($this->gender == 'F' ? 'she' : 'he');
+		if (!$this->gender) return '?';
+
+		return ($this->gender->name == 'Female' ? 'she' : 'he');
 	}
 
 	public function getEpd()
@@ -563,7 +568,7 @@ class Patient extends BaseActiveRecord
 
 	public function getGenderString()
 	{
-		return ($this->gender == 'F' ? 'Female' : 'Male');
+		return $this->gender ? $this->gender->name : 'Unknown';
 	}
 
 	public function getEthnicGroupString()
@@ -577,12 +582,16 @@ class Patient extends BaseActiveRecord
 
 	public function getObj()
 	{
-		return ($this->gender == 'F' ? 'her' : 'him');
+		if (!$this->gender) return '?';
+
+		return ($this->gender->name == 'Female' ? 'her' : 'him');
 	}
 
 	public function getPos()
 	{
-		return ($this->gender == 'M' ? 'his' : 'her');
+		if (!$this->gender) return '?';
+
+		return ($this->gender->name == 'Male' ? 'his' : 'her');
 	}
 
 	public function getTitle()

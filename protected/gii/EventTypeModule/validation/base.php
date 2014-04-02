@@ -55,10 +55,10 @@ return array(
 							'exists_method' => 'elementShortNameExists',
 							'message' => 'Element short name is already in use',
 					),
-					array(
+					/*array(
 							'type' => 'length',
 							'max'  => 11,
-					),
+					),*/
 			),
 	),
 	'/^elementName([0-9]+)FieldName([0-9]+)$/' => array(
@@ -73,7 +73,7 @@ return array(
 				'message' => 'Field name must be a-z, 0-9 and underscores only, and start with a letter.',
 			),
 			// need to limit the length of the field name for fields which will generate another table
-			array(
+			/*array(
 				'type' => 'length',
 				'max'  => 11,
 				'regstrip' => '/_id$/',
@@ -95,6 +95,7 @@ return array(
 					'message' => 'field name cannot be longer than 20 characters for this field type (excluding _id postfix)'
 
 			),
+			*/
 		),
 	),
 	'/^elementName([0-9]+)FieldLabel([0-9]+)$/' => array(

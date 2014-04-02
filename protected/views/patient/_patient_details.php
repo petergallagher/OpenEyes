@@ -24,84 +24,15 @@
 			Show/hide this section
 		</span>
 	</a>
+	<?php if (Yii::app()->params['patient_demographics_editable'] && Yii::app()->user->checkAccess('OprnEditPatientDetails')) {?>
+		<a href="#" class="toggle-edit-patient-details">
+			edit
+		</a>
+	<?php }?>
 	<div class="js-toggle-body">
-		<div class="row data-row">
-			<div class="large-4 column">
-				<div class="data-label">First name(s):</div>
-			</div>
-			<div class="large-8 column">
-				<div class="data-value"><?php echo $this->patient->first_name?></div>
-			</div>
-		</div>
-		<div class="row data-row">
-			<div class="large-4 column">
-				<div class="data-label">Last name:</div>
-			</div>
-			<div class="large-8 column">
-				<div class="data-value"><?php echo $this->patient->last_name?></div>
-			</div>
-		</div>
-		<div class="row data-row">
-			<div class="large-4 column">
-				<div class="data-label">Address:</div>
-			</div>
-			<div class="large-8 column">
-				<div class="data-value">
-					<?php echo $this->patient->getSummaryAddress()?>
-				</div>
-			</div>
-		</div>
-		<div class="row data-row">
-			<div class="large-4 column">
-				<div class="data-label">Date of Birth:</div>
-			</div>
-			<div class="large-8 column">
-				<div class="data-value">
-					<?php echo ($this->patient->dob) ? $this->patient->NHSDate('dob') : 'Unknown' ?>
-				</div>
-			</div>
-		</div>
-
-		<div class="row data-row">
-			<?php if ($this->patient->date_of_death) { ?>
-				<div class="large-4 column">
-					<div class="data-label">Date of Death:</div>
-				</div>
-				<div class="large-8 column">
-					<div class="data-value">
-						<?php echo $this->patient->NHSDate('date_of_death') . ' (Age '.$this->patient->getAge().')' ?>
-					</div>
-				</div>
-			<?php } else {?>
-				<div class="large-4 column">
-					<div class="data-label">Age:</div>
-				</div>
-				<div class="large-8 column">
-					<div class="data-value">
-						<?php echo $this->patient->getAge()?>
-					</div>
-				</div>
-			<?php }?>
-		</div>
-		<div class="row data-row">
-			<div class="large-4 column">
-				<div class="data-label">Gender:</div>
-			</div>
-			<div class="large-8 column">
-				<div class="data-value">
-					<?php echo $this->patient->getGenderString() ?>
-				</div>
-			</div>
-		</div>
-		<div class="row data-row">
-			<div class="large-4 column">
-				<div class="data-label">Ethnic Group:</div>
-			</div>
-			<div class="large-8 column">
-				<div class="data-value">
-					<?php echo $this->patient->getEthnicGroupString() ?>
-				</div>
-			</div>
-		</div>
+		<?php echo $this->renderPartial('_patient_details_view')?>
+		<?php if (Yii::app()->params['patient_demographics_editable'] && Yii::app()->user->checkAccess('OprnEditPatientDetails')) {?>
+			<?php echo $this->renderPartial('_patient_details_edit')?>
+		<?php }?>
 	</div>
 </section>

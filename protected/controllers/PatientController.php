@@ -84,6 +84,10 @@ class PatientController extends BaseController
 				'actions' => array('addFamilyHistory', 'removeFamilyHistory'),
 				'roles' => array('OprnEditFamilyHistory')
 			),
+			array('allow',
+				'actions' => array('validatePatientDetails', 'updatePatientDetails'),
+				'roles' => array('OprnEditPatientDetails')
+			),
 		);
 	}
 
@@ -1521,5 +1525,109 @@ class PatientController extends BaseController
 	{
 		$oprn = 'OprnCreate' . ($event_type->class_name == 'OphDrPrescription' ? 'Prescription' : 'Event');
 		return $this->checkAccess($oprn, $this->firm, $episode, $event_type);
+	}
+
+	public function actionValidatePatientDetails($id)
+	{
+		if (!$patient = Patient::model()->findByPk($id)) {
+			throw new Exception("Patient not found: $id");
+		}
+
+		$errors = array();
+
+		$patient->attributes = Helper::convertNHS2MySQL($_POST);
+
+		if (!$patient->validate()) {
+			$errors = $patient->getErrors();
+		}
+
+		if (!$contact = $patient->contact) {
+			$contact = new Contact;
+		}
+
+		$contact->attributes = $_POST;
+
+		if (!$contact->validate()) {
+			$errors = array_merge($errors, $contact->getErrors());
+		}
+
+		if (!$contact->last_name) {
+			$errors['last_name'] = array('Last name is required');
+		}
+
+		if (!$address = $contact->address) {
+			$address = new Address;
+		}
+
+		$address->attributes = $_POST;
+
+		if (!$address->validate()) {
+			$errors = array_merge($errors, $address->getErrors());
+		}
+
+		echo json_encode($errors);
+	}
+
+	public function actionUpdatePatientDetails($id)
+	{
+		if (!$patient = Patient::model()->findByPk($id)) {
+			throw new Exception("Patient not found: $id");
+		}
+
+		$transaction = Yii::app()->db->beginTransaction();
+
+		if ($_POST['date_of_death'] == '') {
+			$_POST['date_of_death'] = null;
+		}
+
+		if ($_POST['dob'] == '') {
+			$_POST['dob'] = null;
+		}
+
+		$patient->attributes = Helper::convertNHS2MySQL($_POST);
+
+		if (!$patient->save()) {
+			throw new Exception("Unable to save patient: ".print_r($patient->getErrors(),true));
+		}
+
+		if (!$contact = $patient->contact) {
+			$contact = new Contact;
+
+			$contact_is_new = true;
+		}
+
+		$contact->attributes = $_POST;
+
+		if (!$contact->save()) {
+			throw new Exception("Unable to save contact: ".print_r($contact->getErrors(),true));
+		}
+
+		if (@$contact_is_new) {
+			$patient->contact_id = $contact->id;
+
+			if (!$patient->save()) {
+				throw new Exception("Unable to set patient contact_id: ".print_r($patient->getErrors(),true));
+			}
+		}
+
+		if (!$address = $contact->address) {
+			if (!$address_type = AddressType::model()->find('name=?',array('Home'))) {
+				throw new Exception("AddressType 'Home' not found");
+			}
+
+			$address = new Address;
+			$address->address_type_id = $address_type->id;
+			$address->contact_id = $contact->id;
+		}
+
+		$address->attributes = $_POST;
+
+		if (!$address->save()) {
+			throw new Exception("Unable to save patient address: ".print_r($address->getErrors(),true));
+		}
+
+		$transaction->commit();
+
+		echo "1";
 	}
 }
