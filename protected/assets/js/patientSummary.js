@@ -86,7 +86,7 @@ $(document).ready(function() {
 	$('.patient-info .edit-patient-details').click(function(e) {
 		e.preventDefault();
 
-		if ($('.patient-info .view-mode').is(':visible')) {
+		if ($('section.patient-details .view-mode').is(':visible')) {
 			resetPatientDetailsForm();
 
 			$('.patient-details .view-mode').hide();
@@ -95,8 +95,9 @@ $(document).ready(function() {
 			$(this).text('view');
 
 		} else {
-			$('.patient-info .edit-mode').hide();
-			$('.patient-info .view-mode').show();
+			$('.patient-details .edit-mode').hide();
+			$('.patient-details .view-mode').show();
+			$('section.patient-details .alert-box').hide();
 
 			$(this).text('edit');
 		}
@@ -107,13 +108,14 @@ $(document).ready(function() {
 	handleButton($('#btn-cancel-edit-patient-details'),function(e) {
 		e.preventDefault();
 
-		$('.patient-info .toggle-edit-patient-details').click();
+		$('section.patient-details .toggle-edit-patient-details').click();
 	});
 
 	handleButton($('#btn-save-patient-details'),function(e) {
 		e.preventDefault();
 
-		$('#patient-details-edit span.error').val('');
+		$('section.patient-details .alert-box ul').html('');
+		$('section.patient-details .alert-box').hide();
 
 		$.ajax({
 			'type': 'POST',
@@ -121,15 +123,12 @@ $(document).ready(function() {
 			'data': $('#patient-details-edit').serialize()+"&YII_CSRF_TOKEN="+YII_CSRF_TOKEN,
 			'dataType': 'json',
 			'success': function(data) {
-				var errors = false;
-
 				for (var field in data) {
-					errors = true;
-
-					$('#'+field+'_error').text(data[field][0]);
+					$('section.patient-details .alert-box ul').append('<li>'+data[field][0]+'</li>');
 				}
 
-				if (errors) {
+				if ($('section.patient-details .alert-box ul li').length >0) {
+					$('section.patient-details .alert-box').show();
 					enableButtons();
 				} else {
 					$.ajax({
@@ -166,6 +165,7 @@ $(document).ready(function() {
 		} else {
 			$('.patient-contact-details .edit-mode').hide();
 			$('.patient-contact-details .view-mode').show();
+			$('section.patient-contact-details .alert-box').hide();
 
 			$(this).text('edit');
 		}
@@ -182,7 +182,8 @@ $(document).ready(function() {
 	handleButton($('#btn-save-patient-contact-details'),function(e) {
 		e.preventDefault();
 
-		$('#patient-contact-details-edit span.error').val('');
+		$('section.patient-contact-details .alert-box ul').html('');
+		$('section.patient-contact-details .alert-box').hide();
 
 		$.ajax({
 			'type': 'POST',
@@ -190,15 +191,12 @@ $(document).ready(function() {
 			'data': $('#patient-contact-details-edit').serialize()+"&YII_CSRF_TOKEN="+YII_CSRF_TOKEN,
 			'dataType': 'json',
 			'success': function(data) {
-				var errors = false;
-
 				for (var field in data) {
-					errors = true;
-
-					$('#'+field+'_error').text(data[field][0]);
+					$('section.patient-contact-details .alert-box ul').append('<li>'+data[field][0]+'</li>');
 				}
 
-				if (errors) {
+				if ($('section.patient-contact-details .alert-box ul li').length >0) {
+					$('section.patient-contact-details .alert-box').show();
 					enableButtons();
 				} else {
 					$.ajax({

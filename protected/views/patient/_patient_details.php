@@ -17,7 +17,8 @@
  * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
  */
 ?>
-<section class="box patient-info js-toggle-container">
+<section class="box patient-info patient-details js-toggle-container">
+	<?php echo $this->renderPartial('//patient/_form_errors')?>
 	<h3 class="box-title">Personal Details:</h3>
 	<a href="#" class="toggle-trigger toggle-hide js-toggle">
 		<span class="icon-showhide">

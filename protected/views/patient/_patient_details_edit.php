@@ -50,7 +50,6 @@
 					<div class="large-8 column">
 						<div class="data-value">
 							<?php echo CHtml::textField('title',$this->patient->contact->title)?>
-							<span class="error" id="title_error"></span>
 						</div>
 					</div>
 				</div>
@@ -61,7 +60,6 @@
 					<div class="large-8 column">
 						<div class="data-value">
 							<?php echo CHtml::textField('first_name',$this->patient->first_name)?>
-							<span class="error" id="first_name_error"></span>
 						</div>
 					</div>
 				</div>
@@ -72,7 +70,6 @@
 					<div class="large-8 column">
 						<div class="data-value">
 							<?php echo CHtml::textField('last_name',$this->patient->last_name)?>
-							<span class="error" id="last_name_error"></span>
 						</div>
 					</div>
 				</div>
@@ -82,7 +79,6 @@
 					</div>
 					<div class="large-8 column">
 						<?php echo CHtml::textField('address1',($this->patient->contact && $this->patient->contact->address) ? $this->patient->contact->address->address1 : '')?>
-						<span class="error" id="address1_error"></span>
 					</div>
 				</div>
 				<div class="row data-row">
@@ -91,7 +87,6 @@
 					</div>
 					<div class="large-8 column">
 						<?php echo CHtml::textField('address2',($this->patient->contact && $this->patient->contact->address) ? $this->patient->contact->address->address2 : '')?>
-						<span class="error" id="address2_error"></span>
 					</div>
 				</div>
 				<div class="row data-row">
@@ -100,7 +95,6 @@
 					</div>
 					<div class="large-8 column">
 						<?php echo CHtml::textField('city',($this->patient->contact && $this->patient->contact->address) ? $this->patient->contact->address->city : '')?>
-						<span class="error" id="city_error"></span>
 					</div>
 				</div>
 				<div class="row data-row">
@@ -109,7 +103,6 @@
 					</div>
 					<div class="large-8 column">
 						<?php echo CHtml::textField('county',($this->patient->contact && $this->patient->contact->address) ? $this->patient->contact->address->county : '')?>
-						<span class="error" id="county_error"></span>
 					</div>
 				</div>
 				<div class="row data-row">
@@ -118,7 +111,6 @@
 					</div>
 					<div class="large-8 column">
 						<?php echo CHtml::textField('postcode',($this->patient->contact && $this->patient->contact->address) ? $this->patient->contact->address->postcode : '')?>
-						<span class="error" id="postcode_error"></span>
 					</div>
 				</div>
 				<div class="row data-row">
@@ -127,7 +119,6 @@
 					</div>
 					<div class="large-8 column">
 						<?php echo CHtml::dropDownList('country_id',($this->patient->contact && $this->patient->contact->address) ? $this->patient->contact->address->country_id : '',CHtml::listData(Country::model()->findAll(array('order' => 'name asc')),'id','name'))?>
-						<span class="error" id="country_id_error"></span>
 					</div>
 				</div>
 				<div class="row data-row">
@@ -148,7 +139,6 @@
 									'style' => 'width: 80px;',
 								)
 							))?>
-							<span class="error" id="dob_error"></span>
 						</div>
 					</div>
 				</div>
@@ -159,7 +149,6 @@
 					<div class="large-8 column">
 						<div class="data-value">
 							<?php echo CHtml::textField('yob',$this->patient->yob,array('style'=>'width: 40px'))?>
-							<span class="error" id="age_error"></span>
 						</div>
 					</div>
 				</div>
@@ -181,7 +170,6 @@
 									'style' => 'width: 80px;',
 								)
 							))?>
-							<span class="error" id="date_of_death_error"></span>
 						</div>
 					</div>
 				</div>
@@ -194,7 +182,6 @@
 							<?php foreach (Gender::model()->findAll() as $gender) {?>
 								<?php echo CHtml::radioButton('gender_id',$this->patient->gender_id == $gender->id,array('value' => $gender->id))?> <?php echo $gender->name?>
 							<?php }?>
-							<span class="error" id="gender_id_error"></span>
 						</div>
 					</div>
 				</div>
@@ -205,7 +192,6 @@
 					<div class="large-8 column">
 						<div class="data-value">
 							<?php echo CHtml::dropDownList('ethnic_group_id',$this->patient->ethnic_group_id,CHtml::listData(EthnicGroup::model()->findAll(array('order' => 'name asc')),'id','name'),array('empty' => '- Unknown -'))?>
-							<span class="error" id="ethnic_group_id"></span>
 						</div>
 					</div>
 				</div>

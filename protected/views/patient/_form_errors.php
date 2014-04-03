@@ -1,14 +1,14 @@
-<?php if (isset($errors) && !empty($errors)) {?>
-	<div class="alert-box alert with-icon">
-		<p>Please fix the following input errors:</p>
-		<ul>
-			<?php foreach ($errors as $field => $errs) {?>
-				<?php foreach ($errs as $err) {?>
+<div class="alert-box alert with-icon"<?php if (empty($errors)) {?> style="display: none"<?php }?>>
+	<p>Please fix the following input errors:</p>
+	<ul>
+		<?php if (!empty($errors)) {
+			foreach ($errors as $field => $errs) {
+				foreach ($errs as $err) {?>
 					<li>
 						<?php echo $err?>
 					</li>
-				<?php }?>
-			<?php }?>
-		</ul>
-	</div>
-<?php }?>
+				<?php }
+			}
+		}?>
+	</ul>
+</div>
