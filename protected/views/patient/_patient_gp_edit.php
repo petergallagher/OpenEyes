@@ -98,7 +98,7 @@
 								}",
 							),
 							'htmlOptions'=>array(
-								'placeholder' => 'enter search term here'
+								'placeholder' => 'search for GP by name'
 							),
 						))?>
 					</div>
@@ -192,7 +192,7 @@
 								}",
 							),
 							'htmlOptions'=>array(
-								'placeholder' => 'enter search term here'
+								'placeholder' => 'search for practice by address or telephone number'
 							),
 						))?>
 					</div>

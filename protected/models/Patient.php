@@ -105,7 +105,7 @@ class Patient extends BaseActiveRecord
 			array('hos_num', 'required'),
 			array('pas_key', 'length', 'max' => 10),
 			array('hos_num, nhs_num', 'length', 'max' => 40),
-			array('dob, gender_id, date_of_death, ethnic_group_id, yob', 'safe'),
+			array('dob, gender_id, date_of_death, ethnic_group_id, yob, gp_id, practice_id', 'safe'),
 			array('dob, hos_num, nhs_num, date_of_death', 'safe', 'on' => 'search'),
 		);
 	}

@@ -1704,8 +1704,9 @@ class PatientController extends BaseController
 		$errors = array();
 
 		if (!empty($_POST)) {
-			empty($_POST['date_of_death']) && $_POST['date_of_death'] = null;
-			empty($_POST['dob']) && $_POST['dob'] = null; 
+			foreach (array('date_of_death','dob','gp_id','practice_id') as $field) {
+				empty($_POST[$field]) && $_POST[$field] = null;
+			}
 
 			$transaction = Yii::app()->db->beginTransaction();
 
