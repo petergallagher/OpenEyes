@@ -85,7 +85,7 @@ class PatientController extends BaseController
 				'roles' => array('OprnEditFamilyHistory')
 			),
 			array('allow',
-				'actions' => array('validatePatientDetails', 'updatePatientDetails', 'create', 'validatePatientContactDetails', 'updatePatientContactDetails'),
+				'actions' => array('validatePatientDetails', 'updatePatientDetails', 'create', 'validatePatientContactDetails', 'updatePatientContactDetails', 'GPSearch', 'getGPDetails', 'practiceSearch', 'getPracticeDetails', 'updatePatientGPAndPracticeDetails'),
 				'roles' => array('OprnEditPatientDetails')
 			),
 		);
@@ -1758,5 +1758,140 @@ class PatientController extends BaseController
 			'address' => $address,
 			'errors' => $errors,
 		));
+	}
+
+	public function actionGPSearch()
+	{
+		$term = '%'.strtolower($_GET['term']).'%';
+
+		$gps = array();
+
+		$command = Yii::app()->db->createCommand()
+			->select("c.*, gp.id as gp_id, a.address1, a.city")
+			->from("contact c")
+			->join("gp","gp.contact_id = c.id")
+			->leftJoin("address a","a.contact_id = c.id");
+
+		if (strstr($term,' ')) {
+			$command = $command->where("lower(concat(c.first_name,' ',c.last_name)) like :term",array(
+				":term" => $term,
+			));
+		} else {
+			$command = $command->where("lower(c.last_name) like :term",array(
+				":term" => $term,
+			));
+		}
+
+		foreach ($command->order("last_name asc, first_name asc")->queryAll() as $contact) {
+			$line = trim($contact['title'].' '.$contact['first_name'].' '.$contact['last_name']);
+
+			if (Yii::app()->user->checkAccess('admin')) {
+				if ($contact['address1'] || $contact['city']) {
+					$line .= ' (';
+
+					if ($contact['address1']) {
+						$line .= $contact['address1'];
+					}
+
+					if ($contact['city']) {
+						if ($contact['address1']) {
+							$line .= ", ";
+						}
+						$line .= $contact['city'];
+					}
+
+					$line .= ")";
+				}
+			}
+
+			$gps[] = array(
+				'line' => $line,
+				'gp_id' => $contact['gp_id'],
+			);
+		}
+
+		echo CJavaScript::jsonEncode($gps);
+	}
+
+	public function actionGetGPDetails()
+	{
+		if (!$gp = Gp::model()->with(array('contact' => array('with' => 'address')))->findByPk($_GET['gp_id'])) {
+			throw new Exception("GP not found: ".$_GET['gp_id']);
+		}
+
+		$gp_details = array(
+			'name' => trim($gp->contact->title.' '.$gp->contact->first_name.' '.$gp->contact->last_name),
+		);
+
+		if (Yii::app()->user->checkAccess('admin')) {
+			$gp_details['address'] = $gp->contact->address ? $gp->contact->address->letterLine : 'Unknown';
+			$gp_details['telephone'] = $gp->contact->primary_phone ? $gp->contact->primary_phone : 'Unknown';
+		}
+
+		echo CJavaScript::jsonEncode($gp_details);
+	}
+
+	public function actionPracticeSearch()
+	{
+		$term = '%'.strtolower($_GET['term']).'%';
+
+		$practices = array();
+
+		foreach (Yii::app()->db->createCommand()
+			->select("p.phone, p.id as practice_id, a.*")
+			->from("practice p")
+			->join("contact c","p.contact_id = c.id")
+			->join("address a","a.contact_id = c.id")
+			->where("lower(concat(address1,' ',address2,' ',city,' ',county,' ',postcode,' ',phone)) like :term",array(
+				":term" => $term,
+			))
+			->order("address1 asc,address2 asc,city asc,county asc,postcode asc,phone asc")
+			->queryAll() as $practice) {
+
+			$fields = array();
+
+			foreach (array('address1','address2','city','county','postcode','phone') as $field) {
+				if ($practice[$field]) {
+					$fields[] = $practice[$field];
+				}
+			}
+
+			$practices[] = array(
+				'line' => implode(' ',$fields),
+				'practice_id' => $practice['practice_id'],
+			);
+		}
+
+		echo CJavaScript::jsonEncode($practices);
+	}
+
+	public function actionGetPracticeDetails()
+	{
+		if (!$practice = Practice::model()->with(array('contact' => array('with' => 'address')))->findByPk($_GET['practice_id'])) {
+			throw new Exception("Practice not found: ".$_GET['practice_id']);
+		}
+
+		$practice_details = array(
+			'address' => $practice->contact->address ? $practice->contact->address->letterLine : 'Unknown',
+			'telephone' => $practice->phone ? $practice->phone : 'Unknown',
+		);
+
+		echo CJavaScript::jsonEncode($practice_details);
+	}
+
+	public function actionUpdatePatientGPAndPracticeDetails($id)
+	{
+		if (!$patient = Patient::model()->findByPk($id)) {
+			throw new Exception("Patient not found: $id");
+		}
+
+		$patient->gp_id = $_POST['gp_id'] ? $_POST['gp_id'] : null;
+		$patient->practice_id = $_POST['practice_id'] ? $_POST['practice_id'] : null;
+
+		if (!$patient->save()) {
+			throw new Exception("Unable to save patient: ".print_r($patient->getErrors(),true));
+		}
+
+		echo "1";
 	}
 }

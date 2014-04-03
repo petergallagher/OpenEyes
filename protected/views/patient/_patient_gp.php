@@ -17,55 +17,23 @@
  * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
  */
 ?>
-<section class="box patient-info js-toggle-container">
+<section class="box patient-info patient-gp-details js-toggle-container">
+	<?php echo $this->renderPartial('//patient/_form_errors')?>
 	<h3 class="box-title">General Practitioner:</h3>
 	<a href="#" class="toggle-trigger toggle-hide js-toggle">
 		<span class="icon-showhide">
 			Show/hide this section
 		</span>
 	</a>
-	<div class="js-toggle-body">
-		<div class="row data-row">
-			<div class="large-4 column">
-				<div class="data-label">Name:</div>
-			</div>
-			<div class="large-8 column">
-				<div class="data-value"><?php echo ($this->patient->gp) ? $this->patient->gp->contact->fullName : 'Unknown'; ?></div>
-			</div>
-		</div>
-		<?php if (Yii::app()->user->checkAccess('admin')) { ?>
-		<div class="row data-row highlight">
-			<div class="large-4 column">
-				<div class="data-label">GP Address:</div>
-			</div>
-			<div class="large-8 column">
-				<div class="data-value"><?php echo ($this->patient->gp && $this->patient->gp->contact->address) ? $this->patient->gp->contact->address->letterLine : 'Unknown'; ?></div>
-			</div>
-		</div>
-		<div class="row data-row highlight">
-			<div class="large-4 column">
-				<div class="data-label">GP Telephone:</div>
-			</div>
-			<div class="large-8 column">
-				<div class="data-value"><?php echo ($this->patient->gp && $this->patient->gp->contact->primary_phone) ? $this->patient->gp->contact->primary_phone : 'Unknown'; ?></div>
-			</div>
-		</div>
-		<?php } ?>
-		<div class="row data-row">
-			<div class="large-4 column">
-				<div class="data-label">Practice Address:</div>
-			</div>
-			<div class="large-8 column">
-				<div class="data-value"><?php echo ($this->patient->practice && $this->patient->practice->contact->address) ? $this->patient->practice->contact->address->letterLine : 'Unknown'; ?></div>
-			</div>
-		</div>
-		<div class="row data-row">
-			<div class="large-4 column">
-				<div class="data-label">Practice Telephone:</div>
-			</div>
-			<div class="large-8 column">
-				<div class="data-value"><?php echo ($this->patient->practice && $this->patient->practice->phone) ? $this->patient->practice->phone : 'Unknown'; ?></div>
-			</div>
-		</div>
+	<?php if (Yii::app()->params['patient_demographics_editable'] && Yii::app()->user->checkAccess('OprnEditPatientDetails')) {?>
+		<a href="#" class="toggle-edit-patient-details edit-patient-gp-details">
+			edit
+		</a>
+	<?php }?>
+	<div class="js-toggle-body patient-gp-details">
+		<?php echo $this->renderPartial('_patient_gp_view')?>
+		<?php if (Yii::app()->params['patient_demographics_editable'] && Yii::app()->user->checkAccess('OprnEditPatientDetails')) {?>
+			<?php echo $this->renderPartial('_patient_gp_edit')?>
+		<?php }?>
 	</div>
 </section>

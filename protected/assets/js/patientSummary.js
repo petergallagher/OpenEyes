@@ -216,6 +216,73 @@ $(document).ready(function() {
 			}
 		});
 	});
+
+	$('.patient-info .edit-patient-gp-details').click(function(e) {
+		e.preventDefault();
+
+		if ($('section.patient-gp-details .view-mode').is(':visible')) {
+			resetPatientGPDetailsForm();
+
+			$('.patient-gp-details .view-mode').hide();
+			$('.patient-gp-details .edit-mode').show();
+
+			$(this).text('view');
+			$('#gp_search').select().focus();
+
+		} else {
+			$('.patient-gp-details .edit-mode').hide();
+			$('.patient-gp-details .view-mode').show();
+			$('section.patient-gp-details .alert-box').hide();
+
+			$(this).text('edit');
+		}
+
+		enableButtons();
+	});
+
+	handleButton($('#btn-cancel-edit-patient-gp-details'),function(e) {
+		e.preventDefault();
+
+		$('.patient-info .edit-patient-gp-details').click();
+	});
+
+	handleButton($('#btn-save-patient-gp-details'),function(e) {
+		e.preventDefault();
+
+		$('section.patient-gp-details .alert-box ul').html('');
+		$('section.patient-gp-details .alert-box').hide();
+
+		$.ajax({
+			'type': 'POST',
+			'url': baseUrl+'/patient/updatePatientGPAndPracticeDetails/'+OE_patient_id,
+			'data': $('#patient-gp-details-edit').serialize()+"&YII_CSRF_TOKEN="+YII_CSRF_TOKEN,
+			'success': function(resp) {
+				if (resp != '1') {
+					alert("Something went wrong trying to save the patient details, please try again or contact support for assistance.");
+					enableButtons();
+				} else {
+					window.location.reload();
+				}
+			}
+		});
+	});
+
+	$('#clear_gp').live('click',function(e) {
+		e.preventDefault();
+
+		$('#gp_id').val('');
+		$('#gp_name').text('Unknown');
+		$('#gp_address').text('Unknown');
+		$('#gp_telephone').text('Unknown');
+	});
+
+	$('#clear_practice').live('click',function(e) {
+		e.preventDefault();
+
+		$('#practice_id').val('');
+		$('#gp_practice_address').text('Unknown');
+		$('#gp_practice_telephone').text('Unknown');
+	});
 });
 
 function resetPatientDetailsForm()
@@ -244,6 +311,25 @@ function resetContactDetailsForm()
 {
 	$('#primary_phone').val($('#_primary_phone').val());
 	$('#email').val($('#_email').val());
+}
+
+function resetPatientGPDetailsForm()
+{
+	$('#gp_id').val($('#_gp_id').val());
+	if ($('#_gp_id').val() != '') {
+		$('#gp_name').html($('#_gp_name').val()+' (<a href="#" id="clear_gp">clear</a>)');
+	} else {
+		$('#gp_name').text($('#_gp_name').val());
+	}
+	$('#gp_address').text($('#_gp_address').val());
+	$('#gp_telephone').text($('#_gp_telephone').val());
+	$('#practice_id').val($('#_practice_id').val());
+	if ($('#_practice_id').val() != '') {
+		$('#gp_practice_address').html($('#_gp_practice_address').val()+' (<a href="#" id="clear_practice">clear</a>)');
+	} else {
+		$('#gp_practice_address').text($('#_gp_practice_address').val());
+	}
+	$('#gp_practice_telephone').text($('#_gp_practice_telephone').val());
 }
 
 var contactCache = {};
