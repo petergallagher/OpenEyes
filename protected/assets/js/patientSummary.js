@@ -105,7 +105,7 @@ $(document).ready(function() {
 		enableButtons();
 	});
 
-	handleButton($('#btn-cancel-edit-patient-details'),function(e) {
+	$('#btn-cancel-edit-patient-details').click(function(e) {
 		e.preventDefault();
 
 		$('section.patient-details .toggle-edit-patient-details').click();
@@ -173,7 +173,7 @@ $(document).ready(function() {
 		enableButtons();
 	});
 
-	handleButton($('#btn-cancel-edit-patient-contact-details'),function(e) {
+	$('#btn-cancel-edit-patient-contact-details').click(function(e) {
 		e.preventDefault();
 
 		$('.patient-info .edit-patient-contact-details').click();
@@ -240,7 +240,7 @@ $(document).ready(function() {
 		enableButtons();
 	});
 
-	handleButton($('#btn-cancel-edit-patient-gp-details'),function(e) {
+	$('#btn-cancel-edit-patient-gp-details').click(function(e) {
 		e.preventDefault();
 
 		$('.patient-info .edit-patient-gp-details').click();
