@@ -66,8 +66,6 @@ if (isset($element)) {
 class <?php if (isset($element)) echo $element['class_name']; ?>  extends <?php if (isset($element) && $element['split_element']){?> SplitEventTypeElement<?php } else { ?> BaseEventTypeElement<?php }?>
 
 {
-	public $service;
-
 	/**
 	 * Returns the static model of the specified AR class.
 	 * @return the static model class
