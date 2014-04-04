@@ -23,10 +23,10 @@
 	<div class="large-8 medium-9 small-12 small-centered medium-centered large-centered column">
 		<div class="panel search-examples">
 			Find a patient by
-			<strong>Hospital Number</strong>,
-			<strong>NHS Number</strong>,
-			<strong>Firstname Surname</strong> or
-			<strong>Surname, Firstname</strong>.
+			<strong><?php echo Patient::model()->getAttributeLabel('hos_num')?></strong>,
+			<strong><?php echo Patient::model()->getAttributeLabel('nhs_num')?></strong>,
+			<strong><?php echo Patient::model()->getAttributeLabel('first_name')?> <?php echo Patient::model()->getAttributeLabel('last_name')?></strong> or
+			<strong><?php echo Patient::model()->getAttributeLabel('last_name')?> <?php echo Patient::model()->getAttributeLabel('first_name')?></strong>.
 		</div>
 	</div>
 </div>

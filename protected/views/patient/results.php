@@ -26,7 +26,7 @@
 		$based_on[] = 'FIRST NAME: <strong>"'.$search_terms['first_name'].'"</strong>';
 	}
 	if ($search_terms['hos_num']) {
-		$based_on[] = 'HOSPITAL NUMBER: <strong>'.$search_terms['hos_num']."</strong>";
+		$based_on[] = strtoupper(Patient::model()->getAttributeLabel('hos_num')).': <strong>'.$search_terms['hos_num']."</strong>";
 	}
 	$based_on = implode(', ', $based_on);
 	?>
@@ -60,11 +60,11 @@
 			<table id="patient-grid" class="grid">
 				<thead>
 					<tr>
-						<?php foreach (array('Hospital Number','Title','First name','Last name','Date of birth','Gender','NHS number') as $i => $field) {?>
+						<?php foreach (array('hos_num','title','first_name','last_name','dob','gender','nhs_num') as $i => $field) {?>
 						<th id="patient-grid_c<?php echo $i; ?>">
 							<?php
 								$new_sort_dir = ($i == $sort_by) ? 1 - $sort_dir: 0;
-								echo CHtml::link($field,Yii::app()->createUrl('patient/search', $search_terms + array('sort_by' => $i, 'sort_dir' => $new_sort_dir, 'page_num' => $page_num)));
+								echo CHtml::link(Patient::model()->getAttributeLabel($field),Yii::app()->createUrl('patient/search', $search_terms + array('sort_by' => $i, 'sort_dir' => $new_sort_dir, 'page_num' => $page_num)));
 							?>
 						</th>
 						<?php }?>

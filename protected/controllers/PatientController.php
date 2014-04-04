@@ -240,9 +240,9 @@ class PatientController extends BaseController
 
 			$message = 'Sorry, no results ';
 			if ($search_terms['hos_num']) {
-				$message .= 'for Hospital Number <strong>"'.$search_terms['hos_num'].'"</strong>';
+				$message .= 'for '.Patient::model()->getAttributeLabel('hos_num').' <strong>"'.$search_terms['hos_num'].'"</strong>';
 			} elseif ($search_terms['nhs_num']) {
-				$message .= 'for NHS Number <strong>"'.$search_terms['nhs_num'].'"</strong>';
+				$message .= 'for '.Patient::model()->getAttributeLabel('nhs_num').' <strong>"'.$search_terms['nhs_num'].'"</strong>';
 			} elseif ($search_terms['first_name'] && $search_terms['last_name']) {
 				$message .= 'for Patient Name <strong>"'.$search_terms['first_name'] . ' ' . $search_terms['last_name'].'"</strong>';
 			} else {

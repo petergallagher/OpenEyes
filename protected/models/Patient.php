@@ -161,6 +161,10 @@ class Patient extends BaseActiveRecord
 			'nhs_num' => 'NHS number',
 			'yob' => 'Year of birth',
 			'primary_phone' => 'Telephone',
+			'first_name' => 'First name(s)',
+			'last_name' => 'Last name',
+			'consent_last_name' => "Patient's surname/family name",
+			'consent_first_name' => "Patient's first names",
 		);
 	}
 

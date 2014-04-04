@@ -20,7 +20,7 @@
 		<div class="view-mode">
 			<div class="row data-row">
 				<div class="large-4 column">
-					<div class="data-label">Telephone:</div>
+					<div class="data-label"><?php echo $this->patient->getAttributeLabel('primary_phone')?>:</div>
 				</div>
 				<div class="large-8 column">
 					<div class="data-value"><?php echo !empty($this->patient->primary_phone) ? $this->patient->primary_phone : 'Unknown'?></div>
@@ -28,7 +28,7 @@
 			</div>
 			<div class="row data-row">
 				<div class="large-4 column">
-					<div class="data-label">Email:</div>
+					<div class="data-label"><?php echo $this->patient->contact->address->getAttributeLabel('email')?>:</div>
 				</div>
 				<div class="large-8 column">
 					<div class="data-value"><?php echo !empty($this->patient->contact->address->email) ? $this->patient->contact->address->email : 'Unknown'?></div>

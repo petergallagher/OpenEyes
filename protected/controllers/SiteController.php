@@ -99,7 +99,7 @@ class SiteController extends BaseController
 
 		if (isset($query)) {
 			if (strlen($query) == 0) {
-				Yii::app()->user->setFlash('warning.search_error', "Please enter either a hospital number or a firstname and lastname.");
+				Yii::app()->user->setFlash('warning.search_error', "Please enter either a ".Patient::model()->getAttributeLabel('hos_num')." or a firstname and lastname.");
 			} else {
 				Yii::app()->user->setFlash('warning.search_error', '<strong>"'.CHtml::encode($query).'"</strong> is not a valid search.');
 			}

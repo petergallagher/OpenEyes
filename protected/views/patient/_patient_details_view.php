@@ -20,7 +20,7 @@
 		<div class="view-mode">
 			<div class="row data-row">
 				<div class="large-4 column">
-					<div class="data-label">First name(s):</div>
+					<div class="data-label"><?php echo $this->patient->getAttributeLabel('first_name')?>:</div>
 				</div>
 				<div class="large-8 column">
 					<div class="data-value"><?php echo $this->patient->first_name?></div>
@@ -28,7 +28,7 @@
 			</div>
 			<div class="row data-row">
 				<div class="large-4 column">
-					<div class="data-label">Last name:</div>
+					<div class="data-label"><?php echo $this->patient->getAttributeLabel('last_name')?>:</div>
 				</div>
 				<div class="large-8 column">
 					<div class="data-value"><?php echo $this->patient->last_name?></div>
@@ -46,7 +46,7 @@
 			</div>
 			<div class="row data-row">
 				<div class="large-4 column">
-					<div class="data-label">Date of Birth:</div>
+					<div class="data-label"><?php echo $this->patient->getAttributeLabel('dob')?>:</div>
 				</div>
 				<div class="large-8 column">
 					<div class="data-value">
@@ -57,7 +57,7 @@
 			<?php if (!$this->patient->dob) {?>
 				<div class="row data-row">
 					<div class="large-4 column">
-						<div class="data-label">Year of Birth:</div>
+						<div class="data-label"><?php echo $this->patient->getAttributeLabel('yob')?>:</div>
 					</div>
 					<div class="large-8 column">
 						<div class="data-value">
@@ -69,7 +69,7 @@
 			<div class="row data-row">
 				<?php if ($this->patient->date_of_death) { ?>
 					<div class="large-4 column">
-						<div class="data-label">Date of Death:</div>
+						<div class="data-label"><?php echo $this->patient->getAttributeLabel('date_of_death')?>:</div>
 					</div>
 					<div class="large-8 column">
 						<div class="data-value">
@@ -78,7 +78,7 @@
 					</div>
 				<?php } else {?>
 					<div class="large-4 column">
-						<div class="data-label">Age:</div>
+						<div class="data-label"><?php echo $this->patient->getAttributeLabel('age')?>:</div>
 					</div>
 					<div class="large-8 column">
 						<div class="data-value">
@@ -89,7 +89,7 @@
 			</div>
 			<div class="row data-row">
 				<div class="large-4 column">
-					<div class="data-label">Gender:</div>
+					<div class="data-label"><?php echo $this->patient->getAttributeLabel('gender')?>:</div>
 				</div>
 				<div class="large-8 column">
 					<div class="data-value">
@@ -99,7 +99,7 @@
 			</div>
 			<div class="row data-row">
 				<div class="large-4 column">
-					<div class="data-label">Ethnic Group:</div>
+					<div class="data-label"><?php echo $this->patient->getAttributeLabel('ethnic_group_id')?>:</div>
 				</div>
 				<div class="large-8 column">
 					<div class="data-value">

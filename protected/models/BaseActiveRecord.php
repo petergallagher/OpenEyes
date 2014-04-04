@@ -181,4 +181,13 @@ class BaseActiveRecord extends CActiveRecord
 
 		return $object;
 	}
+
+	public function getAttributeLabel($attribute)
+	{
+		if ($label = ModelAttributeLabel::model()->find('class=? and attribute=?',array(get_class($this),$attribute))) {
+			return $label->label;
+		}
+
+		return parent::getAttributeLabel($attribute);
+	}
 }
