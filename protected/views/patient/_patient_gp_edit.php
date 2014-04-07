@@ -17,13 +17,13 @@
  * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
  */
 ?>
-		<?php echo CHtml::hiddenField('_gp_id',$this->patient->gp_id)?>
-		<?php echo CHtml::hiddenField('_gp_name',($this->patient->gp) ? $this->patient->gp->contact->fullName : 'Unknown')?>
-		<?php echo CHtml::hiddenField('_gp_address',($this->patient->gp && $this->patient->gp->contact->address) ? $this->patient->gp->contact->address->letterLine : 'Unknown')?>
-		<?php echo CHtml::hiddenField('_gp_telephone',($this->patient->gp && $this->patient->gp->contact->primary_phone) ? $this->patient->gp->contact->primary_phone : 'Unknown')?>
-		<?php echo CHtml::hiddenField('_practice_id',$this->patient->practice_id)?>
-		<?php echo CHtml::hiddenField('_gp_practice_address',($this->patient->practice && $this->patient->practice->contact->address) ? $this->patient->practice->contact->address->letterLine : 'Unknown')?>
-		<?php echo CHtml::hiddenField('_gp_practice_telephone',($this->patient->practice && $this->patient->practice->phone) ? $this->patient->practice->phone : 'Unknown')?>
+		<?php echo CHtml::hiddenField('_gp_id',$gp->id)?>
+		<?php echo CHtml::hiddenField('_gp_name',$gp->contact ? $gp->contact->fullName : 'Unknown')?>
+		<?php echo CHtml::hiddenField('_gp_address',$gp->contact->address ? $gp->contact->address->letterLine : 'Unknown')?>
+		<?php echo CHtml::hiddenField('_gp_telephone',$gp->contact->primary_phone ? $gp->contact->primary_phone : 'Unknown')?>
+		<?php echo CHtml::hiddenField('_practice_id',$practice->id)?>
+		<?php echo CHtml::hiddenField('_gp_practice_address',$practice->contact->address ? $practice->contact->address->letterLine : 'Unknown')?>
+		<?php echo CHtml::hiddenField('_gp_practice_telephone',$practice->phone ? $practice->phone : 'Unknown')?>
 
 		<?php
 		$form = $this->beginWidget('BaseEventTypeCActiveForm', array(
