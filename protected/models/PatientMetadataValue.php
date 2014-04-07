@@ -51,7 +51,7 @@ class PatientMetadataValue extends BaseActiveRecord
 	{
 		return array(
 			array('patient_id, key_name, key_value', 'safe'),
-			array('patient_id, key_name, key_value', 'required'),
+			array('patient_id, key_name', 'required'),
 		);
 	}
 
@@ -74,7 +74,7 @@ class PatientMetadataValue extends BaseActiveRecord
 		return array(
 			'id' => 'ID',
 			'key_name' => 'Key',
-			'key_value' => 'Label',
+			'key_value' => 'Value',
 		);
 	}
 

@@ -18,14 +18,13 @@
  */
 
 /**
- * This is the model class for table "patient_metadata_key".
+ * This is the model class for table "patient_metadata_field_type".
  *
- * The followings are the available columns in table 'patient_metadata_key':
+ * The followings are the available columns in table 'patient_metadata_field_type':
  * @property integer $id
- * @property string $key_name
- * @property string $key_label
+ * @property string $name
  */
-class PatientMetadataKey extends BaseActiveRecord
+class PatientMetadataFieldType extends BaseActiveRecord
 {
 	/**
 	 * Returns the static model of the specified AR class.
@@ -41,7 +40,7 @@ class PatientMetadataKey extends BaseActiveRecord
 	 */
 	public function tableName()
 	{
-		return 'patient_metadata_key';
+		return 'patient_metadata_field_type';
 	}
 
 	/**
@@ -50,8 +49,7 @@ class PatientMetadataKey extends BaseActiveRecord
 	public function rules()
 	{
 		return array(
-			array('key_name, key_label', 'required'),
-			array('name', 'length', 'max'=>40),
+			array('name', 'required'),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
 			array('id, name', 'safe', 'on'=>'search'),
@@ -66,8 +64,6 @@ class PatientMetadataKey extends BaseActiveRecord
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return array(
-			'options' => array(self::HAS_MANY, 'PatientMetadataKeyOption', 'key_id', 'order' => 'display_order asc'),
-			'fieldType' => array(self::BELONGS_TO, 'PatientMetadataFieldType', 'field_type_id'),
 		);
 	}
 
@@ -78,8 +74,7 @@ class PatientMetadataKey extends BaseActiveRecord
 	{
 		return array(
 			'id' => 'ID',
-			'key_name' => 'Key',
-			'key_label' => 'Label',
+			'name' => 'Name',
 		);
 	}
 
@@ -95,8 +90,7 @@ class PatientMetadataKey extends BaseActiveRecord
 		$criteria=new CDbCriteria;
 
 		$criteria->compare('id',$this->id,true);
-		$criteria->compare('key_name',$this->name,true);
-		$criteria->compare('key_label',$this->name,true);
+		$criteria->compare('name',$this->name,true);
 
 		return new CActiveDataProvider(get_class($this), array(
 			'criteria'=>$criteria,

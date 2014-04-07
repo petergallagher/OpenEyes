@@ -17,6 +17,7 @@
  * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
  */
 ?>
+			<?php echo $this->renderPartial('_patient_metadata_edit',array('patient'=>$patient,'before'=>'hos_num'))?>
 			<div class="row data-row">
 				<div class="large-4 column">
 					<div class="data-label"><?php echo Patient::model()->getAttributeLabel('hos_num')?>:</div>
@@ -27,6 +28,8 @@
 					</div>
 				</div>
 			</div>
+			<?php echo $this->renderPartial('_patient_metadata_edit',array('patient'=>$patient,'after'=>'hos_num'))?>
+			<?php echo $this->renderPartial('_patient_metadata_edit',array('patient'=>$patient,'before'=>'nhs_num'))?>
 			<div class="row data-row">
 				<div class="large-4 column">
 					<div class="data-label"><?php echo Patient::model()->getAttributeLabel('nhs_num')?>:</div>
@@ -37,6 +40,8 @@
 					</div>
 				</div>
 			</div>
+			<?php echo $this->renderPartial('_patient_metadata_edit',array('patient'=>$patient,'after'=>'nhs_num'))?>
+			<?php echo $this->renderPartial('_patient_metadata_edit',array('patient'=>$patient,'before'=>'title'))?>
 			<div class="row data-row">
 				<div class="large-4 column">
 					<div class="data-label"><?php echo Contact::model()->getAttributeLabel('title')?>:</div>
@@ -47,6 +52,8 @@
 					</div>
 				</div>
 			</div>
+			<?php echo $this->renderPartial('_patient_metadata_edit',array('patient'=>$patient,'after'=>'title'))?>
+			<?php echo $this->renderPartial('_patient_metadata_edit',array('patient'=>$patient,'before'=>'first_name'))?>
 			<div class="row data-row">
 				<div class="large-4 column">
 					<div class="data-label"><?php echo Contact::model()->getAttributeLabel('first_name')?>(s):</div>
@@ -57,6 +64,8 @@
 					</div>
 				</div>
 			</div>
+			<?php echo $this->renderPartial('_patient_metadata_edit',array('patient'=>$patient,'after'=>'first_name'))?>
+			<?php echo $this->renderPartial('_patient_metadata_edit',array('patient'=>$patient,'before'=>'last_name'))?>
 			<div class="row data-row">
 				<div class="large-4 column">
 					<div class="data-label">Last name:</div>
@@ -67,6 +76,8 @@
 					</div>
 				</div>
 			</div>
+			<?php echo $this->renderPartial('_patient_metadata_edit',array('patient'=>$patient,'after'=>'last_name'))?>
+			<?php echo $this->renderPartial('_patient_metadata_edit',array('patient'=>$patient,'before'=>'address1'))?>
 			<div class="row data-row">
 				<div class="large-4 column">
 					<div class="data-label"><?php echo Address::model()->getAttributeLabel('address1')?>:</div>
@@ -75,6 +86,8 @@
 					<?php echo CHtml::textField('address1',$address->address1)?>
 				</div>
 			</div>
+			<?php echo $this->renderPartial('_patient_metadata_edit',array('patient'=>$patient,'after'=>'address1'))?>
+			<?php echo $this->renderPartial('_patient_metadata_edit',array('patient'=>$patient,'before'=>'address2'))?>
 			<div class="row data-row">
 				<div class="large-4 column">
 					<div class="data-label"><?php echo Address::model()->getAttributeLabel('address2')?>:</div>
@@ -83,6 +96,8 @@
 					<?php echo CHtml::textField('address2',$address->address2)?>
 				</div>
 			</div>
+			<?php echo $this->renderPartial('_patient_metadata_edit',array('patient'=>$patient,'after'=>'address2'))?>
+			<?php echo $this->renderPartial('_patient_metadata_edit',array('patient'=>$patient,'before'=>'city'))?>
 			<div class="row data-row">
 				<div class="large-4 column">
 					<div class="data-label"><?php echo Address::model()->getAttributeLabel('city')?>:</div>
@@ -91,6 +106,8 @@
 					<?php echo CHtml::textField('city',$address->city)?>
 				</div>
 			</div>
+			<?php echo $this->renderPartial('_patient_metadata_edit',array('patient'=>$patient,'after'=>'city'))?>
+			<?php echo $this->renderPartial('_patient_metadata_edit',array('patient'=>$patient,'before'=>'county'))?>
 			<div class="row data-row">
 				<div class="large-4 column">
 					<div class="data-label"><?php echo Address::model()->getAttributeLabel('county')?>:</div>
@@ -99,6 +116,8 @@
 					<?php echo CHtml::textField('county',$address->county)?>
 				</div>
 			</div>
+			<?php echo $this->renderPartial('_patient_metadata_edit',array('patient'=>$patient,'after'=>'county'))?>
+			<?php echo $this->renderPartial('_patient_metadata_edit',array('patient'=>$patient,'before'=>'postcode'))?>
 			<div class="row data-row">
 				<div class="large-4 column">
 					<div class="data-label"><?php echo Address::model()->getAttributeLabel('postcode')?>:</div>
@@ -107,6 +126,8 @@
 					<?php echo CHtml::textField('postcode',$address->postcode)?>
 				</div>
 			</div>
+			<?php echo $this->renderPartial('_patient_metadata_edit',array('patient'=>$patient,'after'=>'postcode'))?>
+			<?php echo $this->renderPartial('_patient_metadata_edit',array('patient'=>$patient,'before'=>'country_id'))?>
 			<div class="row data-row">
 				<div class="large-4 column">
 					<div class="data-label"><?php echo Address::model()->getAttributeLabel('country_id')?>:</div>
@@ -115,6 +136,8 @@
 					<?php echo CHtml::dropDownList('country_id',$address->country_id,CHtml::listData(Country::model()->findAll(array('order' => 'name asc')),'id','name'))?>
 				</div>
 			</div>
+			<?php echo $this->renderPartial('_patient_metadata_edit',array('patient'=>$patient,'after'=>'country_id'))?>
+			<?php echo $this->renderPartial('_patient_metadata_edit',array('patient'=>$patient,'before'=>'dob'))?>
 			<div class="row data-row">
 				<div class="large-4 column">
 					<div class="data-label"><?php echo $patient->getAttributeLabel('dob')?>:</div>
@@ -136,6 +159,8 @@
 					</div>
 				</div>
 			</div>
+			<?php echo $this->renderPartial('_patient_metadata_edit',array('patient'=>$patient,'after'=>'dob'))?>
+			<?php echo $this->renderPartial('_patient_metadata_edit',array('patient'=>$patient,'before'=>'yob'))?>
 			<div class="row data-row">
 				<div class="large-4 column">
 					<div class="data-label"><?php echo $patient->getAttributeLabel('yob')?>:</div>
@@ -146,6 +171,8 @@
 					</div>
 				</div>
 			</div>
+			<?php echo $this->renderPartial('_patient_metadata_edit',array('patient'=>$patient,'after'=>'yob'))?>
+			<?php echo $this->renderPartial('_patient_metadata_edit',array('patient'=>$patient,'before'=>'date_of_death'))?>
 			<div class="row data-row">
 				<div class="large-4 column">
 					<div class="data-label"><?php echo $patient->getAttributeLabel('date_of_death')?>:</div>
@@ -167,6 +194,8 @@
 					</div>
 				</div>
 			</div>
+			<?php echo $this->renderPartial('_patient_metadata_edit',array('patient'=>$patient,'after'=>'date_of_death'))?>
+			<?php echo $this->renderPartial('_patient_metadata_edit',array('patient'=>$patient,'before'=>'gender'))?>
 			<div class="row data-row">
 				<div class="large-4 column">
 					<div class="data-label"><?php echo $patient->getAttributeLabel('gender_id')?>:</div>
@@ -179,6 +208,8 @@
 					</div>
 				</div>
 			</div>
+			<?php echo $this->renderPartial('_patient_metadata_edit',array('patient'=>$patient,'after'=>'gender'))?>
+			<?php echo $this->renderPartial('_patient_metadata_edit',array('patient'=>$patient,'before'=>'ethnic_group_id'))?>
 			<div class="row data-row">
 				<div class="large-4 column">
 					<div class="data-label"><?php echo $patient->getAttributeLabel('ethnic_group_id')?>:</div>
@@ -189,25 +220,4 @@
 					</div>
 				</div>
 			</div>
-			<?php foreach (PatientMetadataKey::model()->findAll(array('order' => 'id asc')) as $metadata_key) {?>
-				<div class="row data-row">
-					<div class="large-4 column">
-						<div class="data-label"><?php echo $metadata_key->key_label?>:</div>
-					</div>
-					<div class="large-8 column">
-						<div class="data-value">
-							<?php if ($metadata_key->select) {
-								if ($metadata_key->select_empty) {
-									$htmlOptions = array('empty' => $metadata_key->select_empty);
-								} else {
-									$htmlOptions = array();
-								}
-
-								echo CHtml::dropDownList($metadata_key->key_name,empty($_POST) ? $patient->metadata($metadata_key->key_name) : $_POST[$metadata_key->key_name],CHtml::listData($metadata_key->options,'option_value','option_value'),$htmlOptions);
-							} else {
-								echo CHtml::textField($metadata_key->key_name,empty($_POST) ? $patient->metadata($metadata_key->key_name) : $_POST[$metadata_key->key_name]);
-							}?>
-						</div>
-					</div>
-				</div>
-			<?php }?>
+			<?php echo $this->renderPartial('_patient_metadata_edit',array('patient'=>$patient,'after'=>'ethnic_group_id'))?>

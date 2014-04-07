@@ -18,105 +18,111 @@
  */
 ?>
 		<div class="view-mode">
+			<?php echo $this->renderPartial('_patient_metadata_view',array('patient'=>$patient,'before'=>'first_name'))?>
 			<div class="row data-row">
 				<div class="large-4 column">
-					<div class="data-label"><?php echo $this->patient->getAttributeLabel('first_name')?>:</div>
+					<div class="data-label"><?php echo $patient->getAttributeLabel('first_name')?>:</div>
 				</div>
 				<div class="large-8 column">
-					<div class="data-value"><?php echo $this->patient->first_name?></div>
+					<div class="data-value"><?php echo $patient->first_name?></div>
 				</div>
 			</div>
+			<?php echo $this->renderPartial('_patient_metadata_view',array('patient'=>$patient,'after'=>'first_name'))?>
+			<?php echo $this->renderPartial('_patient_metadata_view',array('patient'=>$patient,'before'=>'last_name'))?>
 			<div class="row data-row">
 				<div class="large-4 column">
-					<div class="data-label"><?php echo $this->patient->getAttributeLabel('last_name')?>:</div>
+					<div class="data-label"><?php echo $patient->getAttributeLabel('last_name')?>:</div>
 				</div>
 				<div class="large-8 column">
-					<div class="data-value"><?php echo $this->patient->last_name?></div>
+					<div class="data-value"><?php echo $patient->last_name?></div>
 				</div>
 			</div>
+			<?php echo $this->renderPartial('_patient_metadata_view',array('patient'=>$patient,'after'=>'last_name'))?>
+			<?php echo $this->renderPartial('_patient_metadata_view',array('patient'=>$patient,'before'=>'address'))?>
 			<div class="row data-row">
 				<div class="large-4 column">
 					<div class="data-label">Address:</div>
 				</div>
 				<div class="large-8 column">
 					<div class="data-value">
-						<?php echo $this->patient->getSummaryAddress()?>
+						<?php echo $patient->getSummaryAddress()?>
 					</div>
 				</div>
 			</div>
+			<?php echo $this->renderPartial('_patient_metadata_view',array('patient'=>$patient,'after'=>'address'))?>
+			<?php echo $this->renderPartial('_patient_metadata_view',array('patient'=>$patient,'before'=>'dob'))?>
 			<div class="row data-row">
 				<div class="large-4 column">
-					<div class="data-label"><?php echo $this->patient->getAttributeLabel('dob')?>:</div>
+					<div class="data-label"><?php echo $patient->getAttributeLabel('dob')?>:</div>
 				</div>
 				<div class="large-8 column">
 					<div class="data-value">
-						<?php echo ($this->patient->dob) ? $this->patient->NHSDate('dob') : 'Unknown' ?>
+						<?php echo ($patient->dob) ? $patient->NHSDate('dob') : 'Unknown' ?>
 					</div>
 				</div>
 			</div>
-			<?php if (!$this->patient->dob) {?>
+			<?php echo $this->renderPartial('_patient_metadata_view',array('patient'=>$patient,'after'=>'dob'))?>
+			<?php if (!$patient->dob) {?>
+				<?php echo $this->renderPartial('_patient_metadata_view',array('patient'=>$patient,'before'=>'yob'))?>
 				<div class="row data-row">
 					<div class="large-4 column">
-						<div class="data-label"><?php echo $this->patient->getAttributeLabel('yob')?>:</div>
+						<div class="data-label"><?php echo $patient->getAttributeLabel('yob')?>:</div>
 					</div>
 					<div class="large-8 column">
 						<div class="data-value">
-							<?php echo ($this->patient->yob) ? $this->patient->yob : 'Unknown' ?>
+							<?php echo ($patient->yob) ? $patient->yob : 'Unknown' ?>
 						</div>
 					</div>
 				</div>
+				<?php echo $this->renderPartial('_patient_metadata_view',array('patient'=>$patient,'after'=>'yob'))?>
 			<?php }?>
 			<div class="row data-row">
-				<?php if ($this->patient->date_of_death) { ?>
+				<?php if ($patient->date_of_death) {?>
+					<?php echo $this->renderPartial('_patient_metadata_view',array('patient'=>$patient,'before'=>'date_of_death'))?>
 					<div class="large-4 column">
-						<div class="data-label"><?php echo $this->patient->getAttributeLabel('date_of_death')?>:</div>
+						<div class="data-label"><?php echo $patient->getAttributeLabel('date_of_death')?>:</div>
 					</div>
 					<div class="large-8 column">
 						<div class="data-value">
-							<?php echo $this->patient->NHSDate('date_of_death') . ' (Age '.$this->patient->getAge().')' ?>
+							<?php echo $patient->NHSDate('date_of_death') . ' (Age '.$patient->getAge().')' ?>
 						</div>
 					</div>
+					<?php echo $this->renderPartial('_patient_metadata_view',array('patient'=>$patient,'after'=>'date_of_death'))?>
 				<?php } else {?>
+					<?php echo $this->renderPartial('_patient_metadata_view',array('patient'=>$patient,'before'=>'age'))?>
 					<div class="large-4 column">
-						<div class="data-label"><?php echo $this->patient->getAttributeLabel('age')?>:</div>
+						<div class="data-label"><?php echo $patient->getAttributeLabel('age')?>:</div>
 					</div>
 					<div class="large-8 column">
 						<div class="data-value">
-							<?php echo $this->patient->getAge()?>
+							<?php echo $patient->getAge()?>
 						</div>
 					</div>
+					<?php echo $this->renderPartial('_patient_metadata_view',array('patient'=>$patient,'after'=>'age'))?>
 				<?php }?>
 			</div>
+			<?php echo $this->renderPartial('_patient_metadata_view',array('patient'=>$patient,'before'=>'gender'))?>
 			<div class="row data-row">
 				<div class="large-4 column">
-					<div class="data-label"><?php echo $this->patient->getAttributeLabel('gender')?>:</div>
+					<div class="data-label"><?php echo $patient->getAttributeLabel('gender')?>:</div>
 				</div>
 				<div class="large-8 column">
 					<div class="data-value">
-						<?php echo $this->patient->getGenderString() ?>
+						<?php echo $patient->getGenderString() ?>
 					</div>
 				</div>
 			</div>
+			<?php echo $this->renderPartial('_patient_metadata_view',array('patient'=>$patient,'after'=>'gender'))?>
+			<?php echo $this->renderPartial('_patient_metadata_view',array('patient'=>$patient,'before'=>'ethnic_group_id'))?>
 			<div class="row data-row">
 				<div class="large-4 column">
-					<div class="data-label"><?php echo $this->patient->getAttributeLabel('ethnic_group_id')?>:</div>
+					<div class="data-label"><?php echo $patient->getAttributeLabel('ethnic_group_id')?>:</div>
 				</div>
 				<div class="large-8 column">
 					<div class="data-value">
-						<?php echo $this->patient->getEthnicGroupString() ?>
+						<?php echo $patient->getEthnicGroupString() ?>
 					</div>
 				</div>
 			</div>
-			<?php foreach (PatientMetadataKey::model()->findAll(array('order' => 'id asc')) as $metadata_key) {?>
-				<div class="row data-row">
-					<div class="large-4 column">
-						<div class="data-label"><?php echo $metadata_key->key_label?>:</div>
-					</div>
-					<div class="large-8 column">
-						<div class="data-value">
-							<?php echo $this->patient->metadata($metadata_key->key_name)?>
-						</div>
-					</div>
-				</div>
-			<?php }?>
+			<?php echo $this->renderPartial('_patient_metadata_view',array('patient'=>$patient,'after'=>'ethnic_group_id'))?>
 		</div>
