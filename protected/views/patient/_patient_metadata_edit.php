@@ -43,7 +43,7 @@ if (@$before) {
 						<div class="data-value">
 							<?php switch($metadata_key->fieldType->name) {
 								case 'Text':
-									echo CHtml::textField($metadata_key->key_name,empty($_POST) ? $patient->metadata($metadata_key->key_name) : $_POST[$metadata_key->key_name]);
+									echo CHtml::textField($metadata_key->key_name,empty($_POST) ? $patient->{$metadata_key->key_name} : $_POST[$metadata_key->key_name]);
 									break;
 								case 'Select':
 									$htmlOptions = $metadata_key->field_option1 ? array('empty' => $metadata_key->field_option1) : array();
@@ -54,11 +54,11 @@ if (@$before) {
 										CHtml::listData($class_name::model()->findAll(array('order' => 'display_order asc')),'name','name') :
 										CHtml::listData($metadata_key->options,'option_value','option_value');
 
-									echo CHtml::dropDownList($metadata_key->key_name,empty($_POST) ? $patient->metadata($metadata_key->key_name) : $_POST[$metadata_key->key_name],$options,$htmlOptions);
+									echo CHtml::dropDownList($metadata_key->key_name,empty($_POST) ? $patient->{$metadata_key->key_name} : $_POST[$metadata_key->key_name],$options,$htmlOptions);
 									break;
 								case 'Checkbox':
 									echo CHtml::hiddenField($metadata_key->key_name,0);
-									echo CHtml::checkBox($metadata_key->key_name,empty($_POST) ? $patient->metadata($metadata_key->key_name) : $_POST[$metadata_key->key_name]);
+									echo CHtml::checkBox($metadata_key->key_name,empty($_POST) ? $patient->{$metadata_key->key_name} : $_POST[$metadata_key->key_name]);
 									echo '&nbsp;'.$metadata_key->key_label;
 									break;
 							}?>

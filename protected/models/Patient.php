@@ -57,6 +57,7 @@ class Patient extends BaseActiveRecord
 
 	public $use_pas = TRUE;
 	private $_orderedepisodes;
+	private $metadata_keys = array();
 
 	/**
 		* Returns the static model of the specified AR class.
@@ -1363,6 +1364,21 @@ class Patient extends BaseActiveRecord
 		}
 
 		return $res;
+	}
+
+	public function __get($key)
+	{
+		if (empty($this->metadata_keys)) {
+			foreach (PatientMetadataKey::model()->findAll() as $metadata_key) {
+				$this->metadata_keys[] = $metadata_key->key_name;
+			}
+		}
+
+		if (in_array($key, $this->metadata_keys)) {
+			return $this->metadata($key);
+		}
+
+		return parent::__get($key);
 	}
 
 	public function metadata($key_name)

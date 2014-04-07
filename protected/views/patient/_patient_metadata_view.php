@@ -38,9 +38,9 @@ if (@$before) {
 					<div class="large-8 column">
 						<div class="data-value">
 							<?php if ($metadata_key->fieldType->name == 'Checkbox') {
-								echo $patient->metadata($metadata_key->key_name) ? 'Yes' : 'No';
+								echo $patient->{$metadata_key->key_name} ? 'Yes' : 'No';
 							} else {
-								echo $patient->metadata($metadata_key->key_name) ? $patient->metadata($metadata_key->key_name) : '-';
+								echo $patient->{$metadata_key->key_name} ? $patient->{$metadata_key->key_name} : '-';
 							}?>
 						</div>
 					</div>
