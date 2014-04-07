@@ -28,7 +28,7 @@
 			</div>
 			<div class="row data-row">
 				<div class="large-4 column">
-					<div class="data-label"><?php echo $this->patient->contact->address : $this->patient->contact->address->getAttributeLabel('email') : 'Unknown'?>:</div>
+					<div class="data-label"><?php echo $this->patient->contact->address ? $this->patient->contact->address->getAttributeLabel('email') : 'Unknown'?>:</div>
 				</div>
 				<div class="large-8 column">
 					<div class="data-value"><?php echo !empty($this->patient->contact->address->email) ? $this->patient->contact->address->email : 'Unknown'?></div>
