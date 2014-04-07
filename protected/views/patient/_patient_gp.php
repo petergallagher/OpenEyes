@@ -33,7 +33,11 @@
 	<div class="js-toggle-body patient-gp-details">
 		<?php echo $this->renderPartial('_patient_gp_view')?>
 		<?php if (Yii::app()->params['patient_demographics_editable'] && Yii::app()->user->checkAccess('OprnEditPatientDetails')) {?>
-			<?php echo $this->renderPartial('_patient_gp_edit')?>
+			<?php echo $this->renderPartial('_patient_gp_edit',array(
+				'patient' => $this->patient,
+				'gp' => $this->patient->gp,
+				'practice' => $this->patient->practice,
+			))?>
 		<?php }?>
 	</div>
 </section>

@@ -87,8 +87,6 @@ $(document).ready(function() {
 		e.preventDefault();
 
 		if ($('section.patient-details .view-mode').is(':visible')) {
-			resetPatientDetailsForm();
-
 			$('.patient-details .view-mode').hide();
 			$('.patient-details .edit-mode').show();
 
@@ -98,6 +96,8 @@ $(document).ready(function() {
 			$('.patient-details .edit-mode').hide();
 			$('.patient-details .view-mode').show();
 			$('section.patient-details .alert-box').hide();
+
+			resetPatientDetailsForm();
 
 			$(this).text('edit');
 		}
@@ -155,8 +155,6 @@ $(document).ready(function() {
 		e.preventDefault();
 
 		if ($('.patient-contact-details .view-mode').is(':visible')) {
-			resetContactDetailsForm();
-
 			$('.patient-contact-details .view-mode').hide();
 			$('.patient-contact-details .edit-mode').show();
 
@@ -166,6 +164,8 @@ $(document).ready(function() {
 			$('.patient-contact-details .edit-mode').hide();
 			$('.patient-contact-details .view-mode').show();
 			$('section.patient-contact-details .alert-box').hide();
+
+			resetContactDetailsForm();
 
 			$(this).text('edit');
 		}
@@ -221,8 +221,6 @@ $(document).ready(function() {
 		e.preventDefault();
 
 		if ($('section.patient-gp-details .view-mode').is(':visible')) {
-			resetPatientGPDetailsForm();
-
 			$('.patient-gp-details .view-mode').hide();
 			$('.patient-gp-details .edit-mode').show();
 
@@ -233,6 +231,8 @@ $(document).ready(function() {
 			$('.patient-gp-details .edit-mode').hide();
 			$('.patient-gp-details .view-mode').show();
 			$('section.patient-gp-details .alert-box').hide();
+
+			resetPatientGPDetailsForm();
 
 			$(this).text('edit');
 		}

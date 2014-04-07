@@ -107,4 +107,16 @@
 					</div>
 				</div>
 			</div>
+			<?php foreach (PatientMetadataKey::model()->findAll(array('order' => 'id asc')) as $metadata_key) {?>
+				<div class="row data-row">
+					<div class="large-4 column">
+						<div class="data-label"><?php echo $metadata_key->key_label?>:</div>
+					</div>
+					<div class="large-8 column">
+						<div class="data-value">
+							<?php echo $this->patient->metadata($metadata_key->key_name)?>
+						</div>
+					</div>
+				</div>
+			<?php }?>
 		</div>

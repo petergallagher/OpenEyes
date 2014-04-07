@@ -23,7 +23,7 @@ class m140401_144530_fix_patient_gender extends CDbMigration
 		$this->renameColumn('patient','gender_id','gender');
 		$this->alterColumn('patient','gender','varchar(1) null');
 
-		$this->update('patient','gender' => null,"gender = ''");
+		$this->update('patient',array('gender' => null),"gender = ''");
 		$this->update('patient',array('gender' => 'M'),"gender = '1'");
 		$this->update('patient',array('gender' => 'F'),"gender = '2'");
 	}

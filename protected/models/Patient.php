@@ -1364,4 +1364,28 @@ class Patient extends BaseActiveRecord
 
 		return $res;
 	}
+
+	public function metadata($key_name)
+	{
+		if ($this->id && $metadata_value = PatientMetadataValue::model()->find('patient_id=? and key_name=?',array($this->id,$key_name))) {
+			return $metadata_value->key_value;
+		}
+
+		return null;
+	}
+
+	public function setMetadata($key_name, $value)
+	{
+		if (!$metadata_value = PatientMetadataValue::model()->find('patient_id=? and key_name=?',array($this->id,$key_name))) {
+			$metadata_value = new PatientMetadataValue;
+			$metadata_value->patient_id = $this->id;
+			$metadata_value->key_name = $key_name;
+		}
+
+		$metadata_value->key_value = $value;
+
+		if (!$metadata_value->save()) {
+			throw new Exception("Unable to save PatientMetadataValue: ".print_r($metadata_value->getErrors(),true));
+		}
+	}
 }

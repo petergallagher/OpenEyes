@@ -1565,6 +1565,12 @@ class PatientController extends BaseController
 			$errors = array_merge($errors, $address->getErrors());
 		}
 
+		foreach (PatientMetadataKey::model()->findAll(array('order'=>'display_order asc')) as $metadata_key) {
+			if ($metadata_key->required && strlen($_POST[$metadata_key->key_name]) <1) {
+				$errors[$metadata_key->key_name] = array($metadata_key->key_label.' is required');
+			}
+		}
+
 		echo json_encode($errors);
 	}
 
@@ -1619,6 +1625,12 @@ class PatientController extends BaseController
 
 		if (!$address->save()) {
 			throw new Exception("Unable to save patient address: ".print_r($address->getErrors(),true));
+		}
+
+		foreach (PatientMetadataKey::model()->findAll() as $metadata_key) {
+			if (isset($_POST[$metadata_key->key_name])) {
+				$patient->setMetadata($metadata_key->key_name,$_POST[$metadata_key->key_name]);
+			}
 		}
 
 		$transaction->commit();
@@ -1699,6 +1711,8 @@ class PatientController extends BaseController
 		$patient = new Patient;
 		$contact = new Contact;
 		$address = new Address;
+		$gp = new Gp;
+		$practice = new Practice;
 		$address->country_id = Country::model()->find('name=?',array(Yii::app()->params['default_country']))->id;
 
 		$errors = array();
@@ -1709,6 +1723,9 @@ class PatientController extends BaseController
 			}
 
 			$transaction = Yii::app()->db->beginTransaction();
+
+			!empty($_POST['gp_id']) && $gp = Gp::model()->findByPk($_POST['gp_id']);
+			!empty($_POST['practice_id']) && $practice = Practice::model()->findByPk($_POST['practice_id']);
 
 			$patient->attributes = Helper::convertNHS2MySQL($_POST);
 
@@ -1736,7 +1753,15 @@ class PatientController extends BaseController
 
 			$address->attributes = $_POST;
 
-			if ($patient->id && $contact->id) {
+			foreach (PatientMetadataKey::model()->findAll(array('order'=>'display_order asc')) as $metadata_key) {
+				if (strlen(@$_POST[$metadata_key->key_name]) <1) {
+					$errors[$metadata_key->key_name] = array($metadata_key->key_label.' cannot be blank.');
+				} else {
+					$patient->id && $patient->setMetadata($metadata_key->key_name,$_POST[$metadata_key->key_name]);
+				}
+			}
+
+			if (empty($errors)) {
 				if (!$address->save()) {
 					$errors = array_merge($errors, $address->getErrors());
 				} else {
@@ -1757,6 +1782,8 @@ class PatientController extends BaseController
 			'patient' => $patient,
 			'contact' => $contact,
 			'address' => $address,
+			'gp' => $gp,
+			'practice' => $practice,
 			'errors' => $errors,
 		));
 	}

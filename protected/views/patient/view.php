@@ -17,9 +17,6 @@
  * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
  */
 
-?>
-
-<?php
 $clinical = $clinical = $this->checkAccess('OprnViewClinical');
 $warnings = $this->patient->getWarnings($clinical);
 ?>
@@ -75,7 +72,7 @@ $warnings = $this->patient->getWarnings($clinical);
 
 	<div class="row">
 		<div class="large-6 column">
-			<?php $this->renderPartial('_patient_details')?>
+			<?php $this->renderPartial('_patient_details',array('patient' => $this->patient))?>
 			<?php $this->renderPartial('_patient_contact_details')?>
 			<?php $this->renderPartial('_patient_gp')?>
 			<?php $this->renderPartial('_patient_commissioningbodies')?>

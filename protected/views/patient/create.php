@@ -53,6 +53,9 @@ $clinical = $clinical = $this->checkAccess('OprnEditPatientDetails');
 					'errors' => $errors,
 				))?>
 				<?php $this->renderPartial('_create_patient_gp',array(
+					'patient' => $patient,
+					'gp' => $gp,
+					'practice' => $practice,
 					'errors' => $errors,
 				))?>
 			</div>
