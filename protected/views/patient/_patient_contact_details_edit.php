@@ -17,8 +17,8 @@
  * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
  */
 ?>
-		<?php echo CHtml::hiddenField('_primary_phone',$this->patient->contact->primary_phone)?>
-		<?php echo CHtml::hiddenField('_email',$this->patient->contact->address ? $this->patient->contact->address->email : '')?>
+		<?php echo CHtml::hiddenField('_primary_phone',$contact->primary_phone)?>
+		<?php echo CHtml::hiddenField('_email',$address->email)?>
 
 		<?php
 		$form = $this->beginWidget('BaseEventTypeCActiveForm', array(
@@ -31,26 +31,10 @@
 			)
 		))?>
 			<div class="edit-mode" style="display: none">
-				<div class="row data-row">
-					<div class="large-4 column">
-						<div class="data-label">Telephone:</div>
-					</div>
-					<div class="large-8 column">
-						<div class="data-value">
-							<?php echo CHtml::textField('primary_phone',$this->patient->contact->primary_phone)?>
-						</div>
-					</div>
-				</div>
-				<div class="row data-row">
-					<div class="large-4 column">
-						<div class="data-label">Email:</div>
-					</div>
-					<div class="large-8 column">
-						<div class="data-value">
-							<?php echo CHtml::textField('email',$this->patient->contact->address ? $this->patient->contact->address->email : '')?>
-						</div>
-					</div>
-				</div>
+				<?php echo $this->renderPartial('_patient_contact_details_form',array(
+					'contact' => $contact,
+					'address' => $address,
+				))?>
 				<div class="row data-row">
 					<div class="large-12 column">
 						<button id="btn-save-patient-contact-details" class="secondary small">

@@ -73,7 +73,7 @@ $warnings = $this->patient->getWarnings($clinical);
 	<div class="row">
 		<div class="large-6 column">
 			<?php $this->renderPartial('_patient_details',array('patient' => $this->patient))?>
-			<?php $this->renderPartial('_patient_contact_details')?>
+			<?php $this->renderPartial('_patient_contact_details',array('patient' => $this->patient))?>
 			<?php $this->renderPartial('_patient_gp')?>
 			<?php $this->renderPartial('_patient_commissioningbodies')?>
 			<?php $this->renderPartial('_patient_contacts')?>

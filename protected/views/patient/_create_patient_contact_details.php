@@ -20,25 +20,9 @@
 <section class="box patient-edit js-toggle-container">
 	<h3 class="box-title">Contact details:</h3>
 	<div class="js-toggle-body">
-		<div class="row data-row">
-			<div class="large-4 column">
-				<div class="data-label"><?php echo $patient->getAttributeLabel('primary_phone')?>:</div>
-			</div>
-			<div class="large-8 column">
-				<div class="data-value">
-					<?php echo CHtml::textField('primary_phone',$patient->primary_phone)?>
-				</div>
-			</div>
-		</div>
-		<div class="row data-row">
-			<div class="large-4 column">
-				<div class="data-label">Email:</div>
-			</div>
-			<div class="large-8 column">
-				<div class="data-value">
-					<?php echo CHtml::textField('email',$address->email)?>
-				</div>
-			</div>
-		</div>
+		<?php echo $this->renderPartial('_patient_contact_details_form',array(
+			'contact' => $contact,
+			'address' => $address,
+		))?>
 	</div>
 </section>

@@ -31,9 +31,17 @@
 		</a>
 	<?php }?>
 	<div class="js-toggle-body patient-contact-details">
-		<?php echo $this->renderPartial('_patient_contact_details_view')?>
+		<?php echo $this->renderPartial('_patient_contact_details_view',array(
+			'patient' => $patient,
+			'contact' => $patient->contact,
+			'address' => $patient->contact->address ? $patient->contact->address : new Address,
+		))?>
 		<?php if (Yii::app()->params['patient_demographics_editable'] && Yii::app()->user->checkAccess('OprnEditPatientDetails')) {?>
-			<?php echo $this->renderPartial('_patient_contact_details_edit')?>
+			<?php echo $this->renderPartial('_patient_contact_details_edit',array(
+				'patient' => $patient,
+				'contact' => $patient->contact,
+				'address' => $patient->contact->address ? $patient->contact->address : new Address,
+			))?>
 		<?php }?>
 	</div>
 </section>

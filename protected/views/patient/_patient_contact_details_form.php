@@ -16,49 +16,24 @@
  * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
  * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
  */
-
-$clinical = $clinical = $this->checkAccess('OprnEditPatientDetails');
 ?>
-
-<div class="container content">
-	<h1 class="badge">Add Patient</h1>
-	<div class="messages patient">
-		<?php $this->renderPartial('//base/_messages'); ?>
-	</div>
-
-	<?php
-	$form = $this->beginWidget('BaseEventTypeCActiveForm', array(
-		'id' => 'patient-create',
-		'enableAjaxValidation' => false,
-		'focus' => '#hos_num',
-		'layoutColumns' => array(
-			'label' => 2,
-			'field' => 5
-		),
-		'htmlOptions' => array(
-			'style' => 'margin: 0',
-		)
-	))?>
-		<div class="row">
-			<div class="large-6 column">
-				<?php $this->renderPartial('_create_patient_details',array(
-					'patient' => $patient,
-					'contact' => $contact,
-					'address' => $address,
-					'errors' => $errors,
-				))?>
-				<?php $this->renderPartial('_create_patient_contact_details',array(
-					'patient' => $patient,
-					'address' => $address,
-					'errors' => $errors,
-				))?>
-				<?php $this->renderPartial('_create_patient_gp',array(
-					'patient' => $patient,
-					'gp' => $gp,
-					'practice' => $practice,
-					'errors' => $errors,
-				))?>
+		<div class="row data-row">
+			<div class="large-4 column">
+				<div class="data-label"><?php echo $contact->getAttributeLabel('primary_phone')?>:</div>
+			</div>
+			<div class="large-8 column">
+				<div class="data-value">
+					<?php echo CHtml::textField('primary_phone',$contact->primary_phone)?>
+				</div>
 			</div>
 		</div>
-	<?php $this->endWidget()?>
-</div>
+		<div class="row data-row">
+			<div class="large-4 column">
+				<div class="data-label">Email:</div>
+			</div>
+			<div class="large-8 column">
+				<div class="data-value">
+					<?php echo CHtml::textField('email',$address->email)?>
+				</div>
+			</div>
+		</div>
