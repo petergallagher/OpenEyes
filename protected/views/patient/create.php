@@ -49,6 +49,7 @@ $clinical = $clinical = $this->checkAccess('OprnEditPatientDetails');
 				))?>
 				<?php $this->renderPartial('_create_patient_contact_details',array(
 					'patient' => $patient,
+					'contact' => $contact,
 					'address' => $address,
 					'errors' => $errors,
 				))?>
