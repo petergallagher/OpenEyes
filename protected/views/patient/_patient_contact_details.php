@@ -44,4 +44,5 @@
 			))?>
 		<?php }?>
 	</div>
+	<?php echo $this->renderPartial('//patient/_form_errors')?>
 </section>

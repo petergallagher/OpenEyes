@@ -36,4 +36,5 @@
 			<?php echo $this->renderPartial('_patient_details_edit',array('patient' => $patient))?>
 		<?php }?>
 	</div>
+	<?php echo $this->renderPartial('//patient/_form_errors')?>
 </section>

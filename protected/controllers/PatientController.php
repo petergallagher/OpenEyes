@@ -1646,7 +1646,7 @@ class PatientController extends BaseController
 
 		$errors = array();
 
-		$contact = $patient->contact;
+		$contact = $patient->contact->isPatient();
 
 		$contact->attributes = Helper::convertNHS2MySQL($_POST);
 
