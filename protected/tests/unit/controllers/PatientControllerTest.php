@@ -38,9 +38,20 @@ class PatientControllerTest extends CDbTestCase
 		parent::setUp();
 	}
 
-	public function test_MarkIncomplete()
+	protected function tearDown()
+	{
+		$_POST = array();
+	}
+
+	/*public function test_MarkIncomplete()
 	{
 		$this->markTestIncomplete('Tests not implemented yet');
+	}*/
+
+	public function testActionValidatePatientDetails()
+	{
+		$this->controller->actionValidatePatientDetails(1);
+		$this->assertTrue(true);
 	}
 
 	/*

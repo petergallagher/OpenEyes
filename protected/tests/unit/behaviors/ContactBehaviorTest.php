@@ -147,7 +147,7 @@ class ContactBehaviorTest extends PHPUnit_Framework_TestCase
 			'city' => 'City',
 			'postcode' => 'Postcode',
 			'county' => 'County',
-			'country_id' => 1,
+			'country_id' => 2,
 		);
 
 		$label = new ContactLabel;
