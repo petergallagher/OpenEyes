@@ -22,14 +22,7 @@ $warnings = $this->patient->getWarnings($clinical);
 ?>
 
 <div class="container content">
-	<h1 class="badge">Patient summary</h1>
-	<?php if (Yii::app()->user->checkAccess('admin')) {?>
-		<div class="admin-actions">
-			<button id="btn-delete-patient" class="secondary small warning">
-				Delete patient
-			</button>
-		</div>
-	<?php }?>
+	<h1 class="badge">Delete patient</h1>
 	<div class="messages patient">
 		<?php $this->renderPartial('//base/_messages'); ?>
 
@@ -79,23 +72,13 @@ $warnings = $this->patient->getWarnings($clinical);
 
 	<div class="row">
 		<div class="large-6 column">
-			<?php $this->renderPartial('_patient_details',array('patient' => $this->patient))?>
-			<?php $this->renderPartial('_patient_contact_details',array('patient' => $this->patient))?>
-			<?php $this->renderPartial('_patient_gp')?>
+			<?php $this->renderPartial('_patient_details',array('patient' => $this->patient, 'no_edit' => true))?>
+			<?php $this->renderPartial('_patient_contact_details',array('patient' => $this->patient, 'no_edit' => true))?>
+			<?php $this->renderPartial('_patient_gp',array('no_edit' => true))?>
 			<?php $this->renderPartial('_patient_commissioningbodies')?>
-			<?php $this->renderPartial('_patient_contacts')?>
 		</div>
 		<div class="large-6 column">
-			<?php if ($this->checkAccess('OprnViewClinical')) {?>
-				<?php $this->renderPartial('_patient_episodes',array(
-					'episodes' => $episodes,
-					'ordered_episodes' => $ordered_episodes,
-					'legacyepisodes' => $legacyepisodes,
-					'episodes_open' => $episodes_open,
-					'episodes_closed' => $episodes_closed,
-					'firm' => $firm,
-				))?>
-			<?php }?>
+			<?php $this->renderPartial('_delete_patient')?>
 		</div>
 	</div>
 </div>

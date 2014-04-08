@@ -97,6 +97,13 @@ class Patient extends BaseActiveRecord
 		return 'patient';
 	}
 
+	public function defaultScope()
+	{
+		return array(
+			'condition' => 'deleted = 0',
+		);
+	}
+
 	/**
 		* @return array validation rules for model attributes.
 		*/
@@ -1403,5 +1410,12 @@ class Patient extends BaseActiveRecord
 		if (!$metadata_value->save()) {
 			throw new Exception("Unable to save PatientMetadataValue: ".print_r($metadata_value->getErrors(),true));
 		}
+	}
+
+	public function softDelete()
+	{
+		$this->deleted = 1;
+
+		return $this->save();
 	}
 }

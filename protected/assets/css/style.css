@@ -3457,6 +3457,13 @@ tfoot.pagination-container .pagination li {
   margin: 0.375em 0 0.75em 0;
 }
 
+/* line 207, ../sass/openeyes/components/boxes/_patient-info.scss */
+.admin-actions {
+  float: right;
+  margin-right: 0.75em;
+  margin-top: 0.3125em;
+}
+
 /* line 20, ../sass/openeyes/components/boxes/_transport.scss */
 .box.transport .csvform {
   margin: 0;

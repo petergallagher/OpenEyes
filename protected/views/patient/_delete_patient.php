@@ -17,27 +17,20 @@
  * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
  */
 ?>
-<section class="box patient-info patient-gp-details js-toggle-container">
-	<?php echo $this->renderPartial('//patient/_form_errors')?>
-	<h3 class="box-title">General Practitioner:</h3>
-	<a href="#" class="toggle-trigger toggle-hide js-toggle">
-		<span class="icon-showhide">
-			Show/hide this section
-		</span>
-	</a>
-	<?php if (!@$no_edit && Yii::app()->params['patient_demographics_editable'] && Yii::app()->user->checkAccess('OprnEditPatientDetails')) {?>
-		<a href="#" class="toggle-edit-patient-details edit-patient-gp-details">
-			edit
-		</a>
-	<?php }?>
-	<div class="js-toggle-body patient-gp-details">
-		<?php echo $this->renderPartial('_patient_gp_view')?>
-		<?php if (!@$no_edit && Yii::app()->params['patient_demographics_editable'] && Yii::app()->user->checkAccess('OprnEditPatientDetails')) {?>
-			<?php echo $this->renderPartial('_patient_gp_edit',array(
-				'patient' => $this->patient,
-				'gp' => $this->patient->gp,
-				'practice' => $this->patient->practice,
-			))?>
-		<?php }?>
-	</div>
+<section class="box patient-info associated-data js-toggle-container">
+	<header class="box-header">
+		<h3 class="box-title">
+			<span class="icon-patient-clinician-hd_flag"></span>
+			Delete patient
+		</h3>
+	</header>
+
+	<h4>Are you sure you want to delete this patient?</h4>
+
+	<button id="btn-do-delete-patient" class="secondary small">
+		Delete patient
+	</button>
+	<button id="btn-cancel-delete-patient" class="warning small">
+		Cancel
+	</button>
 </section>

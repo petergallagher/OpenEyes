@@ -283,6 +283,33 @@ $(document).ready(function() {
 		$('#gp_practice_address').text('Unknown');
 		$('#gp_practice_telephone').text('Unknown');
 	});
+
+	handleButton($('#btn-delete-patient'),function(e) {
+		e.preventDefault();
+
+		window.location.href = baseUrl+'/patient/delete/'+OE_patient_id;
+	});
+
+	handleButton($('#btn-cancel-delete-patient'),function(e) {
+		e.preventDefault();
+
+		window.location.href = baseUrl+'/patient/view/'+OE_patient_id;
+	});
+
+	handleButton($('#btn-do-delete-patient'),function(e) {
+		$.ajax({
+			'type': 'POST',
+			'url': baseUrl+'/patient/delete/'+OE_patient_id,
+			'data': 'delete=1&YII_CSRF_TOKEN='+YII_CSRF_TOKEN,
+			'success': function(resp) {
+				if (resp == "1") {
+					window.location.href = baseUrl+'/patient/view/'+OE_patient_id;
+				} else {
+					alert("Something went wrong trying to delete the patient.  Please try again or contact support for assistance.");
+				}
+			}
+		});
+	});
 });
 
 function resetPatientDetailsForm()

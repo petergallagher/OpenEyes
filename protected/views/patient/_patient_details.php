@@ -25,14 +25,14 @@
 			Show/hide this section
 		</span>
 	</a>
-	<?php if (Yii::app()->params['patient_demographics_editable'] && Yii::app()->user->checkAccess('OprnEditPatientDetails')) {?>
+	<?php if (!@$no_edit && Yii::app()->params['patient_demographics_editable'] && Yii::app()->user->checkAccess('OprnEditPatientDetails')) {?>
 		<a href="#" class="toggle-edit-patient-details edit-patient-details">
 			edit
 		</a>
 	<?php }?>
 	<div class="js-toggle-body patient-details">
 		<?php echo $this->renderPartial('_patient_details_view',array('patient' => $patient))?>
-		<?php if (Yii::app()->params['patient_demographics_editable'] && Yii::app()->user->checkAccess('OprnEditPatientDetails')) {?>
+		<?php if (!@$no_edit && Yii::app()->params['patient_demographics_editable'] && Yii::app()->user->checkAccess('OprnEditPatientDetails')) {?>
 			<?php echo $this->renderPartial('_patient_details_edit',array('patient' => $patient))?>
 		<?php }?>
 	</div>

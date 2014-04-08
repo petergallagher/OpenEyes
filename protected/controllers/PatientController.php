@@ -88,6 +88,10 @@ class PatientController extends BaseController
 				'actions' => array('validatePatientDetails', 'updatePatientDetails', 'create', 'validatePatientContactDetails', 'updatePatientContactDetails', 'GPSearch', 'getGPDetails', 'practiceSearch', 'getPracticeDetails', 'updatePatientGPAndPracticeDetails'),
 				'roles' => array('OprnEditPatientDetails')
 			),
+			array('allow',
+				'actions' => array('delete'),
+				'roles' => array('admin')
+			),
 		);
 	}
 
@@ -1921,5 +1925,60 @@ class PatientController extends BaseController
 		}
 
 		echo "1";
+	}
+
+	public function actionDelete($id)
+	{
+		Yii::app()->assetManager->registerScriptFile('js/patientSummary.js');
+
+		$this->patient = $this->loadModel($id);
+
+		if (@$_POST['delete']) {
+			if (!$this->patient->softDelete()) {
+				throw new Exception("Unable to soft-delete patient: ".print_r($this->patient->getErrors(),true));
+			}
+
+			echo "1";
+			return;
+		}
+
+		$tabId = !empty($_GET['tabId']) ? $_GET['tabId'] : 0;
+		$eventId = !empty($_GET['eventId']) ? $_GET['eventId'] : 0;
+
+		$episodes = $this->patient->episodes;
+		// TODO: verify if ordered_episodes complete supercedes need for unordered $episodes
+		$ordered_episodes = $this->patient->getOrderedEpisodes();
+
+		$legacyepisodes = $this->patient->legacyepisodes;
+		// NOTE that this is not being used in the render
+		$supportserviceepisodes = $this->patient->supportserviceepisodes;
+
+		Audit::add('patient summary','view-delete-page');
+
+		$this->logActivity('viewed patient');
+
+		$episodes_open = 0;
+		$episodes_closed = 0;
+
+		foreach ($episodes as $episode) {
+			if ($episode->end_date === null) {
+				$episodes_open++;
+			} else {
+				$episodes_closed++;
+			}
+		}
+
+		$this->jsVars['currentContacts'] = $this->patient->currentContactIDS();
+
+		$this->breadcrumbs=array(
+			$this->patient->first_name.' '.$this->patient->last_name. '('.$this->patient->hos_num.')',
+		);
+
+		$this->render('delete', array(
+			'tab' => $tabId,
+			'event' => $eventId,
+			'firm' => Firm::model()->findByPk(Yii::app()->session['selected_firm_id']),
+			'supportserviceepisodes' => $supportserviceepisodes,
+		));
 	}
 }
