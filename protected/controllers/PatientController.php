@@ -1639,6 +1639,8 @@ class PatientController extends BaseController
 
 		$transaction->commit();
 
+		$patient->audit('patient','update',serialize($_POST));
+
 		echo "1";
 	}
 
@@ -1705,6 +1707,8 @@ class PatientController extends BaseController
 
 		$transaction->commit();
 
+		$patient->audit('patient','update',serialize($_POST));
+
 		echo "1";
 	}
 
@@ -1770,6 +1774,9 @@ class PatientController extends BaseController
 					$errors = array_merge($errors, $address->getErrors());
 				} else {
 					$transaction->commit();
+
+					$patient->audit('patient','create',serialize($_POST));
+
 					return $this->redirect(array('/patient/view/'.$patient->id));
 				}
 			} else {
@@ -1920,6 +1927,8 @@ class PatientController extends BaseController
 		$patient->gp_id = $_POST['gp_id'] ? $_POST['gp_id'] : null;
 		$patient->practice_id = $_POST['practice_id'] ? $_POST['practice_id'] : null;
 
+		$patient->audit('patient','update-gp-and-practice',serialize($_POST));
+
 		if (!$patient->save()) {
 			throw new Exception("Unable to save patient: ".print_r($patient->getErrors(),true));
 		}
@@ -1938,6 +1947,8 @@ class PatientController extends BaseController
 				throw new Exception("Unable to soft-delete patient: ".print_r($this->patient->getErrors(),true));
 			}
 
+			$this->patient->audit('patient','delete');
+
 			echo "1";
 			return;
 		}
@@ -1953,7 +1964,7 @@ class PatientController extends BaseController
 		// NOTE that this is not being used in the render
 		$supportserviceepisodes = $this->patient->supportserviceepisodes;
 
-		Audit::add('patient summary','view-delete-page');
+		$this->patient->audit('patient','view-delete-page');
 
 		$this->logActivity('viewed patient');
 
