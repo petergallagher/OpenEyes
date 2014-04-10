@@ -100,7 +100,7 @@ class Patient extends BaseActiveRecord
 	public function defaultScope()
 	{
 		return array(
-			'condition' => 'deleted = 0',
+			'condition' => $this->getTableAlias(false,false).'.deleted = 0',
 		);
 	}
 
@@ -200,34 +200,39 @@ class Patient extends BaseActiveRecord
 	public function search($params = null)
 	{
 		if (!is_array($params)) {
-			$params = array(
-				'pageSize' => 20,
-				'currentPage' => 0,
-				'sortBy' => 'hos_num*1',
-				'sortDir' => 'asc',
-			);
+			$params = array();
 		}
+
+		!isset($params['items_per_page']) && $params['items_per_page'] = 20;
+		!isset($params['page']) && $params['page'] = 1;
+		!isset($params['sort_by']) && $params['sort_by'] = 'hos_num*1';
+		!isset($params['sort_dir']) && $params['sort_dir'] = 'asc';
+
+		$params['page']--;
 
 		$criteria=new CDbCriteria;
 		$criteria->join = "JOIN contact ON contact_id = contact.id";
 		$criteria->compare('LOWER(contact.first_name)',strtolower($params['first_name']), false);
 		$criteria->compare('LOWER(contact.last_name)',strtolower($params['last_name']), false);
-		if (strlen($this->nhs_num) == 10) {
-			$criteria->compare('nhs_num',$this->nhs_num, false);
+		if (strlen($params['nhs_num']) == 10) {
+			$criteria->compare('nhs_num',$params['nhs_num'], false);
 		} else {
-			$criteria->compare('hos_num',$this->hos_num, false);
+			$criteria->compare('hos_num',$params['hos_num'], false);
 		}
 
-		$criteria->order = $params['sortBy'] . ' ' . $params['sortDir'];
+		$criteria->order = $params['sort_by'] . ' ' . $params['sort_dir'];
 
 		Yii::app()->event->dispatch('patient_search_criteria', array('patient' => $this, 'criteria' => $criteria, 'params' => $params));
 
 		$dataProvider = new CActiveDataProvider(get_class($this), array(
-			'criteria'=>$criteria,
-			'pagination' => array('pageSize' => $params['pageSize'], 'currentPage' => $params['currentPage'])
+			'criteria' => $criteria,
+			'pagination' => array('pageSize' => $params['items_per_page'], 'currentPage' => $params['page'])
 		));
 
-		return $dataProvider;
+		return array(
+			'data' => $dataProvider->getData(),
+			'total_items' => $dataProvider->totalItemCount,
+		);
 	}
 
 	public function beforeSave()

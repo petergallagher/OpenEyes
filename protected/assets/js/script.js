@@ -232,6 +232,11 @@ $(document).ready(function(){
 	$('#checkall').click(function() {
 		$('input.'+$(this).attr('class')).attr('checked',$(this).is(':checked') ? 'checked' : false);
 	});
+
+	$('table.patient-list tr.clickable').click(function(e) {
+		e.preventDefault();
+		window.location.href = baseUrl+'/patient/view/'+$(this).data('id');
+	});
 });
 
 function changeState(wb,sp) {
@@ -319,5 +324,40 @@ function inArray(needle, haystack) {
 	for(var i = 0; i < length; i++) {
 		if(haystack[i] == needle) return true;
 	}
+	return false;
+}
+
+function getPatients() {
+	window.location.href = '/patient/search?'+$('#patient-filter').serialize();
+	return;
+
+	var button = $('#search_button');
+	var loadingMessage = $('#patient-search-loading');
+	var noResultsMessage = $('#patient-search-no-results');
+	var theatreList = $('#patientList');
+
+	if (!button.hasClass('inactive')) {
+		disableButtons();
+
+		theatreList.empty();
+		loadingMessage.show();
+		noResultsMessage.hide();
+
+		searchData = $('#patient-filter').serialize()+"&YII_CSRF_TOKEN="+YII_CSRF_TOKEN;
+
+		$.ajax({
+			'url': baseUrl+'/site/search?'+$('#patient-filter').serialize(),
+			'type': 'GET',
+			'dataType': 'json',
+			'success': function(data) {
+				if (data['status'] == 'success') {
+					$('#patientList').html(data['data']);
+				} else {
+					$('#patientList').html('<h3>'+data['message']+'</h3>');
+				}
+			},
+		});
+	}
+
 	return false;
 }

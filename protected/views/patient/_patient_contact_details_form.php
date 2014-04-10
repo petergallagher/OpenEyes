@@ -17,6 +17,7 @@
  * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
  */
 ?>
+		<?php echo $this->renderPartial('_patient_metadata_edit',array('patient'=>$patient,'before'=>'primary_phone'))?>
 		<div class="row data-row">
 			<div class="large-4 column">
 				<div class="data-label"><?php echo $contact->getAttributeLabel('primary_phone')?>:</div>
@@ -27,6 +28,8 @@
 				</div>
 			</div>
 		</div>
+		<?php echo $this->renderPartial('_patient_metadata_edit',array('patient'=>$patient,'after'=>'primary_phone'))?>
+		<?php echo $this->renderPartial('_patient_metadata_edit',array('patient'=>$patient,'before'=>'email'))?>
 		<div class="row data-row">
 			<div class="large-4 column">
 				<div class="data-label">Email:</div>
@@ -37,3 +40,4 @@
 				</div>
 			</div>
 		</div>
+		<?php echo $this->renderPartial('_patient_metadata_edit',array('patient'=>$patient,'after'=>'email'))?>

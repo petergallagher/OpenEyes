@@ -243,6 +243,7 @@ return array(
 		'event_lock_days' => 0,
 		'event_lock_disable' => false,
 		'patient_demographics_editable' => true,
+		'default_search_page' => 'basic', // basic or advanced
 		'default_country' => 'United Kingdom',
 	),
 );
