@@ -7,6 +7,7 @@ class m140410_095809_patient_search_fields extends CDbMigration
 		$this->createTable('patient_search_field', array(
 				'id' => 'int(10) unsigned NOT NULL AUTO_INCREMENT',
 				'name' => 'varchar(64) NOT NULL',
+				'label' => 'varchar(64) NOT NULL',
 				'display_order' => 'tinyint(1) unsigned not null',
 				'focus' => 'tinyint(1) unsigned not null',
 				'last_modified_user_id' => 'int(10) unsigned NOT NULL DEFAULT 1',

@@ -102,4 +102,9 @@ class Country extends BaseActiveRecord
 			'criteria'=>$criteria,
 		));
 	}
+
+	public function __toString()
+	{
+		return $this->name;
+	}
 }

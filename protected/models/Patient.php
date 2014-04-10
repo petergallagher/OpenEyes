@@ -1478,4 +1478,11 @@ class Patient extends BaseActiveRecord
 
 		return $this->save();
 	}
+
+	public function getCountry()
+	{
+		if ($this->contact && $this->contact->address) {
+			return $this->contact->address->country;
+		}
+	}
 }

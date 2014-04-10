@@ -36,7 +36,13 @@
 						<thead>
 							<tr>
 								<?php foreach (PatientSearchField::model()->findAll(array('order' => 'display_order asc')) as $patient_search_field) {?>
-									<th><?php echo Patient::model()->getAttributeLabel($patient_search_field->name)?>:</th>
+									<th>
+										<?php if ($patient_search_field->label) {
+											echo $patient_search_field->label.':';
+										} else {
+											echo Patient::model()->getAttributeLabel($patient_search_field->name).':';
+										}?>
+									</th>
 								<?php }?>
 							</tr>
 						</thead>
@@ -119,7 +125,15 @@
 						<thead>
 							<tr>
 								<?php foreach (PatientSearchResultField::model()->findAll(array('order' => 'display_order asc')) as $patient_search_result_field) {?>
-									<th><a href="<?php echo $this->getPatientSearchUrl($patient_search_result_field->name)?>"><?php echo Patient::model()->getAttributeLabel($patient_search_result_field->name)?></a></th>
+									<th>
+										<a href="<?php echo $this->getPatientSearchUrl($patient_search_result_field->name)?>">
+											<?php if ($patient_search_result_field->label) {
+												echo $patient_search_result_field->label;
+											} else {
+												echo Patient::model()->getAttributeLabel($patient_search_result_field->name);
+											}?>
+										</a>
+									</th>
 								<?php }?>
 							</tr>
 						</thead>
