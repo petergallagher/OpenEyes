@@ -56,15 +56,13 @@
 													echo CHtml::textField($metadata_key->key_name,@$_GET[$metadata_key->key_name]);
 													break;
 												case 'Select':
-													$htmlOptions = $metadata_key->field_option1 ? array('empty' => $metadata_key->field_option1) : array();
-
 													$class_name = $metadata_key->field_option2;
 
 													$options = $metadata_key->field_option2 ?
 														CHtml::listData($class_name::model()->findAll(array('order' => 'display_order asc')),'name','name') :
 														CHtml::listData($metadata_key->options,'option_value','option_value');
 
-													echo CHtml::dropDownList($metadata_key->key_name,@$_GET[$metadata_key->key_name],$options,$htmlOptions);
+													echo CHtml::dropDownList($metadata_key->key_name,@$_GET[$metadata_key->key_name],$options,array('empty' => '- Any -'));
 													break;
 												case 'Checkbox':
 													echo CHtml::hiddenField($metadata_key->key_name,0);
