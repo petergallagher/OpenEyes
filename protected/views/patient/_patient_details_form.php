@@ -60,7 +60,7 @@
 				</div>
 				<div class="large-8 column">
 					<div class="data-value">
-						<?php echo CHtml::textField('first_name',$patient->first_name)?>
+						<?php echo CHtml::textField('first_name',$contact->first_name)?>
 					</div>
 				</div>
 			</div>
@@ -72,7 +72,7 @@
 				</div>
 				<div class="large-8 column">
 					<div class="data-value">
-						<?php echo CHtml::textField('last_name',$patient->last_name)?>
+						<?php echo CHtml::textField('last_name',$contact->last_name)?>
 					</div>
 				</div>
 			</div>
