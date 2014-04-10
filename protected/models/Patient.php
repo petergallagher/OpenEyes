@@ -244,10 +244,10 @@ class Patient extends BaseActiveRecord
 						$criteria->join .= " JOIN patient_metadata_value pmv{$join_id} ON pmv{$join_id}.patient_id = t.id AND pmv{$join_id}.key_name = :key_pmv{$join_id}";
 						$criteria->params[':key_pmv'.$join_id] = $field;
 						$criteria->select .= ", pmv{$join_id}.key_value as $field";
-						$criteria->compare("pmv{$join_id}.key_value",$params[$field],false);
+						$criteria->compare("lower(pmv{$join_id}.key_value)",strtolower($params[$field]),false);
 						$join_id++;
 					} else {
-						$criteria->compare($field,$params[$field],false);
+						$criteria->compare("lower($field)",strtolower($params[$field]),false);
 					}
 				}
 			}
