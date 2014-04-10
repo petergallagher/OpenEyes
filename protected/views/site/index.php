@@ -19,11 +19,7 @@
 ?>
 <h1 class="badge">Search</h1>
 
-<?php if (Yii::app()->params['default_search_page'] == 'advanced') {
-	$this->renderPartial('_search_advanced');
-} else {
-	$this->renderPartial('_search_basic');
-}?>
+<?php $this->renderPartial('_search_basic')?>
 
 <script type="text/javascript">
 	handleButton($('#search-form button'));

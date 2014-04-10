@@ -17,7 +17,7 @@
  * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
  */
 ?>
-<h1 class="badge">Search</h1>
+<h1 class="badge">Advanced search</h1>
 <?php
 	$this->beginWidget('CActiveForm', array(
 		'id' => 'patient-filter',
