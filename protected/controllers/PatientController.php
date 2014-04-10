@@ -268,8 +268,8 @@ class PatientController extends BaseController
 	public function getPatientSearchUrl($sort_by)
 	{
 		$search_terms = $this->sanitiseSearchParams($_GET);
-		if ($search_terms['sort_by'] == $sort_by) {
-			$search_terms['sort_dir'] = $search_terms['sort_dir'] == 'asc' ? 'desc' : 'asc';
+		if (@$search_terms['sort_by'] == $sort_by) {
+			$search_terms['sort_dir'] = @$search_terms['sort_dir'] == 'asc' ? 'desc' : 'asc';
 		} else {
 			$search_terms['sort_by'] = $sort_by;
 			$search_terms['sort_dir'] = 'asc';
