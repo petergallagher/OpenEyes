@@ -54,7 +54,7 @@
 					</button>
 				</div>
 				<div class="advanced">
-					<a href="#">Advanced search</a>
+					<a href="<?php echo Yii::app()->createUrl('/patient/results')?>">Advanced search</a>
 				</div>
 			</div>
 		<?php $this->endWidget(); ?>

@@ -80,11 +80,9 @@
 				<div class="large-10 column">
 				</div>
 				<div class="large-2 column text-right">
-
 					<span style="width: 30px;">
 						<img class="loader" src="<?php echo Yii::app()->assetManager->createUrl('img/ajax-loader.gif')?>" alt="loading..." style="display: none;" />
 					</span>
-
 					<button id="search_button" class="secondary small" type="submit">
 						Search
 					</button>
@@ -120,25 +118,23 @@
 					<table class="grid patient-list">
 						<thead>
 							<tr>
-								<th><a href="<?php echo $this->getPatientSearchUrl('hos_num*1')?>"><?php echo Patient::model()->getAttributeLabel('hos_num')?></a></th>
-								<th><a href="<?php echo $this->getPatientSearchUrl('nhs_num*1')?>"><?php echo Patient::model()->getAttributeLabel('nhs_num')?></a></th>
-								<th><a href="<?php echo $this->getPatientSearchUrl('title')?>"><?php echo Patient::model()->getAttributeLabel('title')?></a></th>
-								<th><a href="<?php echo $this->getPatientSearchUrl('first_name')?>"><?php echo Patient::model()->getAttributeLabel('first_name')?></a></th>
-								<th><a href="<?php echo $this->getPatientSearchUrl('last_name')?>"><?php echo Patient::model()->getAttributeLabel('last_name')?></a></th>
-								<th><a href="<?php echo $this->getPatientSearchUrl('dob')?>"><?php echo Patient::model()->getAttributeLabel('dob')?></a></th>
-								<th><a href="<?php echo $this->getPatientSearchUrl('gender_id')?>"><?php echo Patient::model()->getAttributeLabel('gender')?></a></th>
+								<?php foreach (PatientSearchResultField::model()->findAll(array('order' => 'display_order asc')) as $patient_search_result_field) {?>
+									<th><a href="<?php echo $this->getPatientSearchUrl($patient_search_result_field->name)?>"><?php echo Patient::model()->getAttributeLabel($patient_search_result_field->name)?></a></th>
+								<?php }?>
 							</tr>
 						</thead>
 						<tbody>
 							<?php foreach ($data as $i => $result) {?>
 								<tr data-id="<?php echo $result->id?>" class="clickable">
-									<td><?php echo $result->hos_num?></td>
-									<td><?php echo $result->nhs_num?></td>
-									<td><?php echo $result->title?></td>
-									<td><?php echo $result->first_name?></td>
-									<td><?php echo $result->last_name?></td>
-									<td><?php echo $result->dob?></td>
-									<td><?php echo $result->gender->name?></td>
+									<?php foreach (PatientSearchResultField::model()->findAll(array('order' => 'display_order asc')) as $patient_search_result_field) {?>
+										<td>
+											<?php if (preg_match('/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/',$result->{$patient_search_result_field->name})) {
+												echo $result->NHSDate($patient_search_result_field->name);
+											} else {
+												echo $result->{$patient_search_result_field->name};
+											}?>
+										</td>
+									<?php }?>
 								</tr>
 							<?php }?>
 						</tbody>

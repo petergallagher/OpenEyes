@@ -253,6 +253,10 @@ class Patient extends BaseActiveRecord
 			}
 		}
 
+		if (in_array($params['sort_by'],array('hos_num','nhs_num'))) {
+			$params['sort_by'] .= '*1';
+		}
+
 		$criteria->order = $params['sort_by'] . ' ' . $params['sort_dir'];
 
 		Yii::app()->event->dispatch('patient_search_criteria', array('patient' => $this, 'criteria' => $criteria, 'params' => $params));
