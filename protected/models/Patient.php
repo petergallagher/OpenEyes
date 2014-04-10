@@ -227,9 +227,9 @@ class Patient extends BaseActiveRecord
 			} else {
 				$criteria->compare('hos_num',$params['hos_num'], false);
 			}
-		} else if (in_array('hos_num',$search_fields)) {
+		} else if (in_array('hos_num',$search_fields) && @$params['hos_num']) {
 			$criteria->compare('hos_num',$params['hos_num'], false);
-		} else if (in_array('nhs_num',$search_fields)) {
+		} else if (in_array('nhs_num',$search_fields) && @$params['nhs_num']) {
 			$criteria->compare('nhs_num',$params['nhs_num'], false);
 		}
 
