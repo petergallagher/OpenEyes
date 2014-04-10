@@ -167,9 +167,16 @@ class PatientController extends BaseController
 
 	public function sanitiseSearchParams($params)
 	{
-		if (!@$params['first_name'] && !@$params['last_name'] && !@$params['hos_num'] && !@$params['nhs_num']) {
-			return false;
+		$ok = false;
+
+		foreach (PatientSearchField::model()->findAll() as $field) {
+			if (@$params[$field->name]) {
+				$ok = true;
+				break;
+			}
 		}
+
+		if (!$ok) return false;
 
 		foreach ($params as $key => $value) {
 			$params[$key] = trim($value);

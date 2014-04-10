@@ -35,26 +35,42 @@
 					<table class="grid">
 						<thead>
 							<tr>
-								<th><?php echo Patient::model()->getAttributeLabel('hos_num')?>:</th>
-								<th><?php echo Patient::model()->getAttributeLabel('nhs_num')?>:</th>
-								<th><?php echo Patient::model()->getAttributeLabel('first_name')?>:</th>
-								<th><?php echo Patient::model()->getAttributeLabel('last_name')?>:</th>
+								<?php foreach (PatientSearchField::model()->findAll(array('order' => 'display_order asc')) as $patient_search_field) {?>
+									<th><?php echo Patient::model()->getAttributeLabel($patient_search_field->name)?>:</th>
+								<?php }?>
 							</tr>
 						</thead>
 						<tbody>
 							<tr>
-								<td>
-									<?php echo CHtml::textField('hos_num',@$_GET['hos_num'])?>
-								</td>
-								<td>
-									<?php echo CHtml::textField('nhs_num',@$_GET['nhs_num'])?>
-								</td>
-								<td>
-									<?php echo CHtml::textField('first_name',@$_GET['first_name'])?>
-								</td>
-								<td>
-									<?php echo CHtml::textField('last_name',@$_GET['last_name'])?>
-								</td>
+								<?php foreach (PatientSearchField::model()->findAll(array('order' => 'display_order asc')) as $patient_search_field) {?>
+									<td>
+										<?php if ($metadata_key = PatientMetadataKey::model()->find('key_name=?',array($patient_search_field->name))) {
+											switch($metadata_key->fieldType->name) {
+												case 'Text':
+													echo CHtml::textField($metadata_key->key_name,empty($_GET) ? $patient->{$metadata_key->key_name} : $_GET[$metadata_key->key_name]);
+													break;
+												case 'Select':
+													$htmlOptions = $metadata_key->field_option1 ? array('empty' => $metadata_key->field_option1) : array();
+
+													$class_name = $metadata_key->field_option2;
+
+													$options = $metadata_key->field_option2 ?
+														CHtml::listData($class_name::model()->findAll(array('order' => 'display_order asc')),'name','name') :
+														CHtml::listData($metadata_key->options,'option_value','option_value');
+
+													echo CHtml::dropDownList($metadata_key->key_name,empty($_GET) ? $patient->{$metadata_key->key_name} : $_GET[$metadata_key->key_name],$options,$htmlOptions);
+													break;
+												case 'Checkbox':
+													echo CHtml::hiddenField($metadata_key->key_name,0);
+													echo CHtml::checkBox($metadata_key->key_name,empty($_GET) ? $patient->{$metadata_key->key_name} : $_GET[$metadata_key->key_name]);
+													echo '&nbsp;'.$metadata_key->key_label;
+													break;
+											}
+										} else {
+											echo CHtml::textField($patient_search_field->name,@$_GET[$patient_search_field->name]);
+										}?>
+									</td>
+								<?php }?>
 							</tr>
 						</tbody>
 					</table>
@@ -148,8 +164,10 @@
 		<?php }?>
 	<?php }?>
 </div>
-<script type="text/javascript">
-	$(document).ready(function() {
-		$('#hos_num').select().focus();
-	});
-</script>
+<?php if ($focus = PatientSearchField::model()->find('focus=1')) {?>
+	<script type="text/javascript">
+		$(document).ready(function() {
+			$('#<?php echo $focus->name?>').select().focus();
+		});
+	</script>
+<?php }?>

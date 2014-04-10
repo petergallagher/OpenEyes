@@ -178,6 +178,7 @@ class Patient extends BaseActiveRecord
 
 	public function search_nr($params)
 	{
+		throw new Exception('a');
 		$criteria=new CDbCriteria;
 		$criteria->join = "JOIN contact ON contact_id = contact.id";
 		$criteria->compare('LOWER(first_name)',strtolower($params['first_name']),false);
@@ -212,12 +213,44 @@ class Patient extends BaseActiveRecord
 
 		$criteria=new CDbCriteria;
 		$criteria->join = "JOIN contact ON contact_id = contact.id";
-		$criteria->compare('LOWER(contact.first_name)',strtolower($params['first_name']), false);
-		$criteria->compare('LOWER(contact.last_name)',strtolower($params['last_name']), false);
-		if (strlen($params['nhs_num']) == 10) {
-			$criteria->compare('nhs_num',$params['nhs_num'], false);
-		} else {
+
+		$search_fields = CHtml::listData(PatientSearchField::model()->findAll(),'id','name');
+
+		$metadata_keys = array();
+		foreach (PatientMetadataKey::model()->findAll() as $metadata_key) {
+			$metadata_keys[$metadata_key->key_name] = $metadata_key;
+		}
+
+		if (in_array('hos_num',$search_fields) && in_array('nhs_num',$search_fields)) {
+			if (strlen($params['nhs_num']) == 10) {
+				$criteria->compare('nhs_num',$params['nhs_num'], false);
+			} else {
+				$criteria->compare('hos_num',$params['hos_num'], false);
+			}
+		} else if (in_array('hos_num',$search_fields)) {
 			$criteria->compare('hos_num',$params['hos_num'], false);
+		} else if (in_array('nhs_num',$search_fields)) {
+			$criteria->compare('nhs_num',$params['nhs_num'], false);
+		}
+
+		$join_id = 0;
+
+		$criteria->select = "t.*";
+
+		foreach ($search_fields as $field) {
+			if (@$params[$field]) {
+				if (!in_array($field,array('hos_num','nhs_num'))) {
+					if (isset($metadata_keys[$field])) {
+						$criteria->join .= " JOIN patient_metadata_value pmv{$join_id} ON pmv{$join_id}.patient_id = t.id AND pmv{$join_id}.key_name = :key_pmv{$join_id}";
+						$criteria->params[':key_pmv'.$join_id] = $field;
+						$criteria->select .= ", pmv{$join_id}.key_value as $field";
+						$criteria->compare("pmv{$join_id}.key_value",$params[$field],false);
+						$join_id++;
+					} else {
+						$criteria->compare($field,$params[$field],false);
+					}
+				}
+			}
 		}
 
 		$criteria->order = $params['sort_by'] . ' ' . $params['sort_dir'];
@@ -773,7 +806,7 @@ class Patient extends BaseActiveRecord
 			}
 			$this->no_allergies_date = date('Y-m-d H:i:s');
 			if (!$this->save()) {
-				throw new Exception('Unable to set no allergy date:' .  print_r($this->getErrors(), true));
+				throw new Exception('Unable to set no allergy date:' .	print_r($this->getErrors(), true));
 			}
 			$this->audit('patient', 'set-noallergydate');
 			$transaction->commit();
@@ -788,7 +821,7 @@ class Patient extends BaseActiveRecord
 	 * returns all disorder ids for the patient, aggregating the principal diagnosis for each patient episode, and any secondary diagnosis on the patient
 	*
 	* FIXME: some of this can be abstracted to a relation when we upgrade from yii 1.1.8, which has some problems with yii relations:
-	* 	http://www.yiiframework.com/forum/index.php/topic/26806-relations-through-problem-wrong-on-clause-in-sql-generated/
+	*		http://www.yiiframework.com/forum/index.php/topic/26806-relations-through-problem-wrong-on-clause-in-sql-generated/
 	*
 	* @returns array() of disorder ids
 	*/
@@ -818,7 +851,7 @@ class Patient extends BaseActiveRecord
 	 * returns all disorders for the patient.
 	 *
 	 * FIXME: some of this can be abstracted to a relation when we upgrade from yii 1.1.8, which has some problems with yii relations:
-	 * 	http://www.yiiframework.com/forum/index.php/topic/26806-relations-through-problem-wrong-on-clause-in-sql-generated/
+	 *	http://www.yiiframework.com/forum/index.php/topic/26806-relations-through-problem-wrong-on-clause-in-sql-generated/
 	 *
 	 * @returns array() of disorders
 	 */
@@ -1213,7 +1246,7 @@ class Patient extends BaseActiveRecord
 	 */
 	public function hasOpenEpisodeOfSubspecialty($subspecialty_id)
 	{
-		return  $this->getOpenEpisodeOfSubspecialty($subspecialty_id) ? true : false;
+		return	$this->getOpenEpisodeOfSubspecialty($subspecialty_id) ? true : false;
 	}
 
 	/**
@@ -1385,15 +1418,30 @@ class Patient extends BaseActiveRecord
 	{
 		if (empty($this->metadata_keys)) {
 			foreach (PatientMetadataKey::model()->findAll() as $metadata_key) {
-				$this->metadata_keys[] = $metadata_key->key_name;
+				$this->metadata_keys[$metadata_key->key_name] = $metadata_key;
 			}
 		}
 
-		if (in_array($key, $this->metadata_keys)) {
+		if (isset($this->metadata_keys[$key])) {
 			return $this->metadata($key);
 		}
 
 		return parent::__get($key);
+	}
+
+	public function getAttributeLabel($key)
+	{
+		if (empty($this->metadata_keys)) {
+			foreach (PatientMetadataKey::model()->findAll() as $metadata_key) {
+				$this->metadata_keys[$metadata_key->key_name] = $metadata_key;
+			}
+		}
+
+		if (isset($this->metadata_keys[$key])) {
+			return $this->metadata_keys[$key]->key_label;
+		}
+
+		return parent::getAttributeLabel($key);
 	}
 
 	public function metadata($key_name)
