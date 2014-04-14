@@ -36,12 +36,13 @@ class PatientController extends BaseController
 	public $event_tabs = array();
 	public $event_actions = array();
 	public $episodes = array();
+	public $page_size = 20;
 
 	public function accessRules()
 	{
 		return array(
 			array('allow',
-				'actions' => array('search', 'view'),
+				'actions' => array('search', 'results', 'view'),
 				'users' => array('@')
 			),
 			array('allow',
@@ -164,82 +165,42 @@ class PatientController extends BaseController
 		));
 	}
 
-	public function actionSearch()
+	public function sanitiseSearchParams($params)
 	{
-		// Check that we have a valid set of search criteria
-		$search_terms = array(
-				'hos_num' => null,
-				'nhs_num' => null,
-				'first_name' => null,
-				'last_name' => null,
-		);
-		foreach ($search_terms as $search_term => $search_value) {
-			if (isset($_GET[$search_term]) && $search_value = trim($_GET[$search_term])) {
+		$ok = false;
 
-				// Pad hos_num
-				if ($search_term == 'hos_num') {
-					$search_value = sprintf('%07s',$search_value);
-				}
-
-				$search_terms[$search_term] = $search_value;
+		foreach (PatientSearchField::model()->findAll() as $field) {
+			if (@$params[$field->name]) {
+				$ok = true;
+				break;
 			}
 		}
-		// if we are on a dev environment, this allows more flexible search terms (i.e. just a first name or surname - useful for testing
-		// the multiple search results view. If we are live, enforces controls over search terms.
+
+		if (!$ok) return false;
+
+		foreach ($params as $key => $value) {
+			$params[$key] = trim($value);
+
+			if ($key == 'hos_num' && $value) {
+				$params[$key] = sprintf('%07s',$value);
+			}
+		}
+
+		return $params;
+	}
+
+	public function actionSearch()
+	{
+		$search_terms = $this->sanitiseSearchParams($_GET);
+
 		if (!YII_DEBUG && !$search_terms['hos_num'] && !$search_terms['nhs_num'] && !($search_terms['first_name'] && $search_terms['last_name'])) {
 			Yii::app()->user->setFlash('warning.invalid-search', 'Please enter a valid search.');
-			$this->redirect(Yii::app()->homeUrl);
+			return $this->redirect(Yii::app()->homeUrl);
 		}
 
-		 $search_terms = CHtml::encodeArray($search_terms);
+		$patients = Patient::model()->search($search_terms);
 
-		switch (@$_GET['sort_by']) {
-			case 0:
-				$sort_by = 'hos_num*1';
-				break;
-			case 1:
-				$sort_by = 'title';
-				break;
-			case 2:
-				$sort_by = 'first_name';
-				break;
-			case 3:
-				$sort_by = 'last_name';
-				break;
-			case 4:
-				$sort_by = 'dob';
-				break;
-			case 5:
-				$sort_by = 'gender';
-				break;
-			case 6:
-				$sort_by = 'nhs_num*1';
-				break;
-			default:
-				$sort_by = 'hos_num*1';
-		}
-
-		$sort_dir = (@$_GET['sort_dir'] == 0 ? 'asc' : 'desc');
-		$page_num = (integer) @$_GET['page_num'];
-		$page_size = 20;
-
-		$model = new Patient();
-		$model->hos_num = $search_terms['hos_num'];
-		$model->nhs_num = $search_terms['nhs_num'];
-		$dataProvider = $model->search(array(
-			'currentPage' => $page_num,
-			'pageSize' => $page_size,
-			'sortBy' => $sort_by,
-			'sortDir'=> $sort_dir,
-			'first_name' => CHtml::decode($search_terms['first_name']),
-			'last_name' => CHtml::decode($search_terms['last_name']),
-		));
-		$nr = $model->search_nr(array(
-			'first_name' => CHtml::decode($search_terms['first_name']),
-			'last_name' => CHtml::decode($search_terms['last_name']),
-		));
-
-		if ($nr == 0) {
+		if (count($patients) == 0) {
 			Audit::add('search','search-results',implode(',',$search_terms) ." : No results");
 
 			$message = 'Sorry, no results ';
@@ -254,27 +215,69 @@ class PatientController extends BaseController
 			}
 			Yii::app()->user->setFlash('warning.no-results', $message);
 
-			$this->redirect(Yii::app()->homeUrl);
-
-		} elseif ($nr == 1) {
-			foreach ($dataProvider->getData() as $item) {
-				$this->redirect(array('patient/view/' . $item->id));
-			}
-		} else {
-			$this->renderPatientPanel = false;
-			$pages = ceil($nr/$page_size);
-			$this->render('results', array(
-				'data_provider' => $dataProvider,
-				'pages' => $pages,
-				'page_num' => $page_num,
-				'items_per_page' => $page_size,
-				'total_items' => $nr,
-				'search_terms' => $search_terms,
-				'sort_by' => (integer) @$_GET['sort_by'],
-				'sort_dir' => (integer) @$_GET['sort_dir']
-			));
+			return $this->redirect(Yii::app()->homeUrl);
 		}
 
+		if (count($patients) == 1) {
+			return $this->redirect(array('/patient/view/'.$patients[0]->id));
+		}
+
+		$this->redirect(array(Yii::app()->createUrl('/patient/results', $search_terms)));
+	}
+
+	public function actionResults()
+	{
+		if (!$search_terms = $this->sanitiseSearchParams($_GET)) {
+			$data = array();
+			$total_items = 0;
+			$page = 1;
+			$pages = 1;
+			$message = 'Please enter at least one search criteria.';
+		} else {
+			$data = Patient::model()->search(array_merge($search_terms,array(
+				'items_per_page' => $this->page_size,
+			)));
+
+			$total_items = $data['total_items'];
+			$data = $data['data'];
+
+			if ($total_items == 1) {
+				return $this->redirect(array('/patient/view/'.$data[0]->id));
+			}
+			$page = @$_GET['page'];
+			$pages = ceil($total_items / $this->page_size);
+			if ($page <1) $page = 1;
+			if ($page > $pages) $page = $pages;
+		}
+
+		$this->renderPatientPanel = false;
+
+		$this->render('results', array(
+			'data' => $data,
+			'page' => $page,
+			'pages' => $pages,
+			'items_per_page' => $this->page_size,
+			'total_items' => $total_items,
+			'search_terms' => $search_terms,
+			'sort_by' => (integer) @$_GET['sort_by'],
+			'sort_dir' => (integer) @$_GET['sort_dir'],
+			'message' => @$message,
+		));
+	}
+
+	public function getPatientSearchUrl($sort_by)
+	{
+		$search_terms = $this->sanitiseSearchParams($_GET);
+		if (@$search_terms['sort_by'] == $sort_by) {
+			$search_terms['sort_dir'] = @$search_terms['sort_dir'] == 'asc' ? 'desc' : 'asc';
+		} else {
+			$search_terms['sort_by'] = $sort_by;
+			$search_terms['sort_dir'] = 'asc';
+		}
+
+		unset($search_terms['Patient_page']);
+
+		return Yii::app()->createUrl('/patient/results', $search_terms);
 	}
 
 	public function actionEpisodes()

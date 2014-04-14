@@ -32,6 +32,7 @@
 		))?>
 			<div class="edit-mode" style="display: none">
 				<?php echo $this->renderPartial('_patient_contact_details_form',array(
+					'patient' => $patient,
 					'contact' => $contact,
 					'address' => $address,
 				))?>

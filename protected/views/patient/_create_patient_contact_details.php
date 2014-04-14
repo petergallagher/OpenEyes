@@ -21,6 +21,7 @@
 	<h3 class="box-title">Contact details:</h3>
 	<div class="js-toggle-body">
 		<?php echo $this->renderPartial('_patient_contact_details_form',array(
+			'patient' => $patient,
 			'contact' => $contact,
 			'address' => $address,
 		))?>

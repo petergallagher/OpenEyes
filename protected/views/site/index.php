@@ -19,46 +19,7 @@
 ?>
 <h1 class="badge">Search</h1>
 
-<div class="row">
-	<div class="large-8 medium-9 small-12 small-centered medium-centered large-centered column">
-		<div class="panel search-examples">
-			Find a patient by
-			<strong><?php echo Patient::model()->getAttributeLabel('hos_num')?></strong>,
-			<strong><?php echo Patient::model()->getAttributeLabel('nhs_num')?></strong>,
-			<strong><?php echo Patient::model()->getAttributeLabel('first_name')?> <?php echo Patient::model()->getAttributeLabel('last_name')?></strong> or
-			<strong><?php echo Patient::model()->getAttributeLabel('last_name')?> <?php echo Patient::model()->getAttributeLabel('first_name')?></strong>.
-		</div>
-	</div>
-</div>
-
-<div class="row">
-	<div class="large-8 medium-9 small-12 small-centered medium-centered large-centered column">
-
-		<?php $this->renderPartial('//base/_messages'); ?>
-
-		<?php
-			$this->beginWidget('CActiveForm', array(
-				'id' => 'search-form',
-				'focus' => '#query',
-				'action' => Yii::app()->createUrl('site/search'),
-				'htmlOptions' => array(
-					'class' => 'form panel search'
-				)
-			));?>
-			<div class="row">
-				<div class="large-9 medium-8 small-7 column">
-					<?php echo CHtml::textField('query', '', array('class' => 'large', 'placeholder' => 'Enter search...')); ?>
-				</div>
-				<div class="large-3 medium-4 small-5 column text-right">
-					<img class="loader" src="<?php echo Yii::app()->assetManager->createUrl('img/ajax-loader.gif')?>" alt="loading..." style="margin-right: 10px; display: none;" />
-					<button type="submit" class="primary long">
-						Search
-					</button>
-				</div>
-			</div>
-		<?php $this->endWidget(); ?>
-	</div>
-</div>
+<?php $this->renderPartial('_search_basic')?>
 
 <script type="text/javascript">
 	handleButton($('#search-form button'));

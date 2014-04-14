@@ -39,6 +39,11 @@ class SiteController extends BaseController
 	public function actionIndex()
 	{
 		$this->layout = 'main';
+
+		if (Yii::app()->params['default_search_page'] == 'advanced') {
+			return $this->redirect(Yii::app()->createUrl('/patient/results'));
+		}
+
 		$this->render('index');
 	}
 

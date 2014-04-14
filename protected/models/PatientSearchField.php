@@ -18,18 +18,18 @@
  */
 
 /**
- * This is the model class for table "country".
+ * This is the model class for table "patient_search_field".
  *
- * The followings are the available columns in table 'country':
+ * The followings are the available columns in table 'patient_search_field':
  * @property integer $id
- * @property string $code
  * @property string $name
+ *
  */
-class Country extends BaseActiveRecord
+class PatientSearchField extends BaseActiveRecord
 {
 	/**
 	 * Returns the static model of the specified AR class.
-	 * @return Country the static model class
+	 * @return Language the static model class
 	 */
 	public static function model($className=__CLASS__)
 	{
@@ -41,46 +41,7 @@ class Country extends BaseActiveRecord
 	 */
 	public function tableName()
 	{
-		return 'country';
-	}
-
-	/**
-	 * @return array validation rules for model attributes.
-	 */
-	public function rules()
-	{
-		// NOTE: you should only define rules for those attributes that
-		// will receive user inputs.
-		return array(
-			array('code', 'length', 'max'=>2),
-			array('name', 'length', 'max'=>50),
-			// The following rule is used by search().
-			// Please remove those attributes that should not be searched.
-			array('id, code, name', 'safe', 'on'=>'search'),
-		);
-	}
-
-	/**
-	 * @return array relational rules.
-	 */
-	public function relations()
-	{
-		// NOTE: you may need to adjust the relation name and the related
-		// class name for the relations automatically generated below.
-		return array(
-		);
-	}
-
-	/**
-	 * @return array customized attribute labels (name=>label)
-	 */
-	public function attributeLabels()
-	{
-		return array(
-			'id' => 'ID',
-			'code' => 'Code',
-			'name' => 'Name',
-		);
+		return 'patient_search_field';
 	}
 
 	/**
@@ -95,16 +56,10 @@ class Country extends BaseActiveRecord
 		$criteria=new CDbCriteria;
 
 		$criteria->compare('id',$this->id,true);
-		$criteria->compare('code',$this->code,true);
 		$criteria->compare('name',$this->name,true);
 
 		return new CActiveDataProvider(get_class($this), array(
 			'criteria'=>$criteria,
 		));
-	}
-
-	public function __toString()
-	{
-		return $this->name;
 	}
 }

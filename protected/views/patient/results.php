@@ -17,110 +17,165 @@
  * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
  */
 ?>
+<h1 class="badge">Advanced search</h1>
 <?php
-	$based_on = array();
-	if ($search_terms['last_name']) {
-		$based_on[] = 'LAST NAME: <strong>"'.$search_terms['last_name'].'"</strong>';
-	}
-	if ($search_terms['first_name']) {
-		$based_on[] = 'FIRST NAME: <strong>"'.$search_terms['first_name'].'"</strong>';
-	}
-	if ($search_terms['hos_num']) {
-		$based_on[] = strtoupper(Patient::model()->getAttributeLabel('hos_num')).': <strong>'.$search_terms['hos_num']."</strong>";
-	}
-	$based_on = implode(', ', $based_on);
-	?>
-<h1 class="badge">Search Results</h1>
+	$this->beginWidget('CActiveForm', array(
+		'id' => 'patient-filter',
+		'focus' => '#query',
+		'action' => Yii::app()->createUrl('patient/results'),
+		'method' => 'GET',
+		'htmlOptions' => array(
+			'class' => 'form search'
+		)
+	))?>
+	<div class="large-12 column">
+		<div class="panel">
+			<div class="row">
+				<div class="large-12 column">
+					<table class="grid">
+						<thead>
+							<tr>
+								<?php foreach (PatientSearchField::model()->findAll(array('order' => 'display_order asc')) as $patient_search_field) {?>
+									<th>
+										<?php if ($patient_search_field->label) {
+											echo $patient_search_field->label.':';
+										} else {
+											echo Patient::model()->getAttributeLabel($patient_search_field->name).':';
+										}?>
+									</th>
+								<?php }?>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<?php foreach (PatientSearchField::model()->findAll(array('order' => 'display_order asc')) as $patient_search_field) {?>
+									<td>
+										<?php if ($metadata_key = PatientMetadataKey::model()->find('key_name=?',array($patient_search_field->name))) {
+											switch($metadata_key->fieldType->name) {
+												case 'Text':
+													echo CHtml::textField($metadata_key->key_name,@$_GET[$metadata_key->key_name]);
+													break;
+												case 'Select':
+													$class_name = $metadata_key->field_option2;
 
-<div class="row">
-	<div class="large-9 column">
+													$options = $metadata_key->field_option2 ?
+														CHtml::listData($class_name::model()->findAll(array('order' => 'display_order asc')),'name','name') :
+														CHtml::listData($metadata_key->options,'option_value','option_value');
 
-		<div class="box generic">
-			<p>
-				<strong><?php echo $total_items?> patients found</strong>, based on
-				<?php echo $based_on?>
-			</p>
-		</div>
-
-		<?php $this->renderPartial('//base/_messages'); ?>
-
-		<div class="box generic">
-
-			<?php
-				$from =($page_num * $items_per_page) + 1;
-				$to = ($page_num + 1) * $items_per_page;
-				if ($to > $total_items) {
-					$to = $total_items;
-				}
-			?>
-			<h2>
-				Results. You are viewing patients <?php echo $from ?> - <?php echo $to ?> of <?php echo $total_items?>
-			</h2>
-
-			<table id="patient-grid" class="grid">
-				<thead>
-					<tr>
-						<?php foreach (array('hos_num','title','first_name','last_name','dob','gender','nhs_num') as $i => $field) {?>
-						<th id="patient-grid_c<?php echo $i; ?>">
-							<?php
-								$new_sort_dir = ($i == $sort_by) ? 1 - $sort_dir: 0;
-								echo CHtml::link(Patient::model()->getAttributeLabel($field),Yii::app()->createUrl('patient/search', $search_terms + array('sort_by' => $i, 'sort_dir' => $new_sort_dir, 'page_num' => $page_num)));
-							?>
-						</th>
-						<?php }?>
-					</tr>
-				</thead>
-				<tbody>
-					<?php foreach ($data_provider->getData() as $i => $result) {?>
-					<tr id="r<?php echo $result->id?>" class="clickable">
-						<td><?php echo $result->hos_num?></td>
-						<td><?php echo $result->title?></td>
-						<td><?php echo $result->first_name?></td>
-						<td><?php echo $result->last_name?></td>
-						<td><?php echo $result->dob?></td>
-						<td><?php echo $result->gender?></td>
-						<td><?php echo $result->nhsnum?></td>
-					</tr>
-					<?php }?>
-				</tbody>
-				<tfoot class="pagination-container">
-					<tr>
-						<td colspan="7">
-							<ul class="pagination patient-results right">
-								<li class="label">Viewing patients:</li>
-								<?php for ($i=0; $i < $pages; $i++) { ?>
-									<?php
-										$current_page = ($i == $page_num);
-										$from = ($i * $items_per_page) + 1;
-										$to = ($i + 1) * $items_per_page;
-										if ($to > $total_items) {
-											$to = $total_items;
-										}
-									?>
-									<li class="<?php if ($current_page) { ?>current<?php } ?>">
-										<a href="<?php echo Yii::app()->createUrl('patient/search', $search_terms + array('page_num' => $i, 'sort_by' => $sort_by, 'sort_dir' => $sort_dir)); ?>"><?php echo $from; ?> - <?php echo $to; ?></a>
-									</li>
-								<?php } ?>
-							</ul>
-						</td>
-					</tr>
-				</tfoot>
-			</table>
-		</div><!--- /.box -->
-
-	</div><!-- /.large-9.column -->
-
-	<div class="large-3 column">
-		<div class="box generic">
-			<p><?php echo CHtml::link('Clear this search and <span class="highlight">start a new search.</span>',Yii::app()->baseUrl.'/')?></p>
+													echo CHtml::dropDownList($metadata_key->key_name,@$_GET[$metadata_key->key_name],$options,array('empty' => '- Any -'));
+													break;
+												case 'Checkbox':
+													echo CHtml::hiddenField($metadata_key->key_name,0);
+													echo CHtml::checkBox($metadata_key->key_name,@$_GET[$metadata_key->key_name]);
+													echo '&nbsp;'.$metadata_key->key_label;
+													break;
+											}
+										} else {
+											echo CHtml::textField($patient_search_field->name,@$_GET[$patient_search_field->name]);
+										}?>
+									</td>
+								<?php }?>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+			<div class="row">
+				<div class="large-10 column">
+				</div>
+				<div class="large-2 column text-right">
+					<span style="width: 30px;">
+						<img class="loader" src="<?php echo Yii::app()->assetManager->createUrl('img/ajax-loader.gif')?>" alt="loading..." style="display: none;" />
+					</span>
+					<button id="search_button" class="secondary small" type="submit">
+						Search
+					</button>
+				</div>
+			</div>
 		</div>
 	</div>
+<?php $this->endWidget()?>
 
-</div><!-- /.row -->
+<div class="row hide" id="patient-search-loading">
+	<div class="large-12 column">
+		<div class="alert-box">
+			<img src="<?php echo Yii::app()->assetManager->createUrl('img/ajax-loader.gif');?>" class="spinner" /> <strong>Please wait...</strong>
+		</div>
+	</div>
+</div>
 
-<script type="text/javascript">
-	$('#patient-grid tr.clickable').click(function() {
-		window.location.href = '<?php echo Yii::app()->createUrl('patient/view')?>/'+$(this).attr('id').match(/[0-9]+/);
-		return false;
-	});
-</script>
+<div id="patientList" class="patient-list">
+	<?php if (!empty($_GET)) {?>
+		<?php if ($total_items == 0) {?>
+			<div class="row" id="theatre-search-no-results">
+				<div class="large-12 column">
+					<div class="alert-box">
+						<strong>
+							<?php echo @$message ? $message : 'No patients match your search criteria.'?>
+						</strong>
+					</div>
+				</div>
+			</div>
+		<?php } else {?>
+			<div class="row">
+				<div class="large-12 column">
+					<table class="grid patient-list">
+						<thead>
+							<tr>
+								<?php foreach (PatientSearchResultField::model()->findAll(array('order' => 'display_order asc')) as $patient_search_result_field) {?>
+									<th>
+										<a href="<?php echo $this->getPatientSearchUrl($patient_search_result_field->name)?>">
+											<?php if ($patient_search_result_field->label) {
+												echo $patient_search_result_field->label;
+											} else {
+												echo Patient::model()->getAttributeLabel($patient_search_result_field->name);
+											}?>
+										</a>
+									</th>
+								<?php }?>
+							</tr>
+						</thead>
+						<tbody>
+							<?php foreach ($data as $i => $result) {?>
+								<tr data-id="<?php echo $result->id?>" class="clickable">
+									<?php foreach (PatientSearchResultField::model()->findAll(array('order' => 'display_order asc')) as $patient_search_result_field) {?>
+										<td>
+											<?php if (preg_match('/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/',$result->{$patient_search_result_field->name})) {
+												echo $result->NHSDate($patient_search_result_field->name);
+											} else {
+												echo $result->{$patient_search_result_field->name};
+											}?>
+										</td>
+									<?php }?>
+								</tr>
+							<?php }?>
+						</tbody>
+						<tfoot class="pagination-container">
+							<tr>
+								<td colspan="7">
+									<?php for ($i=1; $i <= $pages; $i++) {?>
+										<?php if ($i == $page) {?>
+											<?php echo $i?>
+										<?php }else{?>
+											<a href="<?php echo Yii::app()->createUrl('/patient/results',array('page' => $i) + $search_terms)?>">
+												<?php echo $i?>
+											</a>
+										<?php }?>
+										&nbsp;&nbsp;
+									<?php }?>
+								</td>
+							</tr>
+						</tfoot>
+					</table>
+				</div>
+			</div>
+		<?php }?>
+	<?php }?>
+</div>
+<?php if ($focus = PatientSearchField::model()->find('focus=1')) {?>
+	<script type="text/javascript">
+		$(document).ready(function() {
+			$('#<?php echo $focus->name?>').select().focus();
+		});
+	</script>
+<?php }?>

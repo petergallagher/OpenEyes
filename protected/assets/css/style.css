@@ -3968,6 +3968,13 @@ tfoot.pagination-container .pagination li {
   padding-top: 0.6875em;
   padding-bottom: 0.6875em;
 }
+/* line 61, ../sass/openeyes/components/panels/_search.scss */
+.panel .advanced {
+  padding-top: 1em;
+  padding-left: 6em;
+  display: inline-block;
+  font-size: 10pt;
+}
 
 /* line 22, ../sass/openeyes/components/panels/_actions.scss */
 .panel.actions {
