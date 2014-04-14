@@ -193,6 +193,25 @@ class BaseEventTypeCActiveForm extends FormLayout
 		));
 	}
 
+	public function checkBoxCollection($element, $field, $relation, $relation_id_field, $options, $default_options, $htmlOptions=array(), $hidden=false, $inline=false, $noSelectionsMessage=null, $showRemoveAllLink=false, $sorted=false, $layoutColumns=array())
+	{
+		$this->widget('application.widgets.checkBoxCollection', array(
+				'element' => $element,
+				'field' => $field,
+				'relation' => $relation,
+				'relation_id_field' => $relation_id_field,
+				'options' => $options,
+				'default_options' => $default_options,
+				'htmlOptions' => $htmlOptions,
+				'hidden' => $hidden,
+				'inline' => $inline,
+				'noSelectionsMessage' => $noSelectionsMessage,
+				'showRemoveAllLink' => $showRemoveAllLink,
+				'sorted' => $sorted,
+				'layoutColumns' => $layoutColumns
+		));
+	}
+
 	public function dropDownTextSelection($element, $text_field, $options, $htmlOptions=array(), $layoutColumns=array())
 	{
 		$this->widget('application.widgets.DropDownTextSelection', array(

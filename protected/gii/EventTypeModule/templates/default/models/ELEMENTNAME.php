@@ -253,7 +253,7 @@ if (isset($element)) {
 	{
 <?php if (isset($element) && !empty($element['after_save'])) {
 			foreach ($element['after_save'] as $after_save) {
-				if ($after_save['type'] == 'MultiSelect') {?>
+				if ($after_save['type'] == 'MultiSelect' || $after_save['type'] == 'Checkbox collection') {?>
 		if (!empty($_POST['<?php echo $after_save['post_var']?>'])) {
 
 			$existing_ids = array();

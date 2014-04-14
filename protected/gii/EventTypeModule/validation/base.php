@@ -10,9 +10,9 @@ return array(
 			array(
 				'type' => 'length',
 				'field_property' => 'moduleShortSuffix',
-				'max'  => 20,
+				'max'  => 25,
 				'regstrip' => '/\s+/',
-				'message' => 'Event name cannot be more than 20 characters (not including spaces)'
+				'message' => 'Event name cannot be more than 25 characters (not including spaces)'
 			),
 			array(
 				'type' => 'required',
