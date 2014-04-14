@@ -57,7 +57,7 @@ return array(
 					),
 					array(
 							'type' => 'length',
-							'max'  => 20,
+							'max'  => 25,
 					),
 			),
 	),
@@ -105,7 +105,7 @@ return array(
 			),
 			array(
 				'type' => 'regex',
-				'regex' => '/^[a-zA-Z0-9\s]+$/',
+				'regex' => '/^.*?$/',
 				'message' => 'Field label must be letters, numbers and spaces only.',
 			),
 		),

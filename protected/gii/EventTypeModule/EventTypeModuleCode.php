@@ -182,6 +182,8 @@ class EventTypeModuleCode extends BaseModuleCode // CCodeModel
 			}
 		}
 		$this->files[]=new CCodeFile($this->modulePath.'\template.gii', json_encode($_POST));
+		$this->files[]=new CCodeFile($this->modulePath.'\elements.gii', json_encode($elements));
+		$elements = $this->getElementsFromPost();
 	}
 
 	function changeAllInstancesOfString($path, $from, $to)
@@ -223,7 +225,7 @@ class EventTypeModuleCode extends BaseModuleCode // CCodeModel
 		$elements = Array();
 		foreach ($_POST as $key => $value) {
 			if (preg_match('/^elementName([0-9]+)$/',$key, $matches) || preg_match('/^elementId([0-9]+)$/',$key,$matches)) {
-				$field = $matches[0]; $number = $matches[1]; $name = $value;
+				$field = $matches[0];$number = $matches[1]; $name = $value;
 
 				if (preg_match('/^elementName([0-9]+)$/',$key, $matches)) {
 					$elements[$number]['mode'] = 'create';
@@ -263,10 +265,16 @@ class EventTypeModuleCode extends BaseModuleCode // CCodeModel
 				$elements[$number] = $this->generateKeyNames($elements[$number],array('lmui','cui','ev'));
 
 				$fields = Array();
+
+				$fields_order = 0;
 				foreach ($_POST as $fields_key => $fields_value) {
 					$pattern = '/^' . $field . 'FieldName([0-9]+)$/';
-					if (preg_match($pattern, $fields_key, $field_matches)) {
-						$field_number = $field_matches[1];
+
+						if (preg_match($pattern, $fields_key, $field_matches)) {
+
+						//$field_number = $field_matches[1];
+							$fields_order++;
+							$field_number = $fields_order;
 						$elements[$number]['fields'][$field_number] = Array();
 						$elements[$number]['fields'][$field_number]['name'] = $fields_value;
 						$elements[$number]['fields'][$field_number]['label'] = $_POST[$field . "FieldLabel".$field_number];
@@ -334,7 +342,6 @@ class EventTypeModuleCode extends BaseModuleCode // CCodeModel
 				}
 			}
 		}
-
 		return $elements;
 	}
 

@@ -1,4 +1,7 @@
 <div class="element_field">
+
+	<input type="submit" class="insert_element_field" name="insertElementField<?php echo $element_num?>_<?php echo $field_num?>" value="add field" />
+	<br/><br/>
 	<label style="display: inline;">Field label: </label>
 	<label style="margin-left: 9.3em; display: inline;">Field name: </label>
 	<br/>
@@ -13,6 +16,8 @@
 
 	sort($field_types);
 	?>
+
+
 
 	<select name="elementType<?php echo $element_num?>FieldType<?php echo $field_num?>" class="selectFieldType">
 		<?php foreach ($field_types as $field) {?>

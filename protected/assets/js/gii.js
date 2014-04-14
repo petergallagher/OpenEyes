@@ -1,4 +1,36 @@
 $(document).ready(function() {
+	$('.insert_element_field').live('click',function() {
+
+		var element_num = $(this).attr('name').match(/[0-9]+/);
+		var div = $(this).parent();
+
+		var field_num = 0;
+		div.children('div.element_field').each(function() {
+			$(this).children('.remove_element_field').each(function() {
+				var m = $(this).attr('name').match(/^removeElementField([0-9]+)_([0-9]+)$/);
+				if (parseInt(m[2]) > field_num) {
+					field_num = parseInt(m[2]);
+				}
+			});
+		});
+
+		field_num += 1;
+
+		$.ajax({
+			'url': baseUrl+'/gii/EventTypeModule?ajax=element_field&element_num='+element_num+'&field_num='+field_num,
+			'type': 'GET',
+			'success': function(data) {
+				div.before(data);
+				return false;
+				//$('#elementName'+element_num+'FieldLabel'+field_num).focus();
+				//return false;
+			}
+		});
+
+		return false;
+
+	});
+
 	$('.add_element_field').live('click',function() {
 		var div = $(this).parent().children('div.element_fields');
 
@@ -6,7 +38,7 @@ $(document).ready(function() {
 
 		var field_num = 0;
 		div.children('div.element_field').each(function() {
-			$(this).children('input[type="submit"]').each(function() {
+			$(this).children('.remove_element_field').each(function() {
 				var m = $(this).attr('name').match(/^removeElementField([0-9]+)_([0-9]+)$/);
 				if (parseInt(m[2]) > field_num) {
 					field_num = parseInt(m[2]);
@@ -22,6 +54,43 @@ $(document).ready(function() {
 			'success': function(data) {
 				div.append(data);
 				$('#elementName'+element_num+'FieldLabel'+field_num).focus();
+				return false;
+			}
+		});
+
+		return false;
+	});
+
+	$('.insert_element').live('click',function() {
+		var element_num = 0;
+
+		// work out the highest element number (which will be the latest one)
+		$('input[type="text"]').map(function() {
+			if (m = $(this).attr('name').match(/^elementName([0-9]+)$/)) {
+				if (parseInt(m[1]) > element_num) {
+					element_num = parseInt(m[1]);
+				}
+			}
+		});
+
+		$('select.elementToAddFieldsTo').map(function() {
+			if (m = $(this).attr('name').match(/^elementId([0-9]+)$/)) {
+				if (parseInt(m[1]) > element_num) {
+					element_num = parseInt(m[1]);
+				}
+			}
+		});
+
+		element_num += 1;
+		debugger;
+		var target = $(this).parent();
+
+		$.ajax({
+			'url': baseUrl+'/gii/EventTypeModule?ajax=element&element_num='+element_num,
+			'type': 'GET',
+			'success': function(data) {
+				target.before(data);
+				$('#elementName'+element_num).focus();
 				return false;
 			}
 		});
