@@ -99,7 +99,7 @@ return array(
 			'rules' => array(
 				'' => 'site/index',
 				'patient/viewpas/<pas_key:\d+>' => 'patient/viewpas',
-				'file/view/<id:\d+>/<dimensions:\d+(x\d+)?>/<name:\w+\.\w+>' => 'protectedFile/thumbnail',
+				'file/view/<id:\d+>/<dimensions:\d+(x\d+)?(_\d+x\d+)?>/<name:.*?.\w+>' => 'protectedFile/thumbnail',
 				'file/view/<id:\d+>/<name:\w+\.\w+>' => 'protectedFile/view',
 				'<module:\w+>/<controller:\w+>/<action:\w+>/<id:\d+>' => '<module>/<controller>/<action>',
 				'<controller:\w+>/<id:\d+>' => '<controller>/view',

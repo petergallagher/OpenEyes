@@ -77,7 +77,9 @@ class ProtectedFileController extends BaseController
 		if (!$thumbnail = $file->getThumbnail($dimensions, true)) {
 			throw new CHttpException(404, "Thumbnail not available");
 		}
-		header('Content-Type: ' . $file->mimetype);
+		$mimetype = $file->mimetype == 'application/pdf' ? 'image/jpeg' : $file->mimetype;
+
+		header('Content-Type: ' . $mimetype);
 		header('Expires: 0');
 		header('Cache-Control: must-revalidate');
 		header('Content-Length: ' . $thumbnail['size']);
