@@ -168,7 +168,6 @@ return array(
 				'Service\\GpService',
 				'Service\\PracticeService',
 				'Service\\PatientService',
-				'Service\\PatientMeasurementService',
 			),
 		),
 		'session' => array(
