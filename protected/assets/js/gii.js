@@ -5,7 +5,8 @@ $(document).ready(function() {
 		var div = $(this).parent();
 
 		var field_num = 0;
-		div.children('div.element_field').each(function() {
+
+		$(this).parent().parent().children('.element_field').each(function() {
 			$(this).children('.remove_element_field').each(function() {
 				var m = $(this).attr('name').match(/^removeElementField([0-9]+)_([0-9]+)$/);
 				if (parseInt(m[2]) > field_num) {
@@ -21,9 +22,8 @@ $(document).ready(function() {
 			'type': 'GET',
 			'success': function(data) {
 				div.before(data);
+				$('#elementName'+element_num+'FieldLabel'+field_num).focus();
 				return false;
-				//$('#elementName'+element_num+'FieldLabel'+field_num).focus();
-				//return false;
 			}
 		});
 
