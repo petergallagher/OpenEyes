@@ -272,71 +272,74 @@ class EventTypeModuleCode extends BaseModuleCode // CCodeModel
 
 						if (preg_match($pattern, $fields_key, $field_matches)) {
 
-						//$field_number = $field_matches[1];
-							$fields_order++;
-							$field_number = $fields_order;
-						$elements[$number]['fields'][$field_number] = Array();
-						$elements[$number]['fields'][$field_number]['name'] = $fields_value;
-						$elements[$number]['fields'][$field_number]['label'] = $_POST[$field . "FieldLabel".$field_number];
-						$elements[$number]['fields'][$field_number]['number'] = $field_number;
-						$elements[$number]['fields'][$field_number]['type'] = $_POST["elementType" . $number . "FieldType".$field_number];
-						$elements[$number]['fields'][$field_number]['required'] = (boolean) @$_POST['isRequiredField'.$number.'_'.$field_number];
-
-						if ($elements[$number]['fields'][$field_number]['type'] == 'Dropdown list') {
-							$elements = $this->extraElementFieldWrangling_DropdownList($elements, $number, $field_number, $fields_value);
+						$field_number = $field_matches[1];
+						$fields_order = $field_number;
+						if(isset($_POST['position'.$number.'_'.$field_number])){
+							$fields_order = $_POST['position'.$number.'_'.$field_number];
 						}
 
-						if ($elements[$number]['fields'][$field_number]['type'] == 'Textarea with dropdown') {
-							$elements = $this->extraElementFieldWrangling_TextareaWithDropdown($elements, $number, $field_number, $fields_value);
-							$elements[$number]['fields'][$field_number]['textarea_rows'] = @$_POST['textAreaDropDownRows'.$number.'Field'.$field_number];
-							$elements[$number]['fields'][$field_number]['textarea_cols'] = @$_POST['textAreaDropDownCols'.$number.'Field'.$field_number];
+						$elements[$number]['fields'][$fields_order] = Array();
+						$elements[$number]['fields'][$fields_order]['name'] = $fields_value;
+						$elements[$number]['fields'][$fields_order]['label'] = $_POST[$field . "FieldLabel".$field_number];
+						$elements[$number]['fields'][$fields_order]['number'] = $fields_order;
+						$elements[$number]['fields'][$fields_order]['type'] = $_POST["elementType" . $number . "FieldType".$field_number];
+						$elements[$number]['fields'][$fields_order]['required'] = (boolean) @$_POST['isRequiredField'.$number.'_'.$field_number];
+
+						if ($elements[$number]['fields'][$fields_order]['type'] == 'Dropdown list') {
+							$elements = $this->extraElementFieldWrangling_DropdownList($elements, $number, $fields_order, $field_number, $fields_value);
 						}
 
-						if ($elements[$number]['fields'][$field_number]['type'] == 'Radio buttons') {
-							$elements = $this->extraElementFieldWrangling_RadioButtons($elements, $number, $field_number, $fields_value);
+						if ($elements[$number]['fields'][$fields_order]['type'] == 'Textarea with dropdown') {
+							$elements = $this->extraElementFieldWrangling_TextareaWithDropdown($elements, $number, $fields_order, $field_number, $fields_value);
+							$elements[$number]['fields'][$fields_order]['textarea_rows'] = @$_POST['textAreaDropDownRows'.$number.'Field'.$field_number];
+							$elements[$number]['fields'][$fields_order]['textarea_cols'] = @$_POST['textAreaDropDownCols'.$number.'Field'.$field_number];
 						}
 
-						if ($elements[$number]['fields'][$field_number]['type'] == 'EyeDraw') {
-							$elements = $this->extraElementFieldWrangling_EyeDraw($elements, $number, $field_number, $fields_value);
+						if ($elements[$number]['fields'][$fields_order]['type'] == 'Radio buttons') {
+							$elements = $this->extraElementFieldWrangling_RadioButtons($elements, $number, $fields_order, $field_number, $fields_value);
 						}
 
-						if ($elements[$number]['fields'][$field_number]['type'] == 'Multi select') {
-							$elements = $this->extraElementFieldWrangling_MultiSelect($elements, $number, $field_number, $fields_value);
+						if ($elements[$number]['fields'][$fields_order]['type'] == 'EyeDraw') {
+							$elements = $this->extraElementFieldWrangling_EyeDraw($elements, $number, $fields_order, $field_number, $fields_value);
 						}
 
-						if ($elements[$number]['fields'][$field_number]['type'] == 'Slider') {
-							$elements[$number]['fields'][$field_number]['slider_min_value'] = @$_POST['sliderMinValue'.$number.'Field'.$field_number];
-							$elements[$number]['fields'][$field_number]['slider_max_value'] = @$_POST['sliderMaxValue'.$number.'Field'.$field_number];
-							$elements[$number]['fields'][$field_number]['slider_default_value'] = @$_POST['sliderDefaultValue'.$number.'Field'.$field_number];
-							$elements[$number]['fields'][$field_number]['default_value'] = @$_POST['sliderDefaultValue'.$number.'Field'.$field_number];
-							$elements[$number]['fields'][$field_number]['slider_stepping'] = @$_POST['sliderStepping'.$number.'Field'.$field_number];
-							$elements[$number]['fields'][$field_number]['slider_dp'] = @$_POST['sliderForceDP'.$number.'Field'.$field_number];
+						if ($elements[$number]['fields'][$fields_order]['type'] == 'Multi select') {
+							$elements = $this->extraElementFieldWrangling_MultiSelect($elements, $number, $fields_order, $field_number, $fields_value);
 						}
 
-						if ($elements[$number]['fields'][$field_number]['type'] == 'Integer') {
-							$elements[$number]['fields'][$field_number]['integer_min_value'] = @$_POST['integerMinValue'.$number.'Field'.$field_number];
-							$elements[$number]['fields'][$field_number]['integer_max_value'] = @$_POST['integerMaxValue'.$number.'Field'.$field_number];
-							$elements[$number]['fields'][$field_number]['integer_default_value'] = @$_POST['integerDefaultValue'.$number.'Field'.$field_number];
-							$elements[$number]['fields'][$field_number]['default_value'] = @$_POST['integerDefaultValue'.$number.'Field'.$field_number];
-							$elements[$number]['fields'][$field_number]['integer_size'] = @$_POST['integerSize'.$number.'Field'.$field_number];
-							$elements[$number]['fields'][$field_number]['integer_max_length'] = @$_POST['integerMaxLength'.$number.'Field'.$field_number];
-						}
-						if ($elements[$number]['fields'][$field_number]['type'] == 'Decimal') {
-							$elements[$number]['fields'][$field_number]['decimal_min_value'] = @$_POST['decimalMinValue'.$number.'Field'.$field_number];
-							$elements[$number]['fields'][$field_number]['decimal_max_value'] = @$_POST['decimalMaxValue'.$number.'Field'.$field_number];
-							$elements[$number]['fields'][$field_number]['default_value'] = @$_POST['decimalDefaultValue'.$number.'Field'.$field_number];
-							$elements[$number]['fields'][$field_number]['decimal_size'] = @$_POST['decimalSize'.$number.'Field'.$field_number];
-							$elements[$number]['fields'][$field_number]['decimal_max_length'] = @$_POST['decimalMaxLength'.$number.'Field'.$field_number];
-							$elements[$number]['fields'][$field_number]['decimal_dp'] = @$_POST['decimalForceDP'.$number.'Field'.$field_number];
-						}
-						if ($elements[$number]['fields'][$field_number]['type'] == 'Textbox') {
-							$elements[$number]['fields'][$field_number]['textbox_size'] = @$_POST['textBoxSize'.$number.'Field'.$field_number];
-							$elements[$number]['fields'][$field_number]['textbox_max_length'] = @$_POST['textBoxMaxLength'.$number.'Field'.$field_number];
+						if ($elements[$number]['fields'][$fields_order]['type'] == 'Slider') {
+							$elements[$number]['fields'][$fields_order]['slider_min_value'] = @$_POST['sliderMinValue'.$number.'Field'.$field_number];
+							$elements[$number]['fields'][$fields_order]['slider_max_value'] = @$_POST['sliderMaxValue'.$number.'Field'.$field_number];
+							$elements[$number]['fields'][$fields_order]['slider_default_value'] = @$_POST['sliderDefaultValue'.$number.'Field'.$field_number];
+							$elements[$number]['fields'][$fields_order]['default_value'] = @$_POST['sliderDefaultValue'.$number.'Field'.$field_number];
+							$elements[$number]['fields'][$fields_order]['slider_stepping'] = @$_POST['sliderStepping'.$number.'Field'.$field_number];
+							$elements[$number]['fields'][$fields_order]['slider_dp'] = @$_POST['sliderForceDP'.$number.'Field'.$field_number];
 						}
 
-						if ($elements[$number]['fields'][$field_number]['type'] == 'Textarea') {
-							$elements[$number]['fields'][$field_number]['textarea_rows'] = @$_POST['textAreaRows'.$number.'Field'.$field_number];
-							$elements[$number]['fields'][$field_number]['textarea_cols'] = @$_POST['textAreaCols'.$number.'Field'.$field_number];
+						if ($elements[$number]['fields'][$fields_order]['type'] == 'Integer') {
+							$elements[$number]['fields'][$fields_order]['integer_min_value'] = @$_POST['integerMinValue'.$number.'Field'.$field_number];
+							$elements[$number]['fields'][$fields_order]['integer_max_value'] = @$_POST['integerMaxValue'.$number.'Field'.$field_number];
+							$elements[$number]['fields'][$fields_order]['integer_default_value'] = @$_POST['integerDefaultValue'.$number.'Field'.$field_number];
+							$elements[$number]['fields'][$fields_order]['default_value'] = @$_POST['integerDefaultValue'.$number.'Field'.$field_number];
+							$elements[$number]['fields'][$fields_order]['integer_size'] = @$_POST['integerSize'.$number.'Field'.$field_number];
+							$elements[$number]['fields'][$fields_order]['integer_max_length'] = @$_POST['integerMaxLength'.$number.'Field'.$field_number];
+						}
+						if ($elements[$number]['fields'][$fields_order]['type'] == 'Decimal') {
+							$elements[$number]['fields'][$fields_order]['decimal_min_value'] = @$_POST['decimalMinValue'.$number.'Field'.$field_number];
+							$elements[$number]['fields'][$fields_order]['decimal_max_value'] = @$_POST['decimalMaxValue'.$number.'Field'.$field_number];
+							$elements[$number]['fields'][$fields_order]['default_value'] = @$_POST['decimalDefaultValue'.$number.'Field'.$field_number];
+							$elements[$number]['fields'][$fields_order]['decimal_size'] = @$_POST['decimalSize'.$number.'Field'.$field_number];
+							$elements[$number]['fields'][$fields_order]['decimal_max_length'] = @$_POST['decimalMaxLength'.$number.'Field'.$field_number];
+							$elements[$number]['fields'][$fields_order]['decimal_dp'] = @$_POST['decimalForceDP'.$number.'Field'.$field_number];
+						}
+						if ($elements[$number]['fields'][$fields_order]['type'] == 'Textbox') {
+							$elements[$number]['fields'][$fields_order]['textbox_size'] = @$_POST['textBoxSize'.$number.'Field'.$field_number];
+							$elements[$number]['fields'][$fields_order]['textbox_max_length'] = @$_POST['textBoxMaxLength'.$number.'Field'.$field_number];
+						}
+
+						if ($elements[$number]['fields'][$fields_order]['type'] == 'Textarea') {
+							$elements[$number]['fields'][$fields_order]['textarea_rows'] = @$_POST['textAreaRows'.$number.'Field'.$field_number];
+							$elements[$number]['fields'][$fields_order]['textarea_cols'] = @$_POST['textAreaCols'.$number.'Field'.$field_number];
 						}
 					}
 				}
@@ -345,24 +348,24 @@ class EventTypeModuleCode extends BaseModuleCode // CCodeModel
 		return $elements;
 	}
 
-	public function extraElementFieldWrangling_DropdownList($elements, $number, $field_number, $fields_value)
+	public function extraElementFieldWrangling_DropdownList($elements, $number, $fields_order, $field_number, $fields_value)
 	{
 		// Dropdown list fields should end with _id
 		if (!preg_match('/_id$/',$fields_value)) {
-			$_POST['elementName'.$number.'FieldName'.$field_number] = $elements[$number]['fields'][$field_number]['name'] = $fields_value = $fields_value.'_id';
+			$_POST['elementName'.$number.'FieldName'.$field_number] = $elements[$number]['fields'][$fields_order]['name'] = $fields_value = $fields_value.'_id';
 		}
 
 		// but for class naming/lookups we don't want the id:
 		$root_fields_value = preg_replace('/_id$/', '', $fields_value);
 
-		$elements[$number]['fields'][$field_number]['empty'] = @$_POST['dropDownUseEmpty'.$number.'Field'.$field_number];
+		$elements[$number]['fields'][$fields_order]['empty'] = @$_POST['dropDownUseEmpty'.$number.'Field'.$field_number];
 
 		if (@$_POST['dropDownFieldValueTextInputDefault'.$number.'Field'.$field_number]) {
-			$elements[$number]['fields'][$field_number]['default_value'] = @$_POST['dropDownFieldValueTextInputDefault'.$number.'Field'.$field_number];
+			$elements[$number]['fields'][$fields_order]['default_value'] = @$_POST['dropDownFieldValueTextInputDefault'.$number.'Field'.$field_number];
 		}
 
 		if (@$_POST['dropDownMethod'.$number.'Field'.$field_number] == 0) {
-			$elements[$number]['fields'][$field_number]['method'] = 'Manual';
+			$elements[$number]['fields'][$fields_order]['method'] = 'Manual';
 
 			// Manually-entered values
 			$field_values = array();
@@ -374,74 +377,74 @@ class EventTypeModuleCode extends BaseModuleCode // CCodeModel
 			}
 
 			$lookup_table = array(
-				'name' => $elements[$number]['fields'][$field_number]['lookup_table'] = preg_replace('/^et_/','',$elements[$number]['table_name'].'_'.$root_fields_value),
+				'name' => $elements[$number]['fields'][$fields_order]['lookup_table'] = preg_replace('/^et_/','',$elements[$number]['table_name'].'_'.$root_fields_value),
 			);
 
 			$key_name = $lookup_table['name'].'_fk';
 
 			if (strlen($key_name) >64) {
-				$key_name = $this->generateKeyName($elements[$number]['fields'][$field_number]['name'],$root_fields_value);
+				$key_name = $this->generateKeyName($elements[$number]['fields'][$fields_order]['name'],$root_fields_value);
 			}
 
 			$lookup_table = $this->generateKeyNames($lookup_table,array('lmui','cui'));
 
 			$elements[$number]['foreign_keys'][] = array(
-				'field' => $elements[$number]['fields'][$field_number]['name'],
+				'field' => $elements[$number]['fields'][$fields_order]['name'],
 				'name' => $key_name,
 				'table' => $lookup_table['name']
 			);
 
 			$lookup_table['values'] = $field_values;
-			$lookup_table['class'] = $elements[$number]['fields'][$field_number]['lookup_class'] = preg_replace('/^Element_/','',$elements[$number]['class_name'] . '_' . str_replace(' ','', ucwords(str_replace('_', ' ', $root_fields_value) ) ));
-			$elements[$number]['fields'][$field_number]['lookup_field'] = 'name';
-			$elements[$number]['fields'][$field_number]['order_field'] = 'display_order';
+			$lookup_table['class'] = $elements[$number]['fields'][$fields_order]['lookup_class'] = preg_replace('/^Element_/','',$elements[$number]['class_name'] . '_' . str_replace(' ','', ucwords(str_replace('_', ' ', $root_fields_value) ) ));
+			$elements[$number]['fields'][$fields_order]['lookup_field'] = 'name';
+			$elements[$number]['fields'][$fields_order]['order_field'] = 'display_order';
 
 			$elements[$number]['lookup_tables'][] = $lookup_table;
 
 			$elements[$number]['relations'][] = array(
 				'type' => 'BELONGS_TO',
-				'name' => preg_replace('/_id$/','',$elements[$number]['fields'][$field_number]['name']),
+				'name' => preg_replace('/_id$/','',$elements[$number]['fields'][$fields_order]['name']),
 				'class' => $lookup_table['class'],
-				'field' => $elements[$number]['fields'][$field_number]['name'],
+				'field' => $elements[$number]['fields'][$fields_order]['name'],
 			);
 
 		} else {
-			$elements[$number]['fields'][$field_number]['method'] = 'Table';
+			$elements[$number]['fields'][$fields_order]['method'] = 'Table';
 
 			// Point at table
 
 			$lookup_table = $_POST['dropDownFieldSQLTable'.$number.'Field'.$field_number];
 
-			$key_name = $elements[$number]['table_name'].'_'.$elements[$number]['fields'][$field_number]['name'].'_fk';
+			$key_name = $elements[$number]['table_name'].'_'.$elements[$number]['fields'][$fields_order]['name'].'_fk';
 
 			if (strlen($key_name) >64) {
-				$key_name = $this->generateKeyName($elements[$number]['fields'][$field_number]['name'],$fields_value);
+				$key_name = $this->generateKeyName($elements[$number]['fields'][$fields_order]['name'],$fields_value);
 			}
 
-			$elements[$number]['fields'][$field_number]['lookup_field'] = $elements[$number]['fields'][$field_number]['order_field'] = @$_POST['dropDownFieldSQLTableField'.$number.'Field'.$field_number];
+			$elements[$number]['fields'][$fields_order]['lookup_field'] = $elements[$number]['fields'][$fields_order]['order_field'] = @$_POST['dropDownFieldSQLTableField'.$number.'Field'.$field_number];
 
 			if (@$_POST['dropDownFieldValueTextInputDefault'.$number.'Field'.$field_number]) {
-				$elements[$number]['fields'][$field_number]['default_value'] = @$_POST['dropDownFieldValueTextInputDefault'.$number.'Field'.$field_number];
+				$elements[$number]['fields'][$fields_order]['default_value'] = @$_POST['dropDownFieldValueTextInputDefault'.$number.'Field'.$field_number];
 			}
 
 			$elements[$number]['foreign_keys'][] = array(
-				'field' => $elements[$number]['fields'][$field_number]['name'],
+				'field' => $elements[$number]['fields'][$fields_order]['name'],
 				'name' => $key_name,
 				'table' => $lookup_table,
 			);
 
 			$elements[$number]['relations'][] = array(
 				'type' => 'BELONGS_TO',
-				'name' => preg_replace('/_id$/','',$elements[$number]['fields'][$field_number]['name']),
-				'class' => $elements[$number]['fields'][$field_number]['lookup_class'] = EventTypeModuleCode::findModelClassForTable($lookup_table),
-				'field' => $elements[$number]['fields'][$field_number]['name'],
+				'name' => preg_replace('/_id$/','',$elements[$number]['fields'][$fields_order]['name']),
+				'class' => $elements[$number]['fields'][$fields_order]['lookup_class'] = EventTypeModuleCode::findModelClassForTable($lookup_table),
+				'field' => $elements[$number]['fields'][$fields_order]['name'],
 			);
 		}
 
 		return $elements;
 	}
 
-	public function extraElementFieldWrangling_TextareaWithDropdown($elements, $number, $field_number, $fields_value)
+	public function extraElementFieldWrangling_TextareaWithDropdown($elements, $number, $fields_order, $field_number, $fields_value)
 	{
 		// Manually-entered values
 		$field_values = array();
@@ -453,41 +456,41 @@ class EventTypeModuleCode extends BaseModuleCode // CCodeModel
 		}
 
 		$lookup_table = array(
-			'name' => $elements[$number]['fields'][$field_number]['lookup_table'] = preg_replace('/^et_/','',$elements[$number]['table_name'].'_'.preg_replace('/_id$/','',$elements[$number]['fields'][$field_number]['name']))
+			'name' => $elements[$number]['fields'][$fields_order]['lookup_table'] = preg_replace('/^et_/','',$elements[$number]['table_name'].'_'.preg_replace('/_id$/','',$elements[$number]['fields'][$fields_order]['name']))
 		);
 
 		$key_name = $lookup_table['name'].'_fk';
 
 		if (strlen($key_name) >64) {
-			$key_name = $this->generateKeyName($elements[$number]['fields'][$field_number]['name'],$fields_value);
+			$key_name = $this->generateKeyName($elements[$number]['fields'][$fields_order]['name'],$fields_value);
 		}
 
 		$lookup_table = $this->generateKeyNames($lookup_table,array('lmui','cui'));
 
 		$lookup_table['values'] = $field_values;
-		$lookup_table['class'] = $elements[$number]['fields'][$field_number]['lookup_class'] = preg_replace('/^Element_/','',$elements[$number]['class_name'] . '_' . str_replace(' ','',ucwords(str_replace('_',' ', $fields_value)) ));
-		$elements[$number]['fields'][$field_number]['lookup_field'] = 'name';
+		$lookup_table['class'] = $elements[$number]['fields'][$fields_order]['lookup_class'] = preg_replace('/^Element_/','',$elements[$number]['class_name'] . '_' . str_replace(' ','',ucwords(str_replace('_',' ', $fields_value)) ));
+		$elements[$number]['fields'][$fields_order]['lookup_field'] = 'name';
 
 		$elements[$number]['lookup_tables'][] = $lookup_table;
 
 		return $elements;
 	}
 
-	public function extraElementFieldWrangling_RadioButtons($elements, $number, $field_number, $fields_value)
+	public function extraElementFieldWrangling_RadioButtons($elements, $number, $fields_order, $field_number, $fields_value)
 	{
 		// Radio button fields should end with _id
 		if (!preg_match('/_id$/',$fields_value)) {
-			$_POST['elementName'.$number.'FieldName'.$field_number] = $elements[$number]['fields'][$field_number]['name'] = $fields_value = $fields_value.'_id';
+			$_POST['elementName'.$number.'FieldName'.$field_number] = $elements[$number]['fields'][$fields_order]['name'] = $fields_value = $fields_value.'_id';
 		}
 		// but for class naming/lookups we don't want the id:
 		$root_fields_value = preg_replace('/_id$/', '', $fields_value);
 
 		if (@$_POST['radioButtonFieldValueTextInputDefault'.$number.'Field'.$field_number]) {
-			$elements[$number]['fields'][$field_number]['default_value'] = @$_POST['radioButtonFieldValueTextInputDefault'.$number.'Field'.$field_number];
+			$elements[$number]['fields'][$fields_order]['default_value'] = @$_POST['radioButtonFieldValueTextInputDefault'.$number.'Field'.$field_number];
 		}
 
 		if (@$_POST['radioButtonMethod'.$number.'Field'.$field_number] == 0) {
-			$elements[$number]['fields'][$field_number]['method'] = 'Manual';
+			$elements[$number]['fields'][$fields_order]['method'] = 'Manual';
 
 			// Manually-entered values
 			$field_values = array();
@@ -499,25 +502,25 @@ class EventTypeModuleCode extends BaseModuleCode // CCodeModel
 			}
 
 			$lookup_table = array(
-				'name' => $elements[$number]['fields'][$field_number]['lookup_table'] = preg_replace('/^et_/','',$elements[$number]['table_name'].'_'.$root_fields_value)
+				'name' => $elements[$number]['fields'][$fields_order]['lookup_table'] = preg_replace('/^et_/','',$elements[$number]['table_name'].'_'.$root_fields_value)
 			);
 
 			$key_name = $lookup_table['name'].'_fk';
 
 			if (strlen($key_name) >64) {
-				$key_name = $this->generateKeyName($elements[$number]['fields'][$field_number]['name'],$root_fields_value);
+				$key_name = $this->generateKeyName($elements[$number]['fields'][$fields_order]['name'],$root_fields_value);
 			}
 
 			$lookup_table = $this->generateKeyNames($lookup_table,array('lmui','cui'));
 
 			$elements[$number]['foreign_keys'][] = array(
-				'field' => $elements[$number]['fields'][$field_number]['name'],
+				'field' => $elements[$number]['fields'][$fields_order]['name'],
 				'name' => $key_name,
 				'table' => $lookup_table['name']
 			);
 
 			$lookup_table['values'] = $field_values;
-			$lookup_table['class'] = $elements[$number]['fields'][$field_number]['lookup_class'] = preg_replace('/^Element_/','',$elements[$number]['class_name'] . '_' . str_replace(' ','', ucwords(str_replace('_', ' ', $root_fields_value) ) ));
+			$lookup_table['class'] = $elements[$number]['fields'][$fields_order]['lookup_class'] = preg_replace('/^Element_/','',$elements[$number]['class_name'] . '_' . str_replace(' ','', ucwords(str_replace('_', ' ', $root_fields_value) ) ));
 
 			$elements[$number]['lookup_tables'][] = $lookup_table;
 
@@ -525,26 +528,26 @@ class EventTypeModuleCode extends BaseModuleCode // CCodeModel
 				'type' => 'BELONGS_TO',
 				'name' => $root_fields_value,
 				'class' => $lookup_table['class'],
-				'field' => $elements[$number]['fields'][$field_number]['name'],
+				'field' => $elements[$number]['fields'][$fields_order]['name'],
 			);
 
 		} else {
-			$elements[$number]['fields'][$field_number]['method'] = 'Table';
+			$elements[$number]['fields'][$fields_order]['method'] = 'Table';
 
 			// Point at table
 
 			$lookup_table = $_POST['radioButtonFieldSQLTable'.$number.'Field'.$field_number];
 
-			$elements[$number]['fields'][$field_number]['lookup_table'] = $lookup_table;
+			$elements[$number]['fields'][$fields_order]['lookup_table'] = $lookup_table;
 
-			$key_name = $elements[$number]['table_name'].'_'.$elements[$number]['fields'][$field_number]['name'].'_fk';
+			$key_name = $elements[$number]['table_name'].'_'.$elements[$number]['fields'][$fields_order]['name'].'_fk';
 
 			if (strlen($key_name) >64) {
-				$key_name = $this->generateKeyName($elements[$number]['fields'][$field_number]['name'],$root_fields_value);
+				$key_name = $this->generateKeyName($elements[$number]['fields'][$fields_order]['name'],$root_fields_value);
 			}
 
 			$elements[$number]['foreign_keys'][] = array(
-				'field' => $elements[$number]['fields'][$field_number]['name'],
+				'field' => $elements[$number]['fields'][$fields_order]['name'],
 				'name' => $key_name,
 				'table' => $lookup_table,
 			);
@@ -552,28 +555,28 @@ class EventTypeModuleCode extends BaseModuleCode // CCodeModel
 			$elements[$number]['relations'][] = array(
 				'type' => 'BELONGS_TO',
 				'name' => $root_fields_value,
-				'class' => $elements[$number]['fields'][$field_number]['lookup_class'] = EventTypeModuleCode::findModelClassForTable($lookup_table),
-				'field' => $elements[$number]['fields'][$field_number]['name'],
+				'class' => $elements[$number]['fields'][$fields_order]['lookup_class'] = EventTypeModuleCode::findModelClassForTable($lookup_table),
+				'field' => $elements[$number]['fields'][$fields_order]['name'],
 			);
 		}
 
 		return $elements;
 	}
 
-	public function extraElementFieldWrangling_EyeDraw($elements, $number, $field_number, $fields_value)
+	public function extraElementFieldWrangling_EyeDraw($elements, $number, $fields_order, $field_number, $fields_value)
 	{
-		$elements[$number]['fields'][$field_number]['eyedraw_size'] = @$_POST['eyedrawSize'.$number.'Field'.$field_number];
-		$elements[$number]['fields'][$field_number]['eyedraw_toolbar_doodles'] = @$_POST['eyedrawToolbarDoodle'.$number.'Field'.$field_number];
-		$elements[$number]['fields'][$field_number]['eyedraw_default_doodles'] = @$_POST['eyedrawDefaultDoodle'.$number.'Field'.$field_number];
+		$elements[$number]['fields'][$fields_order]['eyedraw_size'] = @$_POST['eyedrawSize'.$number.'Field'.$field_number];
+		$elements[$number]['fields'][$fields_order]['eyedraw_toolbar_doodles'] = @$_POST['eyedrawToolbarDoodle'.$number.'Field'.$field_number];
+		$elements[$number]['fields'][$fields_order]['eyedraw_default_doodles'] = @$_POST['eyedrawDefaultDoodle'.$number.'Field'.$field_number];
 		$elements[$number]['add_selected_eye'] = true;
 
 		return $elements;
 	}
 
-	public function extraElementFieldWrangling_MultiSelect($elements, $number, $field_number, $fields_value)
+	public function extraElementFieldWrangling_MultiSelect($elements, $number, $fields_order, $field_number, $fields_value)
 	{
 		if (@$_POST['multiSelectMethod'.$number.'Field'.$field_number] == 0) {
-			$elements[$number]['fields'][$field_number]['method'] = 'Manual';
+			$elements[$number]['fields'][$fields_order]['method'] = 'Manual';
 
 			// Manually-entered values
 			$field_values = array();
@@ -585,11 +588,11 @@ class EventTypeModuleCode extends BaseModuleCode // CCodeModel
 			}
 
 			$lookup_table = array(
-				'name' => $elements[$number]['fields'][$field_number]['lookup_table'] = preg_replace('/^et_/','',$elements[$number]['table_name'].'_'.$fields_value)
+				'name' => $elements[$number]['fields'][$fields_order]['lookup_table'] = preg_replace('/^et_/','',$elements[$number]['table_name'].'_'.$fields_value)
 			);
 
 			$lookup_table['values'] = $field_values;
-			$lookup_table['class'] = $elements[$number]['fields'][$field_number]['lookup_class'] = preg_replace('/^Element_/','',$elements[$number]['class_name'] . '_' . str_replace(' ','', ucwords(str_replace('_', ' ', $fields_value) ) ));
+			$lookup_table['class'] = $elements[$number]['fields'][$fields_order]['lookup_class'] = preg_replace('/^Element_/','',$elements[$number]['class_name'] . '_' . str_replace(' ','', ucwords(str_replace('_', ' ', $fields_value) ) ));
 
 			$lookup_table['defaults'] = array();
 
@@ -608,7 +611,7 @@ class EventTypeModuleCode extends BaseModuleCode // CCodeModel
 			);
 
 			$mapping_table = array(
-				'name' => $elements[$number]['table_name'].'_'.$elements[$number]['fields'][$field_number]['name'].'_assignment',
+				'name' => $elements[$number]['table_name'].'_'.$elements[$number]['fields'][$fields_order]['name'].'_assignment',
 				'lookup_table' => $lookup_table['name'],
 				'lookup_class' => $lookup_table['class'],
 				'element_class' => $elements[$number]['class_name'],
@@ -622,31 +625,31 @@ class EventTypeModuleCode extends BaseModuleCode // CCodeModel
 
 			$elements[$number]['relations'][] = array(
 				'type' => 'HAS_MANY',
-				'name' => $elements[$number]['fields'][$field_number]['name'].'s',
+				'name' => $elements[$number]['fields'][$fields_order]['name'].'s',
 				#'class' => str_replace(' ','',ucwords(str_replace('_',' ',$mapping_table['name']))),
 				'class' => $mapping_table['class'],
 				'field' => 'element_id',
 			);
 
-			$elements[$number]['fields'][$field_number]['multiselect_relation'] = $elements[$number]['fields'][$field_number]['name'].'s';
-			$elements[$number]['fields'][$field_number]['multiselect_field'] = $lookup_table['name'].'_id';
-			$elements[$number]['fields'][$field_number]['multiselect_lookup_class'] = $lookup_table['class'];
-			$elements[$number]['fields'][$field_number]['multiselect_lookup_table'] = $lookup_table['name'];
-			$elements[$number]['fields'][$field_number]['multiselect_table_field_name'] = 'name';
-			$elements[$number]['fields'][$field_number]['multiselect_order_field'] = 'display_order';
+			$elements[$number]['fields'][$fields_order]['multiselect_relation'] = $elements[$number]['fields'][$fields_order]['name'].'s';
+			$elements[$number]['fields'][$fields_order]['multiselect_field'] = $lookup_table['name'].'_id';
+			$elements[$number]['fields'][$fields_order]['multiselect_lookup_class'] = $lookup_table['class'];
+			$elements[$number]['fields'][$fields_order]['multiselect_lookup_table'] = $lookup_table['name'];
+			$elements[$number]['fields'][$fields_order]['multiselect_table_field_name'] = 'name';
+			$elements[$number]['fields'][$fields_order]['multiselect_order_field'] = 'display_order';
 
 			$elements[$number]['after_save'][] = array(
 				'type' => 'MultiSelect',
-				'post_var' => 'MultiSelect_'.$elements[$number]['fields'][$field_number]['name'],
+				'post_var' => 'MultiSelect_'.$elements[$number]['fields'][$fields_order]['name'],
 				'mapping_table_class' => $mapping_table['class'],
 				'lookup_table_field_id' => $lookup_table['name'].'_id',
 			);
 
 		} else {
-			$elements[$number]['fields'][$field_number]['method'] = 'Table';
+			$elements[$number]['fields'][$fields_order]['method'] = 'Table';
 
 			$lookup_table = array(
-				'name' => $elements[$number]['fields'][$field_number]['lookup_table'] = @$_POST['multiSelectFieldSQLTable'.$number.'Field'.$field_number],
+				'name' => $elements[$number]['fields'][$fields_order]['lookup_table'] = @$_POST['multiSelectFieldSQLTable'.$number.'Field'.$field_number],
 			);
 
 			$lookup_table['class'] = EventTypeModuleCode::findModelClassForTable($lookup_table['name']);
@@ -676,7 +679,7 @@ class EventTypeModuleCode extends BaseModuleCode // CCodeModel
 			);
 
 			$mapping_table = array(
-				'name' => preg_replace('/^et_/','',$elements[$number]['table_name'].'_'.$elements[$number]['fields'][$field_number]['name'].'_'.$elements[$number]['fields'][$field_number]['name']),
+				'name' => preg_replace('/^et_/','',$elements[$number]['table_name'].'_'.$elements[$number]['fields'][$fields_order]['name'].'_'.$elements[$number]['fields'][$fields_order]['name']),
 				'lookup_table' => $lookup_table['name'],
 				'lookup_class' => $lookup_table['class'],
 				'element_class' => $elements[$number]['class_name'],
@@ -690,21 +693,21 @@ class EventTypeModuleCode extends BaseModuleCode // CCodeModel
 
 			$elements[$number]['relations'][] = array(
 				'type' => 'HAS_MANY',
-				'name' => $elements[$number]['fields'][$field_number]['name'].'s',
+				'name' => $elements[$number]['fields'][$fields_order]['name'].'s',
 				'class' => str_replace(' ','',ucwords(str_replace('_',' ',$mapping_table['name']))),
 				'field' => 'element_id',
 			);
 
-			$elements[$number]['fields'][$field_number]['multiselect_relation'] = $elements[$number]['fields'][$field_number]['name'].'s';
-			$elements[$number]['fields'][$field_number]['multiselect_field'] = $lookup_table['name'].'_id';
-			$elements[$number]['fields'][$field_number]['multiselect_lookup_class'] = $lookup_table['class'];
-			$elements[$number]['fields'][$field_number]['multiselect_lookup_table'] = $lookup_table['name'];
-			$elements[$number]['fields'][$field_number]['multiselect_table_field_name'] = @$_POST['multiSelectFieldSQLTableField'.$number.'Field'.$field_number];
-			$elements[$number]['fields'][$field_number]['multiselect_order_field'] = @$_POST['multiSelectFieldSQLTableField'.$number.'Field'.$field_number];
+			$elements[$number]['fields'][$fields_order]['multiselect_relation'] = $elements[$number]['fields'][$fields_order]['name'].'s';
+			$elements[$number]['fields'][$fields_order]['multiselect_field'] = $lookup_table['name'].'_id';
+			$elements[$number]['fields'][$fields_order]['multiselect_lookup_class'] = $lookup_table['class'];
+			$elements[$number]['fields'][$fields_order]['multiselect_lookup_table'] = $lookup_table['name'];
+			$elements[$number]['fields'][$fields_order]['multiselect_table_field_name'] = @$_POST['multiSelectFieldSQLTableField'.$number.'Field'.$field_number];
+			$elements[$number]['fields'][$fields_order]['multiselect_order_field'] = @$_POST['multiSelectFieldSQLTableField'.$number.'Field'.$field_number];
 
 			$elements[$number]['after_save'][] = array(
 				'type' => 'MultiSelect',
-				'post_var' => 'MultiSelect_'.$elements[$number]['fields'][$field_number]['name'],
+				'post_var' => 'MultiSelect_'.$elements[$number]['fields'][$fields_order]['name'],
 				'mapping_table_class' => $mapping_table['class'],
 				'lookup_table_field_id' => $lookup_table['name'].'_id',
 			);

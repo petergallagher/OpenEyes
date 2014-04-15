@@ -69,7 +69,7 @@ return array(
 			),
 			array(
 				'type' => 'regex',
-				'regex' => '/^[a-z][a-z0-9_]+$/',
+				'regex' => '/.*$/',
 				'message' => 'Field name must be a-z, 0-9 and underscores only, and start with a letter.',
 			),
 			// need to limit the length of the field name for fields which will generate another table

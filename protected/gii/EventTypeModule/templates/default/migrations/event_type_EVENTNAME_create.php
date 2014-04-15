@@ -95,9 +95,9 @@ class m<?php if (isset($migrationid)) { echo $migrationid; } ?>_event_type_<?php
 				}
 
 				foreach ($element['fields'] as $field => $value) {
-						$field_name = $element['fields'][$count]['name'];
-						$field_label = $element['fields'][$count]['label'];
-						$field_type = $this->getDBFieldSQLType($element['fields'][$count]);
+						$field_name = $value['name'];
+						$field_label = $value['label'];
+						$field_type = $this->getDBFieldSQLType($value);
 						if ($field_type) {?>
 				'<?php echo $field_name?>' => '<?php echo $field_type?>',
 
