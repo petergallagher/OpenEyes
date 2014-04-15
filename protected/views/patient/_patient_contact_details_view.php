@@ -18,28 +18,38 @@
  */
 ?>
 		<div class="view-mode">
-			<div class="row data-row">
-				<div class="large-4 column">
-					<div class="data-label"><?php echo $contact->getAttributeLabel('primary_phone')?>:</div>
+			<?php echo $this->renderPartial('_patient_metadata_view',array('patient'=>$patient,'before'=>'primary_phone'))?>
+			<?php if (!Yii::app()->params['patient_summary_hide_blank_fields'] || $contact->primary_phone) {?>
+				<div class="row data-row">
+					<div class="large-4 column">
+						<div class="data-label"><?php echo $contact->getAttributeLabel('primary_phone')?>:</div>
+					</div>
+					<div class="large-8 column">
+						<div class="data-value"><?php echo $contact->primary_phone ? $contact->primary_phone : 'Unknown'?></div>
+					</div>
 				</div>
-				<div class="large-8 column">
-					<div class="data-value"><?php echo $contact->primary_phone ? $contact->primary_phone : 'Unknown'?></div>
+			<?php }?>
+			<?php echo $this->renderPartial('_patient_metadata_view',array('patient'=>$patient,'after'=>'primary_phone'))?>
+			<?php echo $this->renderPartial('_patient_metadata_view',array('patient'=>$patient,'before'=>'email'))?>
+			<?php if (!Yii::app()->params['patient_summary_hide_blank_fields'] || $address->email) {?>
+				<div class="row data-row">
+					<div class="large-4 column">
+						<div class="data-label"><?php echo $address->getAttributeLabel('email')?>:</div>
+					</div>
+					<div class="large-8 column">
+						<div class="data-value"><?php echo $address->email ? $address->email : 'Unknown'?></div>
+					</div>
 				</div>
-			</div>
-			<div class="row data-row">
-				<div class="large-4 column">
-					<div class="data-label"><?php echo $address->getAttributeLabel('email')?>:</div>
+			<?php }?>
+			<?php echo $this->renderPartial('_patient_metadata_view',array('patient'=>$patient,'after'=>'email'))?>
+			<?php if (!Yii::app()->params['patient_summary_hide_blank_fields']) {?>
+				<div class="row data-row">
+					<div class="large-4 column">
+						<div class="data-label">Next of Kin:</div>
+					</div>
+					<div class="large-8 column">
+						<div class="data-value">Unknown</div>
+					</div>
 				</div>
-				<div class="large-8 column">
-					<div class="data-value"><?php echo $address->email ? $address->email : 'Unknown'?></div>
-				</div>
-			</div>
-			<div class="row data-row">
-				<div class="large-4 column">
-					<div class="data-label">Next of Kin:</div>
-				</div>
-				<div class="large-8 column">
-					<div class="data-value">Unknown</div>
-				</div>
-			</div>
+			<?php }?>
 		</div>

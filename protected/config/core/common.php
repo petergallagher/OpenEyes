@@ -245,5 +245,6 @@ return array(
 		'patient_demographics_editable' => true,
 		'default_search_page' => 'basic', // basic or advanced
 		'default_country' => 'United Kingdom',
+		'patient_summary_hide_blank_fields' => false,
 	),
 );

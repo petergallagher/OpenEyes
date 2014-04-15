@@ -19,61 +19,71 @@
 ?>
 		<div class="view-mode">
 			<?php echo $this->renderPartial('_patient_metadata_view',array('patient'=>$patient,'before'=>'first_name'))?>
-			<div class="row data-row">
-				<div class="large-4 column">
-					<div class="data-label"><?php echo $patient->getAttributeLabel('first_name')?>:</div>
-				</div>
-				<div class="large-8 column">
-					<div class="data-value"><?php echo $patient->first_name?></div>
-				</div>
-			</div>
-			<?php echo $this->renderPartial('_patient_metadata_view',array('patient'=>$patient,'after'=>'first_name'))?>
-			<?php echo $this->renderPartial('_patient_metadata_view',array('patient'=>$patient,'before'=>'last_name'))?>
-			<div class="row data-row">
-				<div class="large-4 column">
-					<div class="data-label"><?php echo $patient->getAttributeLabel('last_name')?>:</div>
-				</div>
-				<div class="large-8 column">
-					<div class="data-value"><?php echo $patient->last_name?></div>
-				</div>
-			</div>
-			<?php echo $this->renderPartial('_patient_metadata_view',array('patient'=>$patient,'after'=>'last_name'))?>
-			<?php echo $this->renderPartial('_patient_metadata_view',array('patient'=>$patient,'before'=>'address'))?>
-			<div class="row data-row">
-				<div class="large-4 column">
-					<div class="data-label">Address:</div>
-				</div>
-				<div class="large-8 column">
-					<div class="data-value">
-						<?php echo $patient->getSummaryAddress()?>
-					</div>
-				</div>
-			</div>
-			<?php echo $this->renderPartial('_patient_metadata_view',array('patient'=>$patient,'after'=>'address'))?>
-			<?php echo $this->renderPartial('_patient_metadata_view',array('patient'=>$patient,'before'=>'dob'))?>
-			<div class="row data-row">
-				<div class="large-4 column">
-					<div class="data-label"><?php echo $patient->getAttributeLabel('dob')?>:</div>
-				</div>
-				<div class="large-8 column">
-					<div class="data-value">
-						<?php echo ($patient->dob) ? $patient->NHSDate('dob') : 'Unknown' ?>
-					</div>
-				</div>
-			</div>
-			<?php echo $this->renderPartial('_patient_metadata_view',array('patient'=>$patient,'after'=>'dob'))?>
-			<?php if (!$patient->dob) {?>
-				<?php echo $this->renderPartial('_patient_metadata_view',array('patient'=>$patient,'before'=>'yob'))?>
+			<?php if (!Yii::app()->params['patient_summary_hide_blank_fields'] || $patient->first_name) {?>
 				<div class="row data-row">
 					<div class="large-4 column">
-						<div class="data-label"><?php echo $patient->getAttributeLabel('yob')?>:</div>
+						<div class="data-label"><?php echo $patient->getAttributeLabel('first_name')?>:</div>
+					</div>
+					<div class="large-8 column">
+						<div class="data-value"><?php echo $patient->first_name?></div>
+					</div>
+				</div>
+			<?php }?>
+			<?php echo $this->renderPartial('_patient_metadata_view',array('patient'=>$patient,'after'=>'first_name'))?>
+			<?php echo $this->renderPartial('_patient_metadata_view',array('patient'=>$patient,'before'=>'last_name'))?>
+			<?php if (!Yii::app()->params['patient_summary_hide_blank_fields'] || $patient->last_name) {?>
+				<div class="row data-row">
+					<div class="large-4 column">
+						<div class="data-label"><?php echo $patient->getAttributeLabel('last_name')?>:</div>
+					</div>
+					<div class="large-8 column">
+						<div class="data-value"><?php echo $patient->last_name?></div>
+					</div>
+				</div>
+			<?php }?>
+			<?php echo $this->renderPartial('_patient_metadata_view',array('patient'=>$patient,'after'=>'last_name'))?>
+			<?php echo $this->renderPartial('_patient_metadata_view',array('patient'=>$patient,'before'=>'address'))?>
+			<?php if (!Yii::app()->params['patient_summary_hide_blank_fields'] || $patient->getSummaryAddress()) {?>
+				<div class="row data-row">
+					<div class="large-4 column">
+						<div class="data-label">Address:</div>
 					</div>
 					<div class="large-8 column">
 						<div class="data-value">
-							<?php echo ($patient->yob) ? $patient->yob : 'Unknown' ?>
+							<?php echo $patient->getSummaryAddress()?>
 						</div>
 					</div>
 				</div>
+			<?php }?>
+			<?php echo $this->renderPartial('_patient_metadata_view',array('patient'=>$patient,'after'=>'address'))?>
+			<?php echo $this->renderPartial('_patient_metadata_view',array('patient'=>$patient,'before'=>'dob'))?>
+			<?php if (!Yii::app()->params['patient_summary_hide_blank_fields'] || $patient->dob) {?>
+				<div class="row data-row">
+					<div class="large-4 column">
+						<div class="data-label"><?php echo $patient->getAttributeLabel('dob')?>:</div>
+					</div>
+					<div class="large-8 column">
+						<div class="data-value">
+							<?php echo ($patient->dob) ? $patient->NHSDate('dob') : 'Unknown' ?>
+						</div>
+					</div>
+				</div>
+			<?php }?>
+			<?php echo $this->renderPartial('_patient_metadata_view',array('patient'=>$patient,'after'=>'dob'))?>
+			<?php if (!$patient->dob) {?>
+				<?php echo $this->renderPartial('_patient_metadata_view',array('patient'=>$patient,'before'=>'yob'))?>
+				<?php if (!Yii::app()->params['patient_summary_hide_blank_fields'] || $patient->yob) {?>
+					<div class="row data-row">
+						<div class="large-4 column">
+							<div class="data-label"><?php echo $patient->getAttributeLabel('yob')?>:</div>
+						</div>
+						<div class="large-8 column">
+							<div class="data-value">
+								<?php echo ($patient->yob) ? $patient->yob : 'Unknown' ?>
+							</div>
+						</div>
+					</div>
+				<?php }?>
 				<?php echo $this->renderPartial('_patient_metadata_view',array('patient'=>$patient,'after'=>'yob'))?>
 			<?php }?>
 			<div class="row data-row">
@@ -90,39 +100,45 @@
 					<?php echo $this->renderPartial('_patient_metadata_view',array('patient'=>$patient,'after'=>'date_of_death'))?>
 				<?php } else {?>
 					<?php echo $this->renderPartial('_patient_metadata_view',array('patient'=>$patient,'before'=>'age'))?>
-					<div class="large-4 column">
-						<div class="data-label"><?php echo $patient->getAttributeLabel('age')?>:</div>
-					</div>
-					<div class="large-8 column">
-						<div class="data-value">
-							<?php echo $patient->getAge()?>
+					<?php if (!Yii::app()->params['patient_summary_hide_blank_fields'] || $patient->age) {?>
+						<div class="large-4 column">
+							<div class="data-label"><?php echo $patient->getAttributeLabel('age')?>:</div>
 						</div>
-					</div>
+						<div class="large-8 column">
+							<div class="data-value">
+								<?php echo $patient->getAge()?>
+							</div>
+						</div>
+					<?php }?>
 					<?php echo $this->renderPartial('_patient_metadata_view',array('patient'=>$patient,'after'=>'age'))?>
 				<?php }?>
 			</div>
 			<?php echo $this->renderPartial('_patient_metadata_view',array('patient'=>$patient,'before'=>'gender'))?>
-			<div class="row data-row">
-				<div class="large-4 column">
-					<div class="data-label"><?php echo $patient->getAttributeLabel('gender')?>:</div>
-				</div>
-				<div class="large-8 column">
-					<div class="data-value">
-						<?php echo $patient->getGenderString() ?>
+			<?php if (!Yii::app()->params['patient_summary_hide_blank_fields'] || $patient->gender) {?>
+				<div class="row data-row">
+					<div class="large-4 column">
+						<div class="data-label"><?php echo $patient->getAttributeLabel('gender')?>:</div>
+					</div>
+					<div class="large-8 column">
+						<div class="data-value">
+							<?php echo $patient->getGenderString() ?>
+						</div>
 					</div>
 				</div>
-			</div>
+			<?php }?>
 			<?php echo $this->renderPartial('_patient_metadata_view',array('patient'=>$patient,'after'=>'gender'))?>
 			<?php echo $this->renderPartial('_patient_metadata_view',array('patient'=>$patient,'before'=>'ethnic_group_id'))?>
-			<div class="row data-row">
-				<div class="large-4 column">
-					<div class="data-label"><?php echo $patient->getAttributeLabel('ethnic_group_id')?>:</div>
-				</div>
-				<div class="large-8 column">
-					<div class="data-value">
-						<?php echo $patient->getEthnicGroupString() ?>
+			<?php if (!Yii::app()->params['patient_summary_hide_blank_fields'] || $patient->ethnic_group_id) {?>
+				<div class="row data-row">
+					<div class="large-4 column">
+						<div class="data-label"><?php echo $patient->getAttributeLabel('ethnic_group_id')?>:</div>
+					</div>
+					<div class="large-8 column">
+						<div class="data-value">
+							<?php echo $patient->getEthnicGroupString() ?>
+						</div>
 					</div>
 				</div>
-			</div>
+			<?php }?>
 			<?php echo $this->renderPartial('_patient_metadata_view',array('patient'=>$patient,'after'=>'ethnic_group_id'))?>
 		</div>
