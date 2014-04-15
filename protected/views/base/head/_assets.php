@@ -24,3 +24,4 @@
 <?php $assetManager->registerScriptFile('js/OpenEyes.UI.Widgets.js')?>
 <?php $assetManager->registerScriptFile('js/script.js')?>
 <?php $assetManager->registerScriptFile('js/jquery.zoom.js')?>
+<?php $assetManager->registerScriptFile('js/jquery.form.js')?>

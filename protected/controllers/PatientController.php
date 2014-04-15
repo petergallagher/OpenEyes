@@ -1634,17 +1634,22 @@ class PatientController extends BaseController
 			throw new Exception("Unable to save patient address: ".print_r($address->getErrors(),true));
 		}
 
-		foreach (PatientMetadataKey::model()->findAll() as $metadata_key) {
-			if (isset($_POST[$metadata_key->key_name])) {
-				$patient->setMetadata($metadata_key->key_name,$_POST[$metadata_key->key_name]);
-			}
-		}
+		$this->saveMetadataKeys($patient);
 
 		$transaction->commit();
 
 		$patient->audit('patient','update',serialize($_POST));
 
 		echo "1";
+	}
+
+	public function saveMetadataKeys($patient)
+	{
+		foreach (PatientMetadataKey::model()->findAll() as $metadata_key) {
+			if (isset($_POST[$metadata_key->key_name])) {
+				$patient->setMetadata($metadata_key->key_name,$_POST[$metadata_key->key_name]);
+			}
+		}
 	}
 
 	public function actionValidatePatientContactDetails($id)
@@ -1707,6 +1712,8 @@ class PatientController extends BaseController
 		if (!$address->save()) {
 			throw new Exception("Unable to save patient address: ".print_r($address->getErrors(),true));
 		}
+
+		$this->saveMetadataKeys($patient);
 
 		$transaction->commit();
 

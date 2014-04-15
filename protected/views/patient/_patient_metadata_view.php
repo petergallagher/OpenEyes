@@ -31,18 +31,20 @@ if (@$before) {
 	$criteria->params[':blank'] = '';
 }
 			foreach (PatientMetadataKey::model()->findAll($criteria) as $metadata_key) {?>
-				<div class="row data-row">
-					<div class="large-4 column">
-						<div class="data-label"><?php echo $metadata_key->key_label?>:</div>
-					</div>
-					<div class="large-8 column">
-						<div class="data-value">
-							<?php if ($metadata_key->fieldType->name == 'Checkbox') {
-								echo $patient->{$metadata_key->key_name} ? 'Yes' : 'No';
-							} else {
-								echo $patient->{$metadata_key->key_name} ? $patient->{$metadata_key->key_name} : '-';
-							}?>
+				<?php if (!Yii::app()->params['patient_summary_hide_blank_fields'] || $metadata_key->fieldType->name == 'Checkbox' || $patient->{$metadata_key->key_name}) {?>
+					<div class="row data-row">
+						<div class="large-4 column">
+							<div class="data-label"><?php echo $metadata_key->key_label?>:</div>
+						</div>
+						<div class="large-8 column">
+							<div class="data-value">
+								<?php if ($metadata_key->fieldType->name == 'Checkbox') {
+									echo $patient->{$metadata_key->key_name} ? 'Yes' : 'No';
+								} else {
+									echo $patient->{$metadata_key->key_name} ? $patient->{$metadata_key->key_name} : '-';
+								}?>
+							</div>
 						</div>
 					</div>
-				</div>
+				<?php }?>
 			<?php }?>
