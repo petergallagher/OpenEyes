@@ -167,10 +167,10 @@ class BaseEventTypeCActiveForm extends FormLayout
 	public function checkBoxArray($element, $labeltext, $fields, $layoutColumns=array())
 	{
 		$this->widget('application.widgets.CheckBoxArray', array(
-			'element' => $element,
-			'fields' => $fields,
-			'labeltext' => $labeltext,
-			'layoutColumns' => $layoutColumns
+				'element' => $element,
+				'fields' => $fields,
+				'labeltext' => $labeltext,
+				'layoutColumns' => $layoutColumns
 		));
 	}
 
