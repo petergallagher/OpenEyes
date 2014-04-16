@@ -16,28 +16,52 @@
  * @property MeasurementType $measurementType
  * @property Patient $patient
  */
-class BasePatientMeasurement extends BaseActiveRecordVersioned {
+abstract class Measurement extends BaseActiveRecordVersioned
+{
 
-	public $patient_measurement_id;
-	public $patientMeasurement;
-	public $patient_id;
-	public $measurement_type_id;
-	
-	/**
-	 * Returns the static model of the specified AR class.
-	 * Please note that you should have this exact method in all your CActiveRecord descendants!
-	 * @param string $className active record class name.
-	 * @return PatientMeasurement the static model class
-	 */
-	public static function model($className = __CLASS__) {
-		return parent::model($className);
-	}
-	
-	public function beforeSave() {
-		$this->patientMeasurement = new PatientMeasurement;
-		$this->patientMeasurement->patient_id = $this->patient_id;
-		$this->patientMeasurement->measurement_type_id = $this->measurement_type_id;
-		return $this->patientMeasurement->save();
+	private $patient_measurement;
+
+	public function beforeValidate()
+	{
+		// TODO: Merge errors from patient measurement;
+		return parent::beforeValidate() && $this->patient_measurement->validate();
 	}
 
+	public function beforeSave()
+	{
+		return parent::beforeSave() && $this->patient_measurement->save();
+	}
+
+	public getPatient_id()
+	{
+		return $this->getPatientMeasurement()->patient_id;
+	}
+
+	public setPatient_id($id)
+	{
+		$this->getPatientMeasurement()->patient_id = $id;
+	}
+
+	public getPatientMeasurement()
+	{
+		if(!$this->patient_measurement) {
+			if(isnew) {
+				$this->patient_measurement = new PatientMeasurement();
+				$this->patient_measurement->measurement_type_id = $this->getMeasurementType()->id;
+			} else {
+        		$this->patient_measurement = PatientMeasurement::model()->findByPk($this->patient_measurement_id);
+			}
+		}
+		return $this->patient_measurement;
+	}
+
+	public getPatient()
+	{
+		return $this->getPatientMeasurement()->patient;
+	}
+
+	public function getMeasurementType()
+	{
+		return MeasurementType::model()->findByClassName(get_class($this));
+	}
 }
