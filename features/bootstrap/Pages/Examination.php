@@ -13,7 +13,7 @@ class Examination extends OpenEyesPage
         'duration' => array('xpath' => "//*[@id='dropDownTextSelection_Element_OphCiExamination_History_description']//*[@value='1 week, ']"),
         'openComorbidities' => array('xpath' => "//div[@class='sub-elements inactive']//*[@data-element-type-name='Comorbidities']"),
         'addComorbidities' => array('xpath' => "//select[@id='comorbidities_items']"),
-        'openVisualAcuity' => array('xpath' => "//*[@class='optional-elements-list']//*[contains(text(),'Visual Acuity')]"),
+        'expandVisualAcuity' => array('xpath' => "//*[@class='optional-elements-list']//*[contains(text(),'Visual Acuity')]"),
         'visualAcuityUnitChange' => array('xpath' => "//*[@id='visualacuity_unit_change']"),
         'openLeftVA' => array('xpath' => "//*[@class='element-eye left-eye column right side']//*[@class='button small secondary addReading']"),
         'snellenLeft' => array('xpath' => "//select[@id='visualacuity_reading_0_value']"),
@@ -256,22 +256,25 @@ class Examination extends OpenEyesPage
 
     protected function isVisualAcuityCollapsed()
     {
-        return (bool) $this->find('xpath', $this->getElement('openVisualAcuity')->getXpath());
+        return (bool) $this->find('xpath', $this->getElement('expandVisualAcuity')->getXpath());
     }
 
     public function openVisualAcuity ()
     {
         if ($this->isVisualAcuityCollapsed()) {
-            $this->getElement('openVisualAcuity')->click();
+            $element = $this->getElement('expandVisualAcuity');
+            $this->scrollWindowToElement($element);
+            $element->click();
             $this->getSession()->wait(3000, 'window.$ && $.active == 0');
         }
     }
 
     public function selectVisualAcuity ($unit)
     {
-        $this->getSession()->wait(3000);
+        $this->waitForElementDisplayBlock('#visualacuity_unit_change');
         $this->getElement('visualAcuityUnitChange')->selectOption($unit);
-        $this->getSession()->wait(5000);
+        $this->waitForElementDisplayBlock('#visualacuity_unit_change');
+//        $this->getSession()->wait(5000);
     }
 
     public function leftVisualAcuity ($metre, $method)
@@ -313,12 +316,13 @@ class Examination extends OpenEyesPage
 {
     if ($this->isIntraocularPressureCollapsed()){
         $this->getElement('openIntraocularPressure')->click();
+        $this->getSession()->wait(3000, 'window.$ && $.active == 0');
     }
 }
 
     public function leftIntracocular ($pressure, $instrument)
     {
-        $this->getSession()->wait(3000);
+//        $this->getSession()->wait(3000);
         $this->getElement('intraocularLeft')->selectOption($pressure);
         $this->getElement('instrumentLeft')->selectOption($instrument);
     }
@@ -392,7 +396,7 @@ class Examination extends OpenEyesPage
     {
         if ($this->isRefractionCollapsed()){
         $this->getElement('expandRefraction')->click();
-        $this->getSession()->wait(10000,'window.$ && $.active == 0');
+        $this->getSession()->wait(5000,'window.$ && $.active == 0');
         }
     }
 
@@ -580,7 +584,7 @@ class Examination extends OpenEyesPage
         $element = $this->getElement('expandClinicalManagement');
         $this->scrollWindowToElement($element);
         $element->click();
-        $this->getSession()->wait(8000, 'window.$ && $.active == 0');
+        $this->getSession()->wait(5000, 'window.$ && $.active == 0');
     }
 
     public function expandCataractSurgicalManagement ()
@@ -719,13 +723,13 @@ class Examination extends OpenEyesPage
     public function rightChoroidalRetinal ()
     {
         $this->getElement('rightChoroidalRetinal')->click();
-        $this->getSession()->wait(5000);
+        $this->getSession()->wait(1000);
     }
 
     public function rightSecondaryTo ($secondary)
     {
         $this->getElement('rightSecondaryTo')->selectOption($secondary);
-        $this->getSession()->wait(5000);
+        $this->getSession()->wait(1000);
     }
 
     public function leftChoroidalRetinal ()
@@ -736,17 +740,19 @@ class Examination extends OpenEyesPage
     public function leftSecondaryTo ($secondary)
     {
         $this->getElement('leftSecondaryTo')->selectOption($secondary);
-        $this->getSession()->wait(5000);
+        $this->getSession()->wait(1000);
     }
 
     public function rightIntendedTreatment ($treatment)
     {
         $this->getElement('rightIntendedTreatment')->selectOption($treatment);
+        $this->getSession()->wait(1000);
     }
 
     public function leftIntendedTreatment ($treatment)
     {
         $this->getElement('leftIntendedTreatment')->selectOption($treatment);
+        $this->getSession()->wait(1000);
     }
 
     public function rightCRTIncreaseLowerThanHundredYes ()
@@ -842,13 +848,13 @@ class Examination extends OpenEyesPage
     public function rightSecondaryVenousRetinalBranchOcclusion ()
     {
         $this->getElement('rightVenousRetinalBranchOcclusion')->click();
-        $this->getSession()->wait(5000);
+//        $this->getSession()->wait(5000);
     }
 
     public function leftSecondaryDiabeticMacularOedema ()
     {
         $this->getElement('leftDiabeticMacularOedema')->click();
-        $this->getSession()->wait(5000);
+//        $this->getSession()->wait(5000);
     }
 
     public function leftCrtIncreaseMoreThanFourHundredYes ()
@@ -903,7 +909,9 @@ class Examination extends OpenEyesPage
 
     public function rightFailedLaserYes ()
     {
-        $this->getElement('rightFailedLaserYes')->click();
+        $element = $this->getElement('rightFailedLaserYes');
+        $this->scrollWindowToElement($element);
+        $element->click();
     }
 
     public function rightFailedLaserNo()
@@ -1063,7 +1071,7 @@ class Examination extends OpenEyesPage
         $element = $this->getElement('addAllElements');
         $this->scrollWindowToElement($element);
         $element->click();
-        $this->getSession()->wait(40000, 'window.$ && $.active == 0');
+        $this->getSession()->wait(8000, 'window.$ && $.active == 0');
     }
 
     public function addAllElementsValidationError ()
@@ -1189,7 +1197,7 @@ class Examination extends OpenEyesPage
     public function removeLeftDilation ()
     {
         $this->getElement('removeDilationLeft')->click();
-        $this->getSession()->wait(10000);
+//        $this->getSession()->wait(10000);
     }
 
     public function expandDRGrading ()

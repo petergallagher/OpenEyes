@@ -31,6 +31,8 @@ class ContactLocationTest extends CDbTestCase
 		'contactlocations' => 'ContactLocation',
 	);
 
+	public $expectedLetterAddress;
+
 	public function dataProvider_Search()
 	{
 		return array(
@@ -48,6 +50,14 @@ class ContactLocationTest extends CDbTestCase
 	{
 		parent::setUp();
 		$this->model = new ContactLocation;
+		$this->expectedLetterAddress =Array(
+			'Moorfields at City Road',
+			'flat 1',
+			'bleakley creek',
+			'flitchley',
+			'london',
+			'ec1v 0dx'
+		);
 	}
 
 	/**
@@ -96,14 +106,14 @@ class ContactLocationTest extends CDbTestCase
 
 	/**
 	 * @covers ContactLocation::search
-	 * @todo   Implement testSearch().
 	 */
 	public function testSearch()
 	{
-		// Remove the following lines when you implement this test.
-		$this->markTestIncomplete(
-			'This test has not been implemented yet.'
-		);
+		$conLoc = $this->contactlocations('contactlocation1');
+		$conLoc->id = 2;
+		$result = $this->contactlocations('contactlocation1')->search();
+		$result = $result->getData();
+		$this->assertEquals('Collin', $result[0]->contact->nick_name);
 	}
 
 	/**
@@ -121,44 +131,22 @@ class ContactLocationTest extends CDbTestCase
 
 	/**
 	 * @covers ContactLocation::getLetterAddress
-	 * @todo   Implement testGetLetterAddress().
 	 */
 	public function testGetLetterAddress()
 	{
-		$this->markTestSkipped(' skipped as generating errors needs REFACTORING');
-		$expected = Array(
-			'MOORFIELDS EYE HOSPITAL NHS FOUNDATION TRUST',
-			'Moorfields City Road',
-			'flat 1',
-			'bleakley creek',
-			'flitchley',
-			'london',
-			'ec1v 0dx'
-		);
-
-		$result = $this->contactlocations('contactlocation1')->GetLetterAddress();
-
+		$expected = $this->expectedLetterAddress ;
+		$result = $this->contactlocations('contactlocation1')->getLetterAddress();
 		$this->assertEquals($expected, $result);
 	}
 
 	/**
 	 * @covers ContactLocation::getLetterArray
-	 * @todo   Implement testGetLetterArray().
 	 */
 	public function testGetLetterArray()
 	{
-		$this->markTestSkipped(' skipped as generating errors needs REFACTORING');
 		Yii::app()->session['selected_site_id'] = 1;
 
-		$expected = Array(
-			'MOORFIELDS EYE HOSPITAL NHS FOUNDATION TRUST',
-			'Moorfields City Road',
-			'flat 1',
-			'bleakley creek',
-			'flitchley',
-			'london',
-			'ec1v 0dx'
-		);
+		$expected = $this->expectedLetterAddress ;
 
 		$result = $this->contactlocations('contactlocation1')->getLetterArray(true);
 

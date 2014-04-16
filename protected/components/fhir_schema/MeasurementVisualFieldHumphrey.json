@@ -34,5 +34,9 @@
 	"strategy":{
 		"type":"string",
 		"plural":false
+	},
+	"legacy":{
+		"type":"string",
+		"plural":false
 	}
 }

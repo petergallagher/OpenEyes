@@ -1,4 +1,5 @@
 <?php
+
 /**
  * OpenEyes
  *
@@ -16,13 +17,20 @@
  * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
  * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
  */
-
 return array(
-	'site1' => array(
+	'eyeLeft' => array(
 		'id' => 1,
-		'name' => 'City Road',
-		'short_name' => 'City Road',
-		'institution_id' => 1,
-		'contact_id' => 1,
+		'name' => 'Left',
+		'display_order' => 3,
+	),
+	'eyeRight' => array(
+		'id' => 2,
+		'name' => 'Right',
+		'display_order' => 1,
+	),
+	'eyeBoth' => array(
+		'id' => 3,
+		'name' => 'Both',
+		'display_order' => 2,
 	),
 );

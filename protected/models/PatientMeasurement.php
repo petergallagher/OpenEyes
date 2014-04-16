@@ -63,6 +63,10 @@ class PatientMeasurement extends BaseActiveRecordVersioned {
 			'patient' => array(self::BELONGS_TO, 'Patient', 'patient_id'),
 		);
 	}
+        
+        public function getPatient() {
+            return Patient::model()->findByPk($this->patient_id);
+        }
 
 	/**
 	 * @return array customized attribute labels (name=>label)
