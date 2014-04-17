@@ -45,6 +45,12 @@ $(document).ready(function() {
 			var removeAll = container.find('.remove-all');
 			var options = container.data('options');
 
+			if (selections.children('li').length >= parseInt(options['maxItems'])) {
+				alert('You can only select a maximum of '+options['maxItems']+' item'+(options['maxItems'] == '1' ? '' : 's'));
+				select.val('');
+				return;
+			}
+
 			var attrs = {};
 			$(selected[0].attributes).each(function() {
 				attrs[this.nodeName] = this.nodeValue;

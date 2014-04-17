@@ -29,6 +29,7 @@ class MultiSelectList extends BaseFieldWidget
 	public $showRemoveAllLink = false;
 	public $sorted = false;
 	public $noSelectionsMessage;
+	public $maxItems = false;
 
 	public function init()
 	{

@@ -47,7 +47,8 @@ foreach($selected_ids as $id) {
 }
 
 $widgetOptionsJson = json_encode(array(
-	'sorted' => $sorted
+	'sorted' => $sorted,
+	'maxItems' => $maxItems,
 ));
 ?>
 
