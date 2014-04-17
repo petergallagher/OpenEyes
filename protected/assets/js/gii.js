@@ -1,4 +1,5 @@
 $(document).ready(function() {
+
 	$('.insert_element_field').live('click',function() {
 
 		var element_num = $(this).attr('name').match(/[0-9]+/);
@@ -16,12 +17,19 @@ $(document).ready(function() {
 		});
 
 		field_num += 1;
+		var elementFields = $(this).parent().parent();
 
 		$.ajax({
 			'url': baseUrl+'/gii/EventTypeModule?ajax=element_field&element_num='+element_num+'&field_num='+field_num,
 			'type': 'GET',
 			'success': function(data) {
 				div.before(data);
+				var position = 0;
+				elementFields.children('.element_field').each(function() {
+					position++
+					$(this).children('.hidden_position').val(position);
+				});
+
 				$('#elementName'+element_num+'FieldLabel'+field_num).focus();
 				return false;
 			}
@@ -47,12 +55,18 @@ $(document).ready(function() {
 		});
 
 		field_num += 1;
+		var position=0;
 
 		$.ajax({
 			'url': baseUrl+'/gii/EventTypeModule?ajax=element_field&element_num='+element_num+'&field_num='+field_num,
 			'type': 'GET',
 			'success': function(data) {
+				debugger;
 				div.append(data);
+				div.children('.element_field').each(function() {
+					position++
+					$(this).children('.hidden_position').val(position);
+				});
 				$('#elementName'+element_num+'FieldLabel'+field_num).focus();
 				return false;
 			}
@@ -192,7 +206,13 @@ $(document).ready(function() {
 	});
 
 	$('.remove_element_field').live('click',function() {
+		var div = $(this).parent().parent();
 		$(this).parent().remove();
+		var position = 0;
+		div.children('.element_field').each(function() {
+			position++
+			$(this).children('.hidden_position').val(position);
+		});
 		return false;
 	});
 

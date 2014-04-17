@@ -28,6 +28,8 @@
 	<input type="submit" class="remove_element_field" name="removeElementField<?php echo $element_num?>_<?php echo $field_num?>" value="remove" /><br />
 	<input type="checkbox" name="isRequiredField<?php echo $element_num?>_<?php echo $field_num?>" value="1" <?php if (empty($_POST) || @$_POST['isRequiredField'.$element_num.'_'.$field_num]) {?> checked="checked" <?php }?>/> Required<br/>
 
+	<input type="hidden" class="hidden_position" name="position<?php echo $element_num?>_<?php echo $field_num?>" value="<?php echo $field_num?>">
+
 	<div id="extraDataElement<?php echo $element_num?>Field<?php echo $field_num?>">
 		<?php if (file_exists("protected/gii/EventTypeModule/views/extra_".str_replace(" ","",@$_POST['elementType'.$element_num.'FieldType'.$field_num]).".php")) {
 			$this->renderPartial('extra_'.str_replace(' ','',@$_POST['elementType'.$element_num.'FieldType'.$field_num]),array('element_num'=>$element_num,'field_num'=>$field_num));

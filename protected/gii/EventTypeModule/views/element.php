@@ -6,10 +6,8 @@ foreach ($_POST as $key => $value) {
 		$field_nums[] = $m[1];
 	}
 }
-sort($field_nums);
+//sort($field_nums);
 ?>
-
-
 <div class="giiElementContainer" style="margin-bottom: 10px;">
 	<input type="submit" class="insert_element" name="add" value="add element" /><br />
 	<div class="giiElement" style="background:#eee;border:1px solid #999;padding:5px;">
