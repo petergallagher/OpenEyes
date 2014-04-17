@@ -24,13 +24,22 @@
 		<div class="large-<?php echo $layoutColumns['label'];?> column">
 			<?php if (!@$htmlOptions['no-label']) {?>
 				<label for="<?php echo get_class($element)."_".$field;?>">
-					<?php echo CHtml::encode($element->getAttributeLabel($field))?>:
+					<?php if (@$htmlOptions['text-align'] != 'right') {?>
+						<?php echo CHtml::encode($element->getAttributeLabel($field))?>:
+					<?php }?>
 				</label>
 			<?php }?>
 		</div>
 		<div class="large-<?php echo $layoutColumns['field'];?> column end">
 			<?php echo CHtml::hiddenField(get_class($element)."[$field]",'0',array('id' => get_class($element)."_".$field."_hidden"))?>
+			<?php if (@$htmlOptions['text-align'] == 'right') {?>
+				<label>
+			<?php }?>
 			<?php echo CHtml::checkBox(get_class($element)."[$field]",$checked[$field],$htmlOptions)?>
+			<?php if (@$htmlOptions['text-align'] == 'right') {?>
+					<?php echo CHtml::encode($element->getAttributeLabel($field))?>
+				</label>
+			<?php }?>
 		</div>
 	</div>
 <?php } else { ?>
