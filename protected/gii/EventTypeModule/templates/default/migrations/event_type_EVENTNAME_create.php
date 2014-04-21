@@ -12,11 +12,13 @@ class m<?php if (isset($migrationid)) { echo $migrationid; } ?>_event_type_<?php
 		$event_type = $this->dbConnection->createCommand()->select('id')->from('event_type')->where('class_name=:class_name', array(':class_name'=>'<?php echo $this->moduleID; ?>'))->queryRow();
 
 <?php
+			$display_order=0;
 			if (isset($elements)) {
 				foreach ($elements as $element) {
+					$display_order++;
 ?>
 		if (!$this->dbConnection->createCommand()->select('id')->from('element_type')->where('name=:name and event_type_id=:eventTypeId', array(':name'=>'<?php echo $element['name'];?>',':eventTypeId'=>$event_type['id']))->queryRow()) {
-			$this->insert('element_type', array('name' => '<?php echo $element['name'];?>','class_name' => '<?php echo $element['class_name'];?>', 'event_type_id' => $event_type['id'], 'display_order' => 1));
+			$this->insert('element_type', array('name' => '<?php echo $element['name'];?>','class_name' => '<?php echo $element['class_name'];?>', 'event_type_id' => $event_type['id'], 'display_order' => <?php echo $display_order?>));
 		}
 
 		$element_type = $this->dbConnection->createCommand()->select('id')->from('element_type')->where('event_type_id=:eventTypeId and name=:name', array(':eventTypeId'=>$event_type['id'],':name'=>'<?php echo $element['name'];?>'))->queryRow();
