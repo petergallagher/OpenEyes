@@ -69,8 +69,8 @@ if (@$htmlOptions['nowrapper']) {?>
 
 						!empty($htmlOptions['class']) && $options['class'] = $htmlOptions['class'];
 
-						if (!empty($htmlOptions['data'])) {
-							foreach ($htmlOptions['data'] as $k => $v) {
+						foreach ($htmlOptions as $k => $v) {
+							if (preg_match('/^data-/',$k)) {
 								$options[$k] = $v;
 							}
 						}
