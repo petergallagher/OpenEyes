@@ -47,6 +47,8 @@ class ProcedureSelection extends BaseFieldWidget
 
 	public function run()
 	{
+		!isset($this->layoutColumns['procedures']) && $this->layoutColumns['procedures'] = 6;
+
 		if (empty($_POST)) {
 			if (!$this->selected_procedures && $this->element) {
 				$this->selected_procedures = $this->element->{$this->relation};
