@@ -268,16 +268,17 @@ $(document).ready(function(){
 			for (var i in fields) {
 				$('fieldset#'+element_name+'_'+fields[i]).show();
 				$('#div_'+element_name+'_'+fields[i]).show();
+				if (i == 0) {
+					$('input[name="'+element_name+'['+fields[i]+']"][type="text"]').focus();
+				}
 			}
 		} else {
 			for (var i in fields) {
 				$('fieldset#'+element_name+'_'+fields[i]).hide();
 				$('#div_'+element_name+'_'+fields[i]).hide();
 
-				if ($('input[name="'+element_name+'['+fields[i]+']"][type="radio"]').length >0) {
-					$('input[name="'+element_name+'['+fields[i]+']"]').removeAttr('checked');
-				}
-
+				$('input[name="'+element_name+'['+fields[i]+']"][type="radio"]').removeAttr('checked');
+				$('input[name="'+element_name+'['+fields[i]+']"][type="text"]').val('');
 				$('select[name="'+element_name+'['+fields[i]+']"]').val('');
 			}
 		}
