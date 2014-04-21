@@ -92,7 +92,7 @@ $widgetOptionsJson = json_encode(array(
 							<span class="text">
 								<?php echo $options[$id] ?>
 							</span>
-							<a href="#" data-text="<?php echo $options[$id] ?>" class="MultiSelectRemove remove-one">Remove</a>
+							<a href="#" data-text="<?php echo $options[$id] ?>" class="MultiSelectRemove remove-one<?php if (isset($htmlOptions['class'])) {?> <?php echo $htmlOptions['class']?><?php }?>"<?php if (isset($htmlOptions['data-linked-fields'])) {?> data-linked-fields="<?php echo $htmlOptions['data-linked-fields']?>"<?php }?><?php if (isset($htmlOptions['data-linked-value'])) {?> data-linked-value="<?php echo $htmlOptions['data-linked-value']?>"<?php }?>>Remove</a>
 							<input type="hidden" name="<?php echo $field?>[]" value="<?php echo $id?>"
 							<?php if (isset($opts[$id])) {
 								foreach ($opts[$id] as $key => $val) {

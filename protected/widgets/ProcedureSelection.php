@@ -38,6 +38,12 @@ class ProcedureSelection extends BaseFieldWidget
 	public $restrict_common = false;
 	public $callback = false;
 	public $layout = false;
+	public $layoutColumns = array(
+		'label' => 2,
+		'field' => 4,
+		'procedures' => 6,
+	);
+	public $procedureListPosition = 'horizontal';
 
 	public function run()
 	{

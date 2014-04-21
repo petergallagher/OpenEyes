@@ -18,12 +18,12 @@
  */
 ?>
 <div class="row field-row procedure-selection eventDetail<?php if ($last) {?> eventDetailLast<?php }?>" id="typeProcedure"<?php if ($hidden) {?> style="display: none;"<?php }?>>
-	<div class="large-2 column">
+	<div class="large-<?php echo $layoutColumns['label']?> column">
 		<label for="select_procedure_id_<?php echo $identifier;?>">
 			<?php echo $label?>:
 		</label>
 	</div>
-	<div class="large-4 column">
+	<div class="large-<?php echo $layoutColumns['field']?> column<?php if ($procedureListPosition != 'horizontal') {?> end<?php }?>">
 		<fieldset>
 			<legend><em>Add a procedure:</em></legend>
 			<?php if ($headertext) {?>
@@ -101,7 +101,12 @@
 	<?php
 	$totalDuration = 0;
 	?>
-	<div class="large-6 column">
+	<?php if ($procedureListPosition == 'vertical') {?>
+		</div>
+		<div class="row field-row">
+		<div class="large-<?php echo $layoutColumns['label']?> column"><label></label></div>
+	<?php }?>
+	<div class="large-<?php echo $layoutColumns['procedures']?> column end">
 		<div id="procedureList_<?php echo $identifier?>" class="panel procedures" style="<?php if (empty($selected_procedures)) {?> display: none;<?php }?>">
 			<table class="plain">
 				<thead>
