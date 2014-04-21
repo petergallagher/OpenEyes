@@ -294,6 +294,12 @@ function hide_linked_field(element_name,field_name)
 	$('input[name="'+element_name+'['+field_name+']"][type="radio"]').removeAttr('checked');
 	$('input[name="'+element_name+'['+field_name+']"][type="text"]').val('');
 	$('select[name="'+element_name+'['+field_name+']"]').val('');
+
+	if ($('#'+field_name).hasClass('MultiSelectList')) {
+		$('a.MultiSelectRemove[data-name="'+field_name+'[]"]').map(function() {
+			$(this).click();
+		});
+	}
 }
 
 function changeState(wb,sp) {

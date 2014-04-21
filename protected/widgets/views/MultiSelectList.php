@@ -29,7 +29,7 @@ if (isset($htmlOptions['div_id'])) {
 } else {
 	// for legacy, this is the original definition of the div id that was created for the multiselect
 	// not recommended as it doesn't allow for sided uniqueness
-	$div_id = "div_" . get_class($element) . "_" . @$htmlOptions['label'];
+	$div_id = "div_" . get_class($element) . "_" . $field;
 }
 
 if (isset($htmlOptions['div_class'])) {
