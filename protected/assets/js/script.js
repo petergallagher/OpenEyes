@@ -237,6 +237,51 @@ $(document).ready(function(){
 		e.preventDefault();
 		window.location.href = baseUrl+'/patient/view/'+$(this).data('id');
 	});
+
+	$('select.linked-fields').change(function() {
+		var element_name = $(this).attr('name').replace(/\[.*$/,'');
+
+		var fields = $(this).data('linked-fields').split(',');
+
+		if ($(this).children('option:selected').text() == $(this).data('linked-value')) {
+			for (var i in fields) {
+				$('#div_'+element_name+'_'+fields[i]).show();
+
+				if (i == 0) {
+					$('#'+element_name+'_'+fields[i]).focus();
+				}
+			}
+		} else {
+			for (var i in fields) {
+				$('#div_'+element_name+'_'+fields[i]).hide();
+				$('#'+element_name+'_'+fields[i]).val('');
+			}
+		}
+	});
+
+	$('input[type="radio"].linked-fields').click(function() {
+		var element_name = $(this).attr('name').replace(/\[.*$/,'');
+
+		var fields = $(this).data('linked-fields').split(',');
+
+		if ($(this).parent().text().trim() == $(this).data('linked-value')) {
+			for (var i in fields) {
+				$('fieldset#'+element_name+'_'+fields[i]).show();
+				$('#div_'+element_name+'_'+fields[i]).show();
+			}
+		} else {
+			for (var i in fields) {
+				$('fieldset#'+element_name+'_'+fields[i]).hide();
+				$('#div_'+element_name+'_'+fields[i]).hide();
+
+				if ($('input[name="'+element_name+'['+fields[i]+']"][type="radio"]').length >0) {
+					$('input[name="'+element_name+'['+fields[i]+']"]').removeAttr('checked');
+				}
+
+				$('select[name="'+element_name+'['+fields[i]+']"]').val('');
+			}
+		}
+	});
 });
 
 function changeState(wb,sp) {

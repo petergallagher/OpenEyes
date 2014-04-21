@@ -16,10 +16,8 @@
  * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
  * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
  */
-?>
 
-
-<?php if (@$htmlOptions['nowrapper']) {?>
+if (@$htmlOptions['nowrapper']) {?>
 
 	<?php if (!$no_element) {?>
 		<input type="hidden" value="" name="<?php echo get_class($element)?>[<?php echo $field?>]">
@@ -35,7 +33,7 @@
 				}
 			}?>
 			<label class="inline highlight">
-				<?php echo CHtml::radioButton($name, (!is_null($value) && $value == $id) && (!is_string($value) || $value!=""), $options); ?>
+				<?php echo CHtml::radioButton($name, (!is_null($value) && $value == $id) && (!is_string($value) || $value!=""), $options, $htmlOptions); ?>
 		 		<?php echo $data_value?>
 	 		</label>
 	<?php }?>
@@ -69,7 +67,15 @@
 							}
 						}
 
-						echo CHtml::radioButton($name, (!is_null($value) && $value == $id) && (!is_string($value) || $value!=""), $options);
+						!empty($htmlOptions['class']) && $options['class'] = $htmlOptions['class'];
+
+						if (!empty($htmlOptions['data'])) {
+							foreach ($htmlOptions['data'] as $k => $v) {
+								$options[$k] = $v;
+							}
+						}
+
+						echo CHtml::radioButton($name, (!is_null($value) && $value == $id) && (!is_string($value) || $value!=""), $options, $htmlOptions);
 					?>
 					<?php echo $data_value?>
 				</label>
