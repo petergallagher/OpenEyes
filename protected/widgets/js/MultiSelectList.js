@@ -64,13 +64,21 @@ $(document).ready(function() {
 
 			var input = $(inp_str);
 
-			var remove = $('<a />', {
+			var remote_data = {
 				'href': '#',
 				'class': 'MultiSelectRemove remove-one '+selected.val(),
 				'text': 'Remove',
 				'data-name': fieldName+'[]',
 				'data-text': selected.text()
-			});
+			};
+
+			if ($(this).hasClass('linked-fields')) {
+				remote_data['class'] += ' linked-fields';
+				remote_data['data-linked-fields'] = $(this).data('linked-fields');
+				remote_data['data-linked-value'] = $(this).data('linked-value');
+			}
+
+			var remove = $('<a />', remote_data);
 
 			var item = $('<li><span class="text">'+selected.text()+'</span></li>');
 			item.append(remove);
@@ -130,6 +138,17 @@ $(document).ready(function() {
 		if (!selections.children().length) {
 			selections.add(removeAll).addClass('hide');
 			noSelectionsMsg.removeClass('hide');
+		}
+
+		if ($(this).hasClass('linked-fields')) {
+			if ($(this).data('text') == $(this).data('linked-value')) {
+				var element_name = container.children('input[type="hidden"]').attr('name').replace(/\[.*$/,'');
+				var fields = $(this).data('linked-fields').split(',');
+
+				for (var i in fields) {
+					hide_linked_field(element_name,fields[i]);
+				}
+			}
 		}
 
 		select.trigger('MultiSelectChanged');

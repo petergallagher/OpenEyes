@@ -239,22 +239,23 @@ $(document).ready(function(){
 	});
 
 	$('select.linked-fields').change(function() {
-		var element_name = $(this).attr('name').replace(/\[.*$/,'');
+		if ($(this).hasClass('MultiSelectList')) {
+			var element_name = $(this).parent().prev('input').attr('name').replace(/\[.*$/,'');
+		} else {
+			var element_name = $(this).attr('name').replace(/\[.*$/,'');
+		}
 
 		var fields = $(this).data('linked-fields').split(',');
 
 		if ($(this).children('option:selected').text() == $(this).data('linked-value')) {
 			for (var i in fields) {
-				$('#div_'+element_name+'_'+fields[i]).show();
-
-				if (i == 0) {
-					$('#'+element_name+'_'+fields[i]).focus();
-				}
+				show_linked_field(element_name,fields[i],i==0);
 			}
 		} else {
-			for (var i in fields) {
-				$('#div_'+element_name+'_'+fields[i]).hide();
-				$('#'+element_name+'_'+fields[i]).val('');
+			if (!$(this).hasClass('MultiSelectList')) {
+				for (var i in fields) {
+					hide_linked_field(element_name,fields[i]);
+				}
 			}
 		}
 	});
@@ -266,24 +267,34 @@ $(document).ready(function(){
 
 		if ($(this).parent().text().trim() == $(this).data('linked-value')) {
 			for (var i in fields) {
-				$('fieldset#'+element_name+'_'+fields[i]).show();
-				$('#div_'+element_name+'_'+fields[i]).show();
-				if (i == 0) {
-					$('input[name="'+element_name+'['+fields[i]+']"][type="text"]').focus();
-				}
+				show_linked_field(element_name,fields[i],i==0);
 			}
 		} else {
 			for (var i in fields) {
-				$('fieldset#'+element_name+'_'+fields[i]).hide();
-				$('#div_'+element_name+'_'+fields[i]).hide();
-
-				$('input[name="'+element_name+'['+fields[i]+']"][type="radio"]').removeAttr('checked');
-				$('input[name="'+element_name+'['+fields[i]+']"][type="text"]').val('');
-				$('select[name="'+element_name+'['+fields[i]+']"]').val('');
+				hide_linked_field(element_name,fields[i]);
 			}
 		}
 	});
 });
+
+function show_linked_field(element_name,field_name,focus)
+{
+	$('fieldset#'+element_name+'_'+field_name).show();
+	$('#div_'+element_name+'_'+field_name).show();
+	if (focus) {
+		$('#'+element_name+'_'+field_name).focus();
+	}
+}
+
+function hide_linked_field(element_name,field_name)
+{
+	$('fieldset#'+element_name+'_'+field_name).hide();
+	$('#div_'+element_name+'_'+field_name).hide();
+
+	$('input[name="'+element_name+'['+field_name+']"][type="radio"]').removeAttr('checked');
+	$('input[name="'+element_name+'['+field_name+']"][type="text"]').val('');
+	$('select[name="'+element_name+'['+field_name+']"]').val('');
+}
 
 function changeState(wb,sp) {
 	if (sp.hasClass('hide')) {

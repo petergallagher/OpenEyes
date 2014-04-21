@@ -335,6 +335,15 @@ class BaseEventTypeElement extends BaseElement
 	 */
 	public function softDelete()
 	{
+	}
 
+	public function hasMultiSelectValue($field, $value) {
+		foreach ($this->$field as $item) {
+			if ($item->name == $value) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 }
