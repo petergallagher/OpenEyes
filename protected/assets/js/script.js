@@ -246,15 +246,14 @@ $(document).ready(function(){
 		}
 
 		var fields = $(this).data('linked-fields').split(',');
+		var values = $(this).data('linked-values').split(',');
 
-		if ($(this).children('option:selected').text() == $(this).data('linked-value')) {
+		if (inArray($(this).children('option:selected').text(),values)) {
+			var vi = arrayIndex($(this).children('option:selected').text(),values);
+
 			for (var i in fields) {
-				show_linked_field(element_name,fields[i],i==0);
-			}
-		} else {
-			if (!$(this).hasClass('MultiSelectList')) {
-				for (var i in fields) {
-					hide_linked_field(element_name,fields[i]);
+				if (values.length == 1 || i == vi) {
+					show_linked_field(element_name,fields[i],i==0);
 				}
 			}
 		}
@@ -386,6 +385,14 @@ function inArray(needle, haystack) {
 	var length = haystack.length;
 	for(var i = 0; i < length; i++) {
 		if(haystack[i] == needle) return true;
+	}
+	return false;
+}
+
+function arrayIndex(needle, haystack) {
+	var length = haystack.length;
+	for(var i = 0; i < length; i++) {
+		if(haystack[i] == needle) return i;
 	}
 	return false;
 }

@@ -75,7 +75,7 @@ $(document).ready(function() {
 			if ($(this).hasClass('linked-fields')) {
 				remote_data['class'] += ' linked-fields';
 				remote_data['data-linked-fields'] = $(this).data('linked-fields');
-				remote_data['data-linked-value'] = $(this).data('linked-value');
+				remote_data['data-linked-values'] = $(this).data('linked-values');
 			}
 
 			var remove = $('<a />', remote_data);
@@ -141,12 +141,15 @@ $(document).ready(function() {
 		}
 
 		if ($(this).hasClass('linked-fields')) {
-			if ($(this).data('text') == $(this).data('linked-value')) {
+			if (inArray($(this).data('text'),$(this).data('linked-values').split(','))) {
 				var element_name = container.children('input[type="hidden"]').attr('name').replace(/\[.*$/,'');
 				var fields = $(this).data('linked-fields').split(',');
+				var values = $(this).data('linked-values').split(',');
 
 				for (var i in fields) {
-					hide_linked_field(element_name,fields[i]);
+					if (values.length == 1 || i == arrayIndex($(this).data('text'),values)) {
+						hide_linked_field(element_name,fields[i]);
+					}
 				}
 			}
 		}
