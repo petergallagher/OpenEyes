@@ -263,8 +263,9 @@ $(document).ready(function(){
 		var element_name = $(this).attr('name').replace(/\[.*$/,'');
 
 		var fields = $(this).data('linked-fields').split(',');
+		var values = $(this).data('linked-values').split(',');
 
-		if ($(this).parent().text().trim() == $(this).data('linked-value')) {
+		if (inArray($(this).parent().text().trim(),values)) {
 			for (var i in fields) {
 				show_linked_field(element_name,fields[i],i==0);
 			}
