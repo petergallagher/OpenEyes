@@ -40,7 +40,8 @@
 		<?php }?>
 
 			<?php if (@$htmlOptions['divided']) {?>
-				<select name="<?php echo get_class($element)?>[<?php echo $field?>]" id="<?php echo get_class($element)?>_<?php echo $field?>">
+
+				<select name="<?php echo get_class($element)?>[<?php echo $field?>]" id="<?php echo get_class($element)?>_<?php echo $field?>" <?php if (isset($htmlOptions['class'])) {?> <?php echo $htmlOptions['class']?><?php }?>"<?php if (isset($htmlOptions['data-linked-fields'])) {?> data-linked-fields="<?php echo $htmlOptions['data-linked-fields']?>"<?php }?><?php if (isset($htmlOptions['data-linked-values'])) {?> data-linked-values="<?php echo $htmlOptions['data-linked-values']?>"<?php }?>>
 					<?php if (isset($htmlOptions['empty'])) {?>
 						<option value=""><?php echo $htmlOptions['empty']?></option>
 					<?php }?>

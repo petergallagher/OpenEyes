@@ -829,7 +829,7 @@ class EventTypeModuleCode extends BaseModuleCode // CCodeModel
 			case 'Radio buttons':
 				return isset($field['default_value']) ? "int(10) unsigned NOT NULL DEFAULT {$field['default_value']}" : "int(10) unsigned NOT NULL";
 			case 'Boolean':
-				return "tinyint(1) unsigned NOT NULL DEFAULT 0";
+				return "tinyint(1) unsigned NOT NULL";
 			case 'Integer':
 				$default = strlen($field['integer_default_value'])>0 ? " DEFAULT {$field['integer_default_value']}" : '';
 				return "int(10) unsigned NOT NULL$default";
