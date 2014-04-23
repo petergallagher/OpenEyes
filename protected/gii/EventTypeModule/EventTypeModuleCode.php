@@ -19,6 +19,7 @@ class EventTypeModuleCode extends BaseModuleCode // CCodeModel
 	public $imgPath;
 	public $validation_rules_path = "protected/gii/EventTypeModule/validation";
 	public $validation_rules = array();
+	const DB_IDENTIFIERS_MAX_LENGTH = 61;
 
 	public function __construct()
 	{
@@ -369,7 +370,7 @@ class EventTypeModuleCode extends BaseModuleCode // CCodeModel
 
 			$key_name = $lookup_table['name'].'_fk';
 
-			if (strlen($key_name) >64) {
+			if (strlen($key_name) > self::DB_IDENTIFIERS_MAX_LENGTH) {
 				$key_name = $this->generateKeyName($elements[$number]['fields'][$field_number]['name'],$root_fields_value);
 			}
 
@@ -404,7 +405,7 @@ class EventTypeModuleCode extends BaseModuleCode // CCodeModel
 
 			$key_name = $elements[$number]['table_name'].'_'.$elements[$number]['fields'][$field_number]['name'].'_fk';
 
-			if (strlen($key_name) >64) {
+			if (strlen($key_name) > self::DB_IDENTIFIERS_MAX_LENGTH) {
 				$key_name = $this->generateKeyName($elements[$number]['fields'][$field_number]['name'],$fields_value);
 			}
 
@@ -448,7 +449,7 @@ class EventTypeModuleCode extends BaseModuleCode // CCodeModel
 
 		$key_name = $lookup_table['name'].'_fk';
 
-		if (strlen($key_name) >64) {
+		if (strlen($key_name) > self::DB_IDENTIFIERS_MAX_LENGTH) {
 			$key_name = $this->generateKeyName($elements[$number]['fields'][$field_number]['name'],$fields_value);
 		}
 
@@ -494,7 +495,7 @@ class EventTypeModuleCode extends BaseModuleCode // CCodeModel
 
 			$key_name = $lookup_table['name'].'_fk';
 
-			if (strlen($key_name) >64) {
+			if (strlen($key_name) >self::DB_IDENTIFIERS_MAX_LENGTH) {
 				$key_name = $this->generateKeyName($elements[$number]['fields'][$field_number]['name'],$root_fields_value);
 			}
 
@@ -529,7 +530,7 @@ class EventTypeModuleCode extends BaseModuleCode // CCodeModel
 
 			$key_name = $elements[$number]['table_name'].'_'.$elements[$number]['fields'][$field_number]['name'].'_fk';
 
-			if (strlen($key_name) >64) {
+			if (strlen($key_name) >self::DB_IDENTIFIERS_MAX_LENGTH) {
 				$key_name = $this->generateKeyName($elements[$number]['fields'][$field_number]['name'],$root_fields_value);
 			}
 
@@ -714,7 +715,7 @@ class EventTypeModuleCode extends BaseModuleCode // CCodeModel
 		foreach ($keys as $key) {
 			$table[$key.'_key'] = $table_name.'_'.$key.'_fk';
 
-			if (strlen($table[$key.'_key']) >64) {
+			if (strlen($table[$key.'_key']) > self::DB_IDENTIFIERS_MAX_LENGTH) {
 				$ex = explode('_',$table_name);
 				$table[$key.'_key'] = array_shift($ex).'_';
 
@@ -723,6 +724,10 @@ class EventTypeModuleCode extends BaseModuleCode // CCodeModel
 				}
 
 				$table[$key.'_key'] .= '_'.$key.'_fk';
+
+				if(strlen($table[$key.'_key']) > self::DB_IDENTIFIERS_MAX_LENGTH){
+					$table[$key.'_key'] =  substr($table[$key.'_key'], - self::DB_IDENTIFIERS_MAX_LENGTH);
+				}
 			}
 		}
 
@@ -788,7 +793,11 @@ class EventTypeModuleCode extends BaseModuleCode // CCodeModel
 			$key .= strtolower($segment[0]);
 		}
 
-		return $key . '_'.$field.'_fk';
+		$key = $key . '_'.$field.'_fk';
+		if(strlen($key) > self::DB_IDENTIFIERS_MAX_LENGTH){
+			return substr($key, - self::DB_IDENTIFIERS_MAX_LENGTH);
+		}
+		return $key;
 	}
 
 	public function renderMigrations($file, $migrationid)
