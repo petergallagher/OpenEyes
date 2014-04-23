@@ -20,13 +20,9 @@ abstract class Measurement extends BaseActiveRecordVersioned {
 
     protected $patient_measurement;
     
-    public function getErrors() {
+    public function getErrors($attribute=NULL) {
         return array_merge($this->getErrors(), $this->getPatientMeasurement()->getErrors());
     }
-    
-//    public function beforeValidate() {
-//        return parent::beforeValidate() && $this->getPatientMeasurement()->validate();
-//    }
 
     public function beforeSave() {
         $this->getPatientMeasurement()->patient_id = $this->getPatient_id();
