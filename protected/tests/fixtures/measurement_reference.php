@@ -17,11 +17,6 @@
  * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
  * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
  */
-// | id | address1 | address2       | city      | postcode | county | country_id | email                   |
-// +----+----------+----------------+-----------+----------+--------+------------+-------------------------+
-// |  1 | flat 1   | bleakley creek | flitchley | ec1v 0dx | london |          1 | bleakley1@bleakley1.com |
-// |  2 | flat 2   | bleakley creek | flitchley | ec1v 0dx | london |          1 | bleakley2@bleakley2.com |
-// |  3 | flat 3   | bleakley creek | flitchley | ec1v 0dx | london |          1 | bleakley3@bleakley3.com |
 
 return array(
 	'measurement_ref_1' => array(
