@@ -239,14 +239,18 @@ $(document).ready(function(){
 	});
 
 	$('select.linked-fields').change(function() {
+
+		var fields = $(this).data('linked-fields').split(',');
+		var values = $(this).data('linked-values').split(',');
+
 		if ($(this).hasClass('MultiSelectList')) {
 			var element_name = $(this).parent().prev('input').attr('name').replace(/\[.*$/,'');
 		} else {
 			var element_name = $(this).attr('name').replace(/\[.*$/,'');
+			for (var i in fields) {
+					hide_linked_field(element_name,fields[i]);
+				}
 		}
-
-		var fields = $(this).data('linked-fields').split(',');
-		var values = $(this).data('linked-values').split(',');
 
 		if (inArray($(this).children('option:selected').text(),values)) {
 			var vi = arrayIndex($(this).children('option:selected').text(),values);
