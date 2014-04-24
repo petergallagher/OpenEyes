@@ -16,12 +16,12 @@
  * @property MeasurementType $measurementType
  * @property Patient $patient
  */
-abstract class Measurement extends BaseActiveRecordVersioned {
+abstract class Measurement extends BaseActiveRecord {
 
     protected $patient_measurement;
     
     public function getErrors($attribute=NULL) {
-        return array_merge($this->getErrors(), $this->getPatientMeasurement()->getErrors());
+        return array_merge(parent::getErrors(), $this->getPatientMeasurement()->getErrors());
     }
 
     public function beforeSave() {
