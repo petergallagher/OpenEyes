@@ -247,9 +247,10 @@ $(document).ready(function(){
 			var element_name = $(this).parent().prev('input').attr('name').replace(/\[.*$/,'');
 		} else {
 			var element_name = $(this).attr('name').replace(/\[.*$/,'');
+
 			for (var i in fields) {
-					hide_linked_field(element_name,fields[i]);
-				}
+				hide_linked_field(element_name,fields[i]);
+			}
 		}
 
 		if (inArray($(this).children('option:selected').text(),values)) {
