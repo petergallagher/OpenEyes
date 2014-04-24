@@ -26,6 +26,7 @@
 return array(
 	'measurement_ref_1' => array(
 		'patient_measurement_id' => 1,
+            'class_name' => 'MeasurementVisualFieldHumphrey'
 	),
 	'measurement_ref_2' => array(
 		'patient_measurement_id' => 2,
