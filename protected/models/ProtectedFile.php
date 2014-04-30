@@ -41,12 +41,13 @@ class ProtectedFile extends BaseActiveRecord
 	/**
 	 * Create a new protected file from an existing file
 	 * @param string $path Path to file
+	 * @param string $name name of file
 	 * @return ProtectedFile
 	*/
-	public static function createFromFile($path)
+	public static function createFromFile($path, $name=null)
 	{
 		$file = new ProtectedFile();
-		$file->setSource($path);
+		$file->setSource($path, $name);
 		return $file;
 	}
 
@@ -240,19 +241,19 @@ class ProtectedFile extends BaseActiveRecord
 	/**
 	 * Initialise protected file from a source file
 	 * @param string $path
+	 * @param string $name
 	 * @throws CException
 	 */
-	public function setSource($path)
+	public function setSource($path, $name=null)
 	{
 		if (!file_exists($path) || is_dir($path)) {
 			throw new CException("File doesn't exist: ".$path);
 		}
 		$this->_source_path = $path;
 
-		$this->name = basename($path);
+		$this->name = $name ? $name : basename($path);
 
 		// Set MIME type
-		$path_parts = pathinfo($this->name);
 		$this->mimetype = $this->lookupMimetype($path);
 
 		// Set size
@@ -436,9 +437,6 @@ class ProtectedFile extends BaseActiveRecord
 			$im->clear();
 			$im->destroy();
 		}
-
-		header('Content-Type: image/jpeg');
-		readfile($thumbnail_path);
 
 		return true;
 	}
