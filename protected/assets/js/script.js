@@ -280,6 +280,22 @@ $(document).ready(function(){
 			}
 		}
 	});
+
+	$('input[type="checkbox"].linked-fields').click(function() {
+		var element_name = $(this).attr('name').replace(/\[.*$/,'');
+
+		var fields = $(this).data('linked-fields').split(',');
+
+		if ($(this).is(':checked')) {
+			for (var i in fields) {
+				show_linked_field(element_name,fields[i],i==0);
+			}
+		} else {
+			for (var i in fields) {
+				hide_linked_field(element_name,fields[i]);
+			}
+		}
+	});
 });
 
 function show_linked_field(element_name,field_name,focus)
