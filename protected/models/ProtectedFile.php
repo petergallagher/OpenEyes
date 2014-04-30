@@ -433,7 +433,8 @@ class ProtectedFile extends BaseActiveRecord
 			MagickCropImage($im,$width,$height,$offset_x,$offset_y);
 			MagickSetCompressionQuality($im,100);
 			MagickSetImageFormat($im,'JPEG');
-			MagickWriteImage($im,$thumbnail_path);
+			MagickWriteImage($im,$thumbnail_path.'.jpg');
+			@rename($thumbnail_path.'.jpg',$thumbnail_path); // don't ask
 		}
 
 		return true;
