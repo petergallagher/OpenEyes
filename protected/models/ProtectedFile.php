@@ -428,7 +428,7 @@ class ProtectedFile extends BaseActiveRecord
 				mkdir(dirname($thumbnail_path), 0777, true);
 			}
 
-			$im = new imagick();
+			$im = new Imagick();
 			$im->readImage($this->getPath());
 			$im->cropImage($width,$height,$offset_x,$offset_y);
 			$im->setCompressionQuality(100);
