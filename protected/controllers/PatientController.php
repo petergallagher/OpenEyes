@@ -78,7 +78,7 @@ class PatientController extends BaseController
 				'roles' => array('OprnEditPreviousOperation'),
 			),
 			array('allow',
-				'actions' => array('drugList', 'drugDefaults', 'getDrugRouteOptions', 'validateAddMedication', 'addMedication', 'getMedication', 'removeMedication'),
+				'actions' => array('drugList', 'drugDefaults', 'getDrugRouteOptions', 'validateAddMedication', 'addMedication', 'getMedication', 'removeMedication','validateMedication'),
 				'roles' => array('OprnEditMedication'),
 			),
 			array('allow',
@@ -2001,5 +2001,36 @@ class PatientController extends BaseController
 			'firm' => Firm::model()->findByPk(Yii::app()->session['selected_firm_id']),
 			'supportserviceepisodes' => $supportserviceepisodes,
 		));
+	}
+
+	public function actionValidateMedication()
+	{
+		$medication = new Medication;
+		$medication->attributes = Helper::convertNHS2MySQL($_POST);
+
+		$errors = array();
+
+		if (!$medication->validate()) {
+			foreach ($medication->getErrors() as $error) {
+				$errors[] = $error[0];
+			}
+		}
+
+		if (!empty($errors)) {
+			echo json_encode(array(
+				'status' => 'error',
+				'errors' => $errors,
+			));
+		} else {
+			echo json_encode(array(
+				'status' => 'ok',
+				'row' => $this->widget('application.widgets.MedicationSelection',array(
+					'medication' => $medication,
+					'i' => @$_POST['i'],
+					'edit' => true,
+					'input_name' => @$_POST['input_name'],
+				), true)
+			));
+		}
 	}
 }
