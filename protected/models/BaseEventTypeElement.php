@@ -346,4 +346,31 @@ class BaseEventTypeElement extends BaseElement
 
 		return false;
 	}
+
+	public function updateMultiSelectData($model, $ids, $field)
+	{
+		$ids = array();
+
+		foreach ($ids as $id) {
+			if (!$assignment = $model::model()->find("element_id=? and $field=?",array($this->id,$id))) {
+				$assignment = new $model;
+				$assignment->element_id = $this->id;
+				$assignment->$field = $id;
+
+				if (!$assignment->save()) {
+					throw new Exception("Unable to save assignment: ".print_r($assignment->getErrors(),true));
+				}
+			}
+
+			$ids[] = $assignment->id;
+		}
+
+		$criteria = new CDbCriteria;
+		$criteria->addCondition('element_id = :element_id');
+		$criteria->params[':element_id'] = $this->id;
+
+		!empty($ids) && $criteria->addNotInCondition('id',$ids);
+
+		$model::model()->deleteAll($criteria);
+	}
 }
