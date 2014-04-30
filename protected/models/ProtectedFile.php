@@ -428,14 +428,12 @@ class ProtectedFile extends BaseActiveRecord
 				mkdir(dirname($thumbnail_path), 0777, true);
 			}
 
-			$im = new Imagick();
-			$im->readImage($this->getPath());
-			$im->cropImage($width,$height,$offset_x,$offset_y);
-			$im->setCompressionQuality(100);
-			$im->setImageFormat('JPEG');
-			$im->writeImage($thumbnail_path);
-			$im->clear();
-			$im->destroy();
+			$im = NewMagickWand();
+			MagickReadImage($im,$this->getPath());
+			MagickCropImage($im,$width,$height,$offset_x,$offset_y);
+			MagickSetCompressionQuality($im,100);
+			MagickSetImageFormat($im,'JPEG');
+			MagickWriteImage($im,$thumbnail_path);
 		}
 
 		return true;
