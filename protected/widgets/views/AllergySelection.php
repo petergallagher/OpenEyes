@@ -20,7 +20,7 @@
 		<div class="row field-row">
 			<div class="large-3 column"><label><?php if ($label) { echo $label.':';} ?></label></div>
 			<div class="large-9 column end">
-				<?php if (!$edit && empty($element->relation)) {?>
+				<?php if (!$edit && empty($element->$relation)) {?>
 					<div class="data-value">
 						<?php if ($no_allergies_field && $element->$no_allergies_field) {?>
 							It was confirmed that the patient has no allergies.
