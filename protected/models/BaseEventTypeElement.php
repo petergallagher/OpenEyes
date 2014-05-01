@@ -349,7 +349,7 @@ class BaseEventTypeElement extends BaseElement
 
 	public function updateMultiSelectData($model, $ids, $field)
 	{
-		$ids = array();
+		$_ids = array();
 
 		foreach ($ids as $id) {
 			if (!$assignment = $model::model()->find("element_id=? and $field=?",array($this->id,$id))) {
@@ -362,14 +362,14 @@ class BaseEventTypeElement extends BaseElement
 				}
 			}
 
-			$ids[] = $assignment->id;
+			$_ids[] = $assignment->id;
 		}
 
 		$criteria = new CDbCriteria;
 		$criteria->addCondition('element_id = :element_id');
 		$criteria->params[':element_id'] = $this->id;
 
-		!empty($ids) && $criteria->addNotInCondition('id',$ids);
+		!empty($_ids) && $criteria->addNotInCondition('id',$_ids);
 
 		$model::model()->deleteAll($criteria);
 	}
