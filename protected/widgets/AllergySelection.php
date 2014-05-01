@@ -29,7 +29,7 @@ class AllergySelection extends BaseFieldWidget
 		'label' => 2,
 		'field' => 4,
 	);
-	public $label;
+	public $label = 'Allergies';
 	public $no_allergies_field = null;
 
 	public function run()

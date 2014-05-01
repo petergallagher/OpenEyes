@@ -27,7 +27,7 @@ class MedicationSelection extends BaseFieldWidget
 	public $medication = null;
 	public $i;
 	public $edit = true;
-
+	public $label = 'Medications';
 	public $layoutColumns = array(
 		'label' => 2,
 		'field' => 4,

@@ -18,7 +18,7 @@
  */
 ?>
 		<div class="row field-row">
-			<div class="large-3 column"><label></label></div>
+			<div class="large-3 column"><label><?php if ($label) echo $label.':'?></label></div>
 			<div class="large-9 column end">
 				<table class="grid medications" data-input-name="<?php echo $input_name?>">
 					<thead>
