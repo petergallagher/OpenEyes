@@ -221,7 +221,6 @@ return array(
 	),
 
 	'params'=>array(
-		'legacy_event_types' => array('OphLeEpatientletter', 'OphInVisualfields'),
 		'pseudonymise_patient_details' => false,
 		'ab_testing' => false,
 		'auth_source' => 'BASIC', // Options are BASIC or LDAP.
