@@ -19,10 +19,10 @@
 ?>
 		<?php echo CHtml::hiddenField('_gp_id',$gp->id)?>
 		<?php echo CHtml::hiddenField('_gp_name',$gp->contact ? $gp->contact->fullName : 'Unknown')?>
-		<?php echo CHtml::hiddenField('_gp_address',$gp->contact->address ? $gp->contact->address->letterLine : 'Unknown')?>
-		<?php echo CHtml::hiddenField('_gp_telephone',$gp->contact->primary_phone ? $gp->contact->primary_phone : 'Unknown')?>
+		<?php echo CHtml::hiddenField('_gp_address',$gp->contact && $gp->contact->address ? $gp->contact->address->letterLine : 'Unknown')?>
+		<?php echo CHtml::hiddenField('_gp_telephone',$gp->contact && $gp->contact->primary_phone ? $gp->contact->primary_phone : 'Unknown')?>
 		<?php echo CHtml::hiddenField('_practice_id',$practice->id)?>
-		<?php echo CHtml::hiddenField('_gp_practice_address',$practice->contact->address ? $practice->contact->address->letterLine : 'Unknown')?>
+		<?php echo CHtml::hiddenField('_gp_practice_address',$practice->contact && $practice->contact->address ? $practice->contact->address->letterLine : 'Unknown')?>
 		<?php echo CHtml::hiddenField('_gp_practice_telephone',$practice->phone ? $practice->phone : 'Unknown')?>
 
 		<?php

@@ -1766,6 +1766,8 @@ class PatientController extends BaseController
 				}
 			}
 
+			$address_type = AddressType::model()->find('name=?',array('Home'));
+
 			$address->address_type_id = $address_type->id;
 			$address->contact_id = $contact->id;
 

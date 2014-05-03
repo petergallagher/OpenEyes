@@ -35,8 +35,8 @@
 		<?php if (!@$no_edit && Yii::app()->params['patient_demographics_editable'] && Yii::app()->user->checkAccess('OprnEditPatientDetails')) {?>
 			<?php echo $this->renderPartial('_patient_gp_edit',array(
 				'patient' => $this->patient,
-				'gp' => $this->patient->gp,
-				'practice' => $this->patient->practice,
+				'gp' => $this->patient->gp ? $this->patient->gp : new Gp,
+				'practice' => $this->patient->practice ? $this->patient->practice : new Practice,
 			))?>
 		<?php }?>
 	</div>
