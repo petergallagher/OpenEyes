@@ -17,7 +17,7 @@
 			$cell_number++;
 		}
 			$attributes = 'id="'.$cell_number.'" class="'.$id.'-col-'.$cell_number.' '.$id.'-row-'.$row_number.'" data-column="'.$cell_number.'" data-row="'.$row_number.'"';
-			if(($cell_number==1 && @$Options['horizontal-headers'])||($row_number==1 &&  @$Options['vertical-headers'])){
+			if(($cell_number==1 && @$Options['vertical-headers'])||($row_number==1 &&  @$Options['horizontal-headers'])){
 				?>
 				<th <?php echo $attributes?>>
 					<?php echo $cell?>

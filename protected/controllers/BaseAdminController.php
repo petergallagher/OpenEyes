@@ -56,4 +56,9 @@ class BaseAdminController extends BaseController
 		$pagination->applyLimit($criteria);
 		return $pagination;
 	}
+
+	public function actionAddReferenceTableRow()
+	{
+		return $this->renderFile(Yii::app()->basePath.'/widgets/views/_ReferenceTableRow.php',array('name'=>''));
+	}
 }
