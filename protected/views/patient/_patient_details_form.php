@@ -165,9 +165,17 @@
 				<div class="large-4 column">
 					<div class="data-label"><?php echo $patient->getAttributeLabel('yob')?>:</div>
 				</div>
-				<div class="large-8 column">
+				<div class="large-2 column">
 					<div class="data-value">
 						<?php echo CHtml::textField('yob',$patient->yob,array('style'=>'width: 40px'))?>
+					</div>
+				</div>
+				<div class="large-1 column">
+					<div class="data-label">Age:</div>
+				</div>
+				<div class="large-2 column end">
+					<div class="data-value">
+						<?php echo CHtml::textField('age',$patient->age == 'Unknown' ? '' : $patient->age,array('style'=>'width: 40px'))?>
 					</div>
 				</div>
 			</div>

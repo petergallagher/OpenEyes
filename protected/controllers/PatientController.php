@@ -86,7 +86,7 @@ class PatientController extends BaseController
 				'roles' => array('OprnEditFamilyHistory')
 			),
 			array('allow',
-				'actions' => array('validatePatientDetails', 'updatePatientDetails', 'create', 'validatePatientContactDetails', 'updatePatientContactDetails', 'GPSearch', 'getGPDetails', 'practiceSearch', 'getPracticeDetails', 'updatePatientGPAndPracticeDetails'),
+				'actions' => array('validatePatientDetails', 'updatePatientDetails', 'create', 'validatePatientContactDetails', 'updatePatientContactDetails', 'GPSearch', 'getGPDetails', 'practiceSearch', 'getPracticeDetails', 'updatePatientGPAndPracticeDetails', 'getAge', 'getYearOfBirth'),
 				'roles' => array('OprnEditPatientDetails')
 			),
 			array('allow',
@@ -2033,6 +2033,26 @@ class PatientController extends BaseController
 					'input_name' => @$_POST['input_name'],
 				), true)
 			));
+		}
+	}
+
+	public function actionGetAge()
+	{
+		$patient = new Patient;
+
+		$patient->dob = date('Y-m-d',strtotime($_GET['dob']));
+		$patient->yob = $_GET['yob'];
+		$patient->date_of_death = $_GET['dod'];
+
+		echo $patient->age;
+	}
+
+	public function actionGetYearOfBirth()
+	{
+		if (isset($_GET['dob'])) {
+			echo preg_replace('/[0-9]{4}$/','',$_GET['dob']).(date('Y') - $_GET['age']);
+		} else {
+			echo date('Y') - $_GET['age'];
 		}
 	}
 }

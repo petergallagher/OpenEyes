@@ -296,7 +296,66 @@ $(document).ready(function(){
 			}
 		}
 	});
+
+	$('#yob').change(function(e) {
+		if ($(this).length >0) {
+			$('#dob').val('');
+		}
+
+		update_patient_age($('#dob').val(),$('#date_of_death').val(),$(this).val());
+	});
+
+	$('#dob').change(function(e) {
+		if ($(this).length >0) {
+			$('#yob').val('');
+		}
+
+		update_patient_age($(this).val(),$('#date_of_death').val(),$('#yob').val());
+	});
+
+	$('#date_of_death').change(function(e) {
+		update_patient_age($('#dob').val(),$(this).val(),$('#yob').val());
+	});
+
+	$('#age').change(function(e) {
+		if ($('#dob').val().length >0) {
+			$.ajax({
+				'type': 'GET',
+				'url': baseUrl+'/patient/getYearOfBirth?age='+$('#age').val()+'&dob='+$('#dob').val(),
+				'success': function(dob) {
+					$('#dob').val(dob);
+				}
+			});
+		} else {
+			$.ajax({
+				'type': 'GET',
+				'url': baseUrl+'/patient/getYearOfBirth?age='+$('#age').val(),
+				'success': function(yob) {
+					$('#yob').val(yob);
+				}
+			});
+		}
+	});
 });
+
+function update_patient_age(dob,dod,yob)
+{
+	if (dob == '' && dod == '' && yob == '') {
+		$('#age').val('');
+		return;
+	}
+
+	$.ajax({
+		'type': 'GET',
+		'url': baseUrl+'/patient/getAge?dob='+dob+'&yob='+yob+'&dod='+dod,
+		'success': function(age) {
+			if (age == 'Unknown') {
+				age = '';
+			}
+			$('#age').val(age);
+		}
+	});
+}
 
 function show_linked_field(element_name,field_name,focus)
 {
