@@ -361,7 +361,7 @@ class Patient extends BaseActiveRecord
 	 */
 	public function ageOn($check_date)
 	{
-		return Helper::getAge($this->dob, $this->date_of_death, $check_date);
+		return Helper::getAge($this->dob, $this->date_of_death, $check_date, $this->yob);
 	}
 
 	/**
@@ -374,6 +374,7 @@ class Patient extends BaseActiveRecord
 		if(!$check_date) {
 			$check_date = date('Y-m-d');
 		}
+
 		return ($this->ageOn($check_date) < $age_limit);
 	}
 
