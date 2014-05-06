@@ -2,7 +2,14 @@
 	<div class="large-1 column"><span>Drg</span></div>
 	<div class="large-9 column"><div class="data-value">
 			<?php
-			echo "<input type=text value='".$name."' />";
+			if(!isset($id)) {
+				$date = new DateTime();
+				$id = 'rtn-'.$date->getTimestamp();
+			}
+			else{
+				$id = 'rto-'.$id;
+			}
+			echo "<input name='".$id."' class='reference-table-inputs' type=text value='".$name."' />";
 			?>
 		</div>
 	</div>
