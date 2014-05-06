@@ -6,18 +6,15 @@ class ReferenceTable extends BaseFieldWidget
 
 	public function run()
 	{
-		//TODO: had to stop working on this due to time needs refactor
-
 		$model_name = $this->model;
 		if($_POST)
 		{
 			$display_order = 1;
 			foreach($_POST as $key=>$value)
 			{
-				if(@substr($key, 0, 4)=="rto-"){
+				if(@substr($key, 0, 4)=="rto-"){ //only change order for existing values
 					$id = substr($key, 4);
 					if ($model = $model_name::model()->find("id=?",$id)) {
-						$model->name = $value;
 						$model->display_order = $display_order;
 						$display_order ++;
 						if (!$model->save()) {
@@ -25,7 +22,7 @@ class ReferenceTable extends BaseFieldWidget
 						}
 					}
 				}
-				if(@substr($key, 0, 4)=="rtn-"){
+				if(@substr($key, 0, 4)=="rtn-"){ //new value
 					$model = new $model_name();
 					$model->name = $value;
 					$model->display_order = $display_order;
