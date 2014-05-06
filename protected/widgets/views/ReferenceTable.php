@@ -18,7 +18,7 @@ $form = $this->beginWidget('BaseEventTypeCActiveForm', array(
 			?>
 		</div>
 		<div class ="data-row add">
-		<span>Add</span>
+		<span><a href="#">Add</a></span>
 		</div>
 	</div>
 </div>
@@ -31,6 +31,7 @@ $form = $this->beginWidget('BaseEventTypeCActiveForm', array(
 
 <script>
 	$('.add').unbind().click(function() {
+		event.preventDefault();
 		var div = $('.reference-table-edit');
 		$.ajax({
 			'type': 'GET',
