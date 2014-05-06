@@ -246,5 +246,6 @@ return array(
 		'default_search_page' => 'basic', // basic or advanced
 		'default_country' => 'United Kingdom',
 		'patient_summary_hide_blank_fields' => false,
+		'patient_summary_show_hos_num' => false,
 	),
 );

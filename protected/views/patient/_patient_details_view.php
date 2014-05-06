@@ -18,6 +18,16 @@
  */
 ?>
 		<div class="view-mode">
+			<?php if (Yii::app()->params['patient_summary_show_hos_num']) {?>
+				<div class="row data-row">
+					<div class="large-4 column">
+						<div class="data-label"><?php echo $patient->getAttributeLabel('hos_num')?>:</div>
+					</div>
+					<div class="large-8 column">
+						<div class="data-value"><?php echo $patient->hos_num?></div>
+					</div>
+				</div>
+			<?php }?>
 			<?php echo $this->renderPartial('_patient_metadata_view',array('patient'=>$patient,'before'=>'first_name'))?>
 			<?php if (!Yii::app()->params['patient_summary_hide_blank_fields'] || $patient->first_name) {?>
 				<div class="row data-row">
