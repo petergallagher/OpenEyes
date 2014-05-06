@@ -1774,7 +1774,7 @@ class PatientController extends BaseController
 			$address->attributes = $_POST;
 
 			foreach (PatientMetadataKey::model()->findAll(array('order'=>'display_order asc')) as $metadata_key) {
-				if (strlen(@$_POST[$metadata_key->key_name]) <1) {
+				if ($metadata_key->required && strlen(@$_POST[$metadata_key->key_name]) <1) {
 					$errors[$metadata_key->key_name] = array($metadata_key->key_label.' cannot be blank.');
 				} else {
 					$patient->id && $patient->setMetadata($metadata_key->key_name,$_POST[$metadata_key->key_name]);

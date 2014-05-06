@@ -70,7 +70,7 @@ class Contact extends BaseActiveRecord
 	{
 		if ($this->is_patient) {
 			return array(
-				array('last_name', 'required'),
+				array('first_name, last_name', 'required'),
 				array('nick_name', 'length', 'max' => 80),
 				array('title, first_name, last_name, nick_name, primary_phone, qualifications, contact_label_id', 'safe'),
 				array('id, nick_name, primary_phone, title, first_name, last_name, qualifications', 'safe', 'on' => 'search'),
