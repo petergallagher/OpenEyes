@@ -24,9 +24,14 @@
 		<div class="large-<?php echo $layoutColumns['label'];?> column">
 			<?php if (!@$htmlOptions['no-label']) {?>
 				<label for="<?php echo get_class($element)."_".$field;?>">
-					<?php if (@$htmlOptions['text-align'] != 'right') {?>
-						<?php echo CHtml::encode($element->getAttributeLabel($field))?>:
-					<?php }?>
+					<?php if (@$htmlOptions['text-align'] != 'right' || isset($htmlOptions['label'])) {?>
+						<?php if (isset($htmlOptions['label'])) {
+							echo CHtml::encode($htmlOptions['label']).':';
+						}
+						else {
+						echo CHtml::encode($element->getAttributeLabel($field)).':';
+							}
+					}?>
 				</label>
 			<?php }?>
 		</div>
