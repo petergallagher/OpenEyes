@@ -310,6 +310,22 @@ $(document).ready(function() {
 			}
 		});
 	});
+
+	$('#gp_search').die('keypress').live('keypress',function(e) {
+		if (e.keyCode == 13) {
+			return false;
+		}
+
+		return true;
+	});
+
+	$('#practice_search').die('keypress').live('keypress',function(e) {
+		if (e.keyCode == 13) {
+			return false;
+		}
+
+		return true;
+	});
 });
 
 function resetPatientDetailsForm()
