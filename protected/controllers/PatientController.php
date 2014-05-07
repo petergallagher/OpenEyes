@@ -182,7 +182,9 @@ class PatientController extends BaseController
 			$params[$key] = trim($value);
 
 			if ($key == 'hos_num' && $value) {
-				$params[$key] = sprintf('%07s',$value);
+				if (Yii::app()->params['pad_hos_num']) {
+					$params[$key] = sprintf(Yii::app()->params['pad_hos_num'],$value);
+				}
 			}
 		}
 
