@@ -27,6 +27,11 @@ class AdminController extends BaseAdminController
 		$this->redirect(array('/admin/users'));
 	}
 
+	public function actionAllergies()
+	{
+		$this->Render('/admin/allergies');
+	}
+
 	public function actionDrugs()
 	{
 		$pagination = $this->initPagination(Drug::model());

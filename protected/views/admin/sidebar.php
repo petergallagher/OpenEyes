@@ -7,6 +7,7 @@
 			'Contacts' => '/admin/contacts',
 			'Contact labels' => '/admin/contactlabels',
 			'Data sources' => '/admin/datasources',
+			'Allergies' => '/admin/allergies',
 			'Drugs' => '/admin/drugs',
 			'Institutions' => '/admin/institutions',
 			'Sites' => '/admin/sites',
