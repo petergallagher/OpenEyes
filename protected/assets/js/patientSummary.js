@@ -303,7 +303,7 @@ $(document).ready(function() {
 			'data': 'delete=1&YII_CSRF_TOKEN='+YII_CSRF_TOKEN,
 			'success': function(resp) {
 				if (resp == "1") {
-					window.location.href = baseUrl+'/patient/view/'+OE_patient_id;
+					window.location.href = baseUrl+'/';
 				} else {
 					alert("Something went wrong trying to delete the patient.  Please try again or contact support for assistance.");
 				}
