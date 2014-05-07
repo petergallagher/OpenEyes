@@ -222,10 +222,10 @@ class Patient extends BaseActiveRecord
 		}
 
 		if (in_array('hos_num',$search_fields) && in_array('nhs_num',$search_fields)) {
-			if (strlen($params['nhs_num']) == 10) {
-				$criteria->compare('nhs_num',$params['nhs_num'], false);
+			if (strlen(@$params['nhs_num']) == 10) {
+				$criteria->compare('nhs_num',@$params['nhs_num'], false);
 			} else {
-				$criteria->compare('hos_num',$params['hos_num'], false);
+				$criteria->compare('hos_num',@$params['hos_num'], false);
 			}
 		} else if (in_array('hos_num',$search_fields) && @$params['hos_num']) {
 			$criteria->compare('hos_num',$params['hos_num'], false);
@@ -1444,6 +1444,10 @@ class Patient extends BaseActiveRecord
 
 		if (isset($this->metadata_keys[$key])) {
 			return $this->metadata_keys[$key]->key_label;
+		}
+
+		if ($label = ModelAttributeLabel::model()->find('class=? and attribute=?',array(get_class($this),$key))) {
+			return $label->label;
 		}
 
 		return parent::getAttributeLabel($key);
