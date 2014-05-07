@@ -86,7 +86,7 @@ $widgetOptionsJson = json_encode(array(
 				<div class="no-selections-msg pill"><?php echo $noSelectionsMessage;?></div>
 			<?php }?>
 			<ul class="MultiSelectList multi-select-selections<?php if (!$found && (!empty($selected_ids) || !$showNonePlaceholder)) echo ' hide';?>">
-				<li class="MultiSelectNone"<?php if (!empty($selected_ids) || !$showNonePlaceholder) {?> style="display: none"<?php }?>>None</li>
+				<li class="MultiSelectNone"<?php if (!empty($selected_ids) || !$showNonePlaceholder) {?> style="display: none"<?php }?>><?php echo is_bool($showNonePlaceholder) ? 'None' : $showNonePlaceholder?></li>
 				<?php foreach ($selected_ids as $id) {
 					if (isset($options[$id])) {?>
 						<li>
