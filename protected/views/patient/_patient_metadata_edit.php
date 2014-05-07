@@ -43,10 +43,26 @@ if (@$before) {
 						<div class="data-value">
 							<?php switch($metadata_key->fieldType->name) {
 								case 'Text':
-									echo CHtml::textField($metadata_key->key_name,empty($_POST) ? $patient->{$metadata_key->key_name} : $_POST[$metadata_key->key_name]);
+									$htmlOptions = array();
+
+									if ($metadata_key->getDisabled($patient)) {
+										$htmlOptions['disabled'] = 'disabled';
+										$value = 'N/A';
+									} else {
+										$value = empty($_POST) ? $patient->{$metadata_key->key_name} : @$_POST[$metadata_key->key_name];
+									}
+
+									echo CHtml::hiddenField($metadata_key->key_name,'');
+									echo CHtml::textField($metadata_key->key_name, $value, $htmlOptions);
 									break;
 								case 'Select':
 									$htmlOptions = $metadata_key->field_option1 ? array('empty' => $metadata_key->field_option1) : array();
+
+									if ($metadata_key->hide_fields) {
+										$htmlOptions['class'] = 'metadata-hide-fields';
+										$htmlOptions['data-hide-fields'] = $metadata_key->hide_fields;
+										$htmlOptions['data-hide-fields-values'] = $metadata_key->hide_fields_values;
+									}
 
 									$class_name = $metadata_key->field_option2;
 

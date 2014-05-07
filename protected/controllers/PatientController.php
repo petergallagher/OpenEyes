@@ -1777,7 +1777,9 @@ class PatientController extends BaseController
 				if ($metadata_key->required && strlen(@$_POST[$metadata_key->key_name]) <1) {
 					$errors[$metadata_key->key_name] = array($metadata_key->key_label.' cannot be blank.');
 				} else {
-					$patient->id && $patient->setMetadata($metadata_key->key_name,$_POST[$metadata_key->key_name]);
+					if (!$metadata_key->disabled) {
+						$patient->id && $patient->setMetadata($metadata_key->key_name,$_POST[$metadata_key->key_name]);
+					}
 				}
 			}
 

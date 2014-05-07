@@ -336,6 +336,25 @@ $(document).ready(function(){
 			});
 		}
 	});
+
+	$('.metadata-hide-fields').change(function() {
+		var e = $(this).data('hide-fields-values').split(',');
+		var fields = $(this).data('hide-fields').split(',');
+
+		if (inArray($(this).children('option:selected').val(),e)) {
+			for (var i in fields) {
+				$('#'+fields[i]+'[type="text"]').val('N/A');
+				$('#'+fields[i]+'[type="text"]').attr('disabled','disabled');
+			}
+		} else {
+			for (var i in fields) {
+				$('#'+fields[i]+'[type="text"]').removeAttr('disabled');
+				if ($('#'+fields[i]+'[type="text"]').val() == 'N/A') {
+					$('#'+fields[i]+'[type="text"]').val('');
+				}
+			}
+		}
+	});
 });
 
 function update_patient_age(dob,dod,yob)

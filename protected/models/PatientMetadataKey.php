@@ -102,4 +102,29 @@ class PatientMetadataKey extends BaseActiveRecord
 			'criteria'=>$criteria,
 		));
 	}
+
+	public function getDisabled($patient=null)
+	{
+		foreach (PatientMetadataKey::model()->findAll() as $metadata_key) {
+			if ($metadata_key->hide_fields) {
+				$fields = explode(',',$metadata_key->hide_fields);
+
+				if (in_array($this->key_name,$fields)) {
+					$values = explode(',',$metadata_key->hide_fields_values);
+
+					if (empty($_POST)) {
+						if ($patient && in_array($patient->{$metadata_key->key_name},$values)) {
+							return true;
+						}
+					} else {
+						if (in_array(@$_POST[$metadata_key->key_name],$values)) {
+							return true;
+						}
+					}
+				}
+			}
+		}
+
+		return false;
+	}
 }
