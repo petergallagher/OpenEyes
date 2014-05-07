@@ -88,6 +88,10 @@ $(document).ready(function() {
 			.append(item)
 			.removeClass('hide');
 
+			if (container.data('show-none-placeholder') == 'yes') {
+				selections.children('li.MultiSelectNone').hide();
+			}
+
 			noSelectionsMsg.addClass('hide');
 			removeAll.removeClass('hide');
 
@@ -138,6 +142,10 @@ $(document).ready(function() {
 		if (!selections.children().length) {
 			selections.add(removeAll).addClass('hide');
 			noSelectionsMsg.removeClass('hide');
+		}
+
+		if (container.data('show-none-placeholder') == 'yes' && selections.children().length == 1) {
+			selections.children('li.MultiSelectNone').show();
 		}
 
 		if ($(this).hasClass('linked-fields')) {

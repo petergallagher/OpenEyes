@@ -61,7 +61,7 @@ $widgetOptionsJson = json_encode(array(
 		</div>
 		<div class="large-<?php echo $layoutColumns['field'];?> column end">
 	<?php }?>
-		<div class="multi-select<?php if (!$inline) echo ' multi-select-list';?>" data-options='<?php echo $widgetOptionsJson;?>'>
+		<div class="multi-select<?php if (!$inline) echo ' multi-select-list';?>" data-options='<?php echo $widgetOptionsJson;?>' data-show-none-placeholder="<?php echo $showNonePlaceholder ? 'yes' : 'no'?>">
 			<input type="hidden" name="<?php echo get_class($element)?>[MultiSelectList_<?php echo $field?>]" class="multi-select-list-name" />
 			<div class="multi-select-dropdown-container">
 				<select id="<?php echo $field?>" class="MultiSelectList<?php if ($showRemoveAllLink) {?> inline<?php }?><?php if (isset($htmlOptions['class'])) {?> <?php echo $htmlOptions['class']?><?php }?>" name=""<?php if (isset($htmlOptions['data-linked-fields'])) {?> data-linked-fields="<?php echo $htmlOptions['data-linked-fields']?>"<?php }?><?php if (isset($htmlOptions['data-linked-values'])) {?> data-linked-values="<?php echo $htmlOptions['data-linked-values']?>"<?php }?>>
@@ -85,7 +85,8 @@ $widgetOptionsJson = json_encode(array(
 			<?php if (!$found && $noSelectionsMessage) {?>
 				<div class="no-selections-msg pill"><?php echo $noSelectionsMessage;?></div>
 			<?php }?>
-			<ul class="MultiSelectList multi-select-selections<?php if (!$found) echo ' hide';?>">
+			<ul class="MultiSelectList multi-select-selections<?php if (!$found && (!empty($selected_ids) || !$showNonePlaceholder)) echo ' hide';?>">
+				<li class="MultiSelectNone"<?php if (!empty($selected_ids) || !$showNonePlaceholder) {?> style="display: none"<?php }?>>None</li>
 				<?php foreach ($selected_ids as $id) {
 					if (isset($options[$id])) {?>
 						<li>
