@@ -13,7 +13,7 @@ $form = $this->beginWidget('BaseEventTypeCActiveForm', array(
 		<div class ="data-row  reference-table-edit">
 			<?php
 			foreach ($data as $row){
-			$this->controller->renderFile(Yii::app()->basePath.'/widgets/views/_ReferenceTableRow.php',array('name'=>$row['name'],'id'=>$row['id']));
+			$this->renderFile(Yii::app()->basePath.'/widgets/views/_ReferenceTableRow.php',array('name'=>$row['name'],'id'=>$row['id']));
 			}
 			?>
 		</div>

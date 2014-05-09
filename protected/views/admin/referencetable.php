@@ -1,5 +1,5 @@
 <div class="box admin">
-	<h2>Allergy Admin</h2>
+	<h2><?php echo $title?></h2>
 	<?php $this->widget('ReferenceTable', array(
-			'model' => 'Allergy'));?>
+			'model' => $model));?>
 </div>

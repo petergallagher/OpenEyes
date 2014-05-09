@@ -57,6 +57,50 @@ class BaseAdminController extends BaseController
 		return $pagination;
 	}
 
+	public function referenceTableAdmin($model,$title)
+	{
+		$this->Render('/admin/referencetable',array('model'=>$model, 'title'=>$title));
+	}
+
+	public function handleReferenceTableAdmin($model_name)
+	{
+
+		if($_POST)
+		{
+			$display_order = 1;
+			foreach($_POST as $key=>$value)
+			{
+				if(@substr($key, 0, 4)=="rto-"){ //only change order for existing values
+					$id = substr($key, 4);
+					$model = $model_name::model()->find("id=?",$id);
+					if ($model) {
+						$model->display_order = $display_order;
+						$display_order ++;
+						if (!$model->save()) {
+							throw new Exception("Unable to save: ".print_r($model->getErrors(),true));
+						}
+					}
+				}
+				if(@substr($key, 0, 4)=="rtn-"){ //new value
+					$model = new $model_name();
+					$model->name = $value;
+					$model->display_order = $display_order;
+					$display_order ++;
+					if (!$model->save()) {
+						throw new Exception("Unable to save: ".print_r($model->getErrors(),true));
+					}
+				}
+			}
+		}
+		$models=$model_name::model()->findAll(array('order'=>'display_order'));
+		foreach($models as $model){
+			$rows[] = $model->attributes;
+		}
+
+		$this->renderFile(Yii::app()->basePath.'/widgets/views/ReferenceTable.php',array('data'=>$rows));
+	}
+
+
 	public function actionAddReferenceTableRow()
 	{
 		return $this->renderFile(Yii::app()->basePath.'/widgets/views/_ReferenceTableRow.php',array('name'=>''));

@@ -29,7 +29,7 @@ class AdminController extends BaseAdminController
 
 	public function actionAllergies()
 	{
-		$this->Render('/admin/allergies');
+		$this->referenceTableAdmin('Allergy','Allergy Admin');
 	}
 
 	public function actionDrugs()
