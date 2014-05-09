@@ -59,7 +59,7 @@ class BaseAdminController extends BaseController
 
 	public function referenceTableAdmin($model,$title)
 	{
-		$this->Render('/admin/referencetable',array('model'=>$model, 'title'=>$title));
+		$this->Render('//admin/referencetable',array('model'=>$model, 'title'=>$title));
 	}
 
 	public function handleReferenceTableAdmin($model_name)
