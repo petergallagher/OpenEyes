@@ -72,7 +72,7 @@ class BaseAdminController extends BaseController
 			{
 				if(@substr($key, 0, 4)=="rto-"){ //only change order for existing values
 					$id = substr($key, 4);
-					$model = $model_name::model()->find("id=:id",array(':id'=>$id));
+					$model = $model_name::model()->findByPk($id);
 
 					if ($model) {
 						$model->display_order = $display_order;
