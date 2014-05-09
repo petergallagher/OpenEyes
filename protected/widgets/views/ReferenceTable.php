@@ -13,12 +13,12 @@ $form = $this->beginWidget('BaseEventTypeCActiveForm', array(
 		<div class ="data-row  reference-table-edit">
 			<?php
 			foreach ($data as $row){
-			$this->renderFile(Yii::app()->basePath.'/widgets/views/_ReferenceTableRow.php',array('name'=>$row['name'],'id'=>$row['id']));
+				$this->renderFile(Yii::app()->basePath.'/widgets/views/_ReferenceTableRow.php',array('name'=>$row['name'],'id'=>$row['id']));
 			}
 			?>
 		</div>
 		<div class ="data-row add">
-		<span><a href="#">Add</a></span>
+			<span><a href="#">Add</a></span>
 		</div>
 	</div>
 </div>
@@ -26,9 +26,8 @@ $form = $this->beginWidget('BaseEventTypeCActiveForm', array(
 <BR />
 <div>
 	<?php echo EventAction::button('Save', 'save', null, array('class' => 'save-reference-table small primary'))->toHtml()?>&nbsp;
-	<?php echo EventAction::button('Cancel', 'Cancel', null, array('class' => 'small warning'))->toHtml()?>
+	<?php echo EventAction::button('Cancel', 'cancel_rt', null, array('class' => 'small warning'))->toHtml()?>
 </div>
-
 <script>
 	$('.add').unbind().click(function() {
 		event.preventDefault();
@@ -44,8 +43,10 @@ $form = $this->beginWidget('BaseEventTypeCActiveForm', array(
 	$('.save-reference-table').click(function() {
 		$('.reference-table-array').val($('input').serialize());
 	});
-
+	$('#et_cancel_rt').click(function() {
+		event.preventDefault();
+		window.location.href = baseUrl+'/admin';
+	});
 	$('.reference-table-edit').sortable({helper:'clone'});
 </script>
-
 <?php $this->endWidget(); ?>

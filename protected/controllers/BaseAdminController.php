@@ -64,7 +64,6 @@ class BaseAdminController extends BaseController
 
 	public function handleReferenceTableAdmin($model_name)
 	{
-
 		if($_POST)
 		{
 			$display_order = 1;
