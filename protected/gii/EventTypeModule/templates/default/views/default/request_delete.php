@@ -18,9 +18,6 @@
  */
  ?>
 <?php echo '<?php'?> $this->beginContent('//patient/event_container')<?php echo "?>\n"?>
-
-	<h2 class="event-title"><?php echo '<?php'?> echo $this->event_type->name <?php echo '?>'?></h2>
-
 	<?php echo '<?php'?> echo CHtml::form(array('Default/requestDeletion/'.$this->event->id), 'post', array('id' => 'deleteForm'))<?php echo '?>'?>
 	<div id="delete_event">
 		<h3>Request event deletion</h3>
