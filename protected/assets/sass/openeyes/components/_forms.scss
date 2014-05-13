@@ -292,3 +292,9 @@ label {
 .field-label {
 	@extend .field-value;
 }
+
+.generic-admin {
+	.reorder {
+		width: 2em;
+	}
+}

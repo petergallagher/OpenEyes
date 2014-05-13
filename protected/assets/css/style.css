@@ -2496,6 +2496,11 @@ input[type="text"].large, input[type="password"].large, input[type="date"].large
   background: #fff300;
 }
 
+/* line 297, ../sass/openeyes/components/_forms.scss */
+.generic-admin .reorder {
+  width: 2em;
+}
+
 /* line 96, ../sass/openeyes/_mixins.scss */
 button, .button, input[type="submit"] {
   border-style: solid;
