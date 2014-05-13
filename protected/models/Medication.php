@@ -58,6 +58,7 @@ class Medication extends BaseActiveRecord
 		// will receive user inputs.
 		return array(
 			array('patient_id, drug_id, route_id, option_id, frequency_id, start_date, end_date', 'safe'),
+			array('start_date', 'required'),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
 			array('id, name', 'safe', 'on'=>'search'),
