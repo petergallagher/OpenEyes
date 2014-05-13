@@ -29,7 +29,10 @@ class AdminController extends BaseAdminController
 
 	public function actionAllergies()
 	{
-		$this->referenceTableAdmin('Allergy','Allergy Admin');
+		$this->render('//admin/generic_admin',array(
+			'title' => 'Allergies',
+			'model' => 'Allergy',
+		));
 	}
 
 	public function actionDrugs()
