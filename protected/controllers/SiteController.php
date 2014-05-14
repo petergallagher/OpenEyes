@@ -67,20 +67,35 @@ class SiteController extends BaseController
 				return;
 			}
 
-			// NHS number (assume 10 digit number is an NHS number)
-			if(preg_match('/^(N|NHS)\s*[:;]\s*([0-9\- ]+)$/i',$query,$matches)
-					|| preg_match('/^([0-9]{3}[- ]?[0-9]{3}[- ]?[0-9]{4})$/i',$query,$matches)) {
-				$nhs = (isset($matches[2])) ? $matches[2] : $matches[1];
-				$nhs = str_replace(array('-',' '),'',$nhs);
-				$this->redirect(array('patient/search', 'nhs_num' => $nhs));
+			// User specified NHS no
+			if (preg_match('/^(N|NHS)\s*[:;]\s*([0-9\- ]+)$/i',$query,$matches)) {
+				$match = preg_replace('/[- ]*/','',$matches[1]);
+
+				$this->redirect(array('patient/search', 'nhs_num' => $match));
 				return;
 			}
 
-			// Hospital number (assume a < 10 digit number is a hosnum)
-			if(preg_match('/^(H|Hosnum)\s*[:;]\s*([0-9a-zA-Z\-]+)$/i',$query,$matches)
-					|| preg_match(Yii::app()->params['hos_num_regex'],$query,$matches)) {
-				$hosnum = (isset($matches[2])) ? $matches[2] : $matches[1];
-				$this->redirect(array('patient/search', 'hos_num' => $hosnum));
+			// User specified hosnum
+			if (preg_match('/^(H|Hosnum)\s*[:;]\s*([0-9a-zA-Z\-]+)$/i',$query,$matches)) {
+				$match = preg_replace('/[- ]*/','',$matches[1]);
+
+				$this->redirect(array('patient/search', 'hos_num' => $match));
+				return;
+			}
+
+			if (preg_match('/^([0-9]+[- ]?[0-9]+[- ]?[0-9]+)$/i',$query,$matches)) {
+				$match = preg_replace('/[- ]*/','',$matches[1]);
+
+				if (Yii::app()->params['nhs_num_fixed_length']) {
+					if (strlen($match) == Yii::app()->params['nhs_num_fixed_length']) {
+						$this->redirect(array('patient/search', 'nhs_num' => $match));
+					} else {
+						$this->redirect(array('patient/search', 'hos_num' => $match));
+					}
+				} else {
+					$this->redirect(array('patient/search', 'hos_num' => $match, 'nhs_num' => $match));
+				}
+
 				return;
 			}
 

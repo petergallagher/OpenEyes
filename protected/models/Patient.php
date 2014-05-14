@@ -176,23 +176,6 @@ class Patient extends BaseActiveRecord
 		);
 	}
 
-	public function search_nr($params)
-	{
-		throw new Exception('a');
-		$criteria=new CDbCriteria;
-		$criteria->join = "JOIN contact ON contact_id = contact.id";
-		$criteria->compare('LOWER(first_name)',strtolower($params['first_name']),false);
-		$criteria->compare('LOWER(last_name)',strtolower($params['last_name']),false);
-		$criteria->compare('dob',$this->dob,false);
-		$criteria->compare('gender_id',$this->gender_id,false);
-		$criteria->compare('hos_num',$this->hos_num,false);
-		$criteria->compare('nhs_num',$this->nhs_num,false);
-
-
-		return $this->count($criteria);
-
-	}
-
 	/**
 	 * Retrieves a list of models based on the current search/filter conditions.
 	 * @param array $params
@@ -222,10 +205,17 @@ class Patient extends BaseActiveRecord
 		}
 
 		if (in_array('hos_num',$search_fields) && in_array('nhs_num',$search_fields)) {
-			if (strlen(@$params['nhs_num']) == 10) {
-				$criteria->compare('nhs_num',@$params['nhs_num'], false);
+			if (@$params['hos_num'] && @$params['nhs_num']) {
+				$criteria->addCondition('hos_num = :query1 or nhs_num = :query2');
+				$criteria->params[':query1'] = @$params['hos_num'];
+				$criteria->params[':query2'] = @$params['nhs_num'];
 			} else {
-				$criteria->compare('hos_num',@$params['hos_num'], false);
+				if (@$params['nhs_num']) {
+					$criteria->compare('nhs_num',@$params['nhs_num'], false);
+				}
+				if (@$params['hos_num']) {
+					$criteria->compare('hos_num',@$params['hos_num'], false);
+				}
 			}
 		} else if (in_array('hos_num',$search_fields) && @$params['hos_num']) {
 			$criteria->compare('hos_num',$params['hos_num'], false);

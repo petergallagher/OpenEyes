@@ -247,5 +247,6 @@ return array(
 		'default_country' => 'United Kingdom',
 		'patient_summary_hide_blank_fields' => false,
 		'patient_summary_show_hos_num' => false,
+		'nhs_num_fixed_length' => 10,
 	),
 );
