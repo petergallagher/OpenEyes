@@ -36,6 +36,7 @@ class Mailer extends CComponent
 
 	protected $_mailer;
 
+
 	/**
 	 * initialise the component by pulling in the appropriate SwiftMailer classes
 	 */
@@ -44,6 +45,54 @@ class Mailer extends CComponent
 		spl_autoload_unregister(array('YiiBase', 'autoload'));
 		require_once(Yii::getPathOfAlias('application.vendors.SwiftMailer') . '/swift_required.php');
 		spl_autoload_register(array('YiiBase', 'autoload'));
+	}
+
+	/**
+	 * Creates a new Swift_Message from basic details
+	 * Abstracted-out utility from functions that implement mail()-like interfaces to reduce duplication
+	 * @param string $to email of recipient
+	 * @param string $subject subject line
+	 * @param string $body email body
+	 * @return Swift_Message
+	 */
+	protected function basicMessage($to,$subject,$body) {
+		$message = $this->newMessage();
+		$message->setTo($to);
+		$message->setSubject($subject);
+		$message->setBody($body);
+		return $message;
+	}
+
+	/**
+	 * Given mail information and an array of headers, sends a mail in a slightly less insane way than using mail()
+	 * @param string $to Intended recipient address
+	 * @param string $subject
+	 * @param string $body
+	 * @param assoc $headers assoc of HeaderKey => HeaderVal
+	 */
+	public function mailWithHeaders($to, $subject, $body, $headers=array())
+	{
+		$message = $this->basicMessage($to, $subject, $body);
+		$mh = $message->getHeaders();
+		foreach ($headers as $k => $v) {
+			$mh->addTextHeader($k,$v);
+		}
+		return $this->sendMessage($message);
+	}
+
+	/**
+	 * Uses the Swiftmailer infrastructure to send a message using the php mail() interface
+	 * @param string $to
+	 * @param string $subject
+	 * @param string $body
+	 */
+	public function mailWithFrom($to, $subject, $body, $from=null)
+	{
+		$message = $this->basicMessage($to, $subject, $body);
+		if ($from) {
+			$message->setFrom($from);
+		}
+		return $this->sendMessage($message);
 	}
 
 	/**
@@ -137,9 +186,11 @@ class Mailer extends CComponent
 		Yii::trace("We intend to divert a message. Original $orig_rcpts", 'oe.Mailer');
 
 		// 1. Verify we have a list of addresses to divert to
-		if (!isset($params['mailer_divert_addresses'])) {
+		if (!@$params['mailer_divert_addresses']) {
+			Yii::trace('No divert addresses found, dropping mail instead', 'oe.Mailer');
 			return;
 		}
+
 		$diverts = $params['mailer_divert_addresses'];
 
 		// 2. Prepend the intended list of recipients
@@ -149,6 +200,11 @@ class Mailer extends CComponent
 		}
 
 		$message->setBody("!! OpenEyes Mailer: Original $orig_rcpts\n" . $message->getBody());
+
+		if (!array_key_exists('mailer_divert_addresses', $params)) {
+			return;
+		}
+		$diverts = $params['mailer_divert_addresses'];
 
 		// 3. Divert the mail to the divert addresses
 		Yii::trace("Diverting message, to: " . print_r($diverts,true),'oe.Mailer');
