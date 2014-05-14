@@ -1480,4 +1480,15 @@ class Patient extends BaseActiveRecord
 			return $this->contact->address->country;
 		}
 	}
+
+	public function afterValidate()
+	{
+		if ($this->dob && $this->date_of_death) {
+			if (strtotime($this->dob) > strtotime($this->date_of_death)) {
+				$this->addError('date_of_death',$this->getAttributeLabel('date_of_death').' cannot be before '.$this->getAttributeLabel('dob'));
+			}
+		}
+
+		return parent::afterValidate();
+	}
 }
