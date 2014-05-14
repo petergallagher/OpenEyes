@@ -1489,9 +1489,15 @@ class Patient extends BaseActiveRecord
 			}
 		}
 
-		if ($this->dob && $this->date_of_death) {
+		if (strtotime($this->dob) && strtotime($this->date_of_death)) {
 			if (strtotime($this->dob) > strtotime($this->date_of_death)) {
 				$this->addError('date_of_death',$this->getAttributeLabel('date_of_death').' cannot be before '.$this->getAttributeLabel('dob'));
+			}
+		}
+
+		foreach (array('dob','date_of_death') as $field) {
+			if ($this->$field && !preg_match('/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/',$this->$field)) {
+				$this->addError($field,'Invalid date format for '.$this->getAttributeLabel($field));
 			}
 		}
 

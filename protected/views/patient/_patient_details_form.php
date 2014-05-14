@@ -151,7 +151,7 @@
 								'showAnim' => 'fold',
 								'dateFormat'=>Helper::NHS_DATE_FORMAT_JS
 							),
-							'value' => $patient->NHSDate('dob'),
+							'value' => preg_match('/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/',$patient->dob) ? $patient->NHSDate('dob') : $patient->dob,
 							'htmlOptions' => array(
 								'style' => 'width: 80px;',
 							)
@@ -194,7 +194,7 @@
 								'showAnim' => 'fold',
 								'dateFormat'=>Helper::NHS_DATE_FORMAT_JS
 							),
-							'value' => $patient->NHSDate('date_of_death'),
+							'value' => preg_match('/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/',$patient->date_of_death) ? $patient->NHSDate('date_of_death') : $patient->date_of_death,
 							'htmlOptions' => array(
 								'style' => 'width: 80px;',
 							)

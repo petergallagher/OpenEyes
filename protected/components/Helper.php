@@ -153,7 +153,11 @@ class Helper
 		$check_datetime = new DateTime($check_date);
 
 		if ($date_of_death) {
-			$dod_datetime = new DateTime($date_of_death);
+			try {
+				$dod_datetime = new DateTime($date_of_death);
+			} catch (Exception $e) {
+				return 'Unknown';
+			}
 			if ($check_datetime->diff($dod_datetime)->invert) {
 				$check_datetime = $dod_datetime;
 			}
