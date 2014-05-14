@@ -1483,6 +1483,12 @@ class Patient extends BaseActiveRecord
 
 	public function afterValidate()
 	{
+		foreach (array('dob','date_of_death') as $field) {
+			if ($this->$field && strtotime($this->$field) > strtotime(date('Y-m-d'))) {
+				$this->addError($field,$this->getAttributeLabel($field).' cannot be in the future');
+			}
+		}
+
 		if ($this->dob && $this->date_of_death) {
 			if (strtotime($this->dob) > strtotime($this->date_of_death)) {
 				$this->addError('date_of_death',$this->getAttributeLabel('date_of_death').' cannot be before '.$this->getAttributeLabel('dob'));
