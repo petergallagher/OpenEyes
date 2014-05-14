@@ -81,15 +81,18 @@
 				</div>
 			</div>
 			<div class="row">
-				<div class="large-10 column">
+				<div class="large-9 column">
 				</div>
-				<div class="large-2 column text-right">
+				<div class="large-3 column text-right">
 					<span style="width: 30px;">
 						<img class="loader" src="<?php echo Yii::app()->assetManager->createUrl('img/ajax-loader.gif')?>" alt="loading..." style="display: none;" />
 					</span>
 					<button id="search_button" class="small" type="submit">
 						Search
 					</button>
+					<div class="basic">
+						<a href="<?php echo Yii::app()->baseUrl?>/">Basic search</a>
+					</div>
 				</div>
 			</div>
 		</div>
