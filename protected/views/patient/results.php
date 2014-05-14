@@ -87,7 +87,7 @@
 					<span style="width: 30px;">
 						<img class="loader" src="<?php echo Yii::app()->assetManager->createUrl('img/ajax-loader.gif')?>" alt="loading..." style="display: none;" />
 					</span>
-					<button id="search_button" class="secondary small" type="submit">
+					<button id="search_button" class="small" type="submit">
 						Search
 					</button>
 				</div>
