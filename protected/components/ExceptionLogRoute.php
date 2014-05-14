@@ -55,8 +55,9 @@ class ExceptionLogRoute extends CLogRoute
 	public function init()
 	{
 		parent::init();
-		if($this->getLogPath()===null)
+		if($this->getLogPath()===null) {
 			$this->setLogPath(Yii::app()->getRuntimePath());
+		}
 	}
 
 	/**
@@ -74,9 +75,15 @@ class ExceptionLogRoute extends CLogRoute
 	public function setLogPath($value)
 	{
 		$this->_logPath=realpath($value);
-		if($this->_logPath===false || !is_dir($this->_logPath) || !is_writable($this->_logPath))
-			throw new CException(Yii::t('yii','CFileLogRoute.logPath "{path}" does not point to a valid directory. Make sure the directory exists and is writable by the Web server process.',
-				array('{path}'=>$value)));
+		if($this->_logPath===false || !is_dir($this->_logPath) || !is_writable($this->_logPath)) {
+			throw new CException(
+				Yii::t(
+					'yii',
+					'CFileLogRoute.logPath "{path}" does not point to a valid directory. Make sure the directory exists and is writable by the Web server process.',
+					array('{path}'=>$value)
+				)
+			);
+		}
 	}
 
 	/**
@@ -125,61 +132,153 @@ class ExceptionLogRoute extends CLogRoute
 	 */
 	public function setMaxLogFiles($value)
 	{
-		if(($this->_maxLogFiles=(int) $value)<1)
+		if (($this->_maxLogFiles=(int) $value)<1) {
 			$this->_maxLogFiles=1;
+		}
 	}
 
+	/**
+	 * Returns the currently active username or some default text
+	 * @return string
+	 */
+	protected function getUserName()
+	{
+		return isset(Yii::app()->session['user']->username) ? Yii::app()->session['user']->username : 'Not logged in';
+	}
+
+	/**
+	 * Given a timestamp (from time()), formats it for the log
+	 * @param timestamp $time
+	 * @return string
+	 */
+	protected function formatLogTimeStamp($time)
+	{
+		return substr($timestamp,0,5).'-'.substr($timestamp,5,strlen($timestamp));
+	}
+
+	/**
+	 * Given a log file name (should not exist) and an array of entries, write the entries to the log file
+	 * @param string $logFile
+	 * @param array[string] $entries
+	 * @return void
+	 */
+	protected function writeLogFile($logFile, $entries)
+	{
+		if(@filesize($logFile)>$this->getMaxFileSize()*1024) {
+			$this->rotateFiles();
+		}
+		$fp=@fopen($logFile,'a');
+		@flock($fp,LOCK_EX);
+		foreach($entries as $log) {
+			@fwrite($fp,$this->formatLogMessage($log[0],$log[1],$log[2],$log[3]));
+		}
+		@flock($fp,LOCK_UN);
+		@fclose($fp);
+	}
+
+    /**
+	 * In the event that there is a field called 'password' in a 'LoginForm' form, we would quite like to not see that in the logs. PII and all that.
+	 * @return void
+	 */
+	protected function censorPassword()
+	{
+		if (isset($_POST['LoginForm']['password'])) {
+			$_POST['LoginForm']['password'] = '*******';
+		}
+	}
+	
+	/**
+	 * Actually write the log entry
+	 * @param $path a path (which should not exist)
+	 * @return void
+	 */
+	protected function writeLogContents($path)
+	{
+		file_put_contents($path, "SERVER:\n\n".print_r($_SERVER,true)."\n\nPOST:\n\n".print_r($_POST,true));
+	}
+
+	/**
+	 * Attempt to do RCS-style history logfile naming (.1, .2 etc.)
+	 * @param string $path Base path
+	 * @return string a unique path
+	 */
+	protected function findUnusedLogfile($path)
+	{
+		$n = 1;
+		$logPath = $path;
+		while (file_exists($logPath)) {
+			$logPath = $path.'.'.$n;
+			$n++;
+		}
+	}
+	
 	/**
 	 * Saves log messages in files.
 	 * @param array $logs list of log messages
 	 */
 	protected function processLogs($logs)
 	{
-		$logFile=$this->getLogPath().DIRECTORY_SEPARATOR.$this->getLogFile();
-		if(@filesize($logFile)>$this->getMaxFileSize()*1024)
-			$this->rotateFiles();
-		$fp=@fopen($logFile,'a');
-		@flock($fp,LOCK_EX);
-		foreach($logs as $log)
-			@fwrite($fp,$this->formatLogMessage($log[0],$log[1],$log[2],$log[3]));
-		@flock($fp,LOCK_UN);
-		@fclose($fp);
-
+		$logfile=$this->getLogPath().DIRECTORY_SEPARATOR.$this->getLogFile();
+		$this->writeLogFile($logfile, $logs);
+		
 		if ($this->adminEmail && $log[1] == 'error' && !$this->isFiltered($log[0]) && !$this->userAgentFiltered(@$_SERVER['HTTP_USER_AGENT'])) {
-			$user = isset(Yii::app()->session['user']->username) ? Yii::app()->session['user']->username : 'Not logged in';
-			$useragent = isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : 'None';
-
-			$timestamp = time();
-			$timestamp = substr($timestamp,0,5).'-'.substr($timestamp,5,strlen($timestamp));
-
-			$logfilePrefix = $logfile = $timestamp.'.log';
-
-			$n = 1;
-
-			while (file_exists($this->getLogPath().DIRECTORY_SEPARATOR.$logfile)) {
-				$logfile = $logfilePrefix.'.'.$n;
-				$n++;
-			}
-
-			if (isset($_POST['LoginForm']['password'])) {
-				$_POST['LoginForm']['password'] = '*******';
-			}
-
-			file_put_contents($this->getLogPath().DIRECTORY_SEPARATOR.$logfile,"SERVER:\n\n".print_r($_SERVER,true)."\n\nPOST:\n\n".print_r($_POST,true));
-
-			$request_type = !empty($_POST) ? 'POST' : 'GET';
-
-			$msg = "User: $user\n";
-			$msg .= "User agent: $useragent\n";
-			isset($_SERVER['REQUEST_URI']) && $msg .= "Request: $request_type http".(@$_SERVER['HTTPS']?'s':'').'://'.$_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI']."\n";
-			isset($_SERVER['HTTP_REFERER']) && $msg .= "Referer: ".$_SERVER['HTTP_REFERER']."\n";
-			isset($_SERVER['REMOTE_ADDR']) && $msg .= "Remote IP: ".$_SERVER['REMOTE_ADDR']."\n";
-			isset($_SERVER['HTTP_VIA']) && $msg .= "Via: ".$_SERVER['HTTP_VIA']."\n";
-			isset($_SERVER['HTTP_X_FORWARDED_FOR']) && $msg .= "Forwarded IP: ".$_SERVER['HTTP_X_FORWARDED_FOR']."\n";
-			$msg .= "Logfile: $logfile\n";
-			$msg .= "\n".$log[0];
-			mail($this->adminEmail,$this->emailSubject." [$timestamp]",$msg);
+			$timestamp = $this->formatLogTimeStamp(time());
+			$logpath = $this->findUnusedLogFile($timestamp.'.log');
+			$this->censorPassword();
+			$this->writeLogContents($logpath);
+			$details = array(
+				'user' => $this->getUserName(),
+				'user-agent' => isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : 'None',
+				'request-uri' => ((!empty($_POST) ? 'POST' : 'GET'))." http".(@$_SERVER['HTTPS']?'s':'').'://'.$_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI'],
+				'referrer' => $_SERVER['HTTP_REFERER']||'(None)',
+				'remote-addr' => $_SERVER['REMOTE_ADDR']||'(None)',
+				'via' => $_SERVER['HTTP_VIA']||"(None)",
+				'x-forwarded-for' => $_SERVER['HTTP_X_FORWARDED_FOR']||"(None)",
+				'log-0' => $log[0],
+				'to' => $this->adminEmail,
+				'subject' => $this->emailSubject . " [" . $timestamp . "]",
+			);
+			$message = $this->makeMessage($details);
+			$this->sendMessage($message);
 		}
+	}
+
+    /**
+	 * Given a collection of details, construct a Swift_Message
+	 * @param $details
+	 * @return Swift_Message
+	 */
+	protected function makeMessage($details)
+	{
+		$body = "";
+		$msg = array(
+			"User" => $details['user'],
+			"User agent" => $details['user-agent'],
+			"Request URI" => $details['request-uri'],
+			"Referring URL" => $details['referrer'],
+			"Client IP" => $details['remote-addr'],
+			'Via' => $details['via'],
+			'Proxied IP' => $details['x-forwarded-for'],
+			"Log file" => $details['log-file'],
+		);
+		foreach ($msg as $k => $v) {
+			$body .= "$k: $v\n";
+		}
+		$body .= $details['log-0'];
+
+		$message = Yii::app()->Mailer->newMessage();
+		$message->setBody($body);
+		$message->setTo($details['to']);
+		$message->setSubject($details['subject']);
+		return $message;
+	}
+
+	/**
+	 * Given a swiftmailer message, actually send it
+	 * @param Swift_Message $message
+	 */
+	protected function sendMessage($message) {
+		return Yii::app()->mailer->send($message);
 	}
 
 	public function isFiltered($msg)
