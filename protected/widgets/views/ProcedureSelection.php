@@ -106,7 +106,7 @@
 		<div class="row field-row">
 		<div class="large-<?php echo $layoutColumns['label']?> column"><label></label></div>
 	<?php }?>
-	<div class="large-<?php echo $layoutColumns['procedures']?> column end">
+	<div class="large-<?php echo @$layoutColumns['procedures']?> column end">
 		<div id="procedureList_<?php echo $identifier?>" class="panel procedures" style="<?php if (empty($selected_procedures)) {?> display: none;<?php }?>">
 			<table class="plain">
 				<thead>
