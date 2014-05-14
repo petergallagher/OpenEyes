@@ -70,6 +70,11 @@ $config = array(
 				'browser' => array(
 					'class' => 'CWebLogRoute',
 				),
+                // Log to email
+				'email' => array(
+					'class' => 'OEEmailLogRoute',
+					'emails' => array('foo@example.org', 'bar@example.org'),
+		 		),
 			),
 		),
 		*/
