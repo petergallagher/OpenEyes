@@ -195,9 +195,18 @@ class PatientController extends BaseController
 	{
 		$search_terms = $this->sanitiseSearchParams($_GET);
 
-		if (!YII_DEBUG && !$search_terms['hos_num'] && !$search_terms['nhs_num'] && !($search_terms['first_name'] && $search_terms['last_name'])) {
-			Yii::app()->user->setFlash('warning.invalid-search', 'Please enter a valid search.');
-			return $this->redirect(Yii::app()->homeUrl);
+		if (!YII_DEBUG) {
+			$ok = false;
+			foreach (PatientSearchField::model()->findAll() as $search_field) {
+				if (@$search_terms[$search_field->name]) {
+					$ok = true;
+				}
+			}
+
+			if (!$ok) {
+				Yii::app()->user->setFlash('warning.invalid-search', 'Please enter a valid search.');
+				return $this->redirect(Yii::app()->homeUrl);
+			}
 		}
 
 		$patients = Patient::model()->search($search_terms);
