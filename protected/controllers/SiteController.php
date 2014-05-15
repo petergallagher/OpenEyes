@@ -83,7 +83,7 @@ class SiteController extends BaseController
 				return;
 			}
 
-			if (preg_match('/^([0-9]+[- ]?[0-9]+[- ]?[0-9]+)$/i',$query,$matches)) {
+			if (preg_match('/^([0-9\- ]+)$/',$query,$matches)) {
 				$match = preg_replace('/[- ]*/','',$matches[1]);
 
 				if (Yii::app()->params['nhs_num_fixed_length']) {
