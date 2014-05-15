@@ -60,6 +60,7 @@ class BaseEventTypeController extends BaseModuleController
 	const ACTION_TYPE_EDIT = 'Edit';
 	const ACTION_TYPE_DELETE = 'Delete';
 	const ACTION_TYPE_FORM = 'Form';	// AJAX actions that are used during create and update but don't actually modify data themselves
+	const ACTION_TYPE_REPORT = 'Report';
 
 	static private $base_action_types = array(
 		'create' => self::ACTION_TYPE_CREATE,
@@ -105,6 +106,8 @@ class BaseEventTypeController extends BaseModuleController
 	public $renderPatientPanel = true;
 
 	protected $open_elements;
+
+	public $dont_redirect = false;
 
 	public function getTitle()
 	{
@@ -1542,13 +1545,22 @@ class BaseEventTypeController extends BaseModuleController
 					$this->event->episode->audit('episode','delete',false);
 
 					$transaction->commit();
-					$this->redirect(array('/patient/episodes/'.$this->event->episode->patient->id));
 
+					if (!$this->dont_redirect) {
+						$this->redirect(array('/patient/episodes/'.$this->event->episode->patient->id));
+					} else {
+						return true;
+					}
 				}
 
 				Yii::app()->user->setFlash('success', "An event was deleted, please ensure the episode status is still correct.");
 				$transaction->commit();
-				$this->redirect(array('/patient/episode/'.$this->event->episode_id));
+
+				if (!$this->dont_redirect) {
+					$this->redirect(array('/patient/episode/'.$this->event->episode_id));
+				}
+
+				return true;
 			}
 			catch (Exception $e) {
 				$transaction->rollback();
@@ -2096,5 +2108,13 @@ class BaseEventTypeController extends BaseModuleController
 		$this->render('request_delete', array(
 			'errors' => $errors,
 		));
+	}
+
+	/**
+	 * Check access to report functions
+	 */
+	public function checkReportAccess()
+	{
+		return $this->checkAccess('admin');
 	}
 }
