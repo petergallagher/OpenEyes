@@ -330,21 +330,13 @@ $(document).ready(function() {
 
 function resetPatientDetailsForm()
 {
-	$('#title').val($('#_title').val());
-	$('#first_name').val($('#_first_name').val());
-	$('#last_name').val($('#_last_name').val());
-	$('#address1').val($('#_address1').val());
-	$('#address2').val($('#_address2').val());
-	$('#city').val($('#_city').val());
-	$('#county').val($('#_county').val());
-	$('#postcode').val($('#_postcode').val());
-	$('#country_id').val($('#_country_id').val());
-	$('#dob').val($('#_dob').val());
-	$('#date_of_birth').val($('#_date_of_birth').val());
-	$('#yob').val($('#_yob').val());
+	for (var field in PatientSummary_original_values) {
+		$('#'+field).val(PatientSummary_original_values[field]);
+		$('#'+field+'[type="text"]').val(PatientSummary_original_values[field]);
+	}
 
 	$('input[name="gender_id"]').map(function() {
-		if ($(this).val() == $('#_gender_id').val()) {
+		if ($(this).val() == PatientSummary_original_values[field]) {
 			$(this).click();
 		}
 	});

@@ -17,20 +17,30 @@
  * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
  */
 ?>
-		<?php echo CHtml::hiddenField('_title',$this->patient->contact->title)?>
-		<?php echo CHtml::hiddenField('_first_name',$this->patient->contact ? $this->patient->contact->first_name : '')?>
-		<?php echo CHtml::hiddenField('_last_name',$this->patient->contact ? $this->patient->contact->last_name : '')?>
-		<?php echo CHtml::hiddenField('_address1',$this->patient->contact && $this->patient->contact->address ? $this->patient->contact->address->address1 : '')?>
-		<?php echo CHtml::hiddenField('_address2',$this->patient->contact && $this->patient->contact->address ? $this->patient->contact->address->address2 : '')?>
-		<?php echo CHtml::hiddenField('_city',$this->patient->contact && $this->patient->contact->address ? $this->patient->contact->address->city: '')?>
-		<?php echo CHtml::hiddenField('_county',$this->patient->contact && $this->patient->contact->address ? $this->patient->contact->address->county: '')?>
-		<?php echo CHtml::hiddenField('_postcode',$this->patient->contact && $this->patient->contact->address ? $this->patient->contact->address->postcode : '')?>
-		<?php echo CHtml::hiddenField('_country_id',$this->patient->contact && $this->patient->contact->address ? $this->patient->contact->address->country_id : '')?>
-		<?php echo CHtml::hiddenField('_dob',$this->patient->NHSDate('dob'))?>
-		<?php echo CHtml::hiddenField('_date_of_death',$this->patient->NHSDate('date_of_death'))?>
-		<?php echo CHtml::hiddenField('_yob',$this->patient->yob)?>
-		<?php echo CHtml::hiddenField('_gender_id',$this->patient->gender_id)?>
-		<?php echo CHtml::hiddenField('_ethnic_group_id',$this->patient->ethnic_group_id)?>
+		<script type="text/javascript">
+			var PatientSummary_original_values = {};
+
+			PatientSummary_original_values['hos_num'] = '<?php echo $this->patient->hos_num?>';
+			PatientSummary_original_values['nhs_num'] = '<?php echo $this->patient->nhs_num?>';
+			PatientSummary_original_values['title'] = '<?php echo $this->patient->contact->title?>';
+			PatientSummary_original_values['first_name'] = '<?php echo $this->patient->contact ? $this->patient->contact->first_name : ''?>';
+			PatientSummary_original_values['last_name'] = '<?php echo $this->patient->contact ? $this->patient->contact->last_name : ''?>';
+			PatientSummary_original_values['address1'] = '<?php echo $this->patient->contact && $this->patient->contact->address ? $this->patient->contact->address->address1 : ''?>';
+			PatientSummary_original_values['address2'] = '<?php echo $this->patient->contact && $this->patient->contact->address ? $this->patient->contact->address->address2 : ''?>';
+			PatientSummary_original_values['city'] = '<?php echo $this->patient->contact && $this->patient->contact->address ? $this->patient->contact->address->city: ''?>';
+			PatientSummary_original_values['county'] = '<?php echo $this->patient->contact && $this->patient->contact->address ? $this->patient->contact->address->county: ''?>';
+			PatientSummary_original_values['postcode'] = '<?php echo $this->patient->contact && $this->patient->contact->address ? $this->patient->contact->address->postcode : ''?>';
+			PatientSummary_original_values['country_id'] = '<?php echo $this->patient->contact && $this->patient->contact->address ? $this->patient->contact->address->country_id : ''?>';
+			PatientSummary_original_values['dob'] = '<?php echo $this->patient->NHSDate('dob')?>';
+			PatientSummary_original_values['date_of_death'] = '<?php echo $this->patient->NHSDate('date_of_death')?>';
+			PatientSummary_original_values['yob'] = '<?php echo $this->patient->yob?>';
+			PatientSummary_original_values['gender_id'] = '<?php echo $this->patient->gender_id?>';
+			PatientSummary_original_values['ethnic_group_id'] = '<?php echo $this->patient->ethnic_group_id?>';
+
+			<?php foreach (PatientMetadataKey::model()->findAll() as $metadata_key) {?>
+				PatientSummary_original_values['<?php echo $metadata_key->key_name?>'] = '<?php echo $patient->metadata($metadata_key->key_name)?>';
+			<?php }?>
+		</script>
 
 		<?php
 		$form = $this->beginWidget('BaseEventTypeCActiveForm', array(
