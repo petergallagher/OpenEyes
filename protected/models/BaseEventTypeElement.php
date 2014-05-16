@@ -378,43 +378,6 @@ class BaseEventTypeElement extends BaseElement
 	{
 	}
 
-	public function hasMultiSelectValue($field, $value) {
-		foreach ($this->$field as $item) {
-			if ($item->name == $value) {
-				return true;
-			}
-		}
-
-		return false;
-	}
-
-	public function updateMultiSelectData($model, $ids, $field)
-	{
-		$_ids = array();
-
-		foreach ($ids as $id) {
-			if (!$assignment = $model::model()->find("element_id=? and $field=?",array($this->id,$id))) {
-				$assignment = new $model;
-				$assignment->element_id = $this->id;
-				$assignment->$field = $id;
-
-				if (!$assignment->save()) {
-					throw new Exception("Unable to save assignment: ".print_r($assignment->getErrors(),true));
-				}
-			}
-
-			$_ids[] = $assignment->id;
-		}
-
-		$criteria = new CDbCriteria;
-		$criteria->addCondition('element_id = :element_id');
-		$criteria->params[':element_id'] = $this->id;
-
-		!empty($_ids) && $criteria->addNotInCondition('id',$_ids);
-
-		$model::model()->deleteAll($criteria);
-	}
-
 	/**
 	 * Returns true if the specified multiselect relation has the value $value_string
 	 */
