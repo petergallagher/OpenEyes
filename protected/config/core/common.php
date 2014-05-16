@@ -30,9 +30,7 @@ return array(
 		'application.models.*',
 		'application.models.elements.*',
 		'application.components.*',
-		'application.components.summaryWidgets.*',
 		'application.extensions.tcpdf.*',
-		'application.services.*',
 		'application.modules.*',
 		'application.commands.*',
 		'application.commands.shell.*',
@@ -42,6 +40,11 @@ return array(
 		'application.helpers.*',
 		'application.gii.*',
 		'system.gii.generators.module.*',
+	),
+
+	'aliases' => array(
+		'services' => 'application.services',
+		'OEModule'=> 'application.modules',
 	),
 
 	'modules' => array(
@@ -56,27 +59,35 @@ return array(
 
 	// Application components
 	'components' => array(
-		'mailer' => array(
-			'class' => 'Mailer',
-			'mode' => 'sendmail',
+		'assetManager' => array(
+			'class'=>'AssetManager',
+			// Use symbolic links to publish the assets when in debug mode.
+			'linkAssets' => defined('YII_DEBUG') && YII_DEBUG,
 		),
-		'moduleAPI' => array(
-			'class' => 'ModuleAPI',
+		'authManager' => array(
+			'class' => 'AuthManager',
+			'connectionID' => 'db',
 		),
-		'request' => array(
-			'enableCsrfValidation' => true,
-			'class'=>'HttpRequest',
-			'noCsrfValidationRoutes'=>array(
-				'site/login', //disabled csrf check on login form
-			),
+		'cache' => array(
+			'class' => 'system.caching.CFileCache',
+			'directoryLevel' => 1
 		),
-		'event' => array(
-			'class' => 'OEEventManager',
-			'observers' => array(),
+		'cacheBuster' => array(
+			'class'=>'CacheBuster',
 		),
 		'clientScript' => array(
 			'class' => 'ClientScript',
 			'packages' => array(
+				'jquery' => array(
+					'js' => array('jquery/jquery.min.js'),
+					'basePath' => 'application.assets.components',
+				),
+				'jquery.ui' => array(
+					'js' => array('jquery-ui/ui/minified/jquery-ui.min.js'),
+					'css' => array('jquery-ui/themes/base/jquery-ui.css'),
+					'basePath' => 'application.assets.components',
+					'depends'=>array('jquery'),
+				),
 				'flot' => array(
 					'js' => array(
 						'flot/jquery.flot.js',
@@ -85,31 +96,11 @@ return array(
 					),
 					'basePath' => 'application.assets.components',
 					'depends' => array('jquery'),
-				),
-			),
-		),
-		'user' => array(
-			'class' => 'CWebUser',
-			// Enable cookie-based authentication
-			'allowAutoLogin' => true,
-		),
-		'urlManager' => array(
-			'urlFormat' => 'path',
-			'showScriptName' => false,
-			'rules' => array(
-				'' => 'site/index',
-				'patient/viewpas/<pas_key:\d+>' => 'patient/viewpas',
-				'file/view/<id:\d+>/<dimensions:\d+(x\d+)?(_\d+x\d+)?>/<name:.*?.\w+>' => 'protectedFile/thumbnail',
-				'file/view/<id:\d+>/<name:\w+\.\w+>' => 'protectedFile/view',
-				'<module:\w+>/<controller:\w+>/<action:\w+>/<id:\d+>' => '<module>/<controller>/<action>',
-				'<controller:\w+>/<id:\d+>' => '<controller>/view',
-				'<controller:\w+>/<action:\w+>/<id:\d+>' => '<controller>/<action>',
-				'<controller:\w+>/<action:\w+>' => '<controller>/<action>',
-				'<controller:\w+>/<action:\w+>/<hospital_num:\d+>' => 'patient/results',
+				)
 			),
 		),
 		'db' => array(
-			'class' => 'CDbConnection',
+			'class' => 'OEDbConnection',
 			'connectionString' => 'mysql:host=localhost;dbname=openeyes',
 			'emulatePrepare' => true,
 			'username' => 'oe',
@@ -117,19 +108,15 @@ return array(
 			'charset' => 'utf8',
 			'schemaCachingDuration' => 300,
 		),
-		'authManager' => array(
-			'class' => 'AuthManager',
-			'connectionID' => 'db',
-		),
-		'cache' => array(
-			'class' => 'system.caching.CFileCache',
-			'cachePath' => 'cache',
-			'directoryLevel' => 1
-		),
 		'errorHandler' => array(
 			// use 'site/error' action to display errors
 			'errorAction' => 'site/error',
 		),
+		'event' => array(
+			'class' => 'OEEventManager',
+			'observers' => array(),
+		),
+		'fhirMarshal' => array('class' => 'FhirMarshal'),
 		'log' => array(
 			'class' => 'FlushableLogRouter',
 			'autoFlush' => 1,
@@ -159,6 +146,30 @@ return array(
 				),
 			),
 		),
+		'mailer' => array(
+			'class' => 'Mailer',
+			'mode' => 'sendmail',
+		),
+		'moduleAPI' => array(
+			'class' => 'ModuleAPI',
+		),
+		'request' => array(
+			'enableCsrfValidation' => true,
+			'class'=>'HttpRequest',
+			'noCsrfValidationRoutes'=>array(
+				'site/login', //disabled csrf check on login form
+				'api/',
+			),
+		),
+		'service' => array(
+			'class' => 'services\ServiceManager',
+			'internal_services' => array(
+				'services\CommissioningBodyService',
+				'services\GpService',
+				'services\PracticeService',
+				'services\PatientService',
+			),
+		),
 		'session' => array(
 			'class' => 'CDbHttpSession',
 			'connectionID' => 'db',
@@ -168,15 +179,47 @@ return array(
 				'lifetime' => 300,
 			),*/
 		),
-		'cacheBuster' => array(
-			'class'=>'CacheBuster',
+		'urlManager' => array(
+			'urlFormat' => 'path',
+			'showScriptName' => false,
+			'rules' => array(
+				'' => 'site/index',
+				'patient/viewpas/<pas_key:\d+>' => 'patient/viewpas',
+        'file/view/<id:\d+>/<dimensions:\d+(x\d+)?(_\d+x\d+)?>/<name:.*?.\w+>' => 'protectedFile/thumbnail',
+				'file/view/<id:\d+>/<name:\w+\.\w+>' => 'protectedFile/view',
+
+				// API
+				array('api/conformance', 'pattern' => 'api/metadata', 'verb' => 'GET'),
+				array('api/conformance', 'pattern' => 'api', 'verb' => 'OPTIONS'),
+				array('api/read', 'pattern' => 'api/<resource_type:\w+>/<id:[a-z0-9\-\.]{1,36}>', 'verb' => 'GET'),
+				array('api/vread', 'pattern' => 'api/<resource_type:\w+>/<id:[a-z0-9\-\.]{1,36}>/_history/<vid:\d+>', 'verb' => 'GET'),
+				array('api/update', 'pattern' => 'api/<resource_type:\w+>/<id:[a-z0-9\-\.]{1,36}>', 'verb' => 'PUT'),
+				array('api/delete', 'pattern' => 'api/<resource_type:\w+>/<id:[a-z0-9\-\.]{1,36}>', 'verb' => 'DELETE'),
+				array('api/create', 'pattern' => 'api/<resource_type:\w+>', 'verb' => 'POST'),
+				array('api/search', 'pattern' => 'api/<resource_type:\w+>', 'verb' => 'GET'),
+				array('api/search', 'pattern' => 'api/<resource_type:\w+>/_search', 'verb' => 'GET,POST'),
+				array('api/badrequest', 'pattern' => 'api/(.*)'),
+
+				'<module:\w+>/<controller:\w+>/<action:\w+>/<id:\d+>' => '<module>/<controller>/<action>',
+				'<controller:\w+>/<id:\d+>' => '<controller>/view',
+				'<controller:\w+>/<action:\w+>/<id:\d+>' => '<controller>/<action>',
+				'<controller:\w+>/<action:\w+>' => '<controller>/<action>',
+				'<controller:\w+>/<action:\w+>/<hospital_num:\d+>' => 'patient/results',
+			),
 		),
-		'assetManager' => array(
-			'class'=>'AssetManager',
-			// Use symbolic links to publish the assets when in debug mode.
-			'linkAssets' => defined('YII_DEBUG') && YII_DEBUG,
+		'user' => array(
+			'class' => 'CWebUser',
+			// Enable cookie-based authentication
+			'allowAutoLogin' => true,
+		),
+		'version' => array(
+			'class' => 'Version',
+		),
+		'widgetFactory'=>array(
+			'class' => 'WidgetFactory'
 		),
 	),
+
 	'params'=>array(
 		'pseudonymise_patient_details' => false,
 		'ab_testing' => false,
@@ -196,7 +239,6 @@ return array(
 		'ldap_update_name' => false,
 		'ldap_update_email' => true,
 		'environment' => 'dev',
-		'audit_trail' => false,
 		'watermark' => '',
 		'watermark_admin' => 'You are logged in as admin. So this is OpenEyes Goldenrod Edition',
 		'watermark_description' => '',
@@ -205,9 +247,6 @@ return array(
 		'google_analytics_account' => '',
 		'local_users' => array(),
 		'log_events' => true,
-		'urgent_booking_notify_hours' => 24,
-		'urgent_booking_notify_email' => array(),
-		'urgent_booking_notify_email_from' => 'OpenEyes <helpdesk@example.com>',
 		'default_site_code' => '',
 		'institution_code' => 'RP6',
 		'erod_lead_time_weeks' => 3,

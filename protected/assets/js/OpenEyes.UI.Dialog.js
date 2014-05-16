@@ -29,10 +29,10 @@
 	/**
 	 * Dialog constructor.
 	 * @constructor
-	 * @class OpenEyes.UI.Dialog
+	 * @name OpenEyes.UI.Dialog
 	 * @tutorial dialog
 	 * @memberOf OpenEyes.UI
-	 * @extends {Emitter}
+	 * @extends OpenEyes.Util.EventEmitter
 	 * @example
 	 * var dialog = new OpenEyes.UI.Dialog({
 	 *	title: 'Title here',
@@ -66,19 +66,20 @@
 
 	/**
 	 * The default dialog options. Custom options will be merged with these.
-	 * @name Dialog#_defaultOptions
+	 * @name OpenEyes.UI.Dialog#_defaultOptions
 	 * @property {mixed} [content=null] - Content to be displayed in the dialog.
 	 * This option accepts multiple types, including strings, DOM elements, jQuery instances, etc.
-	 * @property {string|null} [title=null] - The dialog title.
-	 * @property {string|null} [iframe=null] - A URL string to load the dialog content
-	 * in via an iFrame.
+	 * @property {boolean} [destroyOnClose=true] - Destroy the dialog when it is closed?
 	 * @property {string|null} [url=null] - A URL string to load the dialog content in via an
 	 * AJAX request.
 	 * @property {object|null} [data=null] - Request data used when loading dialog content
 	 * via an AJAX request.
+	 * @property {string|null} [iframe=null] - A URL string to load the dialog content
+	 * in via an iFrame.
+	 * @property {string|null} [title=null] - The dialog title.
 	 * @property {string|null} [dialogClass=dialog] - A CSS class string to be added to
 	 * the main dialog container.
-	 * @property {boolean} [contrainToViewport=false] - Constrain the dialog dimensions
+	 * @property {boolean} [constrainToViewport=false] - Constrain the dialog dimensions
 	 * so that it is never displayed outside of the window viewport?
 	 * @property {integer|string} [width=400] - The dialog width.
 	 * @property {integer|string} [height=auto] - The dialog height.
@@ -107,7 +108,7 @@
 	/**
 	 * Creates and stores the dialog container, and creates a new jQuery UI
 	 * instance on the container.
-	 * @name Dialog#create
+	 * @name OpenEyes.UI.Dialog#create
 	 * @method
 	 * @private
 	 */
@@ -128,7 +129,7 @@
 
 	/**
 	 * Add content to the dialog.
-	 * @name Dialog#setContent
+	 * @name OpenEyes.UI.Dialog#setContent
 	 * @method
 	 * @public
 	 */
@@ -138,7 +139,7 @@
 
 	/**
 	 * Binds common dialog event handlers.
-	 * @name Dialog#create
+	 * @name OpenEyes.UI.Dialog#create
 	 * @method
 	 * @private
 	 */
@@ -152,7 +153,7 @@
 	/**
 	 * Gets a script template from the DOM, compiles it using Mustache, and
 	 * returns the HTML.
-	 * @name Dialog#compileTemplate
+	 * @name OpenEyes.UI.Dialog#compileTemplate
 	 * @method
 	 * @private
 	 * @param {object} options - An options object container the template selector and data.
@@ -171,7 +172,7 @@
 
 	/**
 	 * Sets the dialog to be in a loading state.
-	 * @name Dialog#setLoadingState
+	 * @name OpenEyes.UI.Dialog#setLoadingState
 	 * @method
 	 * @private
 	 */
@@ -182,7 +183,7 @@
 
 	/**
 	 * Removes the loading state from the dialog.
-	 * @name Dialog#removeLoadingState
+	 * @name OpenEyes.UI.Dialog#removeLoadingState
 	 * @method
 	 * @private
 	 */
@@ -192,7 +193,7 @@
 
 	/**
 	 * Sets a 'loading' message and retrieves the dialog content via AJAX.
-	 * @name Dialog#loadContent
+	 * @name OpenEyes.UI.Dialog#loadContent
 	 * @method
 	 * @private
 	 */
@@ -212,7 +213,7 @@
 
 	/**
 	 * Sets a 'loading' message and creates an iframe with the appropriate src attribute.
-	 * @name Dialog#loadIframeContent
+	 * @name OpenEyes.UI.Dialog#loadIframeContent
 	 * @method
 	 * @private
 	 */
@@ -238,7 +239,7 @@
 
 	/**
 	 * Sets the dialog title.
-	 * @name Dialog#setTitle
+	 * @name OpenEyes.UI.Dialog#setTitle
 	 * @method
 	 * @public
 	 */
@@ -248,7 +249,7 @@
 
 	/**
 	 * Repositions the dialog in the center of the page.
-	 * @name Dialog#reposition
+	 * @name OpenEyes.UI.Dialog#reposition
 	 * @method
 	 * @public
 	 */
@@ -257,10 +258,10 @@
 	};
 
 	/**
-	 * Calculates the dialog dimensions. If Dialog#options.constrainToViewport is
+	 * Calculates the dialog dimensions. If OpenEyes.UI.Dialog#options.constrainToViewport is
 	 * set, then the dimensions will be calculated so that the dialog will not be
 	 * displayed outside of the browser viewport.
-	 * @name Dialog#getDimensions
+	 * @name OpenEyes.UI.Dialog#getDimensions
 	 * @method
 	 * @private
 	 */
@@ -272,25 +273,50 @@
 		};
 
 		if (this.options.constrainToViewport) {
-
-			var margin = 40;
-			var width = parseInt(dimensions.width, 10);
-			var height = parseInt(dimensions.height, 10);
-
-			if (!isNaN(width)) {
-				dimensions.width = Math.min(width, $(window).width() - margin);
-			}
-			if (!isNaN(height)) {
-				dimensions.height = Math.min(height, $(window).height() - margin);
-			}
+			var actualDimensions = this.getActualDimensions();
+			var offset = 40;
+			dimensions.width = Math.min(actualDimensions.width, $(window).width() - offset);
+			dimensions.height = Math.min(actualDimensions.height, $(window).height() - offset);
 		}
 
 		return dimensions;
 	};
 
 	/**
+	 * Gets the actual dimensions of the dialog. We need to ensure the dialog
+	 * is open to calculate the dimensions.
+	 * @return {object} An object containing the width and height dimensions.
+	 */
+	Dialog.prototype.getActualDimensions = function() {
+
+		var options = {
+			show: this.options.show,
+			modal: this.options.modal,
+			destroyOnClose: this.options.destroyOnClose
+		};
+
+		this.instance._setOptions($.extend(this.options, {
+			show: null,
+			destroyOnClose: false,
+			modal: false
+		}));
+
+		this.instance.open();
+
+		var dimensions = {
+			width: parseInt(this.options.width, 10) || this.instance.uiDialog.outerWidth(),
+			height: parseInt(this.options.height, 10) || this.instance.uiDialog.outerHeight()
+		};
+
+		this.instance.close();
+		this.instance._setOptions($.extend(this.options, options));
+
+		return dimensions;
+	};
+
+	/**
 	 * Calculates and sets the dialog dimensions.
-	 * @name Dialog#setDimensions
+	 * @name OpenEyes.UI.Dialog#setDimensions
 	 * @method
 	 * @private
 	 */
@@ -302,18 +328,19 @@
 
 	/**
 	 * Opens (shows) the dialog.
-	 * @name Dialog#open
+	 * @name OpenEyes.UI.Dialog#open
 	 * @method
 	 * @public
 	 */
 	Dialog.prototype.open = function() {
 		this.setDimensions();
 		this.instance.open();
+		this.reposition();
 	};
 
 	/**
 	 * Closes (hides) the dialog.
-	 * @name Dialog#close
+	 * @name OpenEyes.UI.Dialog#close
 	 * @method
 	 * @public
 	 */
@@ -324,8 +351,8 @@
 	/**
 	 * Destroys the dialog. Removes all elements from the DOM and detaches all
 	 * event handlers.
-	 * @name Dialog#destroy
-	 * @fires Dialog#destroy
+	 * @name OpenEyes.UI.Dialog#destroy
+	 * @fires OpenEyes.UI.Dialog#destroy
 	 * @method
 	 * @public
 	 *
@@ -345,7 +372,7 @@
 		/**
 		 * Emitted after the dialog has been destroyed and completed removed from the DOM.
 		 *
-		 * @event Dialog#destroy
+		 * @event OpenEyes.UI.Dialog#destroy
 		 */
 		this.emit('destroy');
 	};
@@ -354,8 +381,8 @@
 
 	/**
 	 * Emit the 'open' event after the dialog has opened.
-	 * @name Dialog#onDialogOpen
-	 * @fires Dialog#open
+	 * @name OpenEyes.UI.Dialog#onDialogOpen
+	 * @fires OpenEyes.UI.Dialog#open
 	 * @method
 	 * @private
 	 */
@@ -363,7 +390,7 @@
 		/**
 		 * Emitted after the dialog has opened.
 		 *
-		 * @event Dialog#open
+		 * @event OpenEyes.UI.Dialog#open
 		 */
 		this.emit('open');
 	};
@@ -371,8 +398,8 @@
 	/**
 	 * Emit the 'close' event after the dialog has closed, and optionally destroy
 	 * the dialog.
-	 * @name Dialog#onDialogClose
-	 * @fires Dialog#close
+	 * @name OpenEyes.UI.Dialog#onDialogClose
+	 * @fires OpenEyes.UI.Dialog#close
 	 * @method
 	 * @private
 	 */
@@ -380,7 +407,7 @@
 		/**
 		 * Emitted after the dialog has closed.
 		 *
-		 * @event Dialog#close
+		 * @event OpenEyes.UI.Dialog#close
 		 */
 		this.emit('close');
 
@@ -394,20 +421,19 @@
 	 * request completes (whether there was an error or not), and is executed after
 	 * any success or fail handlers. This method removes the loading state of the
 	 * dialog, and repositions it in the center of the screen.
-	 * @name Dialog#onContentLoad
+	 * @name OpenEyes.UI.Dialog#onContentLoad
 	 * @method
 	 * @private
 	 */
 	Dialog.prototype.onContentLoad = function() {
 		this.removeLoadingState();
 		this.setDimensions();
-		this.reposition();
 	};
 
 	/**
 	 * Content load success handler. Sets the dialog content to be the response of
 	 * the content request.
-	 * @name Dialog#onContentLoadSuccess
+	 * @name OpenEyes.UI.Dialog#onContentLoadSuccess
 	 * @method
 	 * @private
 	 */
@@ -419,7 +445,7 @@
 	/**
 	 * Content load fail handler. This method is executed if the content request
 	 * fails, and shows an error message.
-	 * @name Dialog#onContentLoadFail
+	 * @name OpenEyes.UI.Dialog#onContentLoadFail
 	 * @method
 	 * @private
 	 */
@@ -432,7 +458,7 @@
 	 * iFrame load handler. This method is always executed after the iFrame
 	 * source is loaded. This method removes the loading state of the
 	 * dialog, and repositions it in the center of the screen.
-	 * @name Dialog#onIframeLoad
+	 * @name OpenEyes.UI.Dialog#onIframeLoad
 	 * @method
 	 * @private
 	 */

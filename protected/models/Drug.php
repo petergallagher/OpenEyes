@@ -37,10 +37,8 @@
  * @property DrugFrequency $default_frequency
  * @property DrugDuration $default_duration
  */
-class Drug extends BaseActiveRecord
+class Drug extends BaseActiveRecordVersioned
 {
-	public $default_scope = true;
-
 	/**
 	 * Returns the static model of the specified AR class.
 	 * @return Drug the static model class
@@ -60,20 +58,7 @@ class Drug extends BaseActiveRecord
 
 	public function defaultScope()
 	{
-		return array(
-			'condition' => 'discontinued = 0',
-		);
-	}
-
-	public function discontinued()
-	{
-		$table_alias = $this->getTableAlias(false,false);
-
-		$this->getDbCriteria()->mergeWith(array(
-			'condition' => $table_alias.'.discontinued = 1',
-		),'OR');
-
-		return $this;
+		return array('order' => $this->getTableAlias(true, false) . '.name');
 	}
 
 	/**
@@ -86,7 +71,7 @@ class Drug extends BaseActiveRecord
 		return array(
 			array('name, tallman', 'required'),
 			array('name', 'unsafe', 'on' => 'update'),
-			array('tallman, dose_unit, default_dose, preservative_free, type_id, form_id, default_duration_id, default_frequency_id, default_route_id, aliases, discontinued', 'safe'),
+			array('tallman, dose_unit, default_dose, preservative_free, type_id, form_id, default_duration_id, default_frequency_id, default_route_id, aliases', 'safe'),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
 			array('id, name, tallman, dose_unit, default_dose, preservative_free, type_id, form_id, default_duration_id, default_frequency_id, default_route_id, aliases', 'safe', 'on'=>'search'),
@@ -121,6 +106,13 @@ class Drug extends BaseActiveRecord
 			'default_duration_id' => 'Default Duration',
 			'default_frequency_id' => 'Default Frequency',
 			'default_route_id' => 'Default Route',
+		);
+	}
+
+	public function behaviors()
+	{
+		return array(
+			'LookupTable' => 'LookupTable',
 		);
 	}
 

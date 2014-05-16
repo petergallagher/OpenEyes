@@ -35,11 +35,7 @@ vendor
 /bin/phpunit
 /bin/webunit
 /docs/public
-
-# Bower development dependencies
-/protected/assets/components/google-code-prettify
-/protected/assets/components/jquery
-/protected/assets/components/jquery-ui
+/protected/assets/img/fieldImages/*
 
 # Tests
 /bin/.enabled-modules

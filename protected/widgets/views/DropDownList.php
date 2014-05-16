@@ -20,28 +20,24 @@
 <?php if (@$htmlOptions['nowrapper']) {?>
 	<?php echo CHtml::activeDropDownList($element,$field,$data,$htmlOptions)?>
 <?php } else {?>
-	<div id="div_<?php echo get_class($element)?>_<?php echo $field?>" class="row field-row"<?php if (@$hidden) {?> style="display: none;"<?php }?>>
-
+	<div id="div_<?php echo CHtml::modelName($element)?>_<?php echo $field?>" class="row field-row"<?php if (@$hidden) {?> style="display: none;"<?php }?>>
 		<?php if (@$htmlOptions['layout'] == 'vertical') {?>
 			<div class="large-12 column end">
-				<label for="<?php echo get_class($element)?>_<?php echo $field?>">
+				<label for="<?php echo CHtml::modelName($element)?>_<?php echo $field?>">
 					<?php echo CHtml::encode($element->getAttributeLabel($field))?>
 				</label>
 		<?php } else {?>
 			<div class="large-<?php echo $layoutColumns['label'];?> column">
 				<?php if (!@$htmlOptions['nolabel']) {?>
-					<label for="<?php echo get_class($element)?>_<?php echo $field?>"><?php echo $element->getAttributeLabel($field)?>:</label>
+					<label for="<?php echo CHtml::modelName($element)?>_<?php echo $field?>"><?php echo $element->getAttributeLabel($field)?>:</label>
 				<?php }?>
 			</div>
 		<?php }?>
-
 		<?php if (@$htmlOptions['layout'] != 'vertical') {?>
 			<div class="large-<?php echo $layoutColumns['field'];?> column end">
 		<?php }?>
-
 			<?php if (@$htmlOptions['divided']) {?>
-
-				<select name="<?php echo get_class($element)?>[<?php echo $field?>]" id="<?php echo get_class($element)?>_<?php echo $field?>" <?php if (isset($htmlOptions['class'])) {?> <?php echo $htmlOptions['class']?><?php }?>"<?php if (isset($htmlOptions['data-linked-fields'])) {?> data-linked-fields="<?php echo $htmlOptions['data-linked-fields']?>"<?php }?><?php if (isset($htmlOptions['data-linked-values'])) {?> data-linked-values="<?php echo $htmlOptions['data-linked-values']?>"<?php }?>>
+				<select name="<?php echo CHtml::modelName($element)?>[<?php echo $field?>]" id="<?php echo CHtml::modelName($element)?>_<?php echo $field?>" <?php if (isset($htmlOptions['class'])) {?>class="<?php echo $htmlOptions['class']?>"<?php }?><?php if (isset($htmlOptions['data-linked-fields'])) {?> data-linked-fields="<?php echo $htmlOptions['data-linked-fields']?>"<?php }?><?php if (isset($htmlOptions['data-linked-values'])) {?> data-linked-values="<?php echo $htmlOptions['data-linked-values']?>"<?php }?>>
 					<?php if (isset($htmlOptions['empty'])) {?>
 						<option value=""><?php echo $htmlOptions['empty']?></option>
 					<?php }?>
@@ -63,7 +59,6 @@
 				}
 				echo CHtml::activeDropDownList($element,$field,$data,$htmlOptions)?>
 			<?php }?>
-
 		</div>
 	</div>
 <?php }?>

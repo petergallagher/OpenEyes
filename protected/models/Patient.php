@@ -51,7 +51,7 @@
  * @property EthnicGroup $ethnic_group
  * @property CommissioningBody[] $commissioningbodies
  */
-class Patient extends BaseActiveRecord
+class Patient extends BaseActiveRecordVersioned
 {
 	const CHILD_AGE_LIMIT = 16;
 
@@ -181,11 +181,18 @@ class Patient extends BaseActiveRecord
 	 * @param array $params
 	 * @return CActiveDataProvider the data provider that can return the models based on the search/filter conditions.
 	 */
-	public function search($params = null)
+	public function search($params = array())
 	{
 		if (!is_array($params)) {
 			$params = array();
 		}
+
+		$params += array(
+			'pageSize' => 20,
+			'currentPage' => 0,
+			'sortBy' => 'hos_num*1',
+			'sortDir' => 'asc',
+		);
 
 		!isset($params['items_per_page']) && $params['items_per_page'] = 20;
 		!isset($params['page']) && $params['page'] = 1;
@@ -195,6 +202,7 @@ class Patient extends BaseActiveRecord
 		$params['page']--;
 
 		$criteria=new CDbCriteria;
+		$criteria->compare('t.id', $this->id);
 		$criteria->join = "JOIN contact ON contact_id = contact.id";
 
 		$search_fields = CHtml::listData(PatientSearchField::model()->findAll(),'id','name');
@@ -366,6 +374,16 @@ class Patient extends BaseActiveRecord
 		}
 
 		return ($this->ageOn($check_date) < $age_limit);
+	}
+
+	/**
+	 * Returns the date on which the patient will become an adult
+	 *
+	 * @return null|string
+	 */
+	public function getBecomesAdultDate()
+	{
+		return Helper::getDateForAge($this->dob, (isset(Yii::app()->params['child_age_limit'])) ? Yii::app()->params['child_age_limit'] : self::CHILD_AGE_LIMIT);
 	}
 
 	/**
@@ -710,7 +728,7 @@ class Patient extends BaseActiveRecord
 					throw new Exception('Unable to add patient allergy assignment: '.print_r($paa->getErrors(),true));
 				}
 
-				$this->audit('patient','add-allergy',$paa->getAuditAttributes());
+				$this->audit('patient','add-allergy');
 				if ($this->no_allergies_date) {
 					$this->no_allergies_date = null;
 					if (!$this->save()) {
@@ -740,7 +758,7 @@ class Patient extends BaseActiveRecord
 				throw new Exception('Unable to delete patient allergy assignment: '.print_r($paa->getErrors(),true));
 			}
 
-			$this->audit('patient','remove-allergy',$paa->getAuditAttributes());
+			$this->audit('patient','remove-allergy');
 		}
 	}
 
@@ -797,7 +815,7 @@ class Patient extends BaseActiveRecord
 				if (!$paa->delete()) {
 					throw new Exception('Unable to delete patient allergy assignment: '.print_r($paa->getErrors(),true));
 				}
-				$this->audit('patient', 'remove-allergy', $paa->getAuditAttributes());
+				$this->audit('patient','remove-allergy');
 			}
 			$this->no_allergies_date = date('Y-m-d H:i:s');
 			if (!$this->save()) {
@@ -963,7 +981,7 @@ class Patient extends BaseActiveRecord
 				throw new Exception('Unable to save secondary diagnosis: '.print_r($sd->getErrors(),true));
 			}
 
-			$this->audit('patient',$action,$sd->getAuditAttributes());
+			$this->audit('patient',$action);
 		}
 	}
 
@@ -983,13 +1001,11 @@ class Patient extends BaseActiveRecord
 			$type = 'sys';
 		}
 
-		$audit_attributes = $sd->getAuditAttributes();
-
 		if (!$sd->delete()) {
 			throw new Exception('Unable to delete diagnosis: '.print_r($sd->getErrors(),true));
 		}
 
-		$this->audit('patient',"remove-$type-diagnosis",$audit_attributes);
+		$this->audit('patient',"remove-$type-diagnosis");
 	}
 
 	/**
@@ -1015,9 +1031,7 @@ class Patient extends BaseActiveRecord
 			return $oph_info->errors;
 		}
 
-		$audit_attributes = $oph_info->getAuditAttributes();
-
-		$this->audit('patient', $action, $audit_attributes);
+		$this->audit('patient', $action);
 
 		return true;
 	}

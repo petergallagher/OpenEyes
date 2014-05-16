@@ -170,7 +170,6 @@ class PatientTest extends CDbTestCase
 	 */
 	public function testGetAge()
 	{
-		$this->markTestSkipped('Too many errors in this class test, Skipping until someone can refactor it.');
 		Yii::app()->params['pseudonymise_patient_details'] = false;
 
 		$attributes = array(
@@ -196,7 +195,6 @@ class PatientTest extends CDbTestCase
 
 	public function testRandomData_ParamSetOff_ReturnsFalse()
 	{
-		$this->markTestSkipped('Too many errors in this class test, Skipping until someone can refactor it.');
 		Yii::app()->params['pseudonymise_patient_details'] = false;
 
 		$attributes = array(

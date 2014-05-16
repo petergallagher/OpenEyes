@@ -25,7 +25,7 @@
  * @property integer $name
  * @property DrugRouteOption[] $options
  */
-class DrugRoute extends BaseActiveRecord
+class DrugRoute extends BaseActiveRecordVersioned
 {
 	/**
 	 * Returns the static model of the specified AR class.
@@ -77,6 +77,13 @@ class DrugRoute extends BaseActiveRecord
 	public function attributeLabels()
 	{
 		return array(
+		);
+	}
+
+	public function behaviors()
+	{
+		return array(
+			'LookupTable' => 'LookupTable',
 		);
 	}
 

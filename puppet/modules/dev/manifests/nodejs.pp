@@ -14,4 +14,12 @@ class dev::nodejs {
 		environment => 'HOME=/home/vagrant',
 		require => Exec['nvm-install']
 	}
+
+	exec { 'npm-install-app-modules':
+		command => '/home/vagrant/.nvm/v0.10.25/bin/npm --registry http://registry.npmjs.eu/ install',
+		user => 'vagrant',
+		cwd => '/var/www',
+		environment => 'HOME=/home/vagrant',
+		require => Exec['node-install']
+	}
 }

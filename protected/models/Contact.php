@@ -31,7 +31,6 @@
  *
  * The following are the available model relations:
  * @property Gp $gp
- * @property Consultant $consultant
  * @property Address[] $addresses
  * @property Address $address Primary address
  * @property Address $homeAddress Home address
@@ -42,7 +41,7 @@
  * @property string $salutationName
  * @property string $fullName
  */
-class Contact extends BaseActiveRecord
+class Contact extends BaseActiveRecordVersioned
 {
 	public $is_patient = false;
 
@@ -102,7 +101,6 @@ class Contact extends BaseActiveRecord
 	public function relations()
 	{
 		return array(
-			'consultant' => array(self::HAS_ONE, 'Consultant', 'contact_id'),
 			'gp' => array(self::HAS_ONE, 'Gp', 'contact_id'),
 			'addresses' => array(self::HAS_MANY, 'Address', 'contact_id'),
 			// Prefer H records for primary address, but fall back to others
