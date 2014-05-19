@@ -702,6 +702,58 @@ class AdminController extends BaseAdminController
 		));
 	}
 
+	public function actionAddsite()
+	{
+		$site = new Site;
+		$address = new Address;
+
+		$errors = array();
+
+		if (!empty($_POST)) {
+			$site->attributes = $_POST['Site'];
+
+			if (!$site->validate()) {
+				$errors = $site->getErrors();
+			}
+
+			$address->attributes = $_POST['Address'];
+
+			if (!$address->validate()) {
+				$errors = array_merge($errors, $address->getErrors());
+			}
+
+			if (empty($errors)) {
+				$contact = new Contact;
+				if (!$contact->save()) {
+					throw new Exception("Unable to save contact: ".print_r($contact->getErrors(),true));
+				}
+
+				$site->contact_id = $contact->id;
+
+				if (!$site->save()) {
+					throw new Exception("Unable to save site: ".print_r($site->getErrors(),true));
+				}
+				$address->contact_id = $contact->id;
+
+				if (!$address->save()) {
+					throw new Exception("Unable to save site address: ".print_r($address->getErrors(),true));
+				}
+
+				Audit::add('admin-Site','edit',serialize(array_merge(array('id'=>@$_GET['site_id']),$_POST)));
+
+				$this->redirect('/admin/sites');
+			}
+		} else {
+			Audit::add('admin-Site','view',@$_GET['site_id']);
+		}
+
+		$this->render('/admin/editsite',array(
+			'site' => $site,
+			'address' => $address,
+			'errors' => $errors,
+		));
+	}
+
 	public function actionEditsite()
 	{
 		if (!$site = Site::model()->findByPk(@$_GET['site_id'])) {
