@@ -382,9 +382,11 @@ class BaseEventTypeElement extends BaseElement
 	 * Returns true if the specified multiselect relation has the value $value_string
 	 */
 	public function hasMultiSelectValue($relation, $value_string) {
-		foreach ($this->$relation as $item) {
-			if ($item->name == $value_string) {
-				return true;
+		if (is_array($this->$relation)) {
+			foreach ($this->$relation as $item) {
+				if ($item->name == $value_string) {
+					return true;
+				}
 			}
 		}
 

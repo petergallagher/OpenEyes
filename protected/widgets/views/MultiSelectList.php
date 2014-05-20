@@ -29,7 +29,7 @@ if (isset($htmlOptions['div_id'])) {
 } else {
 	// for legacy, this is the original definition of the div id that was created for the multiselect
 	// not recommended as it doesn't allow for sided uniqueness
-	$div_id = "div_" . CHtml::modelName($element) . "_" . $field;
+	$div_id = "div_" . CHtml::modelName($element) . '_' . $field;
 }
 
 if (isset($htmlOptions['div_class'])) {
@@ -52,6 +52,7 @@ $widgetOptionsJson = json_encode(array(
 ));
 ?>
 
+<input type="hidden" name="<?php echo CHtml::modelName($element)?>[<?php echo $field?>]" />
 <?php if (!@$htmlOptions['nowrapper']) {?>
 	<div id="<?php echo $div_id ?>" class="<?php echo $div_class ?> row field-row widget"<?php if ($hidden) {?> style="display: none;"<?php }?>>
 		<div class="large-<?php echo $layoutColumns['label'];?> column">
@@ -62,9 +63,9 @@ $widgetOptionsJson = json_encode(array(
 		<div class="large-<?php echo $layoutColumns['field'];?> column end">
 	<?php }?>
 		<div class="multi-select<?php if (!$inline) echo ' multi-select-list';?>" data-options='<?php echo $widgetOptionsJson;?>' data-show-none-placeholder="<?php echo $showNonePlaceholder ? 'yes' : 'no'?>">
-			<input type="hidden" name="<?php echo CHtml::modelName($element)?>[MultiSelectList_<?php echo $field?>]" class="multi-select-list-name" />
+			<input type="hidden" id="<?php echo CHtml::modelName($element)?>[<?php echo $field?>]" class="multi-select-list-name" />
 			<div class="multi-select-dropdown-container">
-				<select id="<?php echo $field?>" class="MultiSelectList<?php if ($showRemoveAllLink) {?> inline<?php }?><?php if (isset($htmlOptions['class'])) {?> <?php echo $htmlOptions['class']?><?php }?>" name=""<?php if (isset($htmlOptions['data-linked-fields'])) {?> data-linked-fields="<?php echo $htmlOptions['data-linked-fields']?>"<?php }?><?php if (isset($htmlOptions['data-linked-values'])) {?> data-linked-values="<?php echo $htmlOptions['data-linked-values']?>"<?php }?>>
+				<select id="<?php echo CHtml::modelName($element)?>[<?php echo $field?>]" class="MultiSelectList<?php if ($showRemoveAllLink) {?> inline<?php }?><?php if (isset($htmlOptions['class'])) {?> <?php echo $htmlOptions['class']?><?php }?>" name=""<?php if (isset($htmlOptions['data-linked-fields'])) {?> data-linked-fields="<?php echo $htmlOptions['data-linked-fields']?>"<?php }?><?php if (isset($htmlOptions['data-linked-values'])) {?> data-linked-values="<?php echo $htmlOptions['data-linked-values']?>"<?php }?>>
 					<option value=""><?php echo $htmlOptions['empty']?></option>
 					<?php foreach ($filtered_options as $value => $option) {
 						$attributes = array('value' => $value);
@@ -94,7 +95,7 @@ $widgetOptionsJson = json_encode(array(
 								<?php echo $options[$id] ?>
 							</span>
 							<a href="#" data-text="<?php echo $options[$id] ?>" class="MultiSelectRemove remove-one<?php if (isset($htmlOptions['class'])) {?> <?php echo $htmlOptions['class']?><?php }?>"<?php if (isset($htmlOptions['data-linked-fields'])) {?> data-linked-fields="<?php echo $htmlOptions['data-linked-fields']?>"<?php }?><?php if (isset($htmlOptions['data-linked-values'])) {?> data-linked-values="<?php echo $htmlOptions['data-linked-values']?>"<?php }?>>Remove</a>
-							<input type="hidden" name="<?php echo $field?>[]" value="<?php echo $id?>"
+							<input type="hidden" name="<?php echo CHtml::modelName($element)?>[<?php echo $field?>][]" value="<?php echo $id?>"
 							<?php if (isset($opts[$id])) {
 								foreach ($opts[$id] as $key => $val) {
 									echo " " . $key . "=\"" . $val . "\"";

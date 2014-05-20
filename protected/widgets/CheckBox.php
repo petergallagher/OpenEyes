@@ -35,5 +35,17 @@ class CheckBox extends BaseFieldWidget
 		} else {
 			$this->checked[$this->field] = (boolean) @$_POST[CHtml::modelName($this->element)][$this->field];
 		}
+
+		if (@$this->htmlOptions['data-linked-fields']) {
+			if (preg_match('/,/',$this->htmlOptions['data-linked-fields'])) {
+				$linked_fields = explode(',',@$this->htmlOptions['data-linked-fields']);
+			} else {
+				$linked_fields = array($this->htmlOptions['data-linked-fields']);
+			}
+			foreach ($linked_fields as $i => $linked_field) {
+				$linked_fields[$i] = CHtml::modelName($this->element).'['.$linked_field.']';
+			}
+			$this->htmlOptions['data-linked-fields'] = implode(',',$linked_fields);
+		}
 	}
 }

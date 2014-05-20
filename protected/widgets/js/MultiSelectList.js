@@ -40,7 +40,7 @@ $(document).ready(function() {
 			var container = select.closest('.multi-select');
 			var selections = container.find('.multi-select-selections');
 			var inputField = container.find('.multi-select-list-name');
-			var fieldName = inputField.attr('name').match(/\[MultiSelectList_(.*?)\]$/)[1];
+			var fieldName = inputField.attr('id');
 			var noSelectionsMsg = container.find('.no-selections-msg');
 			var removeAll = container.find('.remove-all');
 			var options = container.data('options');
@@ -150,13 +150,12 @@ $(document).ready(function() {
 
 		if ($(this).hasClass('linked-fields')) {
 			if (inArray($(this).data('text'),$(this).data('linked-values').split(','))) {
-				var element_name = container.children('input[type="hidden"]').attr('name').replace(/\[.*$/,'');
 				var fields = $(this).data('linked-fields').split(',');
 				var values = $(this).data('linked-values').split(',');
 
 				for (var i in fields) {
 					if (values.length == 1 || i == arrayIndex($(this).data('text'),values)) {
-						hide_linked_field(element_name,fields[i]);
+						hide_linked_field(fields[i]);
 					}
 				}
 			}
