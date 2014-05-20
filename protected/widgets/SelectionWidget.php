@@ -40,5 +40,17 @@ abstract class SelectionWidget extends BaseFieldWidget
 			}
 			$this->data = CHtml::listData($lookup->cache(60)->findAll(), $this->lookup_id_field, $this->lookup_name_field);
 		}
+
+		if (@$this->htmlOptions['data-linked-fields']) {
+			if (preg_match('/,/',$this->htmlOptions['data-linked-fields'])) {
+				$linked_fields = explode(',',@$this->htmlOptions['data-linked-fields']);
+			} else {
+				$linked_fields = array($this->htmlOptions['data-linked-fields']);
+			}
+			foreach ($linked_fields as $i => $linked_field) {
+				$linked_fields[$i] = CHtml::modelName($this->element).'['.$linked_field.']';
+			}
+			$this->htmlOptions['data-linked-fields'] = implode(',',$linked_fields);
+		}
 	}
 }

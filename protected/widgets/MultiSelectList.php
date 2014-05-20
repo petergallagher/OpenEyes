@@ -37,8 +37,8 @@ class MultiSelectList extends BaseFieldWidget
 		if (empty($_POST)) {
 			if ($this->element && $this->element->{$this->relation}) {
 				foreach ($this->element->{$this->relation} as $item) {
-					$this->selected_ids[] = $item->{$this->relation_id_field};
-					unset($this->filtered_options[$item->{$this->relation_id_field}]);
+					$this->selected_ids[] = $item->id;
+					unset($this->filtered_options[$item->id]);
 				}
 			} else if (!$this->element || !$this->element->id) {
 				if (is_array($this->default_options)) {
@@ -49,7 +49,6 @@ class MultiSelectList extends BaseFieldWidget
 				}
 			}
 		} else {
-
 			if (isset($_POST[$this->field])) {
 				foreach ($_POST[$this->field] as $id) {
 					$this->selected_ids[] = $id;
@@ -59,9 +58,11 @@ class MultiSelectList extends BaseFieldWidget
 			// when the field being used contains the appropriate square brackets for defining the associative array, the original (above)
 			// approach for retrieving the posted value does not work. The following (more standard) approach does
 			else if (isset($_POST[CHtml::modelName($this->element)][$this->relation])) {
-				foreach ($_POST[CHtml::modelName($this->element)][$this->relation] as $id) {
-					$this->selected_ids[] = $id;
-					unset($this->filtered_options[$id]);
+				if (is_array($_POST[CHtml::modelName($this->element)][$this->relation])) {
+					foreach ($_POST[CHtml::modelName($this->element)][$this->relation] as $id) {
+						$this->selected_ids[] = $id;
+						unset($this->filtered_options[$id]);
+					}
 				}
 			}
 		}
@@ -69,6 +70,18 @@ class MultiSelectList extends BaseFieldWidget
 		// if the widget has javascript, load it in
 		if (file_exists("protected/widgets/js/".get_class($this).".js")) {
 			$this->assetFolder = Yii::app()->getAssetManager()->publish('protected/widgets/js');
+		}
+
+		if (@$this->htmlOptions['data-linked-fields']) {
+			if (preg_match('/,/',$this->htmlOptions['data-linked-fields'])) {
+				$linked_fields = explode(',',@$this->htmlOptions['data-linked-fields']);
+			} else {
+				$linked_fields = array($this->htmlOptions['data-linked-fields']);
+			}
+			foreach ($linked_fields as $i => $linked_field) {
+				$linked_fields[$i] = CHtml::modelName($this->element).'['.$linked_field.']';
+			}
+			$this->htmlOptions['data-linked-fields'] = implode(',',$linked_fields);
 		}
 
 		//NOTE: don't call parent init as the field behaviour doesn't work for the relations attribute with models

@@ -233,7 +233,171 @@ $(document).ready(function(){
 	$('#checkall').click(function() {
 		$('input.'+$(this).attr('class')).attr('checked',$(this).is(':checked') ? 'checked' : false);
 	});
+
+	$('table.patient-list tr.clickable').click(function(e) {
+		e.preventDefault();
+		window.location.href = baseUrl+'/patient/view/'+$(this).data('id');
+	});
+
+	$('select.linked-fields').change(function() {
+		var fields = $(this).data('linked-fields').split(',');
+		var values = $(this).data('linked-values').split(',');
+
+		if (!$(this).hasClass('MultiSelectList')) {
+			for (var i in fields) {
+				hide_linked_field(fields[i]);
+			}
+		}
+
+		if (inArray($(this).children('option:selected').text(),values)) {
+			var vi = arrayIndex($(this).children('option:selected').text(),values);
+
+			for (var i in fields) {
+				if (values.length == 1 || i == vi) {
+					show_linked_field(fields[i],i==0);
+				}
+			}
+		}
+	});
+
+	$('input[type="radio"].linked-fields').click(function() {
+		var fields = $(this).data('linked-fields').split(',');
+		var values = $(this).data('linked-values').split(',');
+
+		if (inArray($(this).parent().text().trim(),values)) {
+			for (var i in fields) {
+				show_linked_field(fields[i],i==0);
+			}
+		} else {
+			for (var i in fields) {
+				hide_linked_field(fields[i]);
+			}
+		}
+	});
+
+	$('input[type="checkbox"].linked-fields').click(function() {
+		var fields = $(this).data('linked-fields').split(',');
+
+		if ($(this).is(':checked')) {
+			for (var i in fields) {
+				show_linked_field(fields[i],i==0);
+			}
+		} else {
+			for (var i in fields) {
+				hide_linked_field(fields[i]);
+			}
+		}
+	});
+
+	$('#yob').change(function(e) {
+		if ($(this).length >0) {
+			$('#dob').val('');
+		}
+
+		update_patient_age($('#dob').val(),$('#date_of_death').val(),$(this).val());
+	});
+
+	$('#dob').change(function(e) {
+		if ($(this).length >0) {
+			$('#yob').val('');
+		}
+
+		update_patient_age($(this).val(),$('#date_of_death').val(),$('#yob').val());
+	});
+
+	$('#date_of_death').change(function(e) {
+		update_patient_age($('#dob').val(),$(this).val(),$('#yob').val());
+	});
+
+	$('#age').change(function(e) {
+		if ($('#dob').val().length >0) {
+			$.ajax({
+				'type': 'GET',
+				'url': baseUrl+'/patient/getYearOfBirth?age='+$('#age').val()+'&dob='+$('#dob').val(),
+				'success': function(dob) {
+					$('#dob').val(dob);
+				}
+			});
+		} else {
+			$.ajax({
+				'type': 'GET',
+				'url': baseUrl+'/patient/getYearOfBirth?age='+$('#age').val(),
+				'success': function(yob) {
+					$('#yob').val(yob);
+				}
+			});
+		}
+	});
+
+	$('.metadata-hide-fields').change(function() {
+		var e = $(this).data('hide-fields-values').split(',');
+		var fields = $(this).data('hide-fields').split(',');
+
+		if (inArray($(this).children('option:selected').val(),e)) {
+			for (var i in fields) {
+				$('#'+fields[i]+'[type="text"]').val('N/A');
+				$('#'+fields[i]+'[type="text"]').attr('disabled','disabled');
+			}
+		} else {
+			for (var i in fields) {
+				$('#'+fields[i]+'[type="text"]').removeAttr('disabled');
+				if ($('#'+fields[i]+'[type="text"]').val() == 'N/A') {
+					$('#'+fields[i]+'[type="text"]').val('');
+				}
+			}
+		}
+	});
 });
+
+function update_patient_age(dob,dod,yob)
+{
+	if (dob == '' && dod == '' && yob == '') {
+		$('#age').val('');
+		return;
+	}
+
+	$.ajax({
+		'type': 'GET',
+		'url': baseUrl+'/patient/getAge?dob='+dob+'&yob='+yob+'&dod='+dod,
+		'success': function(age) {
+			if (age == 'Unknown') {
+				age = '';
+			}
+			$('#age').val(age);
+		}
+	});
+}
+
+function show_linked_field(field_name,focus)
+{
+	var field = field_name.replace(/\[/,'_').replace(/\]/,'');
+
+	$('#div_'+field).show();
+	$('fieldset#'+field).show();
+
+	if (focus) {
+		$('#'+field).focus();
+	}
+}
+
+function hide_linked_field(field_name)
+{
+	var field = field_name.replace(/\[/,'_').replace(/\]/,'');
+
+	$('#div_'+field).hide();
+	$('fieldset#'+field).hide();
+
+
+	$('input[name="'+field_name+'"][type="radio"]').removeAttr('checked');
+	$('input[name="'+field_name+'"][type="text"]').val('');
+	$('select[name="'+field_name+'"]').val('');
+
+	if ($('select[id="'+field_name+'"]').hasClass('MultiSelectList')) {
+		$('a.MultiSelectRemove[data-name="'+field_name+'[]"]').map(function() {
+			$(this).click();
+		});
+	}
+}
 
 function changeState(wb,sp) {
 	if (sp.hasClass('hide')) {

@@ -51,6 +51,7 @@ $widgetOptionsJson = json_encode(array(
 ));
 ?>
 
+<input type="hidden" name="<?php echo CHtml::modelName($element)?>[<?php echo $field?>]" />
 <?php if (!@$htmlOptions['nowrapper']) {?>
 	<div id="<?php echo $div_id ?>" class="<?php echo $div_class ?> row field-row widget"<?php if ($hidden) {?> style="display: none;"<?php }?>>
 		<div class="large-<?php echo $layoutColumns['label'];?> column">
@@ -60,10 +61,10 @@ $widgetOptionsJson = json_encode(array(
 		</div>
 		<div class="large-<?php echo $layoutColumns['field'];?> column end">
 	<?php }?>
-		<div class="multi-select<?php if (!$inline) echo ' multi-select-list';?>" data-options='<?php echo $widgetOptionsJson;?>'>
-			<input type="hidden" name="<?php echo CHtml::modelName($element)?>[MultiSelectList_<?php echo $field?>]" class="multi-select-list-name" />
+		<div class="multi-select<?php if (!$inline) echo ' multi-select-list';?>" data-options='<?php echo $widgetOptionsJson;?>' data-show-none-placeholder="<?php echo $showNonePlaceholder ? 'yes' : 'no'?>">
+			<input type="hidden" id="<?php echo CHtml::modelName($element)?>[<?php echo $field?>]" class="multi-select-list-name" />
 			<div class="multi-select-dropdown-container">
-				<select id="<?php echo $field?>" class="MultiSelectList<?php if ($showRemoveAllLink) {?> inline<?php }?>" name="">
+				<select id="<?php echo CHtml::modelName($element)?>[<?php echo $field?>]" class="MultiSelectList<?php if ($showRemoveAllLink) {?> inline<?php }?><?php if (isset($htmlOptions['class'])) {?> <?php echo $htmlOptions['class']?><?php }?>" name=""<?php if (isset($htmlOptions['data-linked-fields'])) {?> data-linked-fields="<?php echo $htmlOptions['data-linked-fields']?>"<?php }?><?php if (isset($htmlOptions['data-linked-values'])) {?> data-linked-values="<?php echo $htmlOptions['data-linked-values']?>"<?php }?>>
 					<option value=""><?php echo $htmlOptions['empty']?></option>
 					<?php foreach ($filtered_options as $value => $option) {
 						$attributes = array('value' => $value);
