@@ -61,7 +61,6 @@ class BaseEventTypeController extends BaseModuleController
 	const ACTION_TYPE_DELETE = 'Delete';
 	const ACTION_TYPE_REQUESTDELETE = 'RequestDelete';
 	const ACTION_TYPE_FORM = 'Form';	// AJAX actions that are used during create and update but don't actually modify data themselves
-	const ACTION_TYPE_REPORT = 'Report';
 
 	static private $base_action_types = array(
 		'create' => self::ACTION_TYPE_CREATE,
@@ -1046,28 +1045,20 @@ class BaseEventTypeController extends BaseModuleController
 			if (isset($data[$f_key])) {
 				$keys = array_keys($data[$f_key]);
 
-				if (is_array($data[$f_key][$keys[0]])) {
+				if (is_array($data[$f_key][$keys[0]]) && !count(array_filter(array_keys($data[$f_key]), 'is_string'))) {
 					// there is more than one element of this type
-					if (!$this->event->isNewRecord && !@$data[$f_key]['_element_id']) {
-						throw new Exception("missing _element_id for multiple elements for editing an event");
-					}
-
-					// iterate through each to define the multiple instances we require
-					for ($i=0; $i<count($data[$f_key][$keys[0]]); $i++) {
-						if ($el_id = $data[$f_key]['_element_id'][$i]) {
-							$element = $el_cls_name::model()->findByPk($el_id);
+					$pk_field = $el_cls_name::model()->tableSchema->primaryKey;
+					foreach ($data[$f_key] as $i => $attrs) {
+						if (!$this->event->isNewRecord && !isset($attrs[$pk_field])) {
+							throw new Exception("missing primary key field for multiple elements for editing an event");
+						}
+						if ($pk = @$attrs[$pk_field]) {
+							$element = $el_cls_name::model()->findByPk($pk);
 						}
 						else {
 							$element = $element_type->getInstance();
 						}
-
-						$el_attrs = array();
-						foreach ($keys as $key) {
-							if ($key != '_element_id') {
-								$el_attrs[$key] = $data[$f_key][$key][$i];
-							}
-						}
-						$element->attributes = Helper::convertNHS2MySQL($el_attrs);
+						$element->attributes = Helper::convertNHS2MySQL($attrs);
 						$this->setElementComplexAttributesFromData($element, $data, $i);
 						$element->event = $this->event;
 						$elements[] = $element;
@@ -1718,13 +1709,5 @@ class BaseEventTypeController extends BaseModuleController
 		$this->render('request_delete', array(
 			'errors' => $errors,
 		));
-	}
-
-	/**
-	 * Check access to report functions
-	 */
-	public function checkReportAccess()
-	{
-		return $this->checkAccess('admin');
 	}
 }
