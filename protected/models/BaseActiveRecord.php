@@ -285,15 +285,15 @@ class BaseActiveRecord extends CActiveRecord
 		$orig_by_id = array();
 		if ($orig_objs) {
 			foreach ($orig_objs as $orig) {
-				$orig_by_id[] = $orig->getPrimaryKey();
+				$orig_by_id[$orig->getPrimaryKey()] = $orig;
 			}
 		}
-
 		// array of ids that should be saved
 		if ($new_objs) {
 			foreach ($new_objs as $new) {
-				if (in_array($new->getPrimaryKey(), $orig_by_id)) {
-					unset($orig_by_id[$new->getPrimaryKey()]);
+				$pk = $new->getPrimaryKey();
+				if (@$orig_by_id[$pk]) {
+					unset($orig_by_id[$pk]);
 				}
 				else {
 					// insert statement
@@ -308,7 +308,7 @@ class BaseActiveRecord extends CActiveRecord
 			}
 		}
 
-		foreach ($orig_by_id as $remove_id) {
+		foreach (array_keys($orig_by_id) as $remove_id) {
 			// delete statement
 			$builder = $this->getCommandBuilder();
 			$criteria = new CDbCriteria();
@@ -328,7 +328,8 @@ class BaseActiveRecord extends CActiveRecord
 	protected function afterSave()
 	{
 		if ($this->_auto_update_relations) {
-			foreach ($this->getMetaData()->relations as $name => $rel) {
+			$record_relations = $this->getMetaData()->relations;
+			foreach ($record_relations as $name => $rel) {
 				$rel_cls = get_class($rel);
 				if (in_array($rel_cls, array(self::HAS_MANY, self::MANY_MANY))) {
 					$new_objs = $this->$name;
@@ -338,7 +339,7 @@ class BaseActiveRecord extends CActiveRecord
 					} else {
 						if ($thru_name = $rel->through) {
 							// This is a through relationship so need to update the assignment table
-							$thru = $this->getMetaData()->relations[$thru_name];
+							$thru = $record_relations[$thru_name];
 							if ($thru->className == $rel->className) {
 								// same behaviour when the thru relation is the same class
 								$this->afterSaveHasMany($name, $rel, $new_objs, $orig_objs);
@@ -426,9 +427,10 @@ class BaseActiveRecord extends CActiveRecord
 	{
 		if ($this->_auto_update_relations) {
 			$deleted_classes = array();
-			foreach ($this->relations() as $rel_name => $rel_def) {
-				if ($rel_def[0] == self::MANY_MANY) {
-					$rel = $this->getMetaData()->relations[$rel_name];
+			$record_relations = $this->getMetaData()->relations;
+			foreach ($record_relations as $rel_name => $rel) {
+				$rel_type = get_class($rel);
+				if ($rel_type == self::MANY_MANY) {
 					$tbl_name = $rel->getJunctionTableName();
 					$tbl_keys = $rel->getJunctionForeignKeys();
 					if (count($tbl_keys) == 2) {
@@ -442,13 +444,12 @@ class BaseActiveRecord extends CActiveRecord
 						}
 					}
 				}
-				elseif ($rel_def[0] == self::HAS_MANY) {
-					$rel = $this->getMetaData()->relations[$rel_name];
+				elseif ($rel_type == self::HAS_MANY) {
 					if (!$rel->through) {
 						// if the relationship is 'through', then the delete is handled by that relationship so we ignore it
 						$rel_cls = $rel->className;
 						if (!in_array($rel_cls, $deleted_classes)){
-							// only need to delete once for any given class as the we are ignoring the conditions added to the relation
+							// only need to delete once for any given class as we are ignoring the conditions added to the relation
 							// beyond the fk relation to this owning object (can't envision a relation based on a different fk relation
 							// to the same model)
 							$rel_cls::model()->deleteAllByAttributes(array($rel->foreignKey => $this->getPrimaryKey()));
