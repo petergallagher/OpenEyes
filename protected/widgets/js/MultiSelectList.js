@@ -40,7 +40,7 @@ $(document).ready(function() {
 			var container = select.closest('.multi-select');
 			var selections = container.find('.multi-select-selections');
 			var inputField = container.find('.multi-select-list-name');
-			var fieldName = inputField.attr('id');
+			var fieldName = inputField.attr('name');
 			var noSelectionsMsg = container.find('.no-selections-msg');
 			var removeAll = container.find('.remove-all');
 			var options = container.data('options');

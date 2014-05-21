@@ -42,6 +42,7 @@
 			<?php }?>
 			<?php echo CHtml::checkBox(CHtml::modelName($element)."[$field]",$checked[$field],$htmlOptions)?>
 			<?php if (@$htmlOptions['text-align'] == 'right') {?>
+				<label for="<?php echo CHtml::modelName($element)."_".$field;?>" class="inline">
 					<?php echo CHtml::encode($element->getAttributeLabel($field))?>
 				</label>
 			<?php }?>
