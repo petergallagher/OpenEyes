@@ -1048,7 +1048,7 @@ class BaseEventTypeController extends BaseModuleController
 
 				if (is_array($data[$f_key][$keys[0]])) {
 					// there is more than one element of this type
-					if (!$this->event->isNewRecord && !$data[$f_key]['_element_id']) {
+					if (!$this->event->isNewRecord && !@$data[$f_key]['_element_id']) {
 						throw new Exception("missing _element_id for multiple elements for editing an event");
 					}
 
