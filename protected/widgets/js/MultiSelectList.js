@@ -58,13 +58,21 @@ $(document).ready(function() {
 
 			var input = $(inp_str);
 
-			var remove = $('<a />', {
+			var remote_data = {
 				'href': '#',
 				'class': 'MultiSelectRemove remove-one '+selected.val(),
 				'text': 'Remove',
 				'data-name': fieldName+'[]',
 				'data-text': selected.text()
-			});
+			};
+
+			if ($(this).hasClass('linked-fields')) {
+				remote_data['class'] += ' linked-fields';
+				remote_data['data-linked-fields'] = $(this).data('linked-fields');
+				remote_data['data-linked-values'] = $(this).data('linked-values');
+			}
+
+			var remove = $('<a />', remote_data);
 
 			var item = $('<li><span class="text">'+selected.text()+'</span></li>');
 			item.append(remove);
