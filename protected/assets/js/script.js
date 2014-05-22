@@ -239,56 +239,6 @@ $(document).ready(function(){
 		window.location.href = baseUrl+'/patient/view/'+$(this).data('id');
 	});
 
-	$('select.linked-fields').change(function() {
-		var fields = $(this).data('linked-fields').split(',');
-		var values = $(this).data('linked-values').split(',');
-
-		if (!$(this).hasClass('MultiSelectList')) {
-			for (var i in fields) {
-				hide_linked_field(fields[i]);
-			}
-		}
-
-		if (inArray($(this).children('option:selected').text(),values)) {
-			var vi = arrayIndex($(this).children('option:selected').text(),values);
-
-			for (var i in fields) {
-				if (values.length == 1 || i == vi) {
-					show_linked_field(fields[i],i==0);
-				}
-			}
-		}
-	});
-
-	$('input[type="radio"].linked-fields').click(function() {
-		var fields = $(this).data('linked-fields').split(',');
-		var values = $(this).data('linked-values').split(',');
-
-		if (inArray($(this).parent().text().trim(),values)) {
-			for (var i in fields) {
-				show_linked_field(fields[i],i==0);
-			}
-		} else {
-			for (var i in fields) {
-				hide_linked_field(fields[i]);
-			}
-		}
-	});
-
-	$('input[type="checkbox"].linked-fields').click(function() {
-		var fields = $(this).data('linked-fields').split(',');
-
-		if ($(this).is(':checked')) {
-			for (var i in fields) {
-				show_linked_field(fields[i],i==0);
-			}
-		} else {
-			for (var i in fields) {
-				hide_linked_field(fields[i]);
-			}
-		}
-	});
-
 	$('#yob').change(function(e) {
 		if ($(this).length >0) {
 			$('#dob').val('');
@@ -366,37 +316,6 @@ function update_patient_age(dob,dod,yob)
 			$('#age').val(age);
 		}
 	});
-}
-
-function show_linked_field(field_name,focus)
-{
-	var field = field_name.replace(/\[/,'_').replace(/\]/,'');
-
-	$('#div_'+field).show();
-	$('fieldset#'+field).show();
-
-	if (focus) {
-		$('#'+field).focus();
-	}
-}
-
-function hide_linked_field(field_name)
-{
-	var field = field_name.replace(/\[/,'_').replace(/\]/,'');
-
-	$('#div_'+field).hide();
-	$('fieldset#'+field).hide();
-
-
-	$('input[name="'+field_name+'"][type="radio"]').removeAttr('checked');
-	$('input[name="'+field_name+'"][type="text"]').val('');
-	$('select[name="'+field_name+'"]').val('');
-
-	if ($('select[id="'+field_name+'"]').hasClass('MultiSelectList')) {
-		$('a.MultiSelectRemove[data-name="'+field_name+'[]"]').map(function() {
-			$(this).click();
-		});
-	}
 }
 
 function changeState(wb,sp) {
