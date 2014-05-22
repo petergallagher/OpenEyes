@@ -113,17 +113,12 @@ $(document).ready(function(){
 	});
 
 	$('select.linked-fields').change(function() {
-
 		var fields = $(this).data('linked-fields').split(',');
 		var values = $(this).data('linked-values').split(',');
 
-		if ($(this).hasClass('MultiSelectList')) {
-			var element_name = $(this).parent().prev('input').attr('name').replace(/\[.*$/,'');
-		} else {
-			var element_name = $(this).attr('name').replace(/\[.*$/,'');
-
+		if (!$(this).hasClass('MultiSelectList')) {
 			for (var i in fields) {
-				hide_linked_field(element_name,fields[i]);
+				hide_linked_field(fields[i]);
 			}
 		}
 
@@ -132,41 +127,37 @@ $(document).ready(function(){
 
 			for (var i in fields) {
 				if (values.length == 1 || i == vi) {
-					show_linked_field(element_name,fields[i],i==0);
+					show_linked_field(fields[i],i==0);
 				}
 			}
 		}
 	});
 
 	$('input[type="radio"].linked-fields').click(function() {
-		var element_name = $(this).attr('name').replace(/\[.*$/,'');
-
 		var fields = $(this).data('linked-fields').split(',');
 		var values = $(this).data('linked-values').split(',');
 
 		if (inArray($(this).parent().text().trim(),values)) {
 			for (var i in fields) {
-				show_linked_field(element_name,fields[i],i==0);
+				show_linked_field(fields[i],i==0);
 			}
 		} else {
 			for (var i in fields) {
-				hide_linked_field(element_name,fields[i]);
+				hide_linked_field(fields[i]);
 			}
 		}
 	});
 
 	$('input[type="checkbox"].linked-fields').click(function() {
-		var element_name = $(this).attr('name').replace(/\[.*$/,'');
-
 		var fields = $(this).data('linked-fields').split(',');
 
 		if ($(this).is(':checked')) {
 			for (var i in fields) {
-				show_linked_field(element_name,fields[i],i==0);
+				show_linked_field(fields[i],i==0);
 			}
 		} else {
 			for (var i in fields) {
-				hide_linked_field(element_name,fields[i]);
+				hide_linked_field(fields[i]);
 			}
 		}
 	});
@@ -283,25 +274,31 @@ WidgetSliderTable.prototype = {
 	}
 }
 
-function show_linked_field(element_name,field_name,focus)
+function show_linked_field(field_name,focus)
 {
-	$('fieldset#'+element_name+'_'+field_name).show();
-	$('#div_'+element_name+'_'+field_name).show();
+	var field = field_name.replace(/\[/,'_').replace(/\]/,'');
+
+	$('#div_'+field).show();
+	$('fieldset#'+field).show();
+
 	if (focus) {
-		$('#'+element_name+'_'+field_name).focus();
+		$('#'+field).focus();
 	}
 }
 
-function hide_linked_field(element_name,field_name)
+function hide_linked_field(field_name)
 {
-	$('fieldset#'+element_name+'_'+field_name).hide();
-	$('#div_'+element_name+'_'+field_name).hide();
+	var field = field_name.replace(/\[/,'_').replace(/\]/,'');
 
-	$('input[name="'+element_name+'['+field_name+']"][type="radio"]').removeAttr('checked');
-	$('input[name="'+element_name+'['+field_name+']"][type="text"]').val('');
-	$('select[name="'+element_name+'['+field_name+']"]').val('');
+	$('#div_'+field).hide();
+	$('fieldset#'+field).hide();
 
-	if ($('#'+field_name).hasClass('MultiSelectList')) {
+
+	$('input[name="'+field_name+'"][type="radio"]').removeAttr('checked');
+	$('input[name="'+field_name+'"][type="text"]').val('');
+	$('select[name="'+field_name+'"]').val('');
+
+	if ($('select[id="'+field_name+'"]').hasClass('MultiSelectList')) {
 		$('a.MultiSelectRemove[data-name="'+field_name+'[]"]').map(function() {
 			$(this).click();
 		});
