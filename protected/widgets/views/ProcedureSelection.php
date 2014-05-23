@@ -79,6 +79,7 @@
 	</div>
 	<div class="large-6 column">
 		<div class="panel procedures ProcedureSelectionProcedureList" data-element="<?php echo CHtml::modelName($element)?>" data-field="<?php echo $field?>" style="<?php if (empty($selected_procedures)) {?> display: none;<?php }?>">
+			<input type="hidden" name="<?php echo CHtml::modelName($element)?>[<?php echo $field?>]" />
 			<table class="plain">
 				<thead>
 				<tr>
