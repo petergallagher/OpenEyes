@@ -20,7 +20,7 @@
 ?>
 <tr class="item">
 	<td class="procedure">
-		<span class="field"><?php echo CHtml::hiddenField('Procedures_'.$identifier.'[]', $proc->id); ?></span>
+		<span class="field"><?php echo CHtml::hiddenField(CHtml::modelName($element).'['.$field.'][]', $proc->id); ?></span>
 		<span class="value"><?php echo $proc->term;?></span>
 	</td>
 	<?php if ($durations) {?>

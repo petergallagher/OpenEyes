@@ -134,7 +134,7 @@ class Procedure extends BaseActiveRecordVersioned
 	 *
 	 * @return array
 	 */
-	public static function getList($term, $restrict = null)
+	public static function getList($term, $restrict = null, $subsection = null, $restrict_common = false)
 	{
 		$search = "%{$term}%";
 
@@ -150,15 +150,40 @@ class Procedure extends BaseActiveRecordVersioned
 
 		$where .= " and proc.active = 1";
 
-		return Yii::app()->db->createCommand()
-			->select('term')
+		$procs = array();
+
+		foreach (Yii::app()->db->createCommand()
+			->select('id, term, default_duration')
 			->from('proc')
-			->where($where, array(
+			->where($where,array(
 				':term' => $term,
 				':search' => $search,
 			))
 			->order('term')
-			->queryColumn();
+			->queryAll() as $proc) {
+
+			$proc['is_common'] = Procedure::procIsCommon($proc,$subsection,$restrict_common);
+
+			$procs[] = $proc;
+		}
+
+		return $procs;
+	}
+
+	public static function procIsCommon($proc, $subsection_id, $restrict_common)
+	{
+		$firm = Firm::model()->findByPk(Yii::app()->session['selected_firm_id']);
+		if (!$subspecialty_id = $firm->serviceSubspecialtyAssignment ? $firm->serviceSubspecialtyAssignment->subspecialty_id : null) {
+			return false;
+		}
+
+		if ($subsection_id) {
+			return (boolean)ProcedureSubspecialtySubsectionAssignment::model()->find('proc_id=? and subspecialty_subsection_id=?',array($proc['id'],$subsection_id));
+		}
+
+		$procs = Procedure::model()->getListBySubspecialty($subspecialty_id, $restrict_common);
+
+		return isset($procs[$proc['id']]);
 	}
 
 	public function getListBySubspecialty($subspecialtyId, $restrict = false)

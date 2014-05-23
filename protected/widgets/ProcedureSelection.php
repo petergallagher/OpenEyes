@@ -21,7 +21,7 @@ class ProcedureSelection extends BaseFieldWidget
 {
 	public $subsections;
 	public $procedures;
-	public $removed_stack;
+	public $procedures_options;
 	public $newRecord;
 	public $selected_procedures;
 	public $form;
@@ -29,8 +29,6 @@ class ProcedureSelection extends BaseFieldWidget
 	public $class;
 	public $total_duration = 0;
 	public $last;
-	public $identifier = 'procs';
-	public $relation = 'procedures';
 	public $label = 'Procedures';
 	public $headertext;
 	public $read_only = false;
@@ -38,26 +36,41 @@ class ProcedureSelection extends BaseFieldWidget
 	public $restrict_common = false;
 	public $callback = false;
 	public $layout = false;
+	public $calculated_total_duration = 0;
 
 	public function run()
 	{
 		if (empty($_POST)) {
 			if (!$this->selected_procedures && $this->element) {
-				$this->selected_procedures = $this->element->{$this->relation};
-				if ($this->durations) {
-					$this->total_duration = $this->element->total_duration;
+				$this->selected_procedures = array();
+				
+				foreach ($this->element->{$this->field} as $proc) {
+					$this->selected_procedures[] = array(
+						'id' => $proc->id,
+						'term' => $proc->term,
+						'default_duration' => $proc->default_duration,
+						'is_common' => false,
+					);
 				}
 			}
 		} else {
 			$this->selected_procedures = array();
-			if (isset($_POST['Procedures_'.$this->identifier]) && is_array($_POST['Procedures_'.$this->identifier])) {
-				foreach ($_POST['Procedures_'.$this->identifier] as $proc_id) {
+			if (isset($_POST[CHtml::modelName($this->element)][$this->field]) && is_array($_POST[CHtml::modelName($this->element)][$this->field])) {
+				foreach ($_POST[CHtml::modelName($this->element)][$this->field] as $proc_id) {
 					$proc = Procedure::model()->findByPk($proc_id);
-					$this->selected_procedures[] = $proc;
-					if ($this->durations) {
-						$this->total_duration += $proc->default_duration;
-					}
+					$this->selected_procedures[] = array(
+						'id' => $proc->id,
+						'term' => $proc->term,
+						'default_duration' => $proc->default_duration,
+						'is_common' => false,
+					);
 				}
+			}
+		}
+
+		if ($this->durations) {
+			foreach ($this->selected_procedures as $proc) {
+				$this->calculated_total_duration += $proc['default_duration'];
 			}
 		}
 
@@ -69,36 +82,29 @@ class ProcedureSelection extends BaseFieldWidget
 			$this->subsections = SubspecialtySubsection::model()->getList($subspecialty_id);
 		}
 		$this->procedures = array();
-		$this->removed_stack = array();
+		$this->procedures_options = array();
 		if (empty($this->subsections)) {
 			foreach (Procedure::model()->getListBySubspecialty($subspecialty_id, $this->restrict_common) as $proc_id => $name) {
-				if (empty($_POST)) {
-					$found = false;
-					if ($this->selected_procedures) {
-						foreach ($this->selected_procedures as $procedure) {
-							if ($procedure->id == $proc_id) {
-								$found = true; break;
-							}
+				$found = false;
+				if ($this->selected_procedures) {
+					foreach ($this->selected_procedures as $procedure) {
+						if ($procedure->id == $proc_id) {
+							$found = true; break;
 						}
 					}
-					if (!$found) {
-						$this->procedures[$proc_id] = $name;
-					} else {
-						$this->removed_stack[] = "{id: $proc_id, name: '$name'}";
-					}
-				} else {
-					if (!@$_POST['Procedures_'.$this->identifier] || !in_array($proc_id,$_POST['Procedures_'.$this->identifier])) {
-						$this->procedures[$proc_id] = $name;
-					} else {
-						$this->removed_stack[] = "{id: $proc_id, name: '$name'}";
-					}
 				}
-			}
-		} else {
-			// Doesn't matter if removed_stack contains non-common procedures as lists are reloaded using ajax on removal
-			if (!empty($this->selected_procedures)) {
-				foreach ($this->selected_procedures as $selected_procedure) {
-					$this->removed_stack[] = "{id: $selected_procedure->id, name: '$selected_procedure->term'}";
+				if (!$found) {
+					$_proc = Procedure::model()->findByPk($proc_id);
+					$this->procedures[$proc_id] = $name;
+					$this->procedures_options[$proc_id] = array(
+						'data-default-duration' => $_proc->default_duration,
+					);
+				} else {
+					foreach ($this->selected_procedures as $i => $procedure) {
+						if ($procedure['id'] == $proc_id) {
+							$this->selected_procedures[$i]['is_common'] = true;
+						}
+					}
 				}
 			}
 		}
