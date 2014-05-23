@@ -17,11 +17,7 @@
  * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
  */
 
-echo CHtml::tag('option',
-	array('value'=>''),
-	CHtml::encode('Select a commonly used procedure'), true);
+echo CHtml::tag('option', array('value'=>''), CHtml::encode('Select a commonly used procedure'), true);
 foreach ($procedures as $procedure) {
-	echo CHtml::tag('option',
-		array('value'=>$procedure->id),
-		CHtml::encode($procedure->term), true);
-}
+	echo CHtml::tag('option', array('value'=>$procedure->id, 'data-default-duration' => $procedure->default_duration), CHtml::encode($procedure->term), true);
+	}

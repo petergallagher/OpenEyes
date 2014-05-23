@@ -25,6 +25,8 @@ class DropDownListRow extends BaseFieldWidget
 
 	public function init()
 	{
+		parent::init();
+
 		foreach ($this->fields as $i => $field) {
 			if (empty($_POST)) {
 				if (isset($this->element->$field)) {

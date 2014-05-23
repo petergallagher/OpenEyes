@@ -20,9 +20,13 @@
 class BaseFieldWidget extends BaseCWidget
 {
 	public $name;
+	public $layoutColumns = array();
 
-	public $layoutColumns = array(
-		'label' => 2,
-		'field' => 10
-	);
+	public function init()
+	{
+		!isset($this->layoutColumns['label']) && $this->layoutColumns['label'] = 2;
+		!isset($this->layoutColumns['field']) && $this->layoutColumns['field'] = 10;
+
+		return parent::init();
+	}
 }

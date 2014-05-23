@@ -43,28 +43,14 @@ class ProcedureController extends BaseController
 	 */
 	public function actionAutocomplete()
 	{
-		echo CJavaScript::jsonEncode(Procedure::getList($_GET['term'], @$_GET['restrict']));
-	}
-
-	public function actionDetails()
-	{
-		if (!empty($_GET['name']) && ($proc = Procedure::model()->findByAttributes(array('term' => $_GET['name'])))) {
-			$this->renderPartial(
-				'_ajaxProcedure',
-				array(
-					'proc' => $proc,
-					'durations' => @$_GET['durations'],
-					'identifier' => @$_GET['identifier']
-				)
-			);
-		}
+		echo CJavaScript::jsonEncode(Procedure::getList($_GET['term'], @$_GET['restrict'], @$_GET['subsection'], @$_GET['restrict_common']));
 	}
 
 	public function actionList()
 	{
 		if (!empty($_POST['subsection'])) {
 			$criteria = new CDbCriteria;
-			$criteria->select = 't.id, term, short_format';
+			$criteria->select = 't.id, term, short_format, default_duration';
 			$criteria->join = 'LEFT JOIN proc_subspecialty_subsection_assignment pssa ON t.id = pssa.proc_id';
 			$criteria->compare('pssa.subspecialty_subsection_id', $_POST['subsection']);
 			$criteria->order = 'term asc';

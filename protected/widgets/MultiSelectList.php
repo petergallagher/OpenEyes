@@ -34,6 +34,9 @@ class MultiSelectList extends BaseFieldWidget
 
 	public function init()
 	{
+		!isset($this->layoutColumns['label']) && $this->layoutColumns['label'] = 2;
+		!isset($this->layoutColumns['field']) && $this->layoutColumns['field'] = 10;
+
 		$this->filtered_options = $this->options;
 
 		if (empty($_POST)) {
