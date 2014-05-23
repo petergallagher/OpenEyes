@@ -118,7 +118,7 @@ ProcedureSelection.prototype = {
 			this.procedureList.find('.durations').show();
 		}
 
-		if (this.callback && typeof(window.callbackAddProcedure) == 'function') {
+		if (typeof(window.callbackAddProcedure) == 'function') {
 			callbackAddProcedure(proc.id);
 		}
 	},

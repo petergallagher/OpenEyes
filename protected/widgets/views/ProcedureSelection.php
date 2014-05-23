@@ -140,7 +140,6 @@
 		element: '<?php echo CHtml::modelName($element)?>',
 		field: '<?php echo $field?>',
 		durations: <?php echo CJavaScript::encode($durations)?>,
-		selected_procedures: <?php echo CJavaScript::encode($selected_procedures)?>,
-		callback: <?php echo CJavaScript::encode($callback)?>
+		selected_procedures: <?php echo CJavaScript::encode($selected_procedures)?>
 	});
 </script>
