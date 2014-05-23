@@ -18,13 +18,13 @@
  */
 ?>
 <div class="row field-row procedure-selection eventDetail<?php if ($last) {?> eventDetailLast<?php }?>"<?php if ($hidden) {?> style="display: none;"<?php }?>>
-	<div class="large-2 column">
+	<div class="large-<?php echo $layoutColumns['label']?> column">
 		<label>
 			<?php echo $label?>:
 		</label>
 	</div>
 	<?php if (!$read_only) {?>
-		<div class="large-4 column">
+		<div class="large-<?php echo $layoutColumns['field']?> column">
 			<fieldset>
 				<legend><em>Add a procedure:</em></legend>
 				<?php if ($headertext) {?>
@@ -79,7 +79,7 @@
 			</fieldset>
 		</div>
 	<?php }?>
-	<div class="large-6 column end">
+	<div class="large-<?php echo $layoutColumns['procedures']?> column end">
 		<div class="panel procedures ProcedureSelectionProcedureList" data-element="<?php echo CHtml::modelName($element)?>" data-field="<?php echo $field?>" style="<?php if (empty($selected_procedures)) {?> display: none;<?php }?>">
 			<input type="hidden" name="<?php echo CHtml::modelName($element)?>[<?php echo $field?>]" />
 			<table class="plain">

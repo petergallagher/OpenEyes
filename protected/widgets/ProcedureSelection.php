@@ -37,6 +37,18 @@ class ProcedureSelection extends BaseFieldWidget
 	public $callback = false;
 	public $layout = false;
 	public $calculated_total_duration = 0;
+	public $layoutColumns = array(
+		'label' => 2,
+		'field' => 4,
+		'procedures' => 6,
+	);
+
+	public function init()
+	{
+		parent::init();
+
+		!isset($this->layoutColumns['procedures']) && $this->layoutColumns['procedures'] = 6;
+	}
 
 	public function run()
 	{
