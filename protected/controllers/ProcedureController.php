@@ -46,21 +46,6 @@ class ProcedureController extends BaseController
 		echo CJavaScript::jsonEncode(Procedure::getList($_GET['term'], @$_GET['restrict'], @$_GET['subsection'], @$_GET['restrict_common']));
 	}
 
-	public function actionDetails()
-	{
-		if (!empty($_GET['id']) && ($proc = Procedure::model()->findByPk($_GET['id']))) {
-			$this->renderPartial(
-				'_ajaxProcedure',
-				array(
-					'element' => $_GET['element'],
-					'field' => $_GET['field'],
-					'proc' => $proc,
-					'durations' => @$_GET['durations'],
-				)
-			);
-		}
-	}
-
 	public function actionList()
 	{
 		if (!empty($_POST['subsection'])) {
