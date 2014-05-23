@@ -17,7 +17,7 @@
  * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
  */
 ?>
-<div class="row field-row procedure-selection eventDetail<?php if ($last) {?> eventDetailLast<?php }?>" data-durations="<?php echo $durations ? "1" : "0"?>"<?php if ($hidden) {?> style="display: none;"<?php }?>>
+<div class="row field-row procedure-selection eventDetail<?php if ($last) {?> eventDetailLast<?php }?>"<?php if ($hidden) {?> style="display: none;"<?php }?>>
 	<div class="large-2 column">
 		<label>
 			<?php echo $label?>:
