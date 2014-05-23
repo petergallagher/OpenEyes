@@ -215,6 +215,7 @@ $(document).ready(function() {
 		}
 	});
 	$('div.procedure-selection .removeProcedure').die('click').live('click',function(e) {
+		e.preventDefault();
 		window['ProcedureSelection_'+$(this).attr('data-element')+'_'+$(this).attr('data-field')].removeProcedure($(this).data('proc-id'));
 	});
 });

@@ -23,61 +23,63 @@
 			<?php echo $label?>:
 		</label>
 	</div>
-	<div class="large-4 column">
-		<fieldset>
-			<legend><em>Add a procedure:</em></legend>
-			<?php if ($headertext) {?>
-				<p><em><?php echo $headertext?></em></p>
-			<?php }?>
-			<?php
-			if (!empty($subsections) || !empty($procedures)) {
-				if (!empty($subsections)) {?>
-					<div class="field-row">
-						<?php echo CHtml::dropDownList(CHtml::modelName($element).'_'.$field.'_subsection_id', '', $subsections, array('class' => 'subSectionSelect', 'empty' => 'Select a subsection', 'data-element' => CHtml::modelName($element), 'data-field' => $field));?>
-					</div>
-					<div class="field-row hide">
-						<?php echo CHtml::dropDownList(CHtml::modelName($element).'_'.$field.'_select_procedure_id', '', array(), array('class' => 'procedureSelect', 'empty' => 'Select a commonly used procedure', 'data-element' => CHtml::modelName($element), 'data-field' => $field));?>
-					</div>
-				<?php } else { ?>
-					<div class="field-row">
-						<?php echo CHtml::dropDownList(CHtml::modelName($element).'_'.$field.'_select_procedure_id', '', $procedures, array('class' => 'procedureSelect', 'empty' => 'Select a commonly used procedure', 'data-element' => CHtml::modelName($element), 'data-field' => $field, 'options' => $procedures_options));?>
-					</div>
-				<?php }
-			}
-			?>
-			<div class="field-row">
+	<?php if (!$read_only) {?>
+		<div class="large-4 column">
+			<fieldset>
+				<legend><em>Add a procedure:</em></legend>
+				<?php if ($headertext) {?>
+					<p><em><?php echo $headertext?></em></p>
+				<?php }?>
 				<?php
-				$this->widget('zii.widgets.jui.CJuiAutoComplete', array(
-						'name'=>'autocomplete_'.CHtml::modelName($element).'_'.$field,
-						'id'=>'autocomplete_'.CHtml::modelName($element).'_'.$field,
-						'source'=>"js:function(request, response) {
-							$.ajax({
-								'url': '" . Yii::app()->createUrl('procedure/autocomplete') . "',
-								'type':'GET',
-								'data':{
-									term: request.term,
-									restrict: '$restrict',
-									restrict_common: ".CJavaScript::encode($restrict_common).",
-									subsection: $('select.subSectionSelect[data-element=\"".CHtml::modelName($element)."\"][data-field=\"$field\"]').val()
-								},
-								'success':function(data) {
-									response(ProcedureSelection_".CHtml::modelName($element)."_{$field}.filterSearchResults($.parseJSON(data)));
-								}
-							});
-						}",
-						'options'=>array(
-							'minLength'=>'2',
-							'select'=>"js:function(event, ui) {
-								ProcedureSelection_".CHtml::modelName($element)."_{$field}.selectProcedure(ProcedureSelection_".CHtml::modelName($element)."_{$field}.findProcFromCache(ui.item.value));
-								return false;
+				if (!empty($subsections) || !empty($procedures)) {
+					if (!empty($subsections)) {?>
+						<div class="field-row">
+							<?php echo CHtml::dropDownList(CHtml::modelName($element).'_'.$field.'_subsection_id', '', $subsections, array('class' => 'subSectionSelect', 'empty' => 'Select a subsection', 'data-element' => CHtml::modelName($element), 'data-field' => $field));?>
+						</div>
+						<div class="field-row hide">
+							<?php echo CHtml::dropDownList(CHtml::modelName($element).'_'.$field.'_select_procedure_id', '', array(), array('class' => 'procedureSelect', 'empty' => 'Select a commonly used procedure', 'data-element' => CHtml::modelName($element), 'data-field' => $field));?>
+						</div>
+					<?php } else { ?>
+						<div class="field-row">
+							<?php echo CHtml::dropDownList(CHtml::modelName($element).'_'.$field.'_select_procedure_id', '', $procedures, array('class' => 'procedureSelect', 'empty' => 'Select a commonly used procedure', 'data-element' => CHtml::modelName($element), 'data-field' => $field, 'options' => $procedures_options));?>
+						</div>
+					<?php }
+				}
+				?>
+				<div class="field-row">
+					<?php
+					$this->widget('zii.widgets.jui.CJuiAutoComplete', array(
+							'name'=>'autocomplete_'.CHtml::modelName($element).'_'.$field,
+							'id'=>'autocomplete_'.CHtml::modelName($element).'_'.$field,
+							'source'=>"js:function(request, response) {
+								$.ajax({
+									'url': '" . Yii::app()->createUrl('procedure/autocomplete') . "',
+									'type':'GET',
+									'data':{
+										term: request.term,
+										restrict: '$restrict',
+										restrict_common: ".CJavaScript::encode($restrict_common).",
+										subsection: $('select.subSectionSelect[data-element=\"".CHtml::modelName($element)."\"][data-field=\"$field\"]').val()
+									},
+									'success':function(data) {
+										response(ProcedureSelection_".CHtml::modelName($element)."_{$field}.filterSearchResults($.parseJSON(data)));
+									}
+								});
 							}",
-						),
-						'htmlOptions'=>array('placeholder'=>'or enter procedure here')
-					)); ?>
-			</div>
-		</fieldset>
-	</div>
-	<div class="large-6 column">
+							'options'=>array(
+								'minLength'=>'2',
+								'select'=>"js:function(event, ui) {
+									ProcedureSelection_".CHtml::modelName($element)."_{$field}.selectProcedure(ProcedureSelection_".CHtml::modelName($element)."_{$field}.findProcFromCache(ui.item.value));
+									return false;
+								}",
+							),
+							'htmlOptions'=>array('placeholder'=>'or enter procedure here')
+						)); ?>
+				</div>
+			</fieldset>
+		</div>
+	<?php }?>
+	<div class="large-6 column end">
 		<div class="panel procedures ProcedureSelectionProcedureList" data-element="<?php echo CHtml::modelName($element)?>" data-field="<?php echo $field?>" style="<?php if (empty($selected_procedures)) {?> display: none;<?php }?>">
 			<input type="hidden" name="<?php echo CHtml::modelName($element)?>[<?php echo $field?>]" />
 			<table class="plain">
@@ -87,7 +89,9 @@
 					<?php if ($durations) {?>
 						<th>Duration</th>
 					<?php }?>
-					<th>Actions</th>
+					<?php if (!$read_only) {?>
+						<th>Actions</th>
+					<?php }?>
 				</tr>
 				</thead>
 				<tbody class="body">
@@ -103,10 +107,12 @@
 								<td class="duration">
 									<?php echo $procedure['default_duration']?> mins
 								</td>
-							<?php } ?>
-							<td>
-								<a href="#" class="removeProcedure" data-element="<?php echo CHtml::modelName($element)?>" data-field="<?php echo $field?>" data-proc-id="<?php echo $procedure['id']?>">Remove</a>
-							</td>
+							<?php }?>
+							<?php if (!$read_only) {?>
+								<td>
+									<a href="#" class="removeProcedure" data-element="<?php echo CHtml::modelName($element)?>" data-field="<?php echo $field?>" data-proc-id="<?php echo $procedure['id']?>">Remove</a>
+								</td>
+							<?php }?>
 						</tr>
 					<?php	}
 				}?>

@@ -111,11 +111,7 @@ class ProcedureSelection extends BaseFieldWidget
 
 		$this->class = get_class($this->element);
 
-		if ($this->read_only) {
-			$this->render(get_class($this)."_readonly");
-		} else {
-			$this->render(get_class($this));
-		}
+		$this->render(get_class($this));
 	}
 
 	public function render($view, $data=null, $return=false)
