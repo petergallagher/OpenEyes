@@ -115,6 +115,11 @@ class SiteController extends BaseController
 			}
 		}
 
+		if (preg_match('/^"(.*?)".*?"(.*?)"$/',$query,$matches)) {
+			$this->redirect(array('patient/search', 'first_name' => $matches[1], 'last_name' => $matches[2]));
+			return;
+		}
+
 		Audit::add('search','search-error');
 
 		if (isset($query)) {
