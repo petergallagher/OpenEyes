@@ -202,6 +202,10 @@ class SiteController extends BaseController
 
 		$institution = Institution::model()->getCurrent();
 
+		if (!$institution) {
+			$institution = Institution::model()->find();
+		}
+
 		$criteria = new CDbCriteria;
 		$criteria->compare('institution_id',$institution->id);
 		$criteria->order = 'short_name asc';
