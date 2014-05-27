@@ -33,6 +33,7 @@
 	))?>
 		<?php echo $form->dropDownList($site,'institution_id','Institution',array('style'=>'margin-bottom:6px;'))?>
 		<?php echo $form->textField($site,'name',array('size'=>'50'))?>
+		<?php echo $form->textField($site,'short_name',array('size'=>'50'))?>
 		<?php echo $form->textField($site,'remote_id',null,null,array('field' => 2))?>
 		<?php echo $form->textField($address,'address1')?>
 		<?php echo $form->textField($address,'address2')?>
