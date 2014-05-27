@@ -702,7 +702,7 @@ class AdminController extends BaseAdminController
 		));
 	}
 
-	public function actionAddsite()
+	public function actionAddSite()
 	{
 		$site = new Site;
 		$address = new Address;

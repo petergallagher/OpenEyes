@@ -108,6 +108,7 @@ class Site extends BaseActiveRecord
 			'id' => 'ID',
 			'remote_id' => 'Code',
 			'name' => 'Name',
+			'short_name' => 'Short name',
 			'institution_id' => 'Institution',
 		);
 	}
