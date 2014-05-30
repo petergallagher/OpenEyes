@@ -441,7 +441,9 @@ class User extends BaseActiveRecord
 		}
 
 		if (!$institution = Institution::model()->find('remote_id=?',array(Yii::app()->params['institution_code']))) {
-			throw new Exception("Institution not found: ".Yii::app()->params['institution_code']);
+			if (!$institution = Institution::model()->find()) {
+				throw new Exception("No institution found");
+			}
 		}
 
 		$site_ids = array();
