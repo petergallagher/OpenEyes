@@ -1963,20 +1963,24 @@ class PatientController extends BaseController
 
 	public function actionDelete($id)
 	{
+
 		Yii::app()->assetManager->registerScriptFile('js/patientSummary.js');
 
 		$this->patient = $this->loadModel($id);
 
-		if (@$_POST['delete']) {
-			if (!$this->patient->softDelete()) {
-				throw new Exception("Unable to soft-delete patient: ".print_r($this->patient->getErrors(),true));
+		//FIXME:: pushed back to orbis-r2
+		/*
+			if (@$_POST['delete']) {
+				if (!$this->patient->softDelete()) {
+					throw new Exception("Unable to soft-delete patient: ".print_r($this->patient->getErrors(),true));
+				}
+
+				$this->patient->audit('patient','delete');
+
+				echo "1";
+				return;
 			}
-
-			$this->patient->audit('patient','delete');
-
-			echo "1";
-			return;
-		}
+			*/
 
 		$tabId = !empty($_GET['tabId']) ? $_GET['tabId'] : 0;
 		$eventId = !empty($_GET['eventId']) ? $_GET['eventId'] : 0;

@@ -23,13 +23,18 @@ $warnings = $this->patient->getWarnings($clinical);
 
 <div class="container content">
 	<h1 class="badge">Patient summary</h1>
-	<?php if (Yii::app()->user->checkAccess('admin')) {?>
+	<?php
+	//FIXME:: pushed back to orbis-r2
+	/*
+	if (Yii::app()->user->checkAccess('admin')) {?>
 		<div class="admin-actions">
 			<button id="btn-delete-patient" class="secondary small warning">
 				Delete patient
 			</button>
 		</div>
 	<?php }?>
+	*/
+	?>
 	<div class="messages patient">
 		<?php $this->renderPartial('//base/_messages'); ?>
 
