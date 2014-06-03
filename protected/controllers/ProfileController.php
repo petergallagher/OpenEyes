@@ -152,10 +152,18 @@ class ProfileController extends BaseController
 	public function actionAddSite()
 	{
 		if (@$_POST['site_id'] == 'all') {
-			if (!$institution = Institution::model()->find('remote_id=?',array(Yii::app()->params['institution_code']))) {
-				throw new Exception("Can't find institution: ".Yii::app()->params['institution_code']);
+			if (!$institution_from_config = Institution::model()->find('remote_id=?',array(Yii::app()->params['institution_code']))) {
+				if($institutions_from_database = Institution::model()->findAll()) {
+					if(count($institutions_from_database)==1){
+						$sites = Site::model()->findAll();
+					}
+					else {
+						throw new Exception("Can't find institution set in config: ".Yii::app()->params['institution_code']);
+					}
+				}
+			} else {
+				$sites = Site::model()->findAll('institution_id=?',array($institution_from_config->id));
 			}
-			$sites = Site::model()->findAll('institution_id=?',array($institution->id));
 		} else {
 			$sites = Site::model()->findAllByPk(@$_POST['site_id']);
 		}

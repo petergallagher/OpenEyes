@@ -209,7 +209,7 @@ return array(
 		'urgent_booking_notify_email' => array(),
 		'urgent_booking_notify_email_from' => 'OpenEyes <helpdesk@example.com>',
 		'default_site_code' => '',
-		'institution_code' => 'RP6',
+		'institution_code' => 'Orbis',
 		'erod_lead_time_weeks' => 3,
 		// specifies which specialties are available in patient summary for diagnoses etc (use specialty codes)
 		'specialty_codes' => array(),
