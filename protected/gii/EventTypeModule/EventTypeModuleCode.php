@@ -182,7 +182,6 @@ class EventTypeModuleCode extends BaseModuleCode // CCodeModel
 			}
 		}
 		$this->files[]=new CCodeFile($this->modulePath.'\template.gii', json_encode($_POST));
-		$this->files[]=new CCodeFile($this->modulePath.'\elements.gii', json_encode($elements));
 		$elements = $this->getElementsFromPost();
 	}
 
