@@ -259,9 +259,8 @@ class OEMigration extends CDbMigration
 	 *
 	 * @param string $name
 	 * @param array $columns
-	 * @param boolean $versioned
 	 */
-	protected function createOETable($name, array $columns, $versioned = false)
+	protected function createOETable($name, array $columns)
 	{
 		$fk_prefix = substr($name, 0, 56);
 
@@ -278,65 +277,6 @@ class OEMigration extends CDbMigration
 		);
 
 		$this->createTable($name, $columns, 'engine=InnoDB charset=utf8 collate=utf8_unicode_ci');
-
-		if ($versioned) {
-			foreach ($columns as $n => &$column) {
-				if ($column == 'pk') $column = 'integer not null';
-				if (preg_match('/^constraint/i', $column)) unset($columns[$n]);
-			}
-
-			$columns = array_merge(
-				$columns,
-				array(
-					'version_date' => 'datetime not null',
-					'version_id' => 'pk',
-				)
-			);
-
-			$this->createTable("{$name}_version", $columns, 'engine=InnoDB charset=utf8 collate=utf8_unicode_ci');
-		}
-	}
-
-	/**
-	 * Convenience function to drop OE tables from db - versioned defaults to false to mirroe createOETable
-	 *
-	 * @param $name
-	 * @param bool $versioned
-	 */
-	protected function dropOETable($name, $versioned = false)
-	{
-		if ($versioned) {
-			$this->dropTable("{$name}_version");
-		}
-
-		$this->dropTable($name);
-	}
-
-	/**
-	 * Create a version table for the specified existing OE table
-	 *
-	 * @param string $base_name Base table name
-	 */
-	protected function versionExistingTable($base_name)
-	{
-		$res = $this->dbConnection->createCommand('show create table ' . $this->dbConnection->quoteTableName($base_name))->queryRow();
-		$sql = $res['Create Table'];
-		$start = strpos($sql, '(');
-		$end = strrpos($sql, ')');
-		$defs = explode("\n", trim(substr($sql, $start + 1, $end - $start - 1)));
-		foreach ($defs as $n => &$def) {
-			if (preg_match('/(?:PRIMARY|FOREIGN) KEY/', $def)) {
-				unset($defs[$n]);
-				continue;
-			}
-			$def = rtrim($def, ',');
-			$def = str_replace('AUTO_INCREMENT', '', $def);
-			$def = str_replace('UNIQUE', '', $def);
-		}
-		$defs[] = 'version_date datetime not null';
-		$defs[] = 'version_id int unsigned not null auto_increment primary key';
-
-		$this->createTable("{$base_name}_version", $defs, 'engine=InnoDB charset=utf8 collate=utf8_unicode_ci');
 	}
 
 	/**
@@ -522,65 +462,6 @@ class OEMigration extends CDbMigration
 				) . "\n"
 			);
 		}
-	}
-
-	public function createArchiveTable($table)
-	{
-		$this->migrationEcho( "Creating archive table for $table->name ...\n");
-
-		$a = Yii::app()->db->createCommand("show create table $table->name;")->queryRow();
-
-		$create = $a['Create Table'];
-
-		$create = preg_replace('/CREATE TABLE `(.*?)`/',"CREATE TABLE `{$table->name}_version`",$create);
-
-		preg_match_all('/  KEY `(.*?)`/',$create,$m);
-
-		foreach ($m[1] as $key) {
-			$_key = $key;
-
-			if (strlen($_key) <= 60) {
-				$_key = 'acv_'.$_key;
-			} else {
-				$_key[0] = 'a';
-				$_key[1] = 'c';
-				$_key[2] = 'v';
-				$_key[3] = '_';
-			}
-
-			$create = preg_replace("/KEY `{$key}`/","KEY `$_key`",$create);
-		}
-
-		preg_match_all('/CONSTRAINT `(.*?)`/',$create,$m);
-
-		foreach ($m[1] as $key) {
-			$_key = $key;
-
-			if (strlen($_key) <= 60) {
-				$_key = 'acv_'.$_key;
-			} else {
-				$_key[0] = 'a';
-				$_key[1] = 'c';
-				$_key[2] = 'v';
-				$_key[3] = '_';
-			}
-
-			$create = preg_replace("/CONSTRAINT `{$key}`/","CONSTRAINT `$_key`",$create);
-		}
-
-		Yii::app()->db->createCommand($create)->query();
-
-		$this->alterColumn("{$table->name}_version",'id','int(10) unsigned NOT NULL');
-		$this->dropPrimaryKey('id',"{$table->name}_version");
-
-		$this->createIndex("{$table->name}_aid_fk","{$table->name}_version","id");
-		$this->addForeignKey("{$table->name}_aid_fk","{$table->name}_version","id",$table->name,"id");
-
-		$this->addColumn("{$table->name}_version","version_date","datetime not null default '1900-01-01 00:00:00'");
-
-		$this->addColumn("{$table->name}_version","version_id","int(10) unsigned NOT NULL");
-		$this->addPrimaryKey("version_id","{$table->name}_version","version_id");
-		$this->alterColumn("{$table->name}_version","version_id","int(10) unsigned NOT NULL AUTO_INCREMENT");
 	}
 
 	private function compare_file_basenames($a,$b){

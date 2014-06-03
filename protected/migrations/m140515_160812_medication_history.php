@@ -11,14 +11,11 @@ class m140515_160812_medication_history extends OEMigration
 				"name" => "string not null",
 				"display_order" => "integer not null",
 				"active" => "boolean not null default true",
-			),
-			true
+			)
 		);
 
 		$this->addColumn("medication", "dose", "string");
-		$this->addColumn("medication_version", "dose", "string");
 		$this->addColumn("medication", "stop_reason_id", "integer");
-		$this->addColumn("medication_version", "stop_reason_id", "integer");
 
 		$this->addForeignKey("medication_stop_reason_id_fk", "medication", "stop_reason_id", "medication_stop_reason", "id");
 
