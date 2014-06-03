@@ -47,13 +47,15 @@ $warnings = $this->patient->getWarnings($clinical);
 		<?php }?>
 
 		<?php if (!$this->patient->practice || !$this->patient->practice->contact->address) {?>
-			<div class="row">
-				<div class="large-12 column">
-					<div id="no-practice-address" class="alert-box alert with-icon">
-						Patient has no GP practice address, please correct in PAS before printing GP letter.
+			<?php if (Yii::app()->params['show_pas_warnings']) {?>
+				<div class="row">
+					<div class="large-12 column">
+						<div id="no-practice-address" class="alert-box alert with-icon">
+							Patient has no GP practice address, please correct in PAS before printing GP letter.
+						</div>
 					</div>
 				</div>
-			</div>
+			<?php }?>
 		<?php }?>
 
 		<?php if ($warnings) { ?>
