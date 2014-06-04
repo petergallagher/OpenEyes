@@ -2057,7 +2057,7 @@ class PatientController extends BaseController
 	{
 		$patient = new Patient;
 
-		$patient->dob = date('Y-m-d',strtotime($_GET['dob']));
+		$patient->dob = $_GET['dob'] ? date('Y-m-d',strtotime($_GET['dob'])) : '';
 		$patient->yob = $_GET['yob'];
 		$patient->date_of_death = $_GET['dod'];
 
