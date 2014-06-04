@@ -120,6 +120,16 @@ class SiteController extends BaseController
 			return;
 		}
 
+		if (preg_match('/^"(.*?)"[\s\t]+(.*?)$/',$query,$matches)) {
+			$this->redirect(array('patient/search', 'first_name' => $matches[1], 'last_name' => $matches[2]));
+			return;
+		}
+
+		if (preg_match('/^(.*?)[\s\t]+"(.*?)"$/',$query,$matches)) {
+			$this->redirect(array('patient/search', 'first_name' => $matches[1], 'last_name' => $matches[2]));
+			return;
+		}
+
 		Audit::add('search','search-error');
 
 		if (isset($query)) {
