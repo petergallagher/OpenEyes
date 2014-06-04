@@ -35,6 +35,8 @@
  */
 class Episode extends BaseActiveRecordVersioned
 {
+	private $defaultScopeDisabled = false;
+
 	/**
 	 * Returns the static model of the specified AR class.
 	 * @return Episode the static model class
@@ -50,6 +52,28 @@ class Episode extends BaseActiveRecordVersioned
 	public function tableName()
 	{
 		return 'episode';
+	}
+
+	/**
+	 * Sets default scope for events such that we never pull back any rows that have deleted set to 1
+	 * @return array of mandatory conditions
+	 */
+
+	public function defaultScope()
+	{
+		if ($this->defaultScopeDisabled) {
+			return array();
+		}
+
+		$table_alias = $this->getTableAlias(false,false);
+		return array(
+			'condition' => $table_alias.'.deleted = 0',
+		);
+	}
+
+	public function disableDefaultScope() {
+		$this->defaultScopeDisabled = true;
+		return $this;
 	}
 
 	/**
@@ -78,7 +102,7 @@ class Episode extends BaseActiveRecordVersioned
 		return array(
 			'patient' => array(self::BELONGS_TO, 'Patient', 'patient_id'),
 			'firm' => array(self::BELONGS_TO, 'Firm', 'firm_id'),
-			'events' => array(self::HAS_MANY, 'Event', 'episode_id', 'order' => ' events.accomplished_date asc, events.created_date asc'),
+			'events' => array(self::HAS_MANY, 'Event', 'episode_id', 'order' => ' events.event_date asc, events.created_date asc'),
 			'user' => array(self::BELONGS_TO, 'User', 'created_user_id'),
 			'usermodified' => array(self::BELONGS_TO, 'User', 'last_modified_user_id'),
 			'status' => array(self::BELONGS_TO, 'EpisodeStatus', 'episode_status_id'),

@@ -51,7 +51,7 @@ class BaseActiveRecord extends CActiveRecord
 			$cls = get_class($rel);
 			if ($cls == self::HAS_MANY || $cls == self::MANY_MANY) {
 				$rel_cls = $rel->className;
-				$pk_attr = $rel_cls::getMetaData()->tableSchema->primaryKey;
+				$pk_attr = $rel_cls::model()->getMetaData()->tableSchema->primaryKey;
 				// not supporting composite primary keys at this point
 				if (is_string($pk_attr)) {
 					$m_set = array();
@@ -206,13 +206,11 @@ class BaseActiveRecord extends CActiveRecord
 				$orig_by_id[$orig->{$rel->foreignKey}] = $orig;
 			}
 		}
-		$rel_cls = $rel->className;
-		$rel_pk_attr = $rel_cls::getMetaData()->tableSchema->primaryKey;
 
 		if ($new_objs) {
 			foreach ($new_objs as $new) {
-				if ($save = @$orig_by_id[$new->$rel_pk_attr]) {
-					unset($orig_by_id[$new->$rel_pk_attr]);
+				if ($save = @$orig_by_id[$new->getPrimaryKey()]) {
+					unset($orig_by_id[$new->getPrimaryKey()]);
 				}
 				else {
 					$save = new $thru_cls();
@@ -228,10 +226,9 @@ class BaseActiveRecord extends CActiveRecord
 
 		foreach ($orig_by_id as $orig) {
 			if (!$orig->delete()) {
-				throw new Exception("unable to delete redundant through relation {$thru->name} with id {$orig->getPrimaryKey()} for {$name}");
+				throw new Exception("unable to delete redundant through relation {$thru->name} with id {$orig->getPrimaryKey()} for {$name}" . $orig->rel_id);
 			}
 		}
-
 	}
 
 	/**
@@ -341,8 +338,9 @@ class BaseActiveRecord extends CActiveRecord
 					}
 				}
 			}
+			$safe_attributes = $this->getSafeAttributeNames();
 			foreach ($many_rels as $name) {
-				if (in_array($name, $thru_rels) || !in_array($name, $this->safeAttributeNames)) {
+				if (in_array($name, $thru_rels) || !in_array($name, $safe_attributes)) {
 					continue;
 				}
 				$rel = $record_relations[$name];

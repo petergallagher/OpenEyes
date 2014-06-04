@@ -33,6 +33,8 @@
  */
 class Event extends BaseActiveRecordVersioned
 {
+	private $defaultScopeDisabled = false;
+
 	/**
 	 * Returns the static model of the specified AR class.
 	 * @param string $className
@@ -52,6 +54,28 @@ class Event extends BaseActiveRecordVersioned
 	}
 
 	/**
+	 * Sets default scope for events such that we never pull back any rows that have deleted set to 1
+	 * @return array of mandatory conditions
+	 */
+
+	public function defaultScope()
+	{
+		if ($this->defaultScopeDisabled) {
+			return array();
+		}
+
+		$table_alias = $this->getTableAlias(false,false);
+		return array(
+			'condition' => $table_alias.'.deleted = 0',
+		);
+	}
+
+	public function disableDefaultScope() {
+		$this->defaultScopeDisabled = true;
+		return $this;
+	}
+
+	/**
 	 * @return array validation rules for model attributes.
 	 */
 	public function rules()
@@ -63,7 +87,7 @@ class Event extends BaseActiveRecordVersioned
 			array('episode_id, event_type_id', 'length', 'max'=>10),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
-			array('id, episode_id, event_type_id, created_date, accomplished_date', 'safe', 'on'=>'search'),
+			array('id, episode_id, event_type_id, created_date, event_date', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -84,13 +108,13 @@ class Event extends BaseActiveRecordVersioned
 	}
 
 	/**
-	 * Make sure accomplished date is set
+	 * Make sure event date is set
 	 * @return boolean
 	 */
 	protected function beforeSave()
 	{
-		if ( $this->accomplished_date == "1900-01-01 00:00:00" || $this->accomplished_date == "0000-00-00 00:00:00") {
-			$this->accomplished_date = date('Y-m-d H:i:s');
+		if ( $this->event_date == "1900-01-01 00:00:00" || $this->event_date == "0000-00-00 00:00:00") {
+			$this->event_date = date('Y-m-d H:i:s');
 		}
 
 		return parent::beforeSave();
@@ -416,10 +440,10 @@ class Event extends BaseActiveRecordVersioned
 		);
 	}
 
-	public function isAccDateDifferentFromCreated(){
-		$accDate = new DateTime($this->accomplished_date);
+	public function isEventDateDifferentFromCreated(){
+		$evDate = new DateTime($this->event_date);
 		$creDate = new DateTime($this->created_date);
-		if($creDate->format('Y-m-d') != $accDate->format('Y-m-d')){
+		if($creDate->format('Y-m-d') != $evDate->format('Y-m-d')){
 			return true;
 		}
 		return false;

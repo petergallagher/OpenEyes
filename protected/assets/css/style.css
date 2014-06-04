@@ -4419,9 +4419,9 @@ tfoot.pagination-container .pagination li {
   background-image: url('../img/_elements/icons/event/status/alert-hover.png?1400240765');
 }
 /* line 158, ../sass/openeyes/components/panels/_episode.scss */
-.panel.episode .events .acc_date {
+.panel.episode .events .ev_date {
   padding-left: 21px;
-  background: url('../img/_elements/icons/event/small/datetime-past.png?1400846235') left center no-repeat;
+  background: url('../img/_elements/icons/event/small/datetime-past.png?1401899844') left center no-repeat;
 }
 /* line 162, ../sass/openeyes/components/panels/_episode.scss */
 .panel.episode .events .event-date {
@@ -4780,7 +4780,7 @@ tfoot.pagination-container .pagination li {
 }
 /* line 20, ../sass/openeyes/components/events/_episode.scss */
 .event.episode .event-content {
-  background-image: url('../img/_elements/icons/event/watermark/_episode.png?1400240901');
+  background-image: url('../img/_elements/icons/event/watermark/_episode.png?1401174745');
 }
 
 /* line 28, ../sass/openeyes/components/events/_episode.scss */

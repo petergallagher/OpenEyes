@@ -28,6 +28,8 @@
  * The followings are the available model relations:
  * @property Disorder $disorder
  * @property Subspecialty $subspecialty
+ * @property SecondaryToCommonOphthalmicDisorder[] $secondary_to
+ * @property Disorder[] $secondary_to_disorders
  */
 class CommonOphthalmicDisorder extends BaseActiveRecordVersioned
 {
@@ -74,6 +76,8 @@ class CommonOphthalmicDisorder extends BaseActiveRecordVersioned
 		return array(
 			'disorder' => array(self::BELONGS_TO, 'Disorder', 'disorder_id', 'condition' => 'disorder.active = 1'),
 			'subspecialty' => array(self::BELONGS_TO, 'Subspecialty', 'subspecialty_id'),
+			'secondary_to' => array(self::HAS_MANY, 'SecondaryToCommonOphthalmicDisorder', 'parent_id'),
+			'secondary_to_disorders' => array(self::HAS_MANY, 'Disorder', 'disorder_id', 'through' => 'secondary_to'),
 		);
 	}
 
@@ -127,4 +131,27 @@ class CommonOphthalmicDisorder extends BaseActiveRecordVersioned
 		return array();
 	}
 
+	/**
+	 * @param Firm $firm
+	 * @return array
+	 * @throws CException
+	 */
+	public static function getListWithSecondaryTo(Firm $firm)
+	{
+		if (empty($firm)) {
+			throw new CException('Firm is required');
+		}
+		$disorders = array();
+		$secondary_to = array();
+		if ($ss_id = $firm->getSubspecialtyID()) {
+			$cods = self::model()->with(array('disorder', 'secondary_to_disorders'))->findAllByAttributes(array('subspecialty_id' => $ss_id), array('order' => 'disorder.term'));
+			foreach ($cods as $cod) {
+				$disorders[] = $cod->disorder;
+				if ($secondary_tos = $cod->secondary_to_disorders) {
+					$secondary_to[$cod->disorder_id] = CHtml::listData($secondary_tos, 'id', 'term');
+				}
+			}
+		}
+		return array(CHtml::listData($disorders, 'id', 'term'), $secondary_to);
+	}
 }
