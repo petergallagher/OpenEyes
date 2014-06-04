@@ -20,7 +20,6 @@
 class BaseActiveRecordVersioned extends BaseActiveRecord
 {
 	private $enable_version = true;
-	private $fetch_from_version = false;
 	public $version_id = null;
 
 	/* Disable archiving on save() */
@@ -39,79 +38,6 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 		$this->enable_version = true;
 
 		return $this;
-	}
-
-	/* Fetch from version */
-
-	public function fromVersion()
-	{
-		$this->fetch_from_version = true;
-
-		return $this;
-	}
-
-	/* Disable fetch from version */
-
-	public function notFromVersion()
-	{
-		$this->fetch_from_version = false;
-
-		return $this;
-	}
-
-	public function getTableSchema()
-	{
-		if ($this->fetch_from_version) {
-			return $this->getDbConnection()->getSchema()->getTable($this->tableName().'_version');
-		}
-
-		return parent::getTableSchema();
-	}
-
-	public function getPreviousVersion()
-	{
-		$condition = 'id = :id';
-		$params = array(':id' => $this->id);
-
-		if ($this->version_id) {
-			$condition .= ' and version_id < :version_id';
-			$params[':version_id'] = $this->version_id;
-		}
-
-		return $this->model()->fromVersion()->find(array(
-			'condition' => $condition,
-			'params' => $params,
-			'order' => 'version_id desc',
-		));
-	}
-
-	/* Return all previous versions ordered by most recent */
-
-	public function getPreviousVersions()
-	{
-		$condition = 'id = :id';
-		$params = array(':id' => $this->id);
-
-		if ($this->version_id) {
-			$condition .= ' and version_id = :version_id';
-			$params[':version_id'] = $this->version_id;
-		}
-
-		return $this->model()->fromVersion()->findAll(array(
-			'condition' => $condition,
-			'params' => $params,
-			'order' => 'version_id desc',
-		));
-	}
-
-	public function getVersionTableSchema()
-	{
-		return Yii::app()->db->getSchema()->getTable($this->tableName().'_version');
-	}
-
-	public function getCommandBuilder()
-	{
-		return new OECommandBuilder($this->getDbConnection()->getSchema());
 	}
 
 	public function updateByPk($pk, $attributes, $condition='', $params=array())
@@ -196,17 +122,50 @@ class BaseActiveRecordVersioned extends BaseActiveRecord
 	public function resetScope($resetDefault=true)
 	{
 		$this->enable_version = true;
-		$this->fetch_from_version = false;
 
 		return parent::resetScope($resetDefault);
 	}
 
 	protected function versionToTable(CDbCriteria $criteria)
 	{
-		if ($this->enable_version) {
-			$this->getCommandBuilder()->createInsertFromTableCommand(
-				$this->getVersionTableSchema(), $this->getTableSchema(), $criteria
-			)->execute();
+		if (Yii::app()->params['enable_versioning'] && $this->enable_version) {
+			$model_name = $this->dbConnection->quoteValue(CHtml::modelName($this));
+
+			$table = $this->getTableSchema();
+			$builder = $this->getCommandBuilder();
+
+			$sql = "SELECT {$table->rawName}.* FROM {$table->rawName}";
+			$sql=$builder->applyJoin($sql,$criteria->join);
+			$sql=$builder->applyCondition($sql,$criteria->condition);
+			$sql=$builder->applyOrder($sql,$criteria->order);
+			$sql=$builder->applyLimit($sql,$criteria->limit,$criteria->offset);
+
+			$command=$builder->dbConnection->createCommand($sql);
+			$builder->bindValues($command,$criteria->params);
+
+			$created_user_id = null;
+
+			try {
+				if (isset(Yii::app()->user)) {
+					$created_user_id = Yii::app()->user->id;
+				}
+			} catch (Exception $e) {
+			}
+
+			if (!$created_user_id) {
+				$created_user_id = 1;
+			}
+			
+			foreach ($command->queryAll() as $row) {
+				$id = $this->dbConnection->quoteValue($row['id']);
+				$created_date = $this->dbConnection->quoteValue(date('Y-m-d H:i:s'));
+				$record_last_modified_date = $this->dbConnection->quoteValue($row['last_modified_date']);
+				$record_last_modified_user_id = $this->dbConnection->quoteValue($row['last_modified_user_id']);
+				$record_data = $this->dbConnection->quoteValue(serialize($row));
+
+				$sql="INSERT INTO `version_blob` (`record_class_name`,`record_id`,`created_date`,`created_user_id`,`record_last_modified_date`,`record_last_modified_user_id`,`record_data`) VALUES ($model_name,$id,$created_date,$created_user_id,$record_last_modified_date,$record_last_modified_user_id,$record_data)";
+				$this->dbConnection->createCommand($sql)->execute();
+			}
 		}
 	}
 }
