@@ -508,4 +508,9 @@ class User extends BaseActiveRecordVersioned
 		}
 		return Firm::model()->findAll($crit);
 	}
+
+	public function getResourceName()
+	{
+		return $this->fullName;
+	}
 }
