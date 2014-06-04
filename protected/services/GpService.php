@@ -70,22 +70,4 @@ class GpService extends ModelService
 			$this->saveModel($address);
 		}
 	}
-
-	/**
-	 * Delete the specified GP record, first unassociating it from any patients
-	 *
-	 * @param int $id
-	 */
-	public function delete($id)
-	{
-		if (!($gp = $this->model->findByPk($id))) {
-			throw new NotFound("GP with ID '$id' not found");
-		}
-
-		$crit = new \CDbCriteria;
-		$crit->compare('gp_id', $id);
-		\Patient::model()->updateAll(array('gp_id' => null), $crit);
-
-		$gp->delete();
-	}
 }

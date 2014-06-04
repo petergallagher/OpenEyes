@@ -162,7 +162,7 @@ class ApiController extends CController
 
 		header('Content-Location: ' . $this->createAbsoluteUrl('api/') . '/' . Yii::app()->service->referenceToFhirUrl($ref) . "/_history/{$vid}");
 		header("ETag: \"{$vid}\"");
-		$this->sendResource($ref->resolve());
+		$this->sendResource($ref->fetch());
 	}
 
 	/**
@@ -182,7 +182,7 @@ class ApiController extends CController
 		if ($vid != $current_vid) {
 			$this->sendError("Only accessing the current version of a resource is supported: latest is '{$current_vid}', attempted to fetch '{$vid}'", 405);
 		}
-		$this->sendResource($ref->resolve());
+		$this->sendResource($ref->fetch());
 	}
 
 	/**

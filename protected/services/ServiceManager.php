@@ -50,6 +50,12 @@ class ServiceManager extends \CApplicationComponent
 		return $service;
 	}
 
+	public function __call($name, $args)
+	{
+		$id = array_shift($args);
+		return $this->getReference($name, $id);
+	}
+
 	/**
 	 * @param string $name
 	 * @return Service|null
@@ -72,7 +78,16 @@ class ServiceManager extends \CApplicationComponent
 	}
 
 	/**
-	 * Find an internal service for the specified FHIR resource type, using profiles to differentiate if necessary
+	 * @param string $service_name
+	 * @param scalar $id
+	 */
+	public function getReference($service_name, $id)
+	{
+		return $this->{$service_name}->getReference($id);
+	}
+
+	/**
+	 * Find an internal service for the specified FHIR resource type, using tags to differentiate if necessary
 	 *
 	 * @param string[] $profiles
 	 * @return InternalService|null
@@ -102,6 +117,13 @@ class ServiceManager extends \CApplicationComponent
 			}
 		}
 
+		// Then check for a universal service for this FHIR type
+		foreach ($this->service_config as $service_name => $config) {
+			if ($config['fhir_type'] == $fhir_type && !$config['fhir_prefix']) {
+				return $this->getService($service_name);
+			}
+		}
+
 		// Profile(s) supplied but no match, not necessarily an error
 		return null;
 	}
@@ -120,7 +142,7 @@ class ServiceManager extends \CApplicationComponent
 
 		foreach ($this->service_config as $service_name => $config) {
 			if ($config['fhir_type'] == $fhir_type && $config['fhir_prefix'] == $prefix) {
-				return new InternalReference($service_name, $id);
+				return $this->{$service_name}($id);
 			}
 		}
 

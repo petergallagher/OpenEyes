@@ -64,22 +64,4 @@ class PracticeService extends ModelService
 			$this->saveModel($address);
 		}
 	}
-
-	/**
-	 * Delete the practice from the database, first unassociating it with any patients
-	 *
-	 * @param int $id
-	 */
-	public function delete($id)
-	{
-		if (!($prac = $this->model->findByPk($id))) {
-			throw new NotFound("Practice with ID '$id' not found");
-		}
-
-		$crit = new \CDbCriteria;
-		$crit->compare('practice_id', $id);
-		\Patient::model()->updateAll(array('practice_id' => null), $crit);
-
-		$prac->delete();
-	}
 }

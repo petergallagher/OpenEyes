@@ -58,10 +58,10 @@ class PatientService extends ModelService
 		$res->primary_phone = $patient->contact->primary_phone;
 		$res->addresses = array_map(array('services\PatientAddress', 'fromModel'), $patient->contact->addresses);
 
-		if ($patient->gp_id) $res->gp_ref = new InternalReference('Gp', $patient->gp_id);
-		if ($patient->practice_id) $res->prac_ref = new InternalReference('Practice', $patient->practice_id);
+		if ($patient->gp_id) $res->gp_ref = \Yii::app()->service->Gp($patient->gp_id);
+		if ($patient->practice_id) $res->prac_ref = \Yii::app()->service->Practice($patient->practice_id);
 		foreach ($patient->commissioningbodies as $cb) {
-			$res->cb_refs[] = new InternalReference('CommissioningBody', $cb->id);
+			$res->cb_refs[] = \Yii::app()->service->CommissioningBody($cb->id);
 		}
 		$res->care_providers = array_merge(array_filter(array($res->gp_ref, $res->prac_ref)), $res->cb_refs);
 

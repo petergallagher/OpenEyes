@@ -15,37 +15,21 @@
 
 namespace services;
 
-abstract class Service
+class PracticeReference extends ModelReference
 {
 	/**
-	 * @return Service
+	 * Delete the practice from the database, first unassociating it with any patients
 	 */
-	static public function load(array $params = array())
+	public function delete()
 	{
-		return new static($params);
+		if (!($prac = $this->model->findByPk($this->id))) {
+			throw new NotFound("Practice with ID '$id' not found");
+		}
+
+		$crit = new \CDbCriteria;
+		$crit->compare('practice_id', $this->id);
+		\Patient::model()->updateAll(array('practice_id' => null), $crit);
+
+		$prac->delete();
 	}
-
-	/**
-	 * Get a reference to the resource with the specified ID
-	 *
-	 * @param scalar $id
-	 * @return ResourceReference
-	 */
-	abstract public function getReference($id);
-
-	/**
-	 * Create a new resource and return a reference to it
-	 *
-	 * @param Resource $resource
-	 * @return ResourceReference
-	 */
-	abstract public function create(Resource $resource);
-
-	/**
-	 * Search for resources according to the parameters passed
-	 *
-	 * @param array $params
-	 * @return Resource[]
-	 */
-	abstract public function search(array $params);
 }

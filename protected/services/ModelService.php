@@ -34,27 +34,29 @@ abstract class ModelService extends InternalService
 
 	static public function load(array $params = array())
 	{
-		$class = static::$primary_model;
-		return new static($class::model());
-	}
-
-	protected $model;
-
-	/**
-	 * @param BaseActiveRecord $model
-	 */
-	public function __construct(\BaseActiveRecord $model)
-	{
-		$this->model = $model;
+		return new static();
 	}
 
 	/**
-	 * @param int $id
-	 * @return int
+	 * Get the class name of the reference type for this service's resources
+	 *
+	 * @return string
 	 */
-	public function getLastModified($id)
+	static public function getReferenceClass()
 	{
-		return strtotime($this->readModel($id)->last_modified_date);
+		$class = parent::getReferenceClass();
+		return class_exists($class) ? $class : 'Service\\ModelReference';
+	}
+
+	/**
+	 * @param scalar $id
+	 * @return ModelReference
+	 */
+	public function getReference($id)
+	{
+		$ref_class = static::getReferenceClass();
+		$model_class = static::$primary_model;
+		return new $ref_class($this, $id, $model_class::model());
 	}
 
 	/**
@@ -71,24 +73,8 @@ abstract class ModelService extends InternalService
 	}
 
 	/**
-	 * @param int $id
 	 * @param Resource $resource
-	 */
-	public function update($id, Resource $resource)
-	{
-		if (!$this->supportsOperation(self::OP_UPDATE)) {
-			parent::update($id, $resource);
-		}
-
-		if (!($model = $this->model->findByPk($id))) {
-			throw new NotFound(static::getServiceName() . " with ID '$id' not found");
-		}
-		$this->resourceToModel($resource, $model);
-	}
-
-	/**
-	 * @param Resource $resource
-	 * @return int
+	 * @return InternalReference
 	 */
 	public function create(Resource $resource)
 	{
@@ -99,7 +85,8 @@ abstract class ModelService extends InternalService
 		$class = static::$primary_model;
 		$model = new $class;
 		$this->resourceToModel($resource, $model);
-		return $model->id;
+
+		return $this->getReference($model->id);
 	}
 
 	/**
@@ -119,7 +106,7 @@ abstract class ModelService extends InternalService
 	 * @param BaseActiveRecord $model
 	 * @return Resource
 	 */
-	protected function modelToResource($model)
+	public function modelToResource($model)
 	{
 		$class = static::getResourceClass();
 		return new $class(array('id' => $model->id, 'last_modified' => strtotime($model->last_modified_date)));
@@ -129,7 +116,7 @@ abstract class ModelService extends InternalService
 	 * @param Resource $resource
 	 * @param BaseActiveRecord $model
 	 */
-	protected function resourceToModel($resource, $model)
+	public function resourceToModel($resource, $model)
 	{
 		throw new ProcessingNotSupported("Can't write resources of type '" . get_class($resource) . "' to model layer");
 	}

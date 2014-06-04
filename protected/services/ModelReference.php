@@ -16,45 +16,16 @@
 namespace services;
 
 /**
- * Reference to an internal resource
+ * Reference to a resource within the OE data model
  */
-abstract class InternalReference extends ResourceReference
+class ModelReference extends InternalReference
 {
-	protected $service;
-	protected $id;
+	protected $model;
 
-	/**
-	 * @param InternalService $service
-	 * @param $id
-	 */
-	public function __construct(InternalService $service, $id)
+	public function __construct(ModelService $service, $id, \BaseActiveRecord $model)
 	{
-		$this->service = $service;
-		$this->id = $id;
-	}
-
-	/**
-	 * @return string
-	 */
-	public function getServiceName()
-	{
-		return $this->service->getServiceName();
-	}
-
-	/**
-	 * @return int
-	 */
-	public function getId()
-	{
-		return $this->id;
-	}
-
-	/**
-	 * @return int
-	 */
-	public function getVersionId()
-	{
-		return $this->getLastModified();
+		parent::__construct($service, $id);
+		$this->model = $model;
 	}
 
 	/**
@@ -62,7 +33,7 @@ abstract class InternalReference extends ResourceReference
 	 */
 	public function getLastModified()
 	{
-		throw new ProcessingNotSupported("Read operation not supported");
+		return strtotime($this->readModel()->last_modified_date);
 	}
 
 	/**
@@ -70,7 +41,11 @@ abstract class InternalReference extends ResourceReference
 	 */
 	public function fetch()
 	{
-		throw new ProcessingNotSupported("Read operation not supported");
+		if (!$this->service->supportsOperation(InternalService::OP_READ)) {
+			parent::fetch();
+		}
+
+		return $this->service->modelToResource($this->readModel());
 	}
 
 	/**
@@ -78,30 +53,22 @@ abstract class InternalReference extends ResourceReference
 	 */
 	public function update(Resource $resource)
 	{
-		throw new ProcessingNotSupported("Update operation not supported");
+		if (!$this->service->supportsOperation(InternalService::OP_UPDATE)) {
+			parent::update($resource);
+		}
+
+		$this->service->resourceToModel($resource, $this->readModel());
 	}
 
 	/**
-	 * @return bool
+	 * @return BaseActiveRecord
 	 */
-	public function delete()
+	private function readModel()
 	{
-		throw new ProcessingNotSupported("Delete operation not supported");
-	}
+		if (!($model = $this->model->findByPk($this->id))) {
+			throw new NotFound(static::getServiceName() . " with ID '{$this->id}' not found");
+		}
 
-	/**
-	 * @param StdClass $fhirObject
-	 */
-	public function fhirUpdate(\StdClass $fhirObject)
-	{
-		$this->update($this->service->fhirToResource($fhirObject));
-	}
-
-	/**
-	 * @return StdClass
-	 */
-	public function toFhir()
-	{
-		return (object)array("reference" => \Yii::app()->service->referenceToFhirUrl($this));
+		return $model;
 	}
 }

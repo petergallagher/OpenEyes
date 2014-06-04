@@ -15,37 +15,6 @@
 
 namespace services;
 
-abstract class Service
+class CommissioningBodyReference extends ModelReference
 {
-	/**
-	 * @return Service
-	 */
-	static public function load(array $params = array())
-	{
-		return new static($params);
-	}
-
-	/**
-	 * Get a reference to the resource with the specified ID
-	 *
-	 * @param scalar $id
-	 * @return ResourceReference
-	 */
-	abstract public function getReference($id);
-
-	/**
-	 * Create a new resource and return a reference to it
-	 *
-	 * @param Resource $resource
-	 * @return ResourceReference
-	 */
-	abstract public function create(Resource $resource);
-
-	/**
-	 * Search for resources according to the parameters passed
-	 *
-	 * @param array $params
-	 * @return Resource[]
-	 */
-	abstract public function search(array $params);
 }

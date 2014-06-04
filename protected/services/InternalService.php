@@ -58,6 +58,16 @@ abstract class InternalService extends Service
 	}
 
 	/**
+	 * Get the class name of the reference type for this service's resources
+	 *
+	 * @return string
+	 */
+	static public function getReferenceClass()
+	{
+		return static::getResourceClass() . 'Reference';
+	}
+
+	/**
 	 * Get the class name of the resource type managed by this service
 	 *
 	 * @return string
@@ -93,53 +103,10 @@ abstract class InternalService extends Service
 	}
 
 	/**
-	 * Get the last modified date for a resource without fetching it
-	 *
-	 * @param scalar $id
-	 * @return int
-	 */
-	public function getLastModified($id)
-	{
-		throw new ProcessingNotSupported("Read operation not supported");
-	}
-
-	/**
-	 * Fetch a single resource by ID
-	 *
-	 * @param scalar $id
-	 * @return Resource
-	 */
-	public function read($id)
-	{
-		throw new ProcessingNotSupported("Read operation not supported");
-	}
-
-	/**
-	 * Update a resource by ID
-	 *
-	 * @param scalar $id
-	 * @param Resource $resource
-	 */
-	public function update($id, Resource $resource)
-	{
-		throw new ProcessingNotSupported("Update operation not supported");
-	}
-
-	/**
-	 * Delete a resource by ID
-	 *
-	 * @param scalar $id
-	 */
-	public function delete($id)
-	{
-		throw new ProcessingNotSupported("Delete operation not supported");
-	}
-
-	/**
-	 * Create a new resource and return its ID
+	 * Create a new resource and return a reference to it
 	 *
 	 * @param Resource $resource
-	 * @return scalar
+	 * @return InternalReference
 	 */
 	public function create(Resource $resource)
 	{
@@ -161,29 +128,18 @@ abstract class InternalService extends Service
 	 * Create a new resource using the supplied FHIR object
 	 *
 	 * @param StdClass $fhirObject
-	 * @return ResourceReference
+	 * @return InternalReference
 	 */
 	public function fhirCreate(\StdClass $fhirObject)
 	{
-		return new InternalReference($this->getServiceName(), $this->create($this->fhirToResource($fhirObject)));
-	}
-
-	/**
-	 * Update the specified resource using the supplied FHIR object
-	 *
-	 * @param scalar $id
-	 * @param StdClass $fhirObject
-	 */
-	public function fhirUpdate($id, \StdClass $fhirObject)
-	{
-		$this->update($id, $this->fhirToResource($fhirObject));
+		return $this->create($this->fhirToResource($fhirObject));
 	}
 
 	/**
 	 * @param StdClass $fhirObject
 	 * @return Resource
 	 */
-	protected function fhirToResource(\StdClass $fhirObject)
+	public function fhirToResource(\StdClass $fhirObject)
 	{
 		$class = $this->getResourceClass();
 		return $class::fromFhir($fhirObject);

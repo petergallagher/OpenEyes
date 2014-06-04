@@ -37,7 +37,32 @@ abstract class ResourceReference implements FhirCompatible
 	}
 
 	/**
+	 * Fetch the resource this reference refers to
+	 *
 	 * @return Resource
 	 */
-	abstract public function resolve();
+	abstract public function fetch();
+
+	/**
+	 * Get the last modified date for this resource without fetching it
+	 *
+	 * @param scalar $id
+	 * @return int
+	 */
+	abstract public function getLastModified();
+
+	/**
+	 * Update this resource
+	 *
+	 * @param scalar $id
+	 * @param Resource $resource
+	 */
+	abstract public function update(Resource $resource);
+
+	/**
+	 * Delete this resource
+	 *
+	 * @param scalar $id
+	 */
+	abstract public function delete();
 }
