@@ -17,7 +17,7 @@ namespace services;
 
 class Address extends DataObject
 {
-	static public function fromModel(\Address $address)
+	/*static public function fromModel(\Address $address)
 	{
 		return new static(
 			array(
@@ -30,6 +30,7 @@ class Address extends DataObject
 			)
 		);
 	}
+	*/
 
 	public $use = null;
 	public $line1;
@@ -39,7 +40,7 @@ class Address extends DataObject
 	public $zip;
 	public $country;
 
-	public function toModel(\Address $address)
+	/*public function toModel(\Address $address)
 	{
 		$address->address1 = $this->line1;
 		$address->address2 = $this->line2;
@@ -57,4 +58,5 @@ class Address extends DataObject
 
 		$address->country_id = $country->id;
 	}
+	*/
 }

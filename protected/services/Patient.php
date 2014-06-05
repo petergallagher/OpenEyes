@@ -67,6 +67,29 @@ class Patient extends Resource
 	public $prac_ref = null;
 	public $cb_refs = array();
 
+/*
+    $res = parent::modelToResource($patient);
+    $res->nhs_num = $patient->nhs_num;
+    $res->hos_num = $patient->hos_num;
+    $res->title = $patient->contact->title;
+    $res->family_name = $patient->contact->last_name;
+    $res->given_name = $patient->contact->first_name;
+    $res->gender = $patient->gender;
+    $res->birth_date = $patient->dob;
+    $res->date_of_death = $patient->date_of_death;
+    $res->primary_phone = $patient->contact->primary_phone;
+    $res->addresses = array_map(array('services\PatientAddress', 'fromModel'), $patient->contact->addresses);
+
+    if ($patient->gp_id) $res->gp_ref = \Yii::app()->service->Gp($patient->gp_id);
+    if ($patient->practice_id) $res->prac_ref = \Yii::app()->service->Practice($patient->practice_id);
+    foreach ($patient->commissioningbodies as $cb) {
+      $res->cb_refs[] = \Yii::app()->service->CommissioningBody($cb->id);
+    }
+    $res->care_providers = array_merge(array_filter(array($res->gp_ref, $res->prac_ref)), $res->cb_refs);
+
+    return $res;
+*/
+
 	/**
 	 * @return Gp|null
 	 */

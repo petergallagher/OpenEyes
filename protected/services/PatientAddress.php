@@ -22,7 +22,7 @@ class PatientAddress extends Address
 {
 	static protected $fhir_type = 'Address';
 
-	static public function fromModel(\Address $address)
+	/*static public function fromModel(\Address $address)
 	{
 		$pa = parent::fromModel($address);
 		if ($address->date_start) $pa->date_start = new Date($address->date_start);
@@ -30,7 +30,7 @@ class PatientAddress extends Address
 		if ($address->address_type_id == \AddressType::CORRESPOND) $pa->correspond = true;
 		if ($address->address_type_id == \AddressType::TRANSPORT) $pa->transport = true;
 		return $pa;
-	}
+	}*/
 
 	public $date_start = null;
 	public $date_end = null;

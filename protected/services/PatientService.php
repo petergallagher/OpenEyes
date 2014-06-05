@@ -15,7 +15,7 @@
 
 namespace services;
 
-class PatientService extends ModelService
+class PatientService extends DeclarativeModelService
 {
 	static protected $operations = array(self::OP_READ, self::OP_UPDATE, self::OP_CREATE, self::OP_SEARCH);
 
@@ -27,6 +27,76 @@ class PatientService extends ModelService
 	);
 
 	static protected $primary_model = 'Patient';
+
+	static public $resource_map = array(
+		'Patient' => array(
+			'nhs_num' => 'nhs_num',
+			'hos_num' => 'hos_num',
+			'title' => array(
+				'relation' => 'contact',
+				'field' => 'title',
+			),
+			'family_name' => array(
+				'relation' => 'contact',
+				'field' => 'last_name',
+			),
+			'given_name' => array(
+				'relation' => 'contact',
+				'field' => 'first_name',
+			),
+			'gender' => 'gender',
+			'birth_date' => 'dob',
+			'date_of_death' => 'date_of_death',
+			'primary_phone' => array(
+				'relation' => 'contact',
+				'field' => 'primary_phone',
+			),
+			'addresses' => array(
+				'type' => 'list',
+				'relation' => 'contact',
+				'data_model' => 'PatientAddress',
+			),
+			'gp_id' => array(
+				'reference' => 'Gp',
+				'name' => 'gp_ref',
+			),
+			'practice_id' => array(
+				'reference' => 'Practice',
+				'name' => 'prac_ref',
+			),
+		),
+		'PatientAddress' => array(
+			'line1' => 'address1',
+			'line2' => 'address2',
+			'city' => 'city',
+			'state' => 'county',
+			'zip' => 'postcode',
+			'country' => array(
+				'relation' => 'country',
+				'field' => 'name',
+			),
+			'date_start' => array(
+				'type' => 'date',
+				'data_model' => 'Date',
+				'field' => 'date_start',
+			),
+			'date_end' => array(
+				'type' => 'date',
+				'data_model' => 'Date',
+				'field' => 'date_end',
+			),
+			'correspond' => array(
+				'condition' => 'equals',
+				'value' => \AddressType::CORRESPOND,
+				'field' => 'address_type_id',
+			),
+			'transport' => array(
+				'condition' => 'equals',
+				'value' => \AddressType::TRANSPORT,
+				'field' => 'address_type_id',
+			),
+		),
+	);
 
 	public function search(array $params)
 	{
@@ -42,30 +112,6 @@ class PatientService extends ModelService
 		if (isset($params['given'])) $searchParams['first_name'] = $params['given'];
 
 		return $this->getResourcesFromDataProvider($model->search($searchParams));
-	}
-
-	public function modelToResource($patient)
-	{
-		$res = parent::modelToResource($patient);
-		$res->nhs_num = $patient->nhs_num;
-		$res->hos_num = $patient->hos_num;
-		$res->title = $patient->contact->title;
-		$res->family_name = $patient->contact->last_name;
-		$res->given_name = $patient->contact->first_name;
-		$res->gender = $patient->gender;
-		$res->birth_date = $patient->dob;
-		$res->date_of_death = $patient->date_of_death;
-		$res->primary_phone = $patient->contact->primary_phone;
-		$res->addresses = array_map(array('services\PatientAddress', 'fromModel'), $patient->contact->addresses);
-
-		if ($patient->gp_id) $res->gp_ref = \Yii::app()->service->Gp($patient->gp_id);
-		if ($patient->practice_id) $res->prac_ref = \Yii::app()->service->Practice($patient->practice_id);
-		foreach ($patient->commissioningbodies as $cb) {
-			$res->cb_refs[] = \Yii::app()->service->CommissioningBody($cb->id);
-		}
-		$res->care_providers = array_merge(array_filter(array($res->gp_ref, $res->prac_ref)), $res->cb_refs);
-
-		return $res;
 	}
 
 	public function resourceToModel($res, $patient)
@@ -143,5 +189,14 @@ class PatientService extends ModelService
 			$crit->compare('patient_id', $patient->id)->addInCondition('commissioning_body_id', $del_cb_ids);
 			\CommissioningBodyPatientAssignment::model()->deleteAll($crit);
 		}
+	}
+
+	public function fromJSON($blob)
+	{
+		$data = json_decode($blob,true);
+
+		$patient = new Patient($data);
+
+		return $patient;
 	}
 }

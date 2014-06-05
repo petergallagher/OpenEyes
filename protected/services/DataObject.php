@@ -147,4 +147,33 @@ abstract class DataObject implements FhirCompatible
 			}
 		}
 	}
+
+	/**
+	 * Convert this object to a serialised blob
+	 *
+	 * @return string
+	 */
+	public function serialise()
+	{
+		$values = get_object_vars($this);
+		return json_encode($this->serialiseSubObjects($values));
+	}
+
+	private function serialiseSubObjects($values)
+	{
+		foreach ($values as $key => $value) {
+			if ($value instanceof DataObject) {
+				$values[$key] = (array)$value;
+			} else if ($value instanceof ModelReference) {
+				$values[$key] = array(
+					'service' => $value->getServiceName(),
+					'id' => $value->getId(),
+				);
+			} else if (is_array($value)) {
+				$values[$key] = $this->serialiseSubObjects($value);
+			}
+		}
+
+		return $values;
+	}
 }
