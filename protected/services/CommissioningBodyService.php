@@ -18,7 +18,7 @@ namespace services;
 /**
  * Not to be confused with a CommissioningBodyService
  */
-class CommissioningBodyService extends ModelService
+class CommissioningBodyService extends DeclarativeModelService
 {
 	static protected $operations = array(self::OP_READ, self::OP_UPDATE, self::OP_CREATE, self::OP_SEARCH);
 
@@ -29,6 +29,22 @@ class CommissioningBodyService extends ModelService
 
 	static protected $primary_model = 'CommissioningBody';
 
+	static protected $model_map = array(
+		'CommissioningBody' => array(
+			'code' => 'code',
+			'name' => 'name',
+			'address' => array(self::TYPE_OBJECT, 'contact.address', 'Address'),
+		),
+		'Address' => array(
+			'line1' => 'address1',
+			'line2' => 'address2',
+			'city' => 'city',
+			'state' => 'county',
+			'zip' => 'postcode',
+			'country' => 'country.name',
+		),
+	);
+
 	public function search(array $params)
 	{
 		$model = $this->getSearchModel();
@@ -36,15 +52,6 @@ class CommissioningBodyService extends ModelService
 		if (isset($params['identifier'])) $model->code = $params['identifier'];
 
 		return $this->getResourcesFromDataProvider($model->search());
-	}
-
-	public function modelToResource($cb)
-	{
-		$res = parent::modelToResource($cb);
-		$res->code = $cb->code;
-		$res->name = $cb->name;
-		if ($cb->contact->address) $res->address = Address::fromModel($cb->contact->address);
-		return $res;
 	}
 
 	public function resourceToModel($res, $cb)
