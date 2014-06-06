@@ -81,7 +81,7 @@ class DeclarativeModelService extends ModelService
 		return $resource;
 	}
 
-	public function expandAttribute($model, $attribute)
+	private function expandAttribute($model, $attribute)
 	{
 		if ($dot = strpos($attribute,'.')) {
 			$relation = substr($attribute,0,$dot);
@@ -91,5 +91,46 @@ class DeclarativeModelService extends ModelService
 		}
 
 		return $model->$attribute;
+	}
+
+	/**
+	 * @param string $json
+	 * @return Resource
+	 */
+	public function jsonToResource($json)
+	{
+		$resource = parent::jsonToResource($json);
+
+		$model = json_decode($json);
+
+		return $this->parseJsonProperties($model, $this::$primary_model, $resource);
+	}
+
+	private function parseJsonProperties($model, $model_class_name, &$resource)
+	{
+		foreach ($this::$model_map[$model_class_name] as $key => $def) {
+			if (is_array($def)) {
+				switch ($def[0]) {
+					case self::TYPE_LIST:
+						$data_model = 'services\\'.$def[2];
+						$resource->$key = array_map(array('self','parseJsonProperties'), $model->$key, array_fill(0, count($model->$key), $def[2]), array_fill(0, count($model->$key), new $data_model(array())));
+						break;
+					case self::TYPE_REF:
+						$resource->$key = \Yii::app()->service->{$model->$key->service}($model->$key->id);
+						break;
+					case self::TYPE_OBJECT:
+						$object_model = 'services\\'.$def[2];
+						$resource->$key = $object_model::fromObject($model->$key);
+						break;
+					case self::TYPE_CONDITION:
+						$resource->$key = $model->$key;
+						break;
+				}
+			} else {
+				$resource->$key = $model->$key;
+			}
+		}
+
+		return $resource;
 	}
 }

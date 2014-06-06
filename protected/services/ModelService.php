@@ -114,6 +114,21 @@ abstract class ModelService extends InternalService
 	}
 
 	/**
+	 * @param string $json
+	 * @return Resource
+	 */
+	public function jsonToResource($json)
+	{
+		$class = static::getResourceClass();
+
+		if (!$model = @json_decode($json)) {
+			throw new Exception("Invalid json encountered: $json");
+		}
+
+		return new $class(array('id' => $model->id, 'last_modified' => $model->last_modified));
+	}
+
+	/**
 	 * @param Resource $resource
 	 * @param BaseActiveRecord $model
 	 */

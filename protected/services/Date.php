@@ -26,4 +26,11 @@ class Date extends \DateTime implements FhirCompatible
 	{
 		return $this->format('Y-m-d');
 	}
+
+	static public function fromObject($object)
+	{
+		$dtz = new \DateTimeZone($object->timezone);
+
+		return new self($object->date, $dtz);
+	}
 }
