@@ -15,14 +15,20 @@
 
 namespace services;
 
-class DataObjectTest extends \PHPUnit_Framework_TestCase
+class DataObjectTest extends \CDbTestCase
 {
+	public $fixtures = array(
+		'patients' => 'Patient',
+	);
+
 	static public function getMockDataTemplate()
 	{
 	}
 
 	public function setUp()
 	{
+		parent::setUp();
+
 		$schemas = array(
 			array(
 				'DataObjectTest_Obj1',
@@ -96,6 +102,23 @@ class DataObjectTest extends \PHPUnit_Framework_TestCase
 	public function testToFhir($fhir_object, $object)
 	{
 		$this->assertEquals($fhir_object, $object->toFhir());
+	}
+
+	public function testSerialise()
+	{
+		$patient = $this->patients('patient1');
+
+		$resource = \Yii::app()->service->Patient($patient->id);
+
+		$json = $resource->fetch()->serialise();
+
+		$this->assertTrue((boolean)@json_decode($json));
+
+		$data = json_decode($json);
+
+		$this->assertEquals('12345',$data->hos_num);
+		$this->assertCount(1,$data->addresses);
+		$this->assertEquals('bleakley creek',$data->addresses[0]->line2);
 	}
 }
 
