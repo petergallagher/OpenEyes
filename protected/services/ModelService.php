@@ -103,6 +103,21 @@ abstract class ModelService extends InternalService
 	}
 
 	/**
+	 * @param BaseActiveRecord $model
+	 * @return Resource
+	 */
+	public function modelToResource($model)
+	{
+		if (!isset($this::$model_map[get_class($model)])) {
+			throw new Exception("Unknown object type: ".get_class($model));
+		}
+
+		$class = static::getResourceClass();
+
+		return new $class(array('id' => $model->id, 'last_modified' => strtotime($model->last_modified_date)));
+	}
+
+	/**
 	 * @param Resource $resource
 	 * @param BaseActiveRecord $model
 	 */

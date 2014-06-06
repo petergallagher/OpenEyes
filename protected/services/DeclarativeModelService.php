@@ -28,13 +28,7 @@ class DeclarativeModelService extends ModelService
 	 */
 	public function modelToResource($model)
 	{
-		if (!isset($this::$model_map[get_class($model)])) {
-			throw new Exception("Unknown object type: ".get_class($model));
-		}
-
-		$class = static::getResourceClass();
-
-		$resource = new $class(array('id' => $model->id, 'last_modified' => strtotime($model->last_modified_date)));
+		$resource = parent::modelToResource($model);
 
 		$this->parseModelProperties($model, get_class($model), $resource);
 
