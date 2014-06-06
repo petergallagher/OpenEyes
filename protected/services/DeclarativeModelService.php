@@ -28,10 +28,6 @@ class DeclarativeModelService extends ModelService
 	 */
 	public function modelToResource($model)
 	{
-		if (!isset($this::$model_map[get_class($model)])) {
-			throw new Exception("Unknown object type: ".get_class($model));
-		}
-
 		$resource = parent::modelToResource($model);
 
 		$this->parseModelProperties($model, get_class($model), $resource);
@@ -41,6 +37,10 @@ class DeclarativeModelService extends ModelService
 
 	public function parseModelProperties($model, $model_class_name, &$resource)
 	{
+		if (!isset($this::$model_map[$model_class_name])) {
+			throw new \Exception("Unknown object type: $model_class_name");
+		}
+
 		foreach ($this::$model_map[$model_class_name] as $key => $def) {
 			if (is_array($def)) {
 				switch ($def[0]) {
@@ -54,7 +54,12 @@ class DeclarativeModelService extends ModelService
 						break;
 					case self::TYPE_OBJECT:
 						$object_model = 'services\\'.$def[2];
-						$resource->$key = new $object_model($model->{$def[1]});
+						$attribute = $this->expandAttribute($model,$def[1]);
+						if (is_object($attribute)) {
+							$resource->$key = $this->parseModelProperties($attribute, $def[2], new $object_model(array()));
+						} else {
+							$resource->$key = new $object_model($this->expandAttribute($model,$def[1]));
+						}
 						break;
 					case self::TYPE_CONDITION:
 						switch ($def[2]) {
@@ -62,11 +67,11 @@ class DeclarativeModelService extends ModelService
 								$resource->$key = $model->{$def[1]} == $def[3];
 								break;
 							default:
-								throw new Exception("Unhandled condition type: {$def[2]}");
+								throw new \Exception("Unhandled condition type: {$def[2]}");
 						}
 						break;
 					default:
-						throw new Exception("Unknown declarative type: ".$def[0]);
+						throw new \Exception("Unknown declarative type: ".$def[0]);
 				}
 			} else {
 				$resource->$key = $this->expandAttribute($model,$def);

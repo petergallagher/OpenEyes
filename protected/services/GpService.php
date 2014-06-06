@@ -15,7 +15,7 @@
 
 namespace services;
 
-class GpService extends ModelService
+class GpService extends DeclarativeModelService
 {
 	static protected $operations = array(self::OP_READ, self::OP_UPDATE, self::OP_DELETE, self::OP_CREATE, self::OP_SEARCH);
 
@@ -26,6 +26,25 @@ class GpService extends ModelService
 
 	static protected $primary_model = 'Gp';
 
+	static public $model_map = array(
+		'Gp' => array(
+			'gnc' => 'nat_id',
+			'title' => 'contact.title',
+			'family_name' => 'contact.last_name',
+			'given_name' => 'contact.first_name',
+			'primary_phone' => 'contact.primary_phone',
+			'address' => array(self::TYPE_OBJECT, 'contact.address', 'Address'),
+		),
+		'Address' => array(
+			'line1' => 'address1',
+			'line2' => 'address2',
+			'city' => 'city',
+			'state' => 'county',
+			'zip' => 'postcode',
+			'country' => 'country.name',
+		),
+	);
+
 	public function search(array $params)
 	{
 		$model = $this->getSearchModel();
@@ -33,18 +52,6 @@ class GpService extends ModelService
 		if (isset($params['identifier'])) $model->nat_id = $params['identifier'];
 
 		return $this->getResourcesFromDataProvider($model->search());
-	}
-
-	public function modelToResource($gp)
-	{
-		$res = parent::modelToResource($gp);
-		$res->gnc = $gp->nat_id;
-		$res->title = $gp->contact->title;
-		$res->family_name = $gp->contact->last_name;
-		$res->given_name = $gp->contact->first_name;
-		$res->primary_phone = $gp->contact->primary_phone ?: null;
-		if ($gp->contact->address) $resouce->address = Address::fromModel($gp->contact->address);
-		return $res;
 	}
 
 	public function resourceToModel($res, $gp)
