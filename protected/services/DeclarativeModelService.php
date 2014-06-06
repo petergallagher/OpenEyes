@@ -28,6 +28,10 @@ class DeclarativeModelService extends ModelService
 	 */
 	public function modelToResource($model)
 	{
+		if (!isset($this::$model_map[get_class($model)])) {
+			throw new Exception("Unknown object type: ".get_class($model));
+		}
+
 		$resource = parent::modelToResource($model);
 
 		$this->parseModelProperties($model, get_class($model), $resource);
