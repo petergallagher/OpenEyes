@@ -17,13 +17,18 @@ namespace services;
 
 class DeclarativeModelService extends ModelService
 {
+	const TYPE_LIST = 0;
+	const TYPE_REF = 1;
+	const TYPE_OBJECT = 2;
+	const TYPE_CONDITION = 3;
+
 	/**
 	 * @param BaseActiveRecord $model
 	 * @return Resource
 	 */
 	public function modelToResource($model)
 	{
-		if (!isset($this::$resource_map[get_class($model)])) {
+		if (!isset($this::$model_map[get_class($model)])) {
 			throw new Exception("Unknown object type: ".get_class($model));
 		}
 
@@ -36,59 +41,52 @@ class DeclarativeModelService extends ModelService
 		return $resource;
 	}
 
-	public function parseModelProperties($model, $model_map, &$resource)
+	public function parseModelProperties($model, $model_class_name, &$resource)
 	{
-		foreach ($this::$resource_map[$model_map] as $key => $def) {
-			if (is_string($def)) {
-				$resource->$key = $model->$def;
-			} else if (isset($def['relation']) && isset($def['field'])) {
-				$relation = $def['relation'];
-				$field = $def['field'];
-				$resource->$key = $model->$relation->$field;
-			} else if (isset($def['data_model'])) {
-				if (isset($def['relation'])) {
-					$relation = $def['relation'];
-					$related_data = $model->$relation->$key;
-				} else {
-					$related_data = $model->$key;
-				}
-
-				$data_model = 'services\\'.$def['data_model'];
-
-				switch($def['type']) {
-					case 'list':
-						$items = array();
-
-						if ($related_data) {
-							foreach ($related_data as $item) {
-								$object = new $data_model(array());
-								$items[] = $this->parseModelProperties($item, $def['data_model'], $object);
-							}
+		foreach ($this::$model_map[$model_class_name] as $key => $def) {
+			if (is_array($def)) {
+				switch ($def[0]) {
+					case self::TYPE_LIST:
+						$data_model = 'services\\'.$def[2];
+						$data_list = $this->expandAttribute($model,$def[1]);
+						$resource->$key = array_map(array('self','parseModelProperties'), $data_list, array_fill(0, count($data_list), $def[2]), array_fill(0, count($data_list), new $data_model(array())));
+						break;
+					case self::TYPE_REF:
+						$resource->$key = \Yii::app()->service->$def[2]($model->{$def[1]});
+						break;
+					case self::TYPE_OBJECT:
+						$object_model = 'services\\'.$def[2];
+						$resource->$key = new $object_model($model->{$def[1]});
+						break;
+					case self::TYPE_CONDITION:
+						switch ($def[2]) {
+							case 'equals':
+								$resource->$key = $model->{$def[1]} == $def[3];
+								break;
+							default:
+								throw new Exception("Unhandled condition type: {$def[2]}");
 						}
-
-						$resource->$key = $items;
-						break;
-					case 'date':
-						$resource->$key = new Date($model->{$def['field']});
 						break;
 					default:
-						throw new Exception("Unknown data model type: {$def['type']}");
+						throw new Exception("Unknown declarative type: ".$def[0]);
 				}
-			} else if (isset($def['reference'])) {
-				$reference = $def['reference'];
-				$name = $def['name'];
-				$resource->$name = \Yii::app()->service->$reference($model->$key);
-			} else if (isset($def['condition'])) {
-				switch ($def['condition']) {
-					case 'equals':
-						$resource->$key = $model->{$def['field']} == $def['value'];
-						break;
-					default:
-						throw new Exception("Unknown condition type: {$def['condition']}");
-				}
+			} else {
+				$resource->$key = $this->expandAttribute($model,$def);
 			}
 		}
 
 		return $resource;
+	}
+
+	public function expandAttribute($model, $attribute)
+	{
+		if ($dot = strpos($attribute,'.')) {
+			$relation = substr($attribute,0,$dot);
+			$attribute = substr($attribute,$dot+1,strlen($attribute));
+
+			return $model->$relation->$attribute;
+		}
+
+		return $model->$attribute;
 	}
 }
