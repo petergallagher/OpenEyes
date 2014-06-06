@@ -17,21 +17,6 @@ namespace services;
 
 class Address extends DataObject
 {
-	/*static public function fromModel(\Address $address)
-	{
-		return new static(
-			array(
-				'line1' => $address->address1,
-				'line2' => $address->address2 ?: null,
-				'city' => $address->city,
-				'state' => $address->county ?: null,
-				'zip' => $address->postcode,
-				'country' => $address->country->name,
-			)
-		);
-	}
-	*/
-
 	public $use = null;
 	public $line1;
 	public $line2 = null;
@@ -39,24 +24,4 @@ class Address extends DataObject
 	public $state = null;
 	public $zip;
 	public $country;
-
-	/*public function toModel(\Address $address)
-	{
-		$address->address1 = $this->line1;
-		$address->address2 = $this->line2;
-		$address->city = $this->city;
-		$address->county = $this->state;
-		$address->postcode = $this->zip;
-
-		$crit = new \CDbCriteria;
-		$crit->addColumnCondition(array('code' => $this->country, 'name' => $this->country), 'OR');
-		$country = \Country::model()->find($crit);
-
-		if (!$country) {
-			throw new InvalidValue("Unrecognised country: '{$this->country}'");
-		}
-
-		$address->country_id = $country->id;
-	}
-	*/
 }
