@@ -28,7 +28,7 @@ class PatientService extends DeclarativeModelService
 
 	static protected $primary_model = 'Patient';
 
-	static public $model_map = array(
+	static protected $model_map = array(
 		'Patient' => array(
 			'nhs_num' => 'nhs_num',
 			'hos_num' => 'hos_num',
