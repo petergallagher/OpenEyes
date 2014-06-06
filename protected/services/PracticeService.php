@@ -15,7 +15,7 @@
 
 namespace services;
 
-class PracticeService extends ModelService
+class PracticeService extends DeclarativeModelService
 {
 	static protected $operations = array(self::OP_READ, self::OP_UPDATE, self::OP_DELETE, self::OP_CREATE, self::OP_SEARCH);
 
@@ -26,6 +26,22 @@ class PracticeService extends ModelService
 
 	static protected $primary_model = 'Practice';
 
+	static protected $model_map = array(
+		'Practice' => array(
+			'code' => 'code',
+			'primary_phone' => 'phone',
+			'address' => array(self::TYPE_OBJECT, 'contact.address', 'Address'),
+		),
+		'Address' => array(
+			'line1' => 'address1',
+			'line2' => 'address2',
+			'city' => 'city',
+			'state' => 'county',
+			'zip' => 'postcode',
+			'country' => 'country.name',
+		),
+	);
+
 	public function search(array $params)
 	{
 		$model = $this->getSearchModel();
@@ -33,15 +49,6 @@ class PracticeService extends ModelService
 		if (isset($params['identifier'])) $model->code = $params['identifier'];
 
 		return $this->getResourcesFromDataProvider($model->search());
-	}
-
-	public function modelToResource($practice)
-	{
-		$res = parent::modelToResource($practice);
-		$res->code = $practice->code;
-		$res->primary_phone = $practice->phone;
-		if ($practice->contact->address) $res->address = Address::fromModel($practice->contact->address);
-		return $res;
 	}
 
 	public function resourceToModel($res, $prac)
