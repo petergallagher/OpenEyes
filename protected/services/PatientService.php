@@ -35,7 +35,7 @@ class PatientService extends DeclarativeModelService
 			'title' => 'contact.title',
 			'family_name' => 'contact.last_name',
 			'given_name' => 'contact.first_name',
-			'gender' => 'gender',
+			'gender' => 'gender.name',
 			'birth_date' => 'dob',
 			'date_of_death' => 'date_of_death',
 			'primary_phone' => 'contact.primary_phone',
@@ -148,14 +148,5 @@ class PatientService extends DeclarativeModelService
 			$crit->compare('patient_id', $patient->id)->addInCondition('commissioning_body_id', $del_cb_ids);
 			\CommissioningBodyPatientAssignment::model()->deleteAll($crit);
 		}
-	}
-
-	public function fromJSON($blob)
-	{
-		$data = json_decode($blob,true);
-
-		$patient = new Patient($data);
-
-		return $patient;
 	}
 }
