@@ -57,7 +57,7 @@ class ObjectParserModel extends ObjectParser
 			$relation = substr($ar_attribute,0,$dot);
 			$attribute = substr($ar_attribute,$dot+1,strlen($ar_attribute));
 
-			return $object->$relation->$attribute;
+			return $object->$relation ? $object->$relation->$attribute : null;
 		}
 
 		return $object->$ar_attribute;
