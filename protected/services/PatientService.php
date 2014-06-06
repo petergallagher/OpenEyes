@@ -39,11 +39,11 @@ class PatientService extends DeclarativeModelService
 			'birth_date' => 'dob',
 			'date_of_death' => 'date_of_death',
 			'primary_phone' => 'contact.primary_phone',
-			'addresses' => array(self::TYPE_LIST, 'contact.addresses', 'PatientAddress'),
+			'addresses' => array(self::TYPE_LIST, 'contact.addresses', 'PatientAddress', 'Address'),
 			'gp_ref' => array(self::TYPE_REF, 'gp_id', 'Gp'),
 			'prac_ref' => array(self::TYPE_REF, 'practice_id', 'Practice'),
 		),
-		'PatientAddress' => array(
+		'Address' => array(
 			'line1' => 'address1',
 			'line2' => 'address2',
 			'city' => 'city',
