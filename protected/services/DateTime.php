@@ -15,7 +15,7 @@
 
 namespace services;
 
-class Date extends \DateTime implements FhirCompatible
+class DateTime extends \DateTime implements FhirCompatible
 {
 	static public function fromFhir($value)
 	{
