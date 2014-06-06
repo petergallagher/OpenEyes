@@ -28,7 +28,7 @@ class ObjectParserJSON extends ObjectParser
 
 	protected function parseListType($data_list, $data_class, $model_class)
 	{
-		return array_map(array('self','parse'), $data_list, array_fill(0, count($data_list), $model_class), array_fill(0, count($data_list), new $data_class(array())));
+		return empty($data_list) ? array() : array_map(array('self','parse'), $data_list, array_fill(0, count($data_list), $model_class), array_fill(0, count($data_list), new $data_class(array())));
 	}
 
 	protected function parseReferenceType($object, $ar_attribute, $res_attribute, $data_class)

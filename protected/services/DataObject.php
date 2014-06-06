@@ -176,4 +176,10 @@ abstract class DataObject implements FhirCompatible
 
 		return $values;
 	}
+
+	static public function fromObject($object)
+	{
+		$data_class = get_called_class();
+		return new $data_class((array)$object);
+	}
 }
