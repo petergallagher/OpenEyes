@@ -57,6 +57,11 @@ class PatientService extends DeclarativeModelService
 		),
 	);
 
+	public static function getModelMap()
+	{
+		return self::$model_map;
+	}
+
 	public function search(array $params)
 	{
 		$model = $this->getSearchModel();
