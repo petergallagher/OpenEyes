@@ -15,7 +15,7 @@
 
 namespace services;
 
-class ObjectParserModelTest extends \CDbTestCase
+class JSONConverterTest extends \CDbTestCase
 {
 	public $fixtures = array(
 		'patients' => 'Patient',
@@ -25,15 +25,7 @@ class ObjectParserModelTest extends \CDbTestCase
 
 	public function testParse_DirectKeys()
 	{
-		$patient = new \Patient;
-
-		foreach (array('hos_num','nhs_num','dob','date_of_death') as $field) {
-			if (strstr($field,'date')) {
-				$patient->$field = date('Y-m-d',rand(1000,time()));
-			} else {
-				$patient->$field = substr(str_shuffle("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"), 0, rand(3,10));
-			}
-		}
+		$json = '{"nhs_num":"dJ6LM2","hos_num":"ZrQt","title":null,"family_name":null,"given_name":null,"gender":null,"birth_date":"8U4Knwvx","date_of_death":"1983-08-01","primary_phone":null,"addresses":[],"care_providers":[],"gp_ref":null,"prac_ref":null,"cb_refs":[],"id":null,"last_modified":null}';
 
 		$map = array(
 			'Patient' => array(
@@ -44,27 +36,20 @@ class ObjectParserModelTest extends \CDbTestCase
 			)
 		);
 
-		$op = new ObjectParserModel($map);
+		$op = new JSONConverter($map);
 
-		$resource = $op->parseObject($patient, new Patient(array()));
+		$resource = $op->jsonToResource($json, 'Patient', new Patient(array()));
 
 		$this->assertInstanceOf('services\\Patient',$resource);
-		$this->assertEquals($patient->hos_num, $resource->hos_num);
-		$this->assertEquals($patient->nhs_num, $resource->nhs_num);
-		$this->assertEquals($patient->dob, $resource->birth_date);
-		$this->assertEquals($patient->date_of_death, $resource->date_of_death);
+		$this->assertEquals('ZrQt', $resource->hos_num);
+		$this->assertEquals('dJ6LM2', $resource->nhs_num);
+		$this->assertEquals('8U4Knwvx', $resource->birth_date);
+		$this->assertEquals('1983-08-01', $resource->date_of_death);
 	}
 
 	public function testParse_RelationKeys()
 	{
-		$patient = new \Patient;
-		$contact = new \Contact;
-
-		foreach (array('title','last_name','first_name','primary_phone') as $field) {
-			$contact->$field = substr(str_shuffle("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"), 0, rand(3,10));
-		}
-
-		$patient->contact = $contact;
+		$json = '{"nhs_num":null,"hos_num":null,"title":"SLXbgEH","family_name":"Gy39Y","given_name":"up2gH","gender":null,"birth_date":null,"date_of_death":null,"primary_phone":"KweBN","addresses":[],"care_providers":[],"gp_ref":null,"prac_ref":null,"cb_refs":[],"id":null,"last_modified":null}';
 
 		$map = array(
 			'Patient' => array(
@@ -75,31 +60,20 @@ class ObjectParserModelTest extends \CDbTestCase
 			)
 		);
 
-		$op = new ObjectParserModel($map);
+		$op = new JSONConverter($map);
 
-		$resource = $op->parseObject($patient, new Patient(array()));
+		$resource = $op->jsonToResource($json, 'Patient', new Patient(array()));
 
 		$this->assertInstanceOf('services\\Patient',$resource);
-		$this->assertEquals($contact->title, $resource->title);
-		$this->assertEquals($contact->last_name, $resource->family_name);
-		$this->assertEquals($contact->first_name, $resource->given_name);
-		$this->assertEquals($contact->primary_phone, $resource->primary_phone);
+		$this->assertEquals('SLXbgEH', $resource->title);
+		$this->assertEquals('Gy39Y', $resource->family_name);
+		$this->assertEquals('up2gH', $resource->given_name);
+		$this->assertEquals('KweBN', $resource->primary_phone);
 	}
 
 	public function testParse_Lists()
 	{
-		$patient = new \Patient;
-		$contact = new \Contact;
-		$address = new \Address;
-
-		foreach (array('address1','address2','city','postcode','county') as $field) {
-			$address->$field = substr(str_shuffle("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"), 0, rand(3,10));
-		}
-
-		$address->country_id = 1;
-
-		$contact->addresses = array($address);
-		$patient->contact = $contact;
+		$json = '{"nhs_num":null,"hos_num":null,"title":null,"family_name":null,"given_name":null,"gender":null,"birth_date":null,"date_of_death":null,"primary_phone":null,"addresses":[{"date_start":null,"date_end":null,"correspond":false,"transport":false,"use":null,"line1":"CpPtQ","line2":"hAUwRF9","city":"WBRGT","state":"BxuEvQb","zip":"HoT9N3kj","country":"United States"}],"care_providers":[],"gp_ref":null,"prac_ref":null,"cb_refs":[],"id":null,"last_modified":null}';
 
 		$map = array(
 			'Patient' => array(
@@ -115,27 +89,24 @@ class ObjectParserModelTest extends \CDbTestCase
 			),
 		);
 
-		$op = new ObjectParserModel($map);
+		$op = new JSONConverter($map);
 
-		$resource = $op->parseObject($patient, new Patient(array()));
+		$resource = $op->jsonToResource($json, 'Patient', new Patient(array()));
 
 		$this->assertInstanceOf('services\\Patient',$resource);
 		$this->assertCount(1, $resource->addresses);
 		$this->assertInstanceOf('services\\PatientAddress',$resource->addresses[0]);
-		$this->assertEquals($address->address1, $resource->addresses[0]->line1);
-		$this->assertEquals($address->address2, $resource->addresses[0]->line2);
-		$this->assertEquals($address->city, $resource->addresses[0]->city);
-		$this->assertEquals($address->county, $resource->addresses[0]->state);
-		$this->assertEquals($address->postcode, $resource->addresses[0]->zip);
-		$this->assertEquals($address->country->name, $resource->addresses[0]->country);
+		$this->assertEquals('CpPtQ', $resource->addresses[0]->line1);
+		$this->assertEquals('hAUwRF9', $resource->addresses[0]->line2);
+		$this->assertEquals('WBRGT', $resource->addresses[0]->city);
+		$this->assertEquals('BxuEvQb', $resource->addresses[0]->state);
+		$this->assertEquals('HoT9N3kj', $resource->addresses[0]->zip);
+		$this->assertEquals('United States', $resource->addresses[0]->country);
 	}
 
 	public function testParse_References()
 	{
-		$patient = new \Patient;
-
-		$patient->gp_id = 17;
-		$patient->practice_id = 41;
+		$json = '{"nhs_num":null,"hos_num":null,"title":null,"family_name":null,"given_name":null,"gender":null,"birth_date":null,"date_of_death":null,"primary_phone":null,"addresses":[],"care_providers":[],"gp_ref":{"service":"Gp","id":17},"prac_ref":{"service":"Practice","id":41},"cb_refs":[],"id":null,"last_modified":null}';
 
 		$map = array(
 			'Patient' => array(
@@ -144,32 +115,24 @@ class ObjectParserModelTest extends \CDbTestCase
 			)
 		);
 
-		$op = new ObjectParserModel($map);
+		$op = new JSONConverter($map);
 
-		$resource = $op->parseObject($patient, new Patient(array()));
+		$resource = $op->jsonToResource($json, 'Patient', new Patient(array()));
 
 		$this->assertInstanceOf('services\\Patient',$resource);
 
 		$this->assertInstanceOf('services\\GpReference',$resource->gp_ref);
-		$this->assertEquals($patient->gp_id, $resource->gp_ref->getId());
+		$this->assertEquals(17, $resource->gp_ref->getId());
 		$this->assertEquals('Gp', $resource->gp_ref->getServiceName());
 
 		$this->assertInstanceOf('services\\PracticeReference',$resource->prac_ref);
-		$this->assertEquals($patient->practice_id, $resource->prac_ref->getId());
+		$this->assertEquals(41, $resource->prac_ref->getId());
 		$this->assertEquals('Practice', $resource->prac_ref->getServiceName());
 	}
 
 	public function testParse_DateObjects()
 	{
-		$patient = new \Patient;
-		$contact = new \Contact;
-		$address = new \Address;
-
-		$address->date_start = '2012-01-01';
-		$address->date_end = '2013-04-05';
-
-		$contact->addresses = array($address);
-		$patient->contact = $contact;
+		$json = '{"nhs_num":null,"hos_num":null,"title":null,"family_name":null,"given_name":null,"gender":null,"birth_date":null,"date_of_death":null,"primary_phone":null,"addresses":[{"date_start":{"date":"2012-01-01 00:00:00","timezone_type":3,"timezone":"Europe\/London"},"date_end":{"date":"2013-04-05 00:00:00","timezone_type":3,"timezone":"Europe\/London"},"correspond":false,"transport":false,"use":null,"line1":null,"line2":null,"city":null,"state":null,"zip":null,"country":null}],"care_providers":[],"gp_ref":null,"prac_ref":null,"cb_refs":[],"id":null,"last_modified":null}';
 
 		$map = array(
 			'Patient' => array(
@@ -181,30 +144,23 @@ class ObjectParserModelTest extends \CDbTestCase
 			),
 		);
 
-		$op = new ObjectParserModel($map);
+		$op = new JSONConverter($map);
 
-		$resource = $op->parseObject($patient, new Patient(array()));
+		$resource = $op->jsonToResource($json, 'Patient', new Patient(array()));
 
 		$this->assertInstanceOf('services\\Patient',$resource);
 		$this->assertCount(1, $resource->addresses);
 		$this->assertInstanceOf('services\\PatientAddress',$resource->addresses[0]);
 
 		$this->assertInstanceOf('services\\Date',$resource->addresses[0]->date_start);
-		$this->assertEquals(strtotime($address->date_start),$resource->addresses[0]->date_start->getTimestamp());
+		$this->assertEquals(strtotime('2012-01-01'),$resource->addresses[0]->date_start->getTimestamp());
 		$this->assertInstanceOf('services\\Date',$resource->addresses[0]->date_end);
-		$this->assertEquals(strtotime($address->date_end),$resource->addresses[0]->date_end->getTimestamp());
+		$this->assertEquals(strtotime('2013-04-05'),$resource->addresses[0]->date_end->getTimestamp());
 	}
 
 	public function testParse_ConditionalBooleans()
 	{
-		$patient = new \Patient;
-		$contact = new \Contact;
-		$address = new \Address;
-	
-		$address->address_type_id = 3;
-
-		$contact->addresses = array($address);
-		$patient->contact = $contact;
+		$json = '{"nhs_num":null,"hos_num":null,"title":null,"family_name":null,"given_name":null,"gender":null,"birth_date":null,"date_of_death":null,"primary_phone":null,"addresses":[{"date_start":null,"date_end":null,"correspond":true,"transport":false,"use":null,"line1":null,"line2":null,"city":null,"state":null,"zip":null,"country":null}],"care_providers":[],"gp_ref":null,"prac_ref":null,"cb_refs":[],"id":null,"last_modified":null}';
 
 		$map = array(
 			'Patient' => array(
@@ -216,9 +172,9 @@ class ObjectParserModelTest extends \CDbTestCase
 			),
 		);
 		
-		$op = new ObjectParserModel($map);
+		$op = new JSONConverter($map);
 
-		$resource = $op->parseObject($patient, new Patient(array()));
+		$resource = $op->jsonToResource($json, 'Patient', new Patient(array()));
 
 		$this->assertInstanceOf('services\\Patient',$resource);
 		$this->assertCount(1, $resource->addresses);
@@ -226,30 +182,11 @@ class ObjectParserModelTest extends \CDbTestCase
 
 		$this->assertTrue($resource->addresses[0]->correspond);
 		$this->assertFalse($resource->addresses[0]->transport);
-
-		$address->address_type_id = 4;
-
-		$resource = $op->parseObject($patient, new Patient(array()));
-
-		$this->assertInstanceOf('services\\Patient',$resource);
-		$this->assertCount(1, $resource->addresses);
-		$this->assertInstanceOf('services\\PatientAddress',$resource->addresses[0]);
-
-		$this->assertFalse($resource->addresses[0]->correspond);
-		$this->assertTrue($resource->addresses[0]->transport);
 	}
 
 	public function testParse_FullPatient()
 	{
-		$patient = $this->patients('patient1');
-		$contact = $this->contacts('contact1');
-		$address = $this->addresses('address1');
-
-		$contact->addresses = array($address);
-		$patient->contact = $contact;
-
-		$patient->gp_id = 2;
-		$patient->practice_id = 5;
+		$json = '{"nhs_num":"54321","hos_num":"12345","title":"Mr","family_name":"Aylward","given_name":"Jim","gender":"Male","birth_date":"1970-01-01","date_of_death":null,"primary_phone":"07123 456789","addresses":[{"date_start":{"date":"2014-06-06 16:39:29","timezone_type":3,"timezone":"Europe\/London"},"date_end":{"date":"2014-06-06 16:39:29","timezone_type":3,"timezone":"Europe\/London"},"correspond":false,"transport":false,"use":null,"line1":"flat 1","line2":"bleakley creek","city":"flitchley","state":"london","zip":"ec1v 0dx","country":"United States"}],"care_providers":[],"gp_ref":{"service":"Gp","id":2},"prac_ref":{"service":"Practice","id":5},"cb_refs":[],"id":null,"last_modified":null}';
 
 		$map = array(
 			'Patient' => array(
@@ -280,9 +217,9 @@ class ObjectParserModelTest extends \CDbTestCase
 			),
 		);
 
-		$op = new ObjectParserModel($map);
+		$op = new JSONConverter($map);
 
-		$resource = $op->parseObject($patient, new Patient(array()));
+		$resource = $op->jsonToResource($json, 'Patient', new Patient(array()));
 
 		$this->assertEquals('54321',$resource->nhs_num);
 		$this->assertEquals('12345',$resource->hos_num);
@@ -308,11 +245,11 @@ class ObjectParserModelTest extends \CDbTestCase
 		$this->assertFalse($resource->addresses[0]->transport);
 
 		$this->assertInstanceOf('services\\GpReference',$resource->gp_ref);
-		$this->assertEquals($patient->gp_id, $resource->gp_ref->getId());
+		$this->assertEquals(2, $resource->gp_ref->getId());
 		$this->assertEquals('Gp', $resource->gp_ref->getServiceName());
 
 		$this->assertInstanceOf('services\\PracticeReference',$resource->prac_ref);
-		$this->assertEquals($patient->practice_id, $resource->prac_ref->getId());
+		$this->assertEquals(5, $resource->prac_ref->getId());
 		$this->assertEquals('Practice', $resource->prac_ref->getServiceName());
 	}
 }

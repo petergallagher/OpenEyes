@@ -15,7 +15,7 @@
 
 namespace services;
 
-abstract class ObjectParser
+class ModelConverter
 {
 	protected $map;
 
@@ -24,11 +24,10 @@ abstract class ObjectParser
 		$this->map = $map;
 	}
 
-	abstract protected function parseListType($data_list, $data_class, $model_class);
-	abstract protected function parseReferenceType($object, $key, $attribute, $data_class);
-	abstract protected function parseObjectType($data, $data_class);
-	abstract protected function parseConditionType($object, $key, $model_field, $condition_type, $condition_value);
-	abstract protected function expandObjectAttribute($object, $ar_attribute, $res_attribute);
+	public function modelToResource($object, &$resource)
+	{
+		return $this->parse($object, get_class($object), $resource);
+	}
 
 	protected function parse($object, $object_class_name, &$resource)
 	{
@@ -38,25 +37,47 @@ abstract class ObjectParser
 
 		foreach ($this->map[$object_class_name] as $res_attribute => $def) {
 			if (is_array($def)) {
-				switch ($type = array_shift($def)) {
+				switch ($def[0]) {
 					case DeclarativeModelService::TYPE_LIST:
-						list($ar_attribute, $data_class, $model_class) = $def;
-						$resource->$res_attribute = $this->parseListType($this->expandObjectAttribute($object, $ar_attribute, $res_attribute), 'services\\'.$data_class, $model_class);
+						$data_list = $this->expandObjectAttribute($object, $def[1], $res_attribute);
+						$data_class = 'services\\'.$def[2];
+
+						$resource->$res_attribute = empty($data_list) ?
+							array() :
+							array_map(array(
+									'self','modelToResource'
+								),
+								$data_list,
+								array_fill(0, count($data_list), new $data_class)
+							);
 						break;
 					case DeclarativeModelService::TYPE_REF:
-						list($ar_attribute, $data_class) = $def;
-						$resource->$res_attribute = $this->parseReferenceType($object, $ar_attribute, $res_attribute, $data_class);
+						$data_class = $def[2];
+
+						$resource->$res_attribute = \Yii::app()->service->$data_class($object->{$def[1]});
 						break;
 					case DeclarativeModelService::TYPE_OBJECT:
-						list($ar_attribute, $data_class) = $def;
-						$resource->$res_attribute = $this->parseObjectType($this->expandObjectAttribute($object, $ar_attribute, $res_attribute), 'services\\'.$data_class);
+						$data = $this->expandObjectAttribute($object, $def[1], $res_attribute);
+						$data_class = 'services\\'.$def[2];
+
+						if (is_object($data)) {
+							$resource->$res_attribute = $this->modelToResource($data, new $data_class);
+						} else {
+							$resource->$res_attribute = new $data_class($data);
+						}
 						break;
 					case DeclarativeModelService::TYPE_CONDITION:
-						list($ar_attribute, $condition_type, $condition_value) = $def;
-						$resource->$res_attribute = $this->parseConditionType($object, $ar_attribute, $res_attribute, $condition_type, $condition_value);
+						switch ($def[2]) {
+							case 'equals':
+								$resource->$res_attribute = $object->{$def[1]} == $def[3];
+								break;
+							default:
+								throw new Exception("Unknown condition type: {$def[2]}");
+						}
+
 						break;
 					default:
-						throw new \Exception("Unknown declarative type: $type");
+						throw new \Exception("Unknown declarative type: {$def[0]}");
 				}
 			} else {
 				$resource->$res_attribute = $this->expandObjectAttribute($object, $def, $res_attribute);
@@ -64,5 +85,17 @@ abstract class ObjectParser
 		}
 
 		return $resource;
+	}
+
+	protected function expandObjectAttribute($object, $ar_attribute, $res_attribute)
+	{
+		if ($dot = strpos($ar_attribute,'.')) {
+			$relation = substr($ar_attribute,0,$dot);
+			$attribute = substr($ar_attribute,$dot+1,strlen($ar_attribute));
+
+			return $object->$relation ? $object->$relation->$attribute : null;
+		}
+
+		return $object->$ar_attribute;
 	}
 }

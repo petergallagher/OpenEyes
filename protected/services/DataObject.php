@@ -93,7 +93,7 @@ abstract class DataObject implements FhirCompatible
 	/**
 	 * @param array $values
 	 */
-	public function __construct(array $values)
+	public function __construct($values=array())
 	{
 		foreach ($values as $name => $value) {
 			$this->$name = $value;
