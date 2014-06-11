@@ -163,7 +163,10 @@ abstract class DataObject implements FhirCompatible
 	{
 		foreach ($values as $key => $value) {
 			if ($value instanceof DataObject) {
-				$values[$key] = (array)$value;
+				$values[$key] = array();
+				foreach ($value as $_key => $_value) {
+					$values[$key][$_key] = $_value;
+				}
 			} else if ($value instanceof ModelReference) {
 				$values[$key] = array(
 					'service' => $value->getServiceName(),

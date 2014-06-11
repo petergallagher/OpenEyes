@@ -112,7 +112,7 @@ class DataObjectTest extends \CDbTestCase
 
 		$json = $resource->fetch()->serialise();
 
-		$this->assertTrue((boolean)@json_decode($json));
+		$this->assertTrue((boolean)json_decode($json));
 
 		$data = json_decode($json);
 
