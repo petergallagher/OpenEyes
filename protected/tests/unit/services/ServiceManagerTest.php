@@ -156,6 +156,14 @@ class ServiceManagerTest extends \PHPUnit_Framework_TestCase
 
 class ServiceManagerTest_InternalResourceService extends InternalService
 {
+	public function getReference($id)
+	{
+		return new ServiceManagerTest_InternalResourceReference($this, $id);
+	}
+}
+
+class ServiceManagerTest_InternalResourceReference extends InternalReference
+{
 }
 
 class ServiceManagerTest_InternalResource extends Resource
@@ -167,6 +175,14 @@ class ServiceManagerTest_InternalResource extends Resource
 }
 
 class ServiceManagerTest_InternalAmbiguousResourceService extends InternalService
+{
+	public function getReference($id)
+	{
+		return new ServiceManagerTest_InternalAmbiguousResourceReference($this, $id);
+	}
+}
+
+class ServiceManagerTest_InternalAmbiguousResourceReference extends InternalReference
 {
 }
 
@@ -189,6 +205,14 @@ class ServiceManagerTest_InternalAmbiguousResource extends Resource
 }
 
 class ServiceManagerTest_NonFhirResourceService extends InternalService
+{
+	public function getReference($id)
+	{
+		return new ServiceManagerTest_NonFhirResourceReference($this, $id);
+	}
+}
+
+class ServiceManagerTest_NonFhirResourceReference extends InternalReference
 {
 }
 
