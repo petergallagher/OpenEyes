@@ -132,7 +132,7 @@ abstract class ModelService extends InternalService
 	 * @param Resource $resource
 	 * @param BaseActiveRecord $model
 	 */
-	public function resourceToModel($resource, $model)
+	public function resourceToModelOLD($resource, $model)
 	{
 		throw new ProcessingNotSupported("Can't write resources of type '" . get_class($resource) . "' to model layer");
 	}

@@ -188,34 +188,7 @@ class JSONConverterTest extends \CDbTestCase
 	{
 		$json = '{"nhs_num":"54321","hos_num":"12345","title":"Mr","family_name":"Aylward","given_name":"Jim","gender":"Male","birth_date":"1970-01-01","date_of_death":null,"primary_phone":"07123 456789","addresses":[{"date_start":{"date":"2014-06-06 16:39:29","timezone_type":3,"timezone":"Europe\/London"},"date_end":{"date":"2014-06-06 16:39:29","timezone_type":3,"timezone":"Europe\/London"},"correspond":false,"transport":false,"use":null,"line1":"flat 1","line2":"bleakley creek","city":"flitchley","state":"london","zip":"ec1v 0dx","country":"United States"}],"care_providers":[],"gp_ref":{"service":"Gp","id":2},"prac_ref":{"service":"Practice","id":5},"cb_refs":[],"id":null,"last_modified":null}';
 
-		$map = array(
-			'Patient' => array(
-				'nhs_num' => 'nhs_num',
-				'hos_num' => 'hos_num',
-				'title' => 'contact.title',
-				'family_name' => 'contact.last_name',
-				'given_name' => 'contact.first_name',
-				'gender' => 'gender.name',
-				'birth_date' => 'dob',
-				'date_of_death' => 'date_of_death',
-				'primary_phone' => 'contact.primary_phone',
-				'addresses' => array(DeclarativeModelService::TYPE_LIST, 'contact.addresses', 'PatientAddress', 'Address'),
-				'gp_ref' => array(DeclarativeModelService::TYPE_REF, 'gp_id', 'Gp'),
-				'prac_ref' => array(DeclarativeModelService::TYPE_REF, 'practice_id', 'Practice'),
-			),
-			'Address' => array(
-				'line1' => 'address1',
-				'line2' => 'address2',
-				'city' => 'city',
-				'state' => 'county',
-				'zip' => 'postcode',
-				'country' => 'country.name',
-				'date_start' => array(DeclarativeModelService::TYPE_OBJECT, 'date_start', 'Date'),
-				'date_end' => array(DeclarativeModelService::TYPE_OBJECT, 'date_end', 'Date'),
-				'correspond' => array(DeclarativeModelService::TYPE_CONDITION, 'address_type_id', 'equals', \AddressType::CORRESPOND),
-				'transport' => array(DeclarativeModelService::TYPE_CONDITION, 'address_type_id', 'equals', \AddressType::TRANSPORT),
-			),
-		);
+		$map = PatientService::getModelMap();
 
 		$op = new JSONConverter($map);
 

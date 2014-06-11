@@ -15,49 +15,7 @@
 
 namespace services;
 
-class DeclarativeModelService extends ModelService
+class Country extends Resource
 {
-	const TYPE_LIST = 0;
-	const TYPE_REF = 1;
-	const TYPE_OBJECT = 2;
-	const TYPE_CONDITION = 3;
-	const TYPE_RESOURCE = 4;
-	const TYPE_REF_LIST = 5;
-
-	/**
-	 * @param BaseActiveRecord $model
-	 * @return Resource
-	 */
-	public function modelToResource($model)
-	{
-		$resource = parent::modelToResource($model);
-
-		$mc = new ModelConverter($this::$model_map);
-
-		return $mc->modelToResource($model, $resource);
-	}
-
-	/**
-	 * @param string $json
-	 * @return Resource
-	 */
-	public function jsonToResource($json)
-	{
-		$resource = parent::jsonToResource($json);
-
-		$jc  = new JSONConverter($this::$model_map);
-
-		return $jc->jsonToResource($json, $this::$primary_model, $resource);
-	}
-
-	/**
-	 * @param object $resource
-	 * @return object $model
-	 */
-	public function resourceToModel($resource, $save=true)
-	{
-		$mc = new ModelConverter($this::$model_map);
-
-		return $mc->resourceToModel($resource, $this::$primary_model, $save);
-	}
+	public $name;
 }

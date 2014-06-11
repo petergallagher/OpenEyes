@@ -35,13 +35,14 @@ class PatientService extends DeclarativeModelService
 			'title' => 'contact.title',
 			'family_name' => 'contact.last_name',
 			'given_name' => 'contact.first_name',
-			'gender' => 'gender.name',
+			'gender' => array(self::TYPE_RESOURCE, 'gender', 'Gender'),
 			'birth_date' => 'dob',
 			'date_of_death' => 'date_of_death',
 			'primary_phone' => 'contact.primary_phone',
-			'addresses' => array(self::TYPE_LIST, 'contact.addresses', 'PatientAddress', 'Address'),
+			'addresses' => array(self::TYPE_LIST, 'contact.addresses', 'PatientAddress', 'Address', 'contact_id'),
 			'gp_ref' => array(self::TYPE_REF, 'gp_id', 'Gp'),
 			'prac_ref' => array(self::TYPE_REF, 'practice_id', 'Practice'),
+			'cb_refs' => array(self::TYPE_REF_LIST, 'commissioningbody_assignments', 'commissioning_body_id', 'CommissioningBody'),
 		),
 		'Address' => array(
 			'line1' => 'address1',
@@ -49,11 +50,17 @@ class PatientService extends DeclarativeModelService
 			'city' => 'city',
 			'state' => 'county',
 			'zip' => 'postcode',
-			'country' => 'country.name',
+			'country' => array(self::TYPE_RESOURCE, 'country', 'Country'),
 			'date_start' => array(self::TYPE_OBJECT, 'date_start', 'Date'),
 			'date_end' => array(self::TYPE_OBJECT, 'date_end', 'Date'),
 			'correspond' => array(self::TYPE_CONDITION, 'address_type_id', 'equals', \AddressType::CORRESPOND),
 			'transport' => array(self::TYPE_CONDITION, 'address_type_id', 'equals', \AddressType::TRANSPORT),
+		),
+		'Gender' => array(
+			'name' => 'name',
+		),
+		'Country' => array(
+			'name' => 'name',
 		),
 	);
 
@@ -78,7 +85,7 @@ class PatientService extends DeclarativeModelService
 		return $this->getResourcesFromDataProvider($model->search($searchParams));
 	}
 
-	public function resourceToModel($res, $patient)
+	public function resourceToModelOLD($res, $patient)
 	{
 		$patient->nhs_num = $res->nhs_num;
 		$patient->hos_num = $res->hos_num;

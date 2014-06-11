@@ -33,4 +33,9 @@ class Date extends \DateTime implements FhirCompatible
 
 		return new self($object->date, $dtz);
 	}
+
+	public function toModelValue()
+	{
+		return $this->format('Y-m-d');
+	}
 }

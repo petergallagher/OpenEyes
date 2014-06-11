@@ -15,49 +15,29 @@
 
 namespace services;
 
-class DeclarativeModelService extends ModelService
+class GenderService extends DeclarativeModelService
 {
-	const TYPE_LIST = 0;
-	const TYPE_REF = 1;
-	const TYPE_OBJECT = 2;
-	const TYPE_CONDITION = 3;
-	const TYPE_RESOURCE = 4;
-	const TYPE_REF_LIST = 5;
+	static protected $operations = array(self::OP_READ, self::OP_UPDATE, self::OP_DELETE, self::OP_CREATE, self::OP_SEARCH);
 
-	/**
-	 * @param BaseActiveRecord $model
-	 * @return Resource
-	 */
-	public function modelToResource($model)
+	static protected $search_params = array(
+		'id' => self::TYPE_TOKEN,
+		'identifier' => self::TYPE_TOKEN,
+	);
+
+	static protected $primary_model = 'Gender';
+
+	static protected $model_map = array(
+		'Gender' => array(
+			'name' => 'name',
+		)
+	);
+
+	public function search(array $params)
 	{
-		$resource = parent::modelToResource($model);
+		$model = $this->getSearchModel();
+		if (isset($params['id'])) $model->id = $params['id'];
+		if (isset($params['identifier'])) $model->nat_id = $params['identifier'];
 
-		$mc = new ModelConverter($this::$model_map);
-
-		return $mc->modelToResource($model, $resource);
-	}
-
-	/**
-	 * @param string $json
-	 * @return Resource
-	 */
-	public function jsonToResource($json)
-	{
-		$resource = parent::jsonToResource($json);
-
-		$jc  = new JSONConverter($this::$model_map);
-
-		return $jc->jsonToResource($json, $this::$primary_model, $resource);
-	}
-
-	/**
-	 * @param object $resource
-	 * @return object $model
-	 */
-	public function resourceToModel($resource, $save=true)
-	{
-		$mc = new ModelConverter($this::$model_map);
-
-		return $mc->resourceToModel($resource, $this::$primary_model, $save);
+		return $this->getResourcesFromDataProvider($model->search());
 	}
 }

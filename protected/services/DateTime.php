@@ -26,4 +26,9 @@ class DateTime extends \DateTime implements FhirCompatible
 	{
 		return $this->format(DATE_RFC3339);
 	}
+
+	public function toModelValue()
+	{
+		return $this->format('Y-m-d H:i:s');
+	}
 }

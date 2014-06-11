@@ -251,34 +251,7 @@ class ModelConverterTest extends \CDbTestCase
 		$patient->gp_id = 2;
 		$patient->practice_id = 5;
 
-		$map = array(
-			'Patient' => array(
-				'nhs_num' => 'nhs_num',
-				'hos_num' => 'hos_num',
-				'title' => 'contact.title',
-				'family_name' => 'contact.last_name',
-				'given_name' => 'contact.first_name',
-				'gender' => 'gender.name',
-				'birth_date' => 'dob',
-				'date_of_death' => 'date_of_death',
-				'primary_phone' => 'contact.primary_phone',
-				'addresses' => array(DeclarativeModelService::TYPE_LIST, 'contact.addresses', 'PatientAddress', 'Address'),
-				'gp_ref' => array(DeclarativeModelService::TYPE_REF, 'gp_id', 'Gp'),
-				'prac_ref' => array(DeclarativeModelService::TYPE_REF, 'practice_id', 'Practice'),
-			),
-			'Address' => array(
-				'line1' => 'address1',
-				'line2' => 'address2',
-				'city' => 'city',
-				'state' => 'county',
-				'zip' => 'postcode',
-				'country' => 'country.name',
-				'date_start' => array(DeclarativeModelService::TYPE_OBJECT, 'date_start', 'Date'),
-				'date_end' => array(DeclarativeModelService::TYPE_OBJECT, 'date_end', 'Date'),
-				'correspond' => array(DeclarativeModelService::TYPE_CONDITION, 'address_type_id', 'equals', \AddressType::CORRESPOND),
-				'transport' => array(DeclarativeModelService::TYPE_CONDITION, 'address_type_id', 'equals', \AddressType::TRANSPORT),
-			),
-		);
+		$map = PatientService::getModelMap();
 
 		$op = new ModelConverter($map);
 
@@ -289,7 +262,8 @@ class ModelConverterTest extends \CDbTestCase
 		$this->assertEquals('Mr',$resource->title);
 		$this->assertEquals('Aylward',$resource->family_name);
 		$this->assertEquals('Jim',$resource->given_name);
-		$this->assertEquals('Male',$resource->gender);
+		$this->assertInstanceOf('services\Gender', $resource->gender);
+		$this->assertEquals('Male',$resource->gender->name);
 		$this->assertEquals('1970-01-01',$resource->birth_date);
 		$this->assertEquals('07123 456789',$resource->primary_phone);
 
@@ -300,7 +274,8 @@ class ModelConverterTest extends \CDbTestCase
 		$this->assertEquals($resource->addresses[0]->city, 'flitchley');
 		$this->assertEquals($resource->addresses[0]->state, 'london');
 		$this->assertEquals($resource->addresses[0]->zip, 'ec1v 0dx');
-		$this->assertEquals($resource->addresses[0]->country, 'United States');
+		$this->assertInstanceOf('services\Country', $resource->addresses[0]->country);
+		$this->assertEquals($resource->addresses[0]->country->name, 'United States');
 
 		$this->assertInstanceOf('services\\Date',$resource->addresses[0]->date_start);
 		$this->assertInstanceOf('services\\Date',$resource->addresses[0]->date_end);
@@ -314,5 +289,49 @@ class ModelConverterTest extends \CDbTestCase
 		$this->assertInstanceOf('services\\PracticeReference',$resource->prac_ref);
 		$this->assertEquals($patient->practice_id, $resource->prac_ref->getId());
 		$this->assertEquals('Practice', $resource->prac_ref->getServiceName());
+	}
+
+	public function testresourceToModel()
+	{
+		$patient = $this->patients('patient1');
+		$contact = $this->contacts('contact1');
+		$address = $this->addresses('address1');
+
+		$contact->addresses = array($address);
+		$patient->contact = $contact;
+
+		$patient->gp_id = 2;
+		$patient->practice_id = 5;
+
+		$map = PatientService::getModelMap();
+
+		$op = new ModelConverter($map);
+
+		$resource = $op->modelToResource($patient, new Patient(array()));
+
+		$model = $op->resourceToModel($resource, 'Patient', false);
+
+		$this->assertEquals('54321',$model->nhs_num);
+		$this->assertEquals('12345',$model->hos_num);
+		$this->assertEquals('Mr',$patient->title);
+		$this->assertEquals('Aylward',$patient->last_name);
+		$this->assertEquals('Jim',$patient->first_name);
+		$this->assertInstanceOf('Gender', $patient->gender);
+		$this->assertEquals('Male',$patient->gender->name);
+		$this->assertEquals('1970-01-01',$patient->dob);
+		$this->assertEquals('07123 456789',$patient->contact->primary_phone);
+
+		$this->assertCount(1, $patient->contact->addresses);
+		$this->assertInstanceOf('Address', $patient->contact->addresses[0]);
+		$this->assertEquals($patient->contact->addresses[0]->address1, 'flat 1');
+		$this->assertEquals($patient->contact->addresses[0]->address2, 'bleakley creek');
+		$this->assertEquals($patient->contact->addresses[0]->city, 'flitchley');
+		$this->assertEquals($patient->contact->addresses[0]->county, 'london');
+		$this->assertEquals($patient->contact->addresses[0]->postcode, 'ec1v 0dx');
+		$this->assertInstanceOf('Country', $patient->contact->addresses[0]->country);
+		$this->assertEquals($patient->contact->addresses[0]->country->name, 'United States');
+
+		$this->assertEquals($resource->gp_ref->getId(), $patient->gp_id);
+		$this->assertEquals($resource->prac_ref->getId(), $patient->practice_id);
 	}
 }

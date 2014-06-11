@@ -15,49 +15,27 @@
 
 namespace services;
 
-class DeclarativeModelService extends ModelService
+class PatientAssociatedContactsService extends DeclarativeModelService
 {
-	const TYPE_LIST = 0;
-	const TYPE_REF = 1;
-	const TYPE_OBJECT = 2;
-	const TYPE_CONDITION = 3;
-	const TYPE_RESOURCE = 4;
-	const TYPE_REF_LIST = 5;
+	static protected $operations = array(self::OP_READ, self::OP_UPDATE, self::OP_CREATE, self::OP_SEARCH);
 
-	/**
-	 * @param BaseActiveRecord $model
-	 * @return Resource
-	 */
-	public function modelToResource($model)
+	static protected $search_params = array(
+		'id' => self::TYPE_TOKEN,
+		'identifier' => self::TYPE_TOKEN,
+		'family' => self::TYPE_STRING,
+		'given' => self::TYPE_STRING,
+	);
+
+	static protected $primary_model = 'Patient';
+
+	static protected $model_map = array(
+	);
+
+	public function search(array $params)
 	{
-		$resource = parent::modelToResource($model);
-
-		$mc = new ModelConverter($this::$model_map);
-
-		return $mc->modelToResource($model, $resource);
 	}
 
-	/**
-	 * @param string $json
-	 * @return Resource
-	 */
-	public function jsonToResource($json)
+	public function resourceToModelOLD($res, $patient)
 	{
-		$resource = parent::jsonToResource($json);
-
-		$jc  = new JSONConverter($this::$model_map);
-
-		return $jc->jsonToResource($json, $this::$primary_model, $resource);
-	}
-
-	/**
-	 * @param object $resource
-	 * @return object $model
-	 */
-	public function resourceToModel($resource, $save=true)
-	{
-		$mc = new ModelConverter($this::$model_map);
-
-		return $mc->resourceToModel($resource, $this::$primary_model, $save);
 	}
 }

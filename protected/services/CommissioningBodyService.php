@@ -54,7 +54,7 @@ class CommissioningBodyService extends DeclarativeModelService
 		return $this->getResourcesFromDataProvider($model->search());
 	}
 
-	public function resourceToModel($res, $cb)
+	public function resourceToModelOLD($res, $cb)
 	{
 		$cb->code = $res->code;
 		$cb->name = $res->name;

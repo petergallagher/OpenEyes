@@ -54,7 +54,7 @@ class GpService extends DeclarativeModelService
 		return $this->getResourcesFromDataProvider($model->search());
 	}
 
-	public function resourceToModel($res, $gp)
+	public function resourceToModelOLD($res, $gp)
 	{
 		$gp->nat_id = $res->gnc;
 		$gp->obj_prof = $res->gnc;

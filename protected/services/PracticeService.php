@@ -51,7 +51,7 @@ class PracticeService extends DeclarativeModelService
 		return $this->getResourcesFromDataProvider($model->search());
 	}
 
-	public function resourceToModel($res, $prac)
+	public function resourceToModelOLD($res, $prac)
 	{
 		$prac->code = $res->code;
 		$prac->phone = $res->primary_phone;
