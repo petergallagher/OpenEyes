@@ -19,6 +19,8 @@ class DataObjectTest extends \CDbTestCase
 {
 	public $fixtures = array(
 		'patients' => 'Patient',
+		'contacts' => 'Contact',
+		'addresses' => 'Address',
 	);
 
 	static public function getMockDataTemplate()
