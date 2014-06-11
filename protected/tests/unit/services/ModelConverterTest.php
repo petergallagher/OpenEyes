@@ -21,6 +21,7 @@ class ModelConverterTest extends \CDbTestCase
 		'patients' => 'Patient',
 		'contacts' => 'Contact',
 		'addresses' => 'Address',
+		'countries' => 'Country',
 	);
 
 	public function testParse_DirectKeys()
