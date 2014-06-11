@@ -17,12 +17,6 @@ namespace services;
 
 class DataObjectTest extends \CDbTestCase
 {
-	public $fixtures = array(
-		'patients' => 'Patient',
-		'contacts' => 'Contact',
-		'addresses' => 'Address',
-	);
-
 	static public function getMockDataTemplate()
 	{
 	}
@@ -108,11 +102,16 @@ class DataObjectTest extends \CDbTestCase
 
 	public function testSerialise()
 	{
-		$patient = $this->patients('patient1');
+		$patient_address = new PatientAddress(array(
+			'line2' => 'BLAH',
+		));
 
-		$resource = \Yii::app()->service->Patient($patient->id);
+		$patient = new Patient(array(
+			'hos_num' => '12345',
+			'addresses' => array($patient_address),
+		));
 
-		$json = $resource->fetch()->serialise();
+		$json = $patient->serialise();
 
 		$this->assertTrue((boolean)json_decode($json));
 
@@ -120,7 +119,7 @@ class DataObjectTest extends \CDbTestCase
 
 		$this->assertEquals('12345',$data->hos_num);
 		$this->assertCount(1,$data->addresses);
-		$this->assertEquals('bleakley creek',$data->addresses[0]->line2);
+		$this->assertEquals('BLAH',$data->addresses[0]->line2);
 	}
 }
 
