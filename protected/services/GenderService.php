@@ -40,4 +40,14 @@ class GenderService extends DeclarativeModelService
 
 		return $this->getResourcesFromDataProvider($model->search());
 	}
+
+	/**
+	 * @param string $name
+	 * @return InternalReference|null
+	 */
+	public function getReferenceByName($name)
+	{
+		$id = \Yii::app()->db->createCommand()->select('id')->from('gender')->where('name = ?', array($name))->queryScalar();
+		return $id ? $this->getReference($id) : null;
+	}
 }

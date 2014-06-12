@@ -38,17 +38,6 @@ abstract class ModelService extends InternalService
 	}
 
 	/**
-	 * Get the class name of the reference type for this service's resources
-	 *
-	 * @return string
-	 */
-	static public function getReferenceClass()
-	{
-		$class = parent::getReferenceClass();
-		return class_exists($class) ? $class : 'Service\\ModelReference';
-	}
-
-	/**
 	 * @param scalar $id
 	 * @return ModelReference
 	 */

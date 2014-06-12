@@ -35,7 +35,7 @@ class PatientService extends DeclarativeModelService
 			'title' => 'contact.title',
 			'family_name' => 'contact.last_name',
 			'given_name' => 'contact.first_name',
-			'gender' => array(self::TYPE_RESOURCE, 'gender', 'Gender'),
+			'gender_ref' => array(self::TYPE_REF, 'gender_id', 'Gender'),
 			'birth_date' => 'dob',
 			'date_of_death' => 'date_of_death',
 			'primary_phone' => 'contact.primary_phone',

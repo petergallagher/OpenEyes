@@ -17,25 +17,36 @@ namespace services;
 
 class Patient extends Resource
 {
-	static public function fromFhir($fhirObject)
+	static public function fromFhirValues(array $values)
 	{
-		$patient = parent::fromFhir($fhirObject);
+		switch (@$values['gender']) {
+			case 'M':
+				$values['gender_ref'] = Yii::app()->service->Gender->getReferenceByName('Male');
+				break;
+			case 'F':
+				$values['gender_ref'] = Yii::app()->service->Gender->getReferenceByName('Female');
+				break;
+			default:
+				$values['gender_ref'] = null;
+		}
+		unset($values['gender']);
 
-		foreach ($patient->care_providers as $ref) {
+		foreach ($values['care_providers'] as $ref) {
 			switch ($ref->getServiceName()) {
 				case 'Gp':
-					$patient->gp_ref = $ref;
+					$values['gp_ref'] = $ref;
 					break;
 				case 'Practice':
-					$patient->prac_ref = $ref;
+					$values['prac_ref'] = $ref;
 					break;
 				case 'CommissioningBody':
-					$patient->cb_refs[] = $ref;
+					$values['cb_refs'][] = $ref;
 					break;
 			}
 		}
+		unset($values['care_providers']);
 
-		return $patient;
+		return parent::fromFhirValues($values);
 	}
 
 	static public function getServiceClass($fhirType)
@@ -53,15 +64,13 @@ class Patient extends Resource
 	public $family_name;
 	public $given_name;
 
-	public $gender;
+	public $gender_ref;
 
 	public $birth_date;
 	public $date_of_death;
 
 	public $primary_phone;
 	public $addresses = array();
-
-	public $care_providers = array();
 
 	public $gp_ref = null;
 	public $prac_ref = null;
@@ -91,6 +100,14 @@ class Patient extends Resource
 */
 
 	/**
+	 * @return string|null
+	 */
+	public function getGender()
+	{
+		return $this->gender_ref ? $this->gender_ref->fetch()->name : null;
+	}
+
+	/**
 	 * @return Gp|null
 	 */
 	public function getGp()
@@ -116,5 +133,24 @@ class Patient extends Resource
 			$cbs[] = $cb_ref->resolve();
 		}
 		return $cbs;
+	}
+
+	public function toFhirValues()
+	{
+		$values = parent::toFhirValues();
+
+		switch ($this->getGender()) {
+			case 'Male':
+				$values['gender'] = 'M';
+				break;
+			case 'Female':
+				$values['gender'] = 'F';
+				break;
+		}
+		unset($values['gender_ref']);
+
+		$values['care_providers'] = array_filter(array_merge(array($values['gp_ref'], $values['prac_ref']), $values['cb_refs']));
+
+		return $values;
 	}
 }

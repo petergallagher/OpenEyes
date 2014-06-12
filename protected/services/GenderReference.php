@@ -15,29 +15,6 @@
 
 namespace services;
 
-class Address extends DataObject
+class GenderReference extends ModelReference
 {
-	public $use = null;
-	public $line1;
-	public $line2 = null;
-	public $city;
-	public $state = null;
-	public $zip;
-	public $country;
-
-	static public function fromFhirValues(array $values)
-	{
-		$values['line1'] = array_shift($values['lines']);
-		$values['line2'] = array_shift($values['lines']);
-		unset($values['lines']);
-
-		return new static($values);
-	}
-
-	public function toFhirValues()
-	{
-		$values = parent::toFhirValues();
-		$values['lines'] = array_filter(array($values['line1'], $values['line2']));
-		return array_filter($values);
-	}
 }
