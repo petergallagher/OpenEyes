@@ -541,6 +541,10 @@ class Patient extends BaseActiveRecordVersioned
 	{
 		parent::afterFind();
 		Yii::app()->event->dispatch('patient_after_find', array('patient' => $this));
+
+		foreach (PatientMetadataKey::model()->findAll() as $metadata_key) {
+			$this->metadata_keys[$metadata_key->key_name] = $metadata_key;
+		}
 	}
 
 	/**
@@ -1408,12 +1412,6 @@ class Patient extends BaseActiveRecordVersioned
 
 	public function __get($key)
 	{
-		if (empty($this->metadata_keys)) {
-			foreach (PatientMetadataKey::model()->findAll() as $metadata_key) {
-				$this->metadata_keys[$metadata_key->key_name] = $metadata_key;
-			}
-		}
-
 		if (isset($this->metadata_keys[$key])) {
 			return $this->metadata($key);
 		}
