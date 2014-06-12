@@ -205,12 +205,12 @@ class JSONConverterTest extends \CDbTestCase
 
 		$this->assertCount(1, $resource->addresses);
 		$this->assertInstanceOf('services\PatientAddress', $resource->addresses[0]);
-		$this->assertEquals($resource->addresses[0]->line1, 'flat 1');
-		$this->assertEquals($resource->addresses[0]->line2, 'bleakley creek');
-		$this->assertEquals($resource->addresses[0]->city, 'flitchley');
-		$this->assertEquals($resource->addresses[0]->state, 'london');
-		$this->assertEquals($resource->addresses[0]->zip, 'ec1v 0dx');
-		$this->assertEquals($resource->addresses[0]->country, 'United States');
+		$this->assertEquals('flat 1', $resource->addresses[0]->line1);
+		$this->assertEquals('bleakley creek', $resource->addresses[0]->line2);
+		$this->assertEquals('flitchley', $resource->addresses[0]->city);
+		$this->assertEquals('london', $resource->addresses[0]->state);
+		$this->assertEquals('ec1v 0dx', $resource->addresses[0]->zip);
+		$this->assertEquals('United States', $resource->addresses[0]->country);
 
 		$this->assertInstanceOf('services\\Date',$resource->addresses[0]->date_start);
 		$this->assertInstanceOf('services\\Date',$resource->addresses[0]->date_end);
