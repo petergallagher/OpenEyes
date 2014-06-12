@@ -263,8 +263,8 @@ class ModelConverterTest extends \CDbTestCase
 		$this->assertEquals('Mr',$resource->title);
 		$this->assertEquals('Aylward',$resource->family_name);
 		$this->assertEquals('Jim',$resource->given_name);
-		$this->assertInstanceOf('services\Gender', $resource->gender);
-		$this->assertEquals('Male',$resource->gender->name);
+		$this->assertInstanceOf('services\GenderReference', $resource->gender_ref);
+		$this->assertEquals('Male',$resource->getGender());
 		$this->assertEquals('1970-01-01',$resource->birth_date);
 		$this->assertEquals('07123 456789',$resource->primary_phone);
 
