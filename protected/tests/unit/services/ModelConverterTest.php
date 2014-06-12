@@ -335,4 +335,13 @@ class ModelConverterTest extends \CDbTestCase
 		$this->assertEquals($resource->gp_ref->getId(), $patient->gp_id);
 		$this->assertEquals($resource->prac_ref->getId(), $patient->practice_id);
 	}
+
+	public function testModelToResource_EmptyReference()
+	{
+		$c = new ModelConverter(array('Patient' => array('gp_ref' => array(DeclarativeModelService::TYPE_REF, 'gp_id', 'Gp'))));
+
+		$res = $c->modelToResource(new \Patient, new Patient);
+
+		$this->assertNull($res->gp_ref);
+	}
 }

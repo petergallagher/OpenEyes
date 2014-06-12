@@ -55,9 +55,12 @@ class ModelConverter
 						$resource->$res_attribute = $data_items;
 						break;
 					case DeclarativeModelService::TYPE_REF:
-						$data_class = $def[2];
-
-						$resource->$res_attribute = \Yii::app()->service->$data_class($object->{$def[1]});
+						if ($object->{$def[1]}) {
+							$data_class = $def[2];
+							$resource->$res_attribute = \Yii::app()->service->$data_class($object->{$def[1]});
+						} else {
+							$resource->$res_attribute = null;
+						}
 						break;
 					case DeclarativeModelService::TYPE_OBJECT:
 						$data = $this->expandObjectAttribute($object, $def[1]);
