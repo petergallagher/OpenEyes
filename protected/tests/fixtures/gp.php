@@ -19,19 +19,10 @@
 
 
 return array(
-	'us' => array(
+	'gp1' => array(
 		'id' => 1,
-		'code' => 'US',
-		'name' => 'United States'
+		'obj_prof' => 'AA1134',
+		'nat_id' => 'AII2E2F',
+		'contact_id' => 1,
 	),
-	'uk' => array(
-		'id' => 2,
-		'code' => 'UK',
-		'name' => 'United Kingdom'
-	),
-	'can' => array(
-		'id' => 3,
-		'code' => 'CAN',
-		'name' => 'Canada'
-	)
 );

@@ -19,19 +19,10 @@
 
 
 return array(
-	'us' => array(
+	'practice1' => array(
 		'id' => 1,
-		'code' => 'US',
-		'name' => 'United States'
+		'code' => 'AA1',
+		'phone' => '0202 20202020',
+		'contact_id' => 1,
 	),
-	'uk' => array(
-		'id' => 2,
-		'code' => 'UK',
-		'name' => 'United Kingdom'
-	),
-	'can' => array(
-		'id' => 3,
-		'code' => 'CAN',
-		'name' => 'Canada'
-	)
 );

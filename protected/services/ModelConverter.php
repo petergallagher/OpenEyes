@@ -116,8 +116,10 @@ class ModelConverter
 
 	public function resourceToModel($resource, $model_class_name, $save=true, $extra_fields=false)
 	{
-		if (!method_exists($resource,'getId') || (!$model = $model_class_name::model()->findByPk($resource->getId()))) {
-			$model = new $model_class_name;
+		$_model_class_name = '\\'.$model_class_name;
+
+		if (!method_exists($resource,'getId') || (!$model = $_model_class_name::model()->findByPk($resource->getId()))) {
+			$model = new $_model_class_name;
 		}
 
 		if (is_array($extra_fields)) {
@@ -126,7 +128,6 @@ class ModelConverter
 			}
 		}
 
-		$related_objects = array();
 		$related_resources = array();
 
 		$model_relations = $model->relations();
@@ -192,6 +193,8 @@ class ModelConverter
 			}
 		}
 
+		$save && $this->saveModel($model);
+
 		foreach ($model->relations() as $relation_name => $relation_def) {
 			if (isset($related_objects[$relation_name])) {
 				if (!$related_object = $model->$relation_name) {
@@ -248,8 +251,6 @@ class ModelConverter
 			}
 		}
 
-		$save && $this->saveModel($model);
-
 		return $model;
 	}
 
@@ -273,8 +274,6 @@ class ModelConverter
 	 */
 	protected function saveModel(\BaseActiveRecord $model)
 	{
-		echo "Saving ".get_class($model).": ".$model->id."\n";
-
 		if (!$model->save()) {
 			throw new ValidationFailure("Validation failure on " . get_class($model), $model->errors);
 		}
