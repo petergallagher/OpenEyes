@@ -173,6 +173,7 @@ return array(
 			'class' => 'services\ServiceManager',
 			'internal_services' => array(
 				'services\CommissioningBodyService',
+				'services\GenderService',
 				'services\GpService',
 				'services\PracticeService',
 				'services\PatientService',
