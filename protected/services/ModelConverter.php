@@ -131,7 +131,7 @@ class ModelConverter
 			}
 		}
 
-		$related_resources = array();
+		$related_objects = array();
 
 		$model_relations = $model->relations();
 
