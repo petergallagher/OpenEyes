@@ -296,10 +296,7 @@ class ModelConverterTest extends \CDbTestCase
 
 	public function testResourceToModel_NoSave()
 	{
-		$gender = new Gender(array(
-			'name' => 'Male',
-			'id' => 1,
-		));
+		$gender = \Yii::app()->service->Gender(1);
 
 		$date = new Date;
 
@@ -326,7 +323,7 @@ class ModelConverterTest extends \CDbTestCase
 		$resource->title = 'Mr';
 		$resource->family_name = 'Aylward';
 		$resource->given_name = 'Jim';
-		$resource->gender = $gender;
+		$resource->gender_ref = $gender;
 		$resource->birth_date = '1970-01-01';
 		$resource->primary_phone = '07123 456789';
 		$resource->addresses = array($address);
@@ -362,10 +359,7 @@ class ModelConverterTest extends \CDbTestCase
 
 	public function getResource()
 	{
-		$gender = new Gender(array(
-			'id' => 1,
-			'name' => 'Male',
-		));
+		$gender = \Yii::app()->service->Gender(1);
 
 		$date = new Date;
 
@@ -392,7 +386,7 @@ class ModelConverterTest extends \CDbTestCase
 		$resource->title = 'Mr';
 		$resource->family_name = 'Krinkle';
 		$resource->given_name = 'Henry';
-		$resource->gender = $gender;
+		$resource->gender_ref = $gender;
 		$resource->birth_date = '1994-04-23';
 		$resource->primary_phone = '02332 3241959';
 		$resource->addresses = array($address);
