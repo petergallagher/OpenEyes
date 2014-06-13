@@ -23,6 +23,6 @@ return array(
 		'id' => 1,
 		'obj_prof' => 'AA1134',
 		'nat_id' => 'AII2E2F',
-		'contact_id' => 1,
+		'contact_id' => 7,
 	),
 );

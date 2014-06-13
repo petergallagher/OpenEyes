@@ -28,20 +28,34 @@ class GpService extends DeclarativeModelService
 
 	static protected $model_map = array(
 		'Gp' => array(
-			'gnc' => 'nat_id',
-			'title' => 'contact.title',
-			'family_name' => 'contact.last_name',
-			'given_name' => 'contact.first_name',
-			'primary_phone' => 'contact.primary_phone',
-			'address' => array(self::TYPE_OBJECT, 'contact.address', 'Address'),
+			'related_objects' => array(
+				'contact' => array('contact_id', 'Contact'),
+			),
+			'fields' => array(
+				'gnc' => 'nat_id',
+				'obj_prof' => 'obj_prof',
+				'title' => 'contact.title',
+				'family_name' => 'contact.last_name',
+				'given_name' => 'contact.first_name',
+				'primary_phone' => 'contact.primary_phone',
+				'address' => array(self::TYPE_DATAOBJECT, 'contact.address', 'Address', 'Address', 'contact_id'),
+			),
 		),
 		'Address' => array(
-			'line1' => 'address1',
-			'line2' => 'address2',
-			'city' => 'city',
-			'state' => 'county',
-			'zip' => 'postcode',
-			'country' => 'country.name',
+			'related_objects' => array(
+				'contact' => array('contact_id', 'Contact'),
+			),
+			'reference_objects' => array(
+				'country' => array('country_id', 'Country', array('name')),
+			),
+			'fields' => array(
+				'line1' => 'address1',
+				'line2' => 'address2',
+				'city' => 'city',
+				'state' => 'county',
+				'zip' => 'postcode',
+				'country' => 'country.name',
+			),
 		),
 	);
 

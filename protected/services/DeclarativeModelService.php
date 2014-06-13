@@ -19,10 +19,11 @@ class DeclarativeModelService extends ModelService
 {
 	const TYPE_LIST = 0;
 	const TYPE_REF = 1;
-	const TYPE_OBJECT = 2;
-	const TYPE_CONDITION = 3;
-	const TYPE_RESOURCE = 4;
-	const TYPE_REF_LIST = 5;
+	const TYPE_SIMPLEOBJECT = 2;
+	const TYPE_DATAOBJECT = 3;
+	const TYPE_CONDITION = 4;
+	const TYPE_RESOURCE = 5;
+	const TYPE_REF_LIST = 6;
 
 	/**
 	 * @param BaseActiveRecord $model

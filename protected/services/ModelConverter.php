@@ -62,7 +62,8 @@ class ModelConverter
 							$resource->$res_attribute = null;
 						}
 						break;
-					case DeclarativeModelService::TYPE_OBJECT:
+					case DeclarativeModelService::TYPE_DATAOBJECT:
+					case DeclarativeModelService::TYPE_SIMPLEOBJECT:
 						$data = $this->expandObjectAttribute($object, $def[1]);
 						$data_class = 'services\\'.$def[2];
 
@@ -177,12 +178,22 @@ class ModelConverter
 							$model->{$def[1]} = $resource->$res_attribute->id;
 						}
 						break;
-					case DeclarativeModelService::TYPE_OBJECT:
+					case DeclarativeModelService::TYPE_SIMPLEOBJECT:
 						if (method_exists($resource->$res_attribute,'toModelValue')) {
 							$model->{$def[1]} = $resource->$res_attribute->toModelValue();
 						} else {
 							$data_class = 'services\\'.$def[2];
 							$model->{$def[1]} = $data_class::fromObject($resource->$res_attribute)->toModelValue();
+						}
+						break;
+					case DeclarativeModelService::TYPE_DATAOBJECT:
+						if ($pos = strpos($def[1],'.')) {
+							$related_object_name = substr($def[1],0,$pos);
+							$related_object_attribute = substr($def[1],$pos+1,strlen($def[1]));
+
+							$related_objects[$related_object_name][$related_object_attribute] = $this->resourceToModel($resource->$res_attribute, $def[3], false);
+						} else {
+							throw new \Exception("Unhandled");
 						}
 						break;
 					case DeclarativeModelService::TYPE_CONDITION:
@@ -270,22 +281,42 @@ class ModelConverter
 		}
 
 		foreach ($this->map[$model_class_name]['fields'] as $res_attribute => $def) {
-			if (is_array($def) && $def[0] == DeclarativeModelService::TYPE_LIST) {
-				if ($pos = strpos($def[1],'.')) {
-					$related_object_name = substr($def[1],0,$pos);
-					$related_object_attribute = substr($def[1],$pos+1,strlen($def[1]));
+			if (is_array($def)) {
+				switch ($def[0]) {
+					case DeclarativeModelService::TYPE_LIST:
+						if ($pos = strpos($def[1],'.')) {
+							$related_object_name = substr($def[1],0,$pos);
+							$related_object_attribute = substr($def[1],$pos+1,strlen($def[1]));
 
-					if (isset($def[4])) {
-						// Set extra fields on list items (currently used to set Address.contact_id)
-						foreach ($related_objects[$related_object_name][$related_object_attribute] as $i => $item) {
-							$related_objects[$related_object_name][$related_object_attribute][$i]->{$def[4]} = $model->{$def[4]};
+							if (isset($def[4])) {
+								// Set extra fields on list items (currently used to set Address.contact_id)
+								foreach ($related_objects[$related_object_name][$related_object_attribute] as $i => $item) {
+									$related_objects[$related_object_name][$related_object_attribute][$i]->{$def[4]} = $model->{$def[4]};
+								}
+							}
+						} else {
+							throw new \Exception("Unhandled");
 						}
-					}
-				} else {
-					throw new \Exception("Unhandled");
-				}
 
-				$model->$related_object_name->$related_object_attribute = $this->filterListItems($model->$related_object_name, $related_object_attribute, $related_objects[$related_object_name][$related_object_attribute], $save);
+						$model->$related_object_name->$related_object_attribute = $this->filterListItems($model->$related_object_name, $related_object_attribute, $related_objects[$related_object_name][$related_object_attribute], $save);
+						break;
+					case DeclarativeModelService::TYPE_DATAOBJECT:
+						if ($pos = strpos($def[1],'.')) {
+							$related_object_name = substr($def[1],0,$pos);
+							$related_object_attribute = substr($def[1],$pos+1,strlen($def[1]));
+
+							if (isset($def[4])) {
+								$related_objects[$related_object_name][$related_object_attribute]->{$def[4]} = $model->{$def[4]};
+							}
+						} else {
+							throw new \Exception("Unhandled");
+						}
+
+						$model->$related_object_name->$related_object_attribute = $related_objects[$related_object_name][$related_object_attribute];
+
+						$save && $this->saveModel($model->$related_object_name->$related_object_attribute);
+						break;
+				}
 			}
 		}
 
@@ -345,7 +376,7 @@ class ModelConverter
 	protected function saveModel(\BaseActiveRecord $model)
 	{
 		if (!$model->save()) {
-			throw new ValidationFailure("Validation failure on " . get_class($model), $model->errors);
+			throw new ValidationFailure("Validation failure on " . get_class($model).": ".print_r($model->errors,true), $model->errors);
 		}
 	}
 

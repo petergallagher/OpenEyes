@@ -33,7 +33,7 @@ class CommissioningBodyService extends DeclarativeModelService
 		'CommissioningBody' => array(
 			'code' => 'code',
 			'name' => 'name',
-			'address' => array(self::TYPE_OBJECT, 'contact.address', 'Address'),
+			'address' => array(self::TYPE_DATAOBJECT, 'contact.address', 'Address'),
 		),
 		'Address' => array(
 			'line1' => 'address1',

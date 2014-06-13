@@ -21,6 +21,7 @@ class Gp extends Resource
 	static protected $fhir_prefix = 'gp';
 
 	public $gnc;
+	public $obj_prof;
 
 	public $title;
 	public $family_name;

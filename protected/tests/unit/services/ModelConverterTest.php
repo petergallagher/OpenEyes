@@ -192,8 +192,8 @@ class ModelConverterTest extends \CDbTestCase
 			),
 			'Address' => array(
 				'fields' => array(
-					'date_start' => array(DeclarativeModelService::TYPE_OBJECT, 'date_start', 'Date'),
-					'date_end' => array(DeclarativeModelService::TYPE_OBJECT, 'date_end', 'Date'),
+					'date_start' => array(DeclarativeModelService::TYPE_SIMPLEOBJECT, 'date_start', 'Date'),
+					'date_end' => array(DeclarativeModelService::TYPE_SIMPLEOBJECT, 'date_end', 'Date'),
 				),
 			),
 		);

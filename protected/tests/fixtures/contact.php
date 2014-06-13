@@ -80,4 +80,12 @@ return array(
 		'first_name' => 'Dave',
 		'last_name' => 'Lister',
 	),
+	'contact7' => array(
+		'id' => 7,
+		'nick_name' => 'The good doctor',
+		'primary_phone' => '999',
+		'title' => 'Dr',
+		'first_name' => 'Yuri',
+		'last_name' => 'Zhivago',
+	),
 );

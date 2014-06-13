@@ -60,7 +60,8 @@ class JSONConverter
 					case DeclarativeModelService::TYPE_REF:
 						$resource->$res_attribute = \Yii::app()->service->{$object->$res_attribute->service}($object->$res_attribute->id);
 						break;
-					case DeclarativeModelService::TYPE_OBJECT:
+					case DeclarativeModelService::TYPE_SIMPLEOBJECT:
+					case DeclarativeModelService::TYPE_DATAOBJECT:
 						$data_class = 'services\\'.$def[2];
 						$resource->$res_attribute = $data_class::fromObject($object->$res_attribute);
 						break;
