@@ -342,8 +342,12 @@ class ModelConverterTest extends \CDbTestCase
 		$resource->gp_ref = \Yii::app()->service->Gp(2);
 		$resource->prac_ref = \Yii::app()->service->Practice(1);
 
+		$total_patients = count(\Patient::model()->findAll());
+
 		$mc = new ModelConverter(PatientService::getModelMap());
 		$patient = $mc->resourceToModel($resource, 'Patient', false);
+
+		$this->assertEquals($total_patients, count(\Patient::model()->findAll()));
 
 		$this->assertEquals('54321',$patient->nhs_num);
 		$this->assertEquals('12345',$patient->hos_num);
@@ -406,8 +410,12 @@ class ModelConverterTest extends \CDbTestCase
 	{
 		$resource = $this->getResource();
 
+		$total_patients = count(\Patient::model()->findAll());
+
 		$mc = new ModelConverter(PatientService::getModelMap());
 		$patient = $mc->resourceToModel($resource, 'Patient');
+
+		$this->assertEquals($total_patients+1, count(\Patient::model()->findAll()));
 
 		$this->assertEquals('1919',$patient->nhs_num);
 		$this->assertEquals('4545',$patient->hos_num);

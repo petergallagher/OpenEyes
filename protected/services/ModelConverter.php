@@ -171,10 +171,19 @@ class ModelConverter
 						}
 						break;
 					case DeclarativeModelService::TYPE_REF:
-						$model->{$def[1]} = $resource->$res_attribute->getId();
+						if (method_exists($resource->$res_attribute,'getId')) {
+							$model->{$def[1]} = $resource->$res_attribute->getId();
+						} else {
+							$model->{$def[1]} = $resource->$res_attribute->id;
+						}
 						break;
 					case DeclarativeModelService::TYPE_OBJECT:
-						$model->{$def[1]} = $resource->$res_attribute->toModelValue();
+						if (method_exists($resource->$res_attribute,'toModelValue')) {
+							$model->{$def[1]} = $resource->$res_attribute->toModelValue();
+						} else {
+							$data_class = 'services\\'.$def[2];
+							$model->{$def[1]} = $data_class::fromObject($resource->$res_attribute)->toModelValue();
+						}
 						break;
 					case DeclarativeModelService::TYPE_CONDITION:
 						if ($resource->$res_attribute) {
