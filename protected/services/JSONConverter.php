@@ -87,7 +87,7 @@ class JSONConverter
 		return $resource;
 	}
 
-	public function jsonToModel($json, $model_class_name, $save=true, $extra_fields=false)
+	public function jsonToModel($json, $model_class_name, $save=true)
 	{
 		if (!$object = json_decode($json)) {
 			throw new Exception("Invalid JSON encountered: $json");
@@ -95,6 +95,6 @@ class JSONConverter
 
 		$mc = new ModelConverter($this->map);
 
-		return $mc->resourceToModel($object, $model_class_name, $save, $extra_fields);
+		return $mc->resourceToModel($object, $model_class_name, $save);
 	}
 }
