@@ -21,10 +21,10 @@ class Patient extends Resource
 	{
 		switch (@$values['gender']) {
 			case 'M':
-				$values['gender_ref'] = Yii::app()->service->Gender->getReferenceByName('Male');
+				$values['gender_ref'] = \Yii::app()->service->Gender->getReferenceByName('Male');
 				break;
 			case 'F':
-				$values['gender_ref'] = Yii::app()->service->Gender->getReferenceByName('Female');
+				$values['gender_ref'] = \Yii::app()->service->Gender->getReferenceByName('Female');
 				break;
 			default:
 				$values['gender_ref'] = null;

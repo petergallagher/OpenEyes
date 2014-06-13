@@ -90,16 +90,21 @@ class PatientService extends DeclarativeModelService
 	{
 		$model = $this->getSearchModel();
 		if (isset($params['id'])) $model->id = $params['id'];
-		if (isset($params['identifier'])) {
-			$model->hos_num = $params['identifier'];
-			$model->nhs_num = $params['identifier'];
-		}
 
 		$searchParams = array('pageSize' => null);
+		if (isset($params['identifier'])) {
+			$searchParams['hos_num'] = $params['identifier'];
+			$searchParams['nhs_num'] = $params['identifier'];
+		}
 		if (isset($params['family'])) $searchParams['last_name'] = $params['family'];
 		if (isset($params['given'])) $searchParams['first_name'] = $params['given'];
 
-		return $this->getResourcesFromDataProvider($model->search($searchParams));
+		$resources = array();
+		$results = $model->search($searchParams);
+		foreach ($results['data'] as $model) {
+			$resources[] = $this->modelToResource($model);
+		}
+		return $resources;
 	}
 
 	public function resourceToModelOLD($res, $patient)
