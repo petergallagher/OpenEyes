@@ -33,6 +33,8 @@ return array(
 		'country_id' => 1,
 		'email' => 'bleakley1@bleakley1.com',
 		'contact_id' => 1,
+		'date_start' => '2013-01-03',
+		'date_end' => '2014-05-05',
 	),
 	'address2' => array(
 		'address1' => 'flat 2',

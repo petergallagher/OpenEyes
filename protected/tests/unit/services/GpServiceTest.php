@@ -116,7 +116,7 @@ class GpServiceTest extends \CDbTestCase
 		$this->assertEquals('United States',$gp->contact->address->country->name);
 	}
 
-	public function testResourceToModel_Save_ModelCountsCorrect()
+	public function testResourceToModel_Save_Create_ModelCountsCorrect()
 	{
 		$resource = $this->getResource();
 
@@ -132,7 +132,7 @@ class GpServiceTest extends \CDbTestCase
 		$this->assertEquals($total_addresses+1, count(\Address::model()->findAll()));
 	}
 
-	public function testResourceToModel_Save_ModelIsCorrect()
+	public function testResourceToModel_Save_Create_ModelIsCorrect()
 	{
 		$resource = $this->getResource();
 
@@ -157,7 +157,7 @@ class GpServiceTest extends \CDbTestCase
 		$this->assertEquals('United States',$gp->contact->address->country->name);
 	}
 
-	public function testResourceToModel_Save_DBIsCorrect()
+	public function testResourceToModel_Save_Create_DBIsCorrect()
 	{
 		$resource = $this->getResource();
 
@@ -249,9 +249,9 @@ class GpServiceTest extends \CDbTestCase
 		$this->assertEquals('United States',$gp->contact->address->country->name);
 	}
 
-	public function testJsonToModel_Save_ModelCountsCorrect()
+	public function testJsonToModel_Save_Create_ModelCountsCorrect()
 	{
-		$json = '{"gnc":"AII2E2F","obj_prof":"AA1134","title":"Dr","family_name":"Zhivago","given_name":"Yuri","primary_phone":"999","address":{"use":null,"line1":"Staplegun","line2":"Staplegun Creek","city":"Stapleton","state":"staple","zip":"st44 pl3","country":"United States"},"id":"1","last_modified":-2208988800}';
+		$json = '{"gnc":"AII2E2F","obj_prof":"AA1134","title":"Dr","family_name":"Zhivago","given_name":"Yuri","primary_phone":"999","address":{"use":null,"line1":"Staplegun","line2":"Staplegun Creek","city":"Stapleton","state":"staple","zip":"st44 pl3","country":"United States"},"id":null,"last_modified":-2208988800}';
 
 		$total_gps = count(\Gp::model()->findAll());
 		$total_contacts = count(\Contact::model()->findAll());
@@ -266,9 +266,9 @@ class GpServiceTest extends \CDbTestCase
 		$this->assertEquals($total_addresses+1, count(\Address::model()->findAll()));
 	}
 
-	public function testJsonToModel_Save_DBIsCorrect()
+	public function testJsonToModel_Save_Create_DBIsCorrect()
 	{
-		$json = '{"gnc":"AII2E2F","obj_prof":"AA1134","title":"Dr","family_name":"Zhivago","given_name":"Yuri","primary_phone":"999","address":{"use":null,"line1":"Staplegun","line2":"Staplegun Creek","city":"Stapleton","state":"staple","zip":"st44 pl3","country":"United States"},"id":"1","last_modified":-2208988800}';
+		$json = '{"gnc":"AII2E2F","obj_prof":"AA1134","title":"Dr","family_name":"Zhivago","given_name":"Yuri","primary_phone":"999","address":{"use":null,"line1":"Staplegun","line2":"Staplegun Creek","city":"Stapleton","state":"staple","zip":"st44 pl3","country":"United States"},"id":null,"last_modified":-2208988800}';
 
 		$gs = new GpService;
 		$gp = $gs->jsonToModel($json);

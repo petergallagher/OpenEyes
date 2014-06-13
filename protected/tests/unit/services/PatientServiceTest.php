@@ -42,6 +42,7 @@ class PatientServiceTest extends \CDbTestCase
 
 		$resource = $ps->modelToResource($patient);
 
+		$this->assertEquals(1,$resource->getId());
 		$this->assertEquals('54321',$resource->nhs_num);
 		$this->assertEquals('12345',$resource->hos_num);
 		$this->assertEquals('Mr',$resource->title);
@@ -213,7 +214,7 @@ class PatientServiceTest extends \CDbTestCase
 		return $resource;
 	}
 
-	public function testResourceToModel_Save_ModelCountsCorrect()
+	public function testResourceToModel_Save_Create_ModelCountsCorrect()
 	{
 		$resource = $this->getResource();
 
@@ -233,7 +234,7 @@ class PatientServiceTest extends \CDbTestCase
 		$this->assertEquals($total_genders, count(\Gender::model()->findAll()));
 	}
 
-	public function testResourceToModel_Save_ModelIsCorrect()
+	public function testResourceToModel_Save_Create_ModelIsCorrect()
 	{
 		$resource = $this->getResource();
 
@@ -266,7 +267,7 @@ class PatientServiceTest extends \CDbTestCase
 		$this->assertEquals(1, $patient->practice_id);
 	}
 
-	public function testResourceToModel_Save_DBIsCorrect()
+	public function testResourceToModel_Save_Create_DBIsCorrect()
 	{
 		$resource = $this->getResource();
 
@@ -296,6 +297,94 @@ class PatientServiceTest extends \CDbTestCase
 
 		$this->assertEquals(1, $patient->gp_id);
 		$this->assertEquals(1, $patient->practice_id);
+	}
+
+	public function testResourceToModel_Save_Update_ModelCountsCorrect()
+	{
+		$resource = \Yii::app()->service->Patient(1)->fetch();
+
+		$resource->nhs_num = 'x0000';
+		$resource->hos_num = 'x0001';
+		$resource->title = 'x0002';
+		$resource->family_name = 'x0003';
+		$resource->given_name = 'x0004';
+		$resource->gender = 'Female';
+		$resource->birth_date = '1988-04-04';
+		$resource->primary_phone = '0101010101';
+		$resource->addresses[0]->line1 = 'L1';
+		$resource->addresses[0]->line2 = 'L2';
+		$resource->addresses[0]->city = 'L3';
+		$resource->addresses[0]->state = 'L4';
+		$resource->addresses[0]->zip = 'L5';
+		$resource->addresses[0]->country = 'United Kingdom';
+		$resource->addresses[0]->correspond = 1;
+		$resource->addresses[0]->transport = 0;
+
+		$total_patients = count(\Patient::model()->findAll());
+		$total_contacts = count(\Contact::model()->findAll());
+		$total_addresses = count(\Address::model()->findAll());
+		$total_countries = count(\Country::model()->findAll());
+		$total_genders = count(\Gender::model()->findAll());
+
+		$ps = new PatientService;
+		$patient = $ps->resourceToModel($resource);
+
+		$this->assertEquals($total_patients, count(\Patient::model()->findAll()));
+		$this->assertEquals($total_contacts, count(\Contact::model()->findAll()));
+		$this->assertEquals($total_addresses, count(\Address::model()->findAll()));
+		$this->assertEquals($total_countries, count(\Country::model()->findAll()));
+		$this->assertEquals($total_genders, count(\Gender::model()->findAll()));
+	}
+
+	public function testResourceToModel_Save_Update_DBIsCorrect()
+	{
+		$resource = \Yii::app()->service->Patient(1)->fetch();
+
+		$resource->nhs_num = 'x0000';
+		$resource->hos_num = 'x0001';
+		$resource->title = 'x0002';
+		$resource->family_name = 'x0003';
+		$resource->given_name = 'x0004';
+		$resource->gender_ref = \Yii::app()->service->Gender(\Gender::model()->find('name=?',array('Female'))->id);
+		$resource->birth_date = '1988-04-04';
+		$resource->primary_phone = '0101010101';
+		$resource->gp_ref = \Yii::app()->service->Gp(1);
+		$resource->prac_ref = \Yii::app()->service->Practice(1);
+		$resource->addresses[0]->line1 = 'L1';
+		$resource->addresses[0]->line2 = 'L2';
+		$resource->addresses[0]->city = 'L3';
+		$resource->addresses[0]->state = 'L4';
+		$resource->addresses[0]->zip = 'L5';
+		$resource->addresses[0]->country = 'United Kingdom';
+		$resource->addresses[0]->correspond = 1;
+		$resource->addresses[0]->transport = 0;
+
+		$ps = new PatientService;
+		$patient = $ps->resourceToModel($resource);
+		$patient = \Patient::model()->findByPk($patient->id);
+
+		$this->assertEquals('x0000',$patient->nhs_num);
+		$this->assertEquals('x0001',$patient->hos_num);
+		$this->assertEquals('x0002',$patient->title);
+		$this->assertEquals('x0003',$patient->last_name);
+		$this->assertEquals('x0004',$patient->first_name);
+		$this->assertInstanceOf('Gender', $patient->gender);
+		$this->assertEquals('Female',$patient->gender->name);
+		$this->assertEquals('1988-04-04',$patient->dob);
+		$this->assertEquals('0101010101',$patient->contact->primary_phone);
+		$this->assertEquals(1,$patient->gp_id);
+		$this->assertEquals(1,$patient->practice_id);
+
+		$this->assertCount(1, $patient->contact->addresses);
+		$this->assertInstanceOf('Address', $patient->contact->addresses[0]);
+		$this->assertEquals('L1', $patient->contact->addresses[0]->address1);
+		$this->assertEquals('L2', $patient->contact->addresses[0]->address2);
+		$this->assertEquals('L3', $patient->contact->addresses[0]->city);
+		$this->assertEquals('L4', $patient->contact->addresses[0]->county);
+		$this->assertEquals('L5', $patient->contact->addresses[0]->postcode);
+		$this->assertInstanceOf('\Country', $patient->contact->addresses[0]->country);
+		$this->assertEquals('United Kingdom', $patient->contact->addresses[0]->country->name);
+		$this->assertEquals(\AddressType::CORRESPOND, $patient->contact->addresses[0]->address_type_id);
 	}
 
 	public function testJsonToResource()
@@ -388,7 +477,7 @@ class PatientServiceTest extends \CDbTestCase
 		$this->assertEquals(1, $patient->practice_id);
 	}
 
-	public function testJsonToModel_Save_ModelCountsCorrect()
+	public function testJsonToModel_Save_Create_ModelCountsCorrect()
 	{
 		$json = '{"nhs_num":"54321","hos_num":"12345","title":"Mr","family_name":"Aylward","given_name":"Jim","gender_ref":{"service":"Gender","id":1},"birth_date":"1970-01-01","date_of_death":null,"primary_phone":"07123 456789","addresses":[{"date_start":{"date":"2014-06-06 16:39:29","timezone_type":3,"timezone":"Europe\/London"},"date_end":{"date":"2014-06-06 16:39:29","timezone_type":3,"timezone":"Europe\/London"},"correspond":false,"transport":false,"use":null,"line1":"flat 1","line2":"bleakley creek","city":"flitchley","state":"london","zip":"ec1v 0dx","country":"United States"}],"care_providers":[],"gp_ref":{"service":"Gp","id":1},"prac_ref":{"service":"Practice","id":1},"cb_refs":[],"id":null,"last_modified":null}';
 
@@ -409,7 +498,7 @@ class PatientServiceTest extends \CDbTestCase
 		$this->assertEquals($total_genders, count(\Gender::model()->findAll()));
 	}
 
-	public function testJsonToModel_Save_DBIsCorrect()
+	public function testJsonToModel_Save_Create_DBIsCorrect()
 	{
 		$json = '{"nhs_num":"54321","hos_num":"12345","title":"Mr","family_name":"Aylward","given_name":"Jim","gender_ref":{"service":"Gender","id":1},"birth_date":"1970-01-01","date_of_death":null,"primary_phone":"07123 456789","addresses":[{"date_start":{"date":"2014-06-06 16:39:29","timezone_type":3,"timezone":"Europe\/London"},"date_end":{"date":"2014-06-06 16:39:29","timezone_type":3,"timezone":"Europe\/London"},"correspond":false,"transport":false,"use":null,"line1":"flat 1","line2":"bleakley creek","city":"flitchley","state":"london","zip":"ec1v 0dx","country":"United States"}],"care_providers":[],"gp_ref":{"service":"Gp","id":1},"prac_ref":{"service":"Practice","id":1},"cb_refs":[],"id":null,"last_modified":null}';
 
@@ -436,6 +525,59 @@ class PatientServiceTest extends \CDbTestCase
 		$this->assertEquals('ec1v 0dx', $patient->contact->addresses[0]->postcode);
 		$this->assertInstanceOf('\Country', $patient->contact->addresses[0]->country);
 		$this->assertEquals('United States', $patient->contact->addresses[0]->country->name);
+
+		$this->assertEquals(1, $patient->gp_id);
+		$this->assertEquals(1, $patient->practice_id);
+	}
+
+	public function testJsonToModel_Save_Update_ModelCountsCorrect()
+	{
+		$json = '{"nhs_num":"x0001","hos_num":"x0002","title":"x0003","family_name":"x0004","given_name":"x0005","gender_ref":{"service":"Gender","id":2},"birth_date":"1996-04-20","date_of_death":null,"primary_phone":"03333 343434","addresses":[{"date_start":{"date":"2014-06-06 16:39:29","timezone_type":3,"timezone":"Europe\/London"},"date_end":{"date":"2014-06-06 16:39:29","timezone_type":3,"timezone":"Europe\/London"},"correspond":false,"transport":true,"use":null,"line1":"flat 1","line2":"bleakley creek","city":"flitchley","state":"london","zip":"ec1v 0dx","country":"United States"}],"care_providers":[],"gp_ref":{"service":"Gp","id":1},"prac_ref":{"service":"Practice","id":1},"cb_refs":[],"id":1,"last_modified":null}';
+
+		$total_patients = count(\Patient::model()->findAll());
+		$total_contacts = count(\Contact::model()->findAll());
+		$total_addresses = count(\Address::model()->findAll());
+		$total_countries = count(\Country::model()->findAll());
+		$total_genders = count(\Gender::model()->findAll());
+
+		$ps = new PatientService;
+		$patient = $ps->jsonToModel($json);
+		$patient = \Patient::model()->findByPk($patient->id);
+
+		$this->assertEquals($total_patients, count(\Patient::model()->findAll()));
+		$this->assertEquals($total_contacts, count(\Contact::model()->findAll()));
+		$this->assertEquals($total_addresses, count(\Address::model()->findAll()));
+		$this->assertEquals($total_countries, count(\Country::model()->findAll()));
+		$this->assertEquals($total_genders, count(\Gender::model()->findAll()));
+	}
+
+	public function testJsonToModel_Save_Update_DBIsCorrect()
+	{
+		$json = '{"nhs_num":"x0001","hos_num":"x0002","title":"x0003","family_name":"x0004","given_name":"x0005","gender_ref":{"service":"Gender","id":2},"birth_date":"1996-04-20","date_of_death":null,"primary_phone":"03333 343434","addresses":[{"date_start":{"date":"2014-06-06 16:39:29","timezone_type":3,"timezone":"Europe\/London"},"date_end":{"date":"2014-06-06 16:39:29","timezone_type":3,"timezone":"Europe\/London"},"correspond":false,"transport":true,"use":null,"line1":"L1","line2":"L2","city":"L3","state":"L4","zip":"L5","country":"United Kingdom"}],"care_providers":[],"gp_ref":{"service":"Gp","id":1},"prac_ref":{"service":"Practice","id":1},"cb_refs":[],"id":1,"last_modified":null}';
+
+		$ps = new PatientService;
+		$patient = $ps->jsonToModel($json);
+		$patient = \Patient::model()->findByPk($patient->id);
+
+		$this->assertEquals('x0001',$patient->nhs_num);
+		$this->assertEquals('x0002',$patient->hos_num);
+		$this->assertEquals('x0003',$patient->title);
+		$this->assertEquals('x0004',$patient->last_name);
+		$this->assertEquals('x0005',$patient->first_name);
+		$this->assertInstanceOf('Gender', $patient->gender);
+		$this->assertEquals('Female',$patient->gender->name);
+		$this->assertEquals('1996-04-20',$patient->dob);
+		$this->assertEquals('03333 343434',$patient->contact->primary_phone);
+
+		$this->assertCount(1, $patient->contact->addresses);
+		$this->assertInstanceOf('Address', $patient->contact->addresses[0]);
+		$this->assertEquals('L1', $patient->contact->addresses[0]->address1);
+		$this->assertEquals('L2', $patient->contact->addresses[0]->address2);
+		$this->assertEquals('L3', $patient->contact->addresses[0]->city);
+		$this->assertEquals('L4', $patient->contact->addresses[0]->county);
+		$this->assertEquals('L5', $patient->contact->addresses[0]->postcode);
+		$this->assertInstanceOf('\Country', $patient->contact->addresses[0]->country);
+		$this->assertEquals('United Kingdom', $patient->contact->addresses[0]->country->name);
 
 		$this->assertEquals(1, $patient->gp_id);
 		$this->assertEquals(1, $patient->practice_id);

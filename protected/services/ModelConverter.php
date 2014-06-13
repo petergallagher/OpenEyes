@@ -70,7 +70,7 @@ class ModelConverter
 						if (is_object($data)) {
 							$resource->$res_attribute = $this->modelToResource($data, new $data_class);
 						} else {
-							$resource->$res_attribute = new $data_class($data);
+							$resource->$res_attribute = is_null($data) ? null : new $data_class($data);
 						}
 						break;
 					case DeclarativeModelService::TYPE_CONDITION:
@@ -122,8 +122,14 @@ class ModelConverter
 	{
 		$_model_class_name = '\\'.$model_class_name;
 
-		if (!method_exists($resource,'getId') || (!$model = $_model_class_name::model()->findByPk($resource->getId()))) {
-			$model = new $_model_class_name;
+		if (get_class($resource) == 'stdClass') {
+			if (!isset($resource->id) || (!$model = $_model_class_name::model()->findByPk($resource->id))) {
+				$model = new $_model_class_name;
+			}
+		} else {
+			if (!method_exists($resource,'getId') || (!$model = $_model_class_name::model()->findByPk($resource->getId()))) {
+				$model = new $_model_class_name;
+			}
 		}
 
 		if (is_array($extra_fields)) {
@@ -172,10 +178,14 @@ class ModelConverter
 						}
 						break;
 					case DeclarativeModelService::TYPE_REF:
-						if (method_exists($resource->$res_attribute,'getId')) {
-							$model->{$def[1]} = $resource->$res_attribute->getId();
+						if ($resource->$res_attribute) {
+							if (method_exists($resource->$res_attribute,'getId')) {
+								$model->{$def[1]} = $resource->$res_attribute->getId();
+							} else {
+								$model->{$def[1]} = $resource->$res_attribute->id;
+							}
 						} else {
-							$model->{$def[1]} = $resource->$res_attribute->id;
+							$model->{$def[1]} = null;
 						}
 						break;
 					case DeclarativeModelService::TYPE_SIMPLEOBJECT:
@@ -183,7 +193,7 @@ class ModelConverter
 							$model->{$def[1]} = $resource->$res_attribute->toModelValue();
 						} else {
 							$data_class = 'services\\'.$def[2];
-							$model->{$def[1]} = $data_class::fromObject($resource->$res_attribute)->toModelValue();
+							$model->{$def[1]} = is_null($resource->$res_attribute) ? null : $data_class::fromObject($resource->$res_attribute)->toModelValue();
 						}
 						break;
 					case DeclarativeModelService::TYPE_DATAOBJECT:
@@ -337,10 +347,11 @@ class ModelConverter
 
 			if ($object->$relation) {
 				foreach ($object->$relation as $current_item) {
-					$class_name = get_class($current_item);
-					$current_item_res = $mc->modelToResourceParse($current_item, new $class_name);
+					$class_name = 'services\\'.get_class($current_item);
+					$current_item_res = $mc->modelToResource($current_item, new $class_name);
+					$new_item_res = $mc->modelToResource($item, new $class_name);
 
-					if ($current_item_res->isEqual($item)) {
+					if ($current_item_res->isEqual($new_item_res)) {
 						$found = true;
 						$items_to_keep[] = $current_item;
 						$matched_ids[] = $current_item->id;
@@ -387,7 +398,7 @@ class ModelConverter
 	 */
 	protected function deleteModel(\BaseActiveRecord $model)
 	{
-		if (!$model->save()) {
+		if (!$model->delete()) {
 			throw new \Exception("Unable to delete: " . get_class($model), $model->errors);
 		}
 	}

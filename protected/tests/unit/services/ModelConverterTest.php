@@ -298,7 +298,9 @@ class ModelConverterTest extends \CDbTestCase
 		$this->assertEquals('United States',$resource->addresses[0]->country);
 
 		$this->assertInstanceOf('services\\Date',$resource->addresses[0]->date_start);
+		$this->assertEquals(strtotime('2013-01-03'),$resource->addresses[0]->date_start->getTimestamp());
 		$this->assertInstanceOf('services\\Date',$resource->addresses[0]->date_end);
+		$this->assertEquals(strtotime('2014-05-05'),$resource->addresses[0]->date_end->getTimestamp());
 		$this->assertFalse($resource->addresses[0]->correspond);
 		$this->assertFalse($resource->addresses[0]->transport);
 
