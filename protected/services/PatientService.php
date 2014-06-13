@@ -30,37 +30,54 @@ class PatientService extends DeclarativeModelService
 
 	static protected $model_map = array(
 		'Patient' => array(
-			'nhs_num' => 'nhs_num',
-			'hos_num' => 'hos_num',
-			'title' => 'contact.title',
-			'family_name' => 'contact.last_name',
-			'given_name' => 'contact.first_name',
-			'gender_ref' => array(self::TYPE_REF, 'gender_id', 'Gender'),
-			'birth_date' => 'dob',
-			'date_of_death' => 'date_of_death',
-			'primary_phone' => 'contact.primary_phone',
-			'addresses' => array(self::TYPE_LIST, 'contact.addresses', 'PatientAddress', 'Address', 'contact_id'),
-			'gp_ref' => array(self::TYPE_REF, 'gp_id', 'Gp'),
-			'prac_ref' => array(self::TYPE_REF, 'practice_id', 'Practice'),
-			'cb_refs' => array(self::TYPE_REF_LIST, 'commissioningbody_assignments', 'commissioning_body_id', 'CommissioningBody'),
+			'related_objects' => array(
+				'contact' => array('contact_id', 'Contact'),
+			),
+			'fields' => array(
+				'nhs_num' => 'nhs_num',
+				'hos_num' => 'hos_num',
+				'title' => 'contact.title',
+				'family_name' => 'contact.last_name',
+				'given_name' => 'contact.first_name',
+				'gender_ref' => array(self::TYPE_REF, 'gender_id', 'Gender'),
+				'birth_date' => 'dob',
+				'date_of_death' => 'date_of_death',
+				'primary_phone' => 'contact.primary_phone',
+				'addresses' => array(self::TYPE_LIST, 'contact.addresses', 'PatientAddress', 'Address', 'contact_id'),
+				'gp_ref' => array(self::TYPE_REF, 'gp_id', 'Gp'),
+				'prac_ref' => array(self::TYPE_REF, 'practice_id', 'Practice'),
+				'cb_refs' => array(self::TYPE_REF_LIST, 'commissioningbody_assignments', 'commissioning_body_id', 'CommissioningBody'),
+			),
 		),
 		'Address' => array(
-			'line1' => 'address1',
-			'line2' => 'address2',
-			'city' => 'city',
-			'state' => 'county',
-			'zip' => 'postcode',
-			'country' => array(self::TYPE_RESOURCE, 'country', 'Country'),
-			'date_start' => array(self::TYPE_OBJECT, 'date_start', 'Date'),
-			'date_end' => array(self::TYPE_OBJECT, 'date_end', 'Date'),
-			'correspond' => array(self::TYPE_CONDITION, 'address_type_id', 'equals', \AddressType::CORRESPOND),
-			'transport' => array(self::TYPE_CONDITION, 'address_type_id', 'equals', \AddressType::TRANSPORT),
+			'related_objects' => array(
+				'contact' => array('contact_id', 'Contact'),
+			),
+			'reference_objects' => array(
+				'country' => array('country_id', 'Country', array('name')),
+			),
+			'fields' => array(
+				'line1' => 'address1',
+				'line2' => 'address2',
+				'city' => 'city',
+				'state' => 'county',
+				'zip' => 'postcode',
+				'country' => 'country.name',
+				'date_start' => array(self::TYPE_OBJECT, 'date_start', 'Date'),
+				'date_end' => array(self::TYPE_OBJECT, 'date_end', 'Date'),
+				'correspond' => array(self::TYPE_CONDITION, 'address_type_id', 'equals', \AddressType::CORRESPOND),
+				'transport' => array(self::TYPE_CONDITION, 'address_type_id', 'equals', \AddressType::TRANSPORT),
+			),
 		),
 		'Gender' => array(
-			'name' => 'name',
+			'fields' => array(
+				'name' => 'name',
+			),
 		),
 		'Country' => array(
-			'name' => 'name',
+			'fields' => array(
+				'name' => 'name',
+			),
 		),
 	);
 

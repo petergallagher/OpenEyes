@@ -35,7 +35,7 @@ class ModelConverter
 			throw new \Exception("Unknown object type: $object_class_name");
 		}
 
-		foreach ($this->map[$object_class_name] as $res_attribute => $def) {
+		foreach ($this->map[$object_class_name]['fields'] as $res_attribute => $def) {
 			if (is_array($def)) {
 				switch ($def[0]) {
 					case DeclarativeModelService::TYPE_RESOURCE:
@@ -131,11 +131,21 @@ class ModelConverter
 			}
 		}
 
-		$related_objects = array();
-
 		$model_relations = $model->relations();
 
-		foreach ($this->map[$model_class_name] as $res_attribute => $def) {
+		if (isset($this->map[$model_class_name]['related_objects'])) {
+			foreach ($this->map[$model_class_name]['related_objects'] as $relation_name => $def) {
+				if (!$model->$relation_name) {
+					$class_name = '\\'.$def[1];
+					$model->$relation_name = new $class_name;
+				}
+			}
+		}
+
+		$related_objects = array();
+		$reference_object_attributes = array();
+
+		foreach ($this->map[$model_class_name]['fields'] as $res_attribute => $def) {
 			if (is_array($def)) {
 				switch ($def[0]) {
 					case DeclarativeModelService::TYPE_RESOURCE:
@@ -146,12 +156,18 @@ class ModelConverter
 						break;
 					case DeclarativeModelService::TYPE_LIST:
 						if (($pos = strpos($def[1],'.')) !== FALSE) {
-							$this->addToRelatedObjects(substr($def[1],0,$pos), $res_attribute, array(
-									'ar_attribute' => substr($def[1],$pos+1,strlen($def[1])),
-									'ar_model' => $def[3],
-									'res_model' => $def[2],
-									'copy_field' => @$def[4]
-								), $related_objects);
+							$items = array();
+
+							$related_object_name = substr($def[1],0,$pos);
+							$related_object_attribute = substr($def[1],$pos+1,strlen($def[1]));
+
+							$extra_fields = array();
+
+							foreach ($resource->$res_attribute as $item) {
+								$related_objects[$related_object_name][$related_object_attribute][] = $this->resourceToModel($item, $def[3], false);
+							}
+						} else {
+							throw new \Exception("Unhandled");
 						}
 						break;
 					case DeclarativeModelService::TYPE_REF:
@@ -189,85 +205,127 @@ class ModelConverter
 				}
 			} else {
 				if (($pos = strpos($def,'.')) !== FALSE) {
-					$this->addToRelatedObjects(substr($def,0,$pos), $res_attribute, substr($def,$pos+1,strlen($def)), $related_objects);
+					$relation_name = substr($def,0,$pos);
+					$related_object_attribute = substr($def,$pos+1,strlen($def));
+
+					if (isset($this->map[$model_class_name]['related_objects'][$relation_name])) {
+						if (!$related_object = $model->$relation_name) {
+							throw new \Exception("Model has nothing for relation: $relation_name");
+						}
+
+						$related_object->$related_object_attribute = $resource->$res_attribute;
+						$model->$relation_name = $related_object;
+					} else {
+						$reference_object_attributes[$relation_name][$related_object_attribute] = $resource->$res_attribute;
+
+						$def = $this->map[$model_class_name]['reference_objects'][$relation_name];
+
+						if (array_keys($reference_object_attributes[$relation_name]) == $def[2]) {
+							// All required properties for matching the reference item have been set, so now we can associate it with the model
+							$criteria = new \CDbCriteria;
+
+							foreach ($reference_object_attributes[$relation_name] as $key => $value) {
+								$criteria->compare($key, $value);
+							}
+
+							$related_object_class = '\\'.$def[1];
+
+							if (!$related_object = $related_object_class::model()->find($criteria)) {
+								$related_object = new $related_object_class;
+
+								foreach ($reference_object_attributes[$relation_name] as $key => $value) {
+									$related_object->$key = $value;
+								}
+
+								$save && $this->saveModel($related_object);
+							}
+
+							$model->{$def[0]} = $related_object->primaryKey;
+							$model->$relation_name = $related_object;
+						}
+					}
 				} else {
 					$model->$def = $resource->$res_attribute;
 				}
 			}
 		}
 
-		$save && $this->saveModel($model);
+		if (isset($this->map[$model_class_name]['related_objects'])) {
+			foreach ($this->map[$model_class_name]['related_objects'] as $relation_name => $def) {
+				$save && $this->saveModel($model->$relation_name);
 
-		foreach ($model->relations() as $relation_name => $relation_def) {
-			if (isset($related_objects[$relation_name])) {
-				if (!$related_object = $model->$relation_name) {
-					$related_object = new $relation_def[1];
+				if (!$model->{$def[0]}) {
+					$model->{$def[0]} = $model->$relation_name->primaryKey;
 				}
-
-				if (isset($related_objects[$relation_name]['keys'])) {
-					foreach ($related_objects[$relation_name]['keys'] as $res_attribute => $ar_attribute) {
-						$related_object->$ar_attribute = $resource->$res_attribute;
-					}
-				}
-
-				if (isset($related_objects[$relation_name]['objects'])) {
-					foreach ($related_objects[$relation_name]['objects'] as $res_attribute => $def) {
-						$data_items = array();
-						$matched_ids = array();
-
-						foreach ($resource->$res_attribute as $data_item) {
-							$found = false;
-							if ($related_object->{$def['ar_attribute']}) {
-								foreach ($related_object->{$def['ar_attribute']} as $existing_item) {
-									$class_name = get_class($data_item);
-									$existing_item_res = $this->modelToResource($existing_item, new $class_name);
-
-									if ($existing_item_res->isEqual($data_item)) {
-										$found = true;
-										$data_items[] = $existing_item;
-										$matched_ids[] = $existing_item->id;
-									}
-								}
-							}
-							if (!$found) {
-								$data_items[] = $this->resourceToModel($data_item, $def['ar_model'], $save, $def['copy_field'] ? array($def['copy_field'] => $model->{$def['copy_field']}) : false);
-							}
-						}
-
-						$related_object->{$def['ar_attribute']} = $data_items;
-
-						if ($save) {
-							if ($related_object->{$def['ar_attribute']}) {
-								foreach ($related_object->{$def['ar_attribute']} as $existing_item) {
-									if (!in_array($existing_item->id,$matched_ids)) {
-										$this->deleteModel($existing_item);
-									}
-								}
-							}
-						}
-					}
-				}
-
-				$save && $this->saveModel($related_object);
-
-				$model->$relation_name = $related_object;
 			}
 		}
+
+		foreach ($this->map[$model_class_name]['fields'] as $res_attribute => $def) {
+			if (is_array($def) && $def[0] == DeclarativeModelService::TYPE_LIST) {
+				if ($pos = strpos($def[1],'.')) {
+					$related_object_name = substr($def[1],0,$pos);
+					$related_object_attribute = substr($def[1],$pos+1,strlen($def[1]));
+
+					if (isset($def[4])) {
+						// Set extra fields on list items (currently used to set Address.contact_id)
+						foreach ($related_objects[$related_object_name][$related_object_attribute] as $i => $item) {
+							$related_objects[$related_object_name][$related_object_attribute][$i]->{$def[4]} = $model->{$def[4]};
+						}
+					}
+				} else {
+					throw new \Exception("Unhandled");
+				}
+
+				$model->$related_object_name->$related_object_attribute = $this->filterListItems($model->$related_object_name, $related_object_attribute, $related_objects[$related_object_name][$related_object_attribute], $save);
+			}
+		}
+
+		$save && $this->saveModel($model);
 
 		return $model;
 	}
 
-	protected function addToRelatedObjects($relation_name, $res_attribute, $ar_attribute, &$related_objects)
+	protected function filterListItems($object, $relation, $items, $save)
 	{
-		if (!isset($related_objects[$relation_name])) {
-			$related_objects[$relation_name] = array();
+		$mc = new ModelConverter($this->map);
+
+		$items_to_keep = array();
+		$matched_ids = array();
+
+		foreach ($items as $item) {
+			$found = false;
+
+			if ($object->$relation) {
+				foreach ($object->$relation as $current_item) {
+					$class_name = get_class($current_item);
+					$current_item_res = $mc->modelToResourceParse($current_item, new $class_name);
+
+					if ($current_item_res->isEqual($item)) {
+						$found = true;
+						$items_to_keep[] = $current_item;
+						$matched_ids[] = $current_item->id;
+					}
+				}
+			}
+
+			if (!$found) {
+				$items_to_keep[] = $item;
+
+				$save && $this->saveModel($item);
+			}
 		}
 
-		if (is_string($ar_attribute)) {
-			$related_objects[$relation_name]['keys'][$res_attribute] = $ar_attribute;
-		} else {
-			$related_objects[$relation_name]['objects'][$res_attribute] = $ar_attribute;
+		if ($save) {
+			if ($object->$relation) {
+				foreach ($object->$relation as $current_item) {
+					if (!in_array($current_item->id,$matched_ids)) {
+						$this->deleteModel($current_item);
+					}
+				}
+			}
 		}
+
+		return $items_to_keep;
 	}
 
 	/*

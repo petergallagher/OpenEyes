@@ -29,10 +29,12 @@ class JSONConverterTest extends \CDbTestCase
 
 		$map = array(
 			'Patient' => array(
-				'nhs_num' => 'nhs_num',
-				'hos_num' => 'hos_num',
-				'birth_date' => 'dob',
-				'date_of_death' => 'date_of_death',
+				'fields' => array(
+					'nhs_num' => 'nhs_num',
+					'hos_num' => 'hos_num',
+					'birth_date' => 'dob',
+					'date_of_death' => 'date_of_death',
+				),
 			)
 		);
 
@@ -53,10 +55,12 @@ class JSONConverterTest extends \CDbTestCase
 
 		$map = array(
 			'Patient' => array(
-				'title' => 'contact.title',
-				'family_name' => 'contact.last_name',
-				'given_name' => 'contact.first_name',
-				'primary_phone' => 'contact.primary_phone',
+				'fields' => array(
+					'title' => 'contact.title',
+					'family_name' => 'contact.last_name',
+					'given_name' => 'contact.first_name',
+					'primary_phone' => 'contact.primary_phone',
+				),
 			)
 		);
 
@@ -77,15 +81,19 @@ class JSONConverterTest extends \CDbTestCase
 
 		$map = array(
 			'Patient' => array(
-				'addresses' => array(DeclarativeModelService::TYPE_LIST, 'contact.addresses', 'PatientAddress', 'Address'),
+				'fields' => array(
+					'addresses' => array(DeclarativeModelService::TYPE_LIST, 'contact.addresses', 'PatientAddress', 'Address'),
+				),
 			),
 			'Address' => array(
-				'line1' => 'address1',
-				'line2' => 'address2',
-				'city' => 'city',
-				'state' => 'county',
-				'zip' => 'postcode',
-				'country' => 'country.name',
+				'fields' => array(
+					'line1' => 'address1',
+					'line2' => 'address2',
+					'city' => 'city',
+					'state' => 'county',
+					'zip' => 'postcode',
+					'country' => 'country.name',
+				),
 			),
 		);
 
@@ -110,8 +118,10 @@ class JSONConverterTest extends \CDbTestCase
 
 		$map = array(
 			'Patient' => array(
-				'gp_ref' => array(DeclarativeModelService::TYPE_REF, 'gp_id', 'Gp'),
-				'prac_ref' => array(DeclarativeModelService::TYPE_REF, 'practice_id', 'Practice'),
+				'fields' => array(
+					'gp_ref' => array(DeclarativeModelService::TYPE_REF, 'gp_id', 'Gp'),
+					'prac_ref' => array(DeclarativeModelService::TYPE_REF, 'practice_id', 'Practice'),
+				),
 			)
 		);
 
@@ -136,11 +146,15 @@ class JSONConverterTest extends \CDbTestCase
 
 		$map = array(
 			'Patient' => array(
-				'addresses' => array(DeclarativeModelService::TYPE_LIST, 'contact.addresses', 'PatientAddress', 'Address'),
+				'fields' => array(
+					'addresses' => array(DeclarativeModelService::TYPE_LIST, 'contact.addresses', 'PatientAddress', 'Address'),
+				),
 			),
 			'Address' => array(
-				'date_start' => array(DeclarativeModelService::TYPE_OBJECT, 'date_start', 'Date'),
-				'date_end' => array(DeclarativeModelService::TYPE_OBJECT, 'date_end', 'Date'),
+				'fields' => array(
+					'date_start' => array(DeclarativeModelService::TYPE_OBJECT, 'date_start', 'Date'),
+					'date_end' => array(DeclarativeModelService::TYPE_OBJECT, 'date_end', 'Date'),
+				),
 			),
 		);
 
@@ -164,11 +178,15 @@ class JSONConverterTest extends \CDbTestCase
 
 		$map = array(
 			'Patient' => array(
-				'addresses' => array(DeclarativeModelService::TYPE_LIST, 'contact.addresses', 'PatientAddress', 'Address'),
+				'fields' => array(
+					'addresses' => array(DeclarativeModelService::TYPE_LIST, 'contact.addresses', 'PatientAddress', 'Address'),
+				),
 			),
 			'Address' => array(
-				'correspond' => array(DeclarativeModelService::TYPE_CONDITION, 'address_type_id', 'equals', \AddressType::CORRESPOND),
-				'transport' => array(DeclarativeModelService::TYPE_CONDITION, 'address_type_id', 'equals', \AddressType::TRANSPORT),
+				'fields' => array(
+					'correspond' => array(DeclarativeModelService::TYPE_CONDITION, 'address_type_id', 'equals', \AddressType::CORRESPOND),
+					'transport' => array(DeclarativeModelService::TYPE_CONDITION, 'address_type_id', 'equals', \AddressType::TRANSPORT),
+				),
 			),
 		);
 		
@@ -224,5 +242,68 @@ class JSONConverterTest extends \CDbTestCase
 		$this->assertInstanceOf('services\\PracticeReference',$resource->prac_ref);
 		$this->assertEquals(5, $resource->prac_ref->getId());
 		$this->assertEquals('Practice', $resource->prac_ref->getServiceName());
+	}
+
+	public function testJsonToModel_NoSave()
+	{
+		$json = '{"nhs_num":"54321","hos_num":"12345","title":"Mr","family_name":"Aylward","given_name":"Jim","gender_ref":{"service":"Gender","id":1},"birth_date":"1970-01-01","date_of_death":null,"primary_phone":"07123 456789","addresses":[{"date_start":{"date":"2014-06-06 16:39:29","timezone_type":3,"timezone":"Europe\/London"},"date_end":{"date":"2014-06-06 16:39:29","timezone_type":3,"timezone":"Europe\/London"},"correspond":false,"transport":false,"use":null,"line1":"flat 1","line2":"bleakley creek","city":"flitchley","state":"london","zip":"ec1v 0dx","country":"United States"}],"care_providers":[],"gp_ref":{"service":"Gp","id":1},"prac_ref":{"service":"Practice","id":1},"cb_refs":[],"id":null,"last_modified":null}';
+
+		$jc = new JSONConverter(PatientService::getModelMap());
+		$patient = $jc->jsonToModel($json, 'Patient', false);
+
+		$this->assertEquals('54321',$patient->nhs_num);
+		$this->assertEquals('12345',$patient->hos_num);
+		$this->assertEquals('Mr',$patient->title);
+		$this->assertEquals('Aylward',$patient->last_name);
+		$this->assertEquals('Jim',$patient->first_name);
+		$this->assertInstanceOf('Gender', $patient->gender);
+		$this->assertEquals('Male',$patient->gender->name);
+		$this->assertEquals('1970-01-01',$patient->dob);
+		$this->assertEquals('07123 456789',$patient->contact->primary_phone);
+
+		$this->assertCount(1, $patient->contact->addresses);
+		$this->assertInstanceOf('Address', $patient->contact->addresses[0]);
+		$this->assertEquals('flat 1', $patient->contact->addresses[0]->address1);
+		$this->assertEquals('bleakley creek', $patient->contact->addresses[0]->address2);
+		$this->assertEquals('flitchley', $patient->contact->addresses[0]->city);
+		$this->assertEquals('london', $patient->contact->addresses[0]->county);
+		$this->assertEquals('ec1v 0dx', $patient->contact->addresses[0]->postcode);
+		$this->assertInstanceOf('\Country', $patient->contact->addresses[0]->country);
+		$this->assertEquals('United States', $patient->contact->addresses[0]->country->name);
+
+		$this->assertEquals(1, $patient->gp_id);
+		$this->assertEquals(1, $patient->practice_id);
+	}
+
+	public function testJsonToModel_DBIsCorrect()
+	{
+		$json = '{"nhs_num":"54321","hos_num":"12345","title":"Mr","family_name":"Aylward","given_name":"Jim","gender_ref":{"service":"Gender","id":1},"birth_date":"1970-01-01","date_of_death":null,"primary_phone":"07123 456789","addresses":[{"date_start":{"date":"2014-06-06 16:39:29","timezone_type":3,"timezone":"Europe\/London"},"date_end":{"date":"2014-06-06 16:39:29","timezone_type":3,"timezone":"Europe\/London"},"correspond":false,"transport":false,"use":null,"line1":"flat 1","line2":"bleakley creek","city":"flitchley","state":"london","zip":"ec1v 0dx","country":"United States"}],"care_providers":[],"gp_ref":{"service":"Gp","id":1},"prac_ref":{"service":"Practice","id":1},"cb_refs":[],"id":null,"last_modified":null}';
+
+		$jc = new JSONConverter(PatientService::getModelMap());
+		$patient = $jc->jsonToModel($json, 'Patient', false);
+		$patient = \Patient::model()->findByPk($patient->id);
+
+		$this->assertEquals('54321',$patient->nhs_num);
+		$this->assertEquals('12345',$patient->hos_num);
+		$this->assertEquals('Mr',$patient->title);
+		$this->assertEquals('Aylward',$patient->last_name);
+		$this->assertEquals('Jim',$patient->first_name);
+		$this->assertInstanceOf('Gender', $patient->gender);
+		$this->assertEquals('Male',$patient->gender->name);
+		$this->assertEquals('1970-01-01',$patient->dob);
+		$this->assertEquals('07123 456789',$patient->contact->primary_phone);
+
+		$this->assertCount(1, $patient->contact->addresses);
+		$this->assertInstanceOf('Address', $patient->contact->addresses[0]);
+		$this->assertEquals('flat 1', $patient->contact->addresses[0]->address1);
+		$this->assertEquals('bleakley creek', $patient->contact->addresses[0]->address2);
+		$this->assertEquals('flitchley', $patient->contact->addresses[0]->city);
+		$this->assertEquals('london', $patient->contact->addresses[0]->county);
+		$this->assertEquals('ec1v 0dx', $patient->contact->addresses[0]->postcode);
+		$this->assertInstanceOf('\Country', $patient->contact->addresses[0]->country);
+		$this->assertEquals('United States', $patient->contact->addresses[0]->country->name);
+
+		$this->assertEquals(1, $patient->gp_id);
+		$this->assertEquals(1, $patient->practice_id);
 	}
 }

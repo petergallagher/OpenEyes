@@ -40,10 +40,12 @@ class ModelConverterTest extends \CDbTestCase
 
 		$map = array(
 			'Patient' => array(
-				'nhs_num' => 'nhs_num',
-				'hos_num' => 'hos_num',
-				'birth_date' => 'dob',
-				'date_of_death' => 'date_of_death',
+				'fields' => array(
+					'nhs_num' => 'nhs_num',
+					'hos_num' => 'hos_num',
+					'birth_date' => 'dob',
+					'date_of_death' => 'date_of_death',
+				),
 			)
 		);
 
@@ -71,10 +73,12 @@ class ModelConverterTest extends \CDbTestCase
 
 		$map = array(
 			'Patient' => array(
-				'title' => 'contact.title',
-				'family_name' => 'contact.last_name',
-				'given_name' => 'contact.first_name',
-				'primary_phone' => 'contact.primary_phone',
+				'fields' => array(
+					'title' => 'contact.title',
+					'family_name' => 'contact.last_name',
+					'given_name' => 'contact.first_name',
+					'primary_phone' => 'contact.primary_phone',
+				),
 			)
 		);
 
@@ -106,15 +110,19 @@ class ModelConverterTest extends \CDbTestCase
 
 		$map = array(
 			'Patient' => array(
-				'addresses' => array(DeclarativeModelService::TYPE_LIST, 'contact.addresses', 'PatientAddress', 'Address'),
+				'fields' => array(
+					'addresses' => array(DeclarativeModelService::TYPE_LIST, 'contact.addresses', 'PatientAddress', 'Address'),
+				),
 			),
 			'Address' => array(
-				'line1' => 'address1',
-				'line2' => 'address2',
-				'city' => 'city',
-				'state' => 'county',
-				'zip' => 'postcode',
-				'country' => 'country.name',
+				'fields' => array(
+					'line1' => 'address1',
+					'line2' => 'address2',
+					'city' => 'city',
+					'state' => 'county',
+					'zip' => 'postcode',
+					'country' => 'country.name',
+				),
 			),
 		);
 
@@ -142,8 +150,10 @@ class ModelConverterTest extends \CDbTestCase
 
 		$map = array(
 			'Patient' => array(
-				'gp_ref' => array(DeclarativeModelService::TYPE_REF, 'gp_id', 'Gp'),
-				'prac_ref' => array(DeclarativeModelService::TYPE_REF, 'practice_id', 'Practice'),
+				'fields' => array(
+					'gp_ref' => array(DeclarativeModelService::TYPE_REF, 'gp_id', 'Gp'),
+					'prac_ref' => array(DeclarativeModelService::TYPE_REF, 'practice_id', 'Practice'),
+				),
 			)
 		);
 
@@ -176,11 +186,15 @@ class ModelConverterTest extends \CDbTestCase
 
 		$map = array(
 			'Patient' => array(
-				'addresses' => array(DeclarativeModelService::TYPE_LIST, 'contact.addresses', 'PatientAddress', 'Address'),
+				'fields' => array(
+					'addresses' => array(DeclarativeModelService::TYPE_LIST, 'contact.addresses', 'PatientAddress', 'Address'),
+				),
 			),
 			'Address' => array(
-				'date_start' => array(DeclarativeModelService::TYPE_OBJECT, 'date_start', 'Date'),
-				'date_end' => array(DeclarativeModelService::TYPE_OBJECT, 'date_end', 'Date'),
+				'fields' => array(
+					'date_start' => array(DeclarativeModelService::TYPE_OBJECT, 'date_start', 'Date'),
+					'date_end' => array(DeclarativeModelService::TYPE_OBJECT, 'date_end', 'Date'),
+				),
 			),
 		);
 
@@ -211,11 +225,15 @@ class ModelConverterTest extends \CDbTestCase
 
 		$map = array(
 			'Patient' => array(
-				'addresses' => array(DeclarativeModelService::TYPE_LIST, 'contact.addresses', 'PatientAddress', 'Address'),
+				'fields' => array(
+					'addresses' => array(DeclarativeModelService::TYPE_LIST, 'contact.addresses', 'PatientAddress', 'Address'),
+				),
 			),
 			'Address' => array(
-				'correspond' => array(DeclarativeModelService::TYPE_CONDITION, 'address_type_id', 'equals', \AddressType::CORRESPOND),
-				'transport' => array(DeclarativeModelService::TYPE_CONDITION, 'address_type_id', 'equals', \AddressType::TRANSPORT),
+				'fields' => array(
+					'correspond' => array(DeclarativeModelService::TYPE_CONDITION, 'address_type_id', 'equals', \AddressType::CORRESPOND),
+					'transport' => array(DeclarativeModelService::TYPE_CONDITION, 'address_type_id', 'equals', \AddressType::TRANSPORT),
+				),
 			),
 		);
 		
@@ -277,8 +295,7 @@ class ModelConverterTest extends \CDbTestCase
 		$this->assertEquals('flitchley', $resource->addresses[0]->city);
 		$this->assertEquals('london', $resource->addresses[0]->state);
 		$this->assertEquals('ec1v 0dx', $resource->addresses[0]->zip);
-		$this->assertInstanceOf('services\Country', $resource->addresses[0]->country);
-		$this->assertEquals('United States', $resource->addresses[0]->country->name);
+		$this->assertEquals('United States',$resource->addresses[0]->country);
 
 		$this->assertInstanceOf('services\\Date',$resource->addresses[0]->date_start);
 		$this->assertInstanceOf('services\\Date',$resource->addresses[0]->date_end);
@@ -300,11 +317,6 @@ class ModelConverterTest extends \CDbTestCase
 
 		$date = new Date;
 
-		$country = new Country(array(
-			'name' => 'United States',
-			'id' => 1,
-		));
-
 		$address = new Address;
 		$address->date_start = $date;
 		$address->date_end = $date;
@@ -313,7 +325,7 @@ class ModelConverterTest extends \CDbTestCase
 		$address->city = 'flitchley';
 		$address->state = 'london';
 		$address->zip = 'ec1v 0dx';
-		$address->country = $country;
+		$address->country = 'United States';
 		$address->correspond = false;
 		$address->transport = false;
 
@@ -350,8 +362,7 @@ class ModelConverterTest extends \CDbTestCase
 		$this->assertEquals('flitchley', $resource->addresses[0]->city);
 		$this->assertEquals('london', $resource->addresses[0]->state);
 		$this->assertEquals('ec1v 0dx', $resource->addresses[0]->zip);
-		$this->assertInstanceOf('services\Country', $resource->addresses[0]->country);
-		$this->assertEquals('United States', $resource->addresses[0]->country->name);
+		$this->assertEquals('United States', $resource->addresses[0]->country);
 
 		$this->assertEquals(2, $patient->gp_id);
 		$this->assertEquals(1, $patient->practice_id);
@@ -363,11 +374,6 @@ class ModelConverterTest extends \CDbTestCase
 
 		$date = new Date;
 
-		$country = new Country(array(
-			'id' => 2,
-			'name' => 'United Kingdom',
-		));
-
 		$address = new Address;
 		$address->date_start = $date;
 		$address->date_end = $date;
@@ -376,7 +382,7 @@ class ModelConverterTest extends \CDbTestCase
 		$address->city = 'somewhere';
 		$address->state = 'someton';
 		$address->zip = 'som3 0ne';
-		$address->country = $country;
+		$address->country = 'United Kingdom';
 		$address->correspond = false;
 		$address->transport = false;
 
@@ -461,7 +467,7 @@ class ModelConverterTest extends \CDbTestCase
 
 	public function testModelToResource_EmptyReference()
 	{
-		$c = new ModelConverter(array('Patient' => array('gp_ref' => array(DeclarativeModelService::TYPE_REF, 'gp_id', 'Gp'))));
+		$c = new ModelConverter(array('Patient' => array('fields' => array('gp_ref' => array(DeclarativeModelService::TYPE_REF, 'gp_id', 'Gp')))));
 
 		$res = $c->modelToResource(new \Patient, new Patient);
 

@@ -28,7 +28,9 @@ class GenderService extends DeclarativeModelService
 
 	static protected $model_map = array(
 		'Gender' => array(
-			'name' => 'name',
+			'fields' => array(
+				'name' => 'name',
+			),
 		)
 	);
 
