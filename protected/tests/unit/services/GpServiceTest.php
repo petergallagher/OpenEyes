@@ -183,6 +183,93 @@ class GpServiceTest extends \CDbTestCase
 		$this->assertEquals('United States',$gp->contact->address->country->name);
 	}
 
+	public function getModifiedResource($id)
+	{
+		$resource = \Yii::app()->service->Gp($id)->fetch();
+
+		$resource->gnc = 'x0001';
+		$resource->obj_prof = 'x0002';
+		$resource->title = 'x0003';
+		$resource->family_name = 'x0004';
+		$resource->given_name = 'x0005';
+		$resource->primary_phone = 'x0006';
+		$resource->address->line1 = 'x0007';
+		$resource->address->line2 = 'x0008';
+		$resource->address->city = 'x0009';
+		$resource->address->state = 'x0010';
+		$resource->address->zip = 'x0011';
+		$resource->address->country = 'United Kingdom';
+
+		return $resource;
+	}
+
+	public function testResourceToModel_Save_Update_ModelCountsCorrect()
+	{
+		$resource = $this->getModifiedResource(1);
+
+		$total_gps = count(\Gp::model()->findAll());
+		$total_contacts = count(\Contact::model()->findAll());
+		$total_addresses = count(\Address::model()->findAll());
+
+		$gs = new GpService;
+		$gp = $gs->resourceToModel($resource);
+
+		$this->assertEquals($total_gps, count(\Gp::model()->findAll()));
+		$this->assertEquals($total_contacts, count(\Contact::model()->findAll()));
+		$this->assertEquals($total_addresses, count(\Address::model()->findAll()));
+	}
+
+	public function testResourceToModel_Save_Update_ModelIsCorrect()
+	{
+		$resource = $this->getModifiedResource(1);
+
+		$gs = new GpService;
+		$gp = $gs->resourceToModel($resource);
+
+		$this->assertInstanceOf('\Gp',$gp);
+		$this->assertEquals('x0001',$gp->nat_id);
+		$this->assertEquals('x0002',$gp->obj_prof);
+		$this->assertEquals('x0003',$gp->contact->title);
+		$this->assertEquals('x0004',$gp->contact->last_name);
+		$this->assertEquals('x0005',$gp->contact->first_name);
+		$this->assertEquals('x0006',$gp->contact->primary_phone);
+
+		$this->assertInstanceOf('\Address',$gp->contact->address);
+		$this->assertEquals('x0007',$gp->contact->address->address1);
+		$this->assertEquals('x0008',$gp->contact->address->address2);
+		$this->assertEquals('x0009',$gp->contact->address->city);
+		$this->assertEquals('x0010',$gp->contact->address->county);
+		$this->assertEquals('x0011',$gp->contact->address->postcode);
+		$this->assertInstanceOf('Country',$gp->contact->address->country);
+		$this->assertEquals('United Kingdom',$gp->contact->address->country->name);
+	}
+
+	public function testResourceToModel_Save_Update_DBIsCorrect()
+	{
+		$resource = $this->getModifiedResource(1);
+
+		$gs = new GpService;
+		$gp = $gs->resourceToModel($resource);
+		$gp = \Gp::model()->findByPk(1);
+
+		$this->assertInstanceOf('\Gp',$gp);
+		$this->assertEquals('x0001',$gp->nat_id);
+		$this->assertEquals('x0002',$gp->obj_prof);
+		$this->assertEquals('x0003',$gp->contact->title);
+		$this->assertEquals('x0004',$gp->contact->last_name);
+		$this->assertEquals('x0005',$gp->contact->first_name);
+		$this->assertEquals('x0006',$gp->contact->primary_phone);
+
+		$this->assertInstanceOf('\Address',$gp->contact->address);
+		$this->assertEquals('x0007',$gp->contact->address->address1);
+		$this->assertEquals('x0008',$gp->contact->address->address2);
+		$this->assertEquals('x0009',$gp->contact->address->city);
+		$this->assertEquals('x0010',$gp->contact->address->county);
+		$this->assertEquals('x0011',$gp->contact->address->postcode);
+		$this->assertInstanceOf('Country',$gp->contact->address->country);
+		$this->assertEquals('United Kingdom',$gp->contact->address->country->name);
+	}
+
 	public function testJsonToResource()
 	{
 		$json = '{"gnc":"AII2E2F","obj_prof":"AA1134","title":"Dr","family_name":"Zhivago","given_name":"Yuri","primary_phone":"999","address":{"use":null,"line1":"Staplegun","line2":"Staplegun Creek","city":"Stapleton","state":"staple","zip":"st44 pl3","country":"United States"},"id":"1","last_modified":-2208988800}';
@@ -266,6 +353,32 @@ class GpServiceTest extends \CDbTestCase
 		$this->assertEquals($total_addresses+1, count(\Address::model()->findAll()));
 	}
 
+	public function testJsonToModel_Save_Create_ModelIsCorrect()
+	{
+		$json = '{"gnc":"AII2E2F","obj_prof":"AA1134","title":"Dr","family_name":"Zhivago","given_name":"Yuri","primary_phone":"999","address":{"use":null,"line1":"Staplegun","line2":"Staplegun Creek","city":"Stapleton","state":"staple","zip":"st44 pl3","country":"United States"},"id":null,"last_modified":-2208988800}';
+
+		$gs = new GpService;
+		$gp = $gs->jsonToModel($json);
+
+		$this->assertInstanceOf('\Gp',$gp);
+		$this->assertEquals('AII2E2F',$gp->nat_id);
+		$this->assertEquals('AA1134',$gp->obj_prof);
+		$this->assertEquals('Dr',$gp->contact->title);
+		$this->assertEquals('Zhivago',$gp->contact->last_name);
+		$this->assertEquals('Yuri',$gp->contact->first_name);
+		$this->assertEquals('999',$gp->contact->primary_phone);
+
+		$this->assertInstanceOf('\Contact',$gp->contact);
+		$this->assertInstanceOf('\Address',$gp->contact->address);
+		$this->assertEquals('Staplegun',$gp->contact->address->address1);
+		$this->assertEquals('Staplegun Creek',$gp->contact->address->address2);
+		$this->assertEquals('Stapleton',$gp->contact->address->city);
+		$this->assertEquals('staple',$gp->contact->address->county);
+		$this->assertEquals('st44 pl3',$gp->contact->address->postcode);
+		$this->assertInstanceOf('\Country',$gp->contact->address->country);
+		$this->assertEquals('United States',$gp->contact->address->country->name);
+	}
+
 	public function testJsonToModel_Save_Create_DBIsCorrect()
 	{
 		$json = '{"gnc":"AII2E2F","obj_prof":"AA1134","title":"Dr","family_name":"Zhivago","given_name":"Yuri","primary_phone":"999","address":{"use":null,"line1":"Staplegun","line2":"Staplegun Creek","city":"Stapleton","state":"staple","zip":"st44 pl3","country":"United States"},"id":null,"last_modified":-2208988800}';
@@ -291,5 +404,75 @@ class GpServiceTest extends \CDbTestCase
 		$this->assertEquals('st44 pl3',$gp->contact->address->postcode);
 		$this->assertInstanceOf('\Country',$gp->contact->address->country);
 		$this->assertEquals('United States',$gp->contact->address->country->name);
+	}
+
+	public function testJsonToModel_Save_Update_ModelCountsCorrect()
+	{
+		$json = '{"gnc":"x0001","obj_prof":"x0002","title":"x0003","family_name":"x0004","given_name":"x0005","primary_phone":"x0006","address":{"use":null,"line1":"x0007","line2":"x0008","city":"x0009","state":"x0010","zip":"x0011","country":"United Kingdom"},"id":"1","last_modified":-2208988800}';
+
+		$total_gps = count(\Gp::model()->findAll());
+		$total_contacts = count(\Contact::model()->findAll());
+		$total_addresses = count(\Address::model()->findAll());
+
+		$gs = new GpService;
+		$gp = $gs->jsonToModel($json);
+		$gp = \Gp::model()->findByPk($gp->id);
+
+		$this->assertEquals($total_gps, count(\Gp::model()->findAll()));
+		$this->assertEquals($total_contacts, count(\Contact::model()->findAll()));
+		$this->assertEquals($total_addresses, count(\Address::model()->findAll()));
+	}
+
+	public function testJsonToModel_Save_Update_ModelIsCorrect()
+	{
+		$json = '{"gnc":"x0001","obj_prof":"x0002","title":"x0003","family_name":"x0004","given_name":"x0005","primary_phone":"x0006","address":{"use":null,"line1":"x0007","line2":"x0008","city":"x0009","state":"x0010","zip":"x0011","country":"United Kingdom"},"id":"1","last_modified":-2208988800}';
+
+		$gs = new GpService;
+		$gp = $gs->jsonToModel($json);
+
+		$this->assertInstanceOf('\Gp',$gp);
+		$this->assertEquals('x0001',$gp->nat_id);
+		$this->assertEquals('x0002',$gp->obj_prof);
+		$this->assertEquals('x0003',$gp->contact->title);
+		$this->assertEquals('x0004',$gp->contact->last_name);
+		$this->assertEquals('x0005',$gp->contact->first_name);
+		$this->assertEquals('x0006',$gp->contact->primary_phone);
+
+		$this->assertInstanceOf('\Contact',$gp->contact);
+		$this->assertInstanceOf('\Address',$gp->contact->address);
+		$this->assertEquals('x0007',$gp->contact->address->address1);
+		$this->assertEquals('x0008',$gp->contact->address->address2);
+		$this->assertEquals('x0009',$gp->contact->address->city);
+		$this->assertEquals('x0010',$gp->contact->address->county);
+		$this->assertEquals('x0011',$gp->contact->address->postcode);
+		$this->assertInstanceOf('\Country',$gp->contact->address->country);
+		$this->assertEquals('United Kingdom',$gp->contact->address->country->name);
+	}
+
+	public function testJsonToModel_Save_Update_DBIsCorrect()
+	{
+		$json = '{"gnc":"x0001","obj_prof":"x0002","title":"x0003","family_name":"x0004","given_name":"x0005","primary_phone":"x0006","address":{"use":null,"line1":"x0007","line2":"x0008","city":"x0009","state":"x0010","zip":"x0011","country":"United Kingdom"},"id":"1","last_modified":-2208988800}';
+
+		$gs = new GpService;
+		$gp = $gs->jsonToModel($json);
+		$gp = \Gp::model()->findByPk($gp->id);
+
+		$this->assertInstanceOf('\Gp',$gp);
+		$this->assertEquals('x0001',$gp->nat_id);
+		$this->assertEquals('x0002',$gp->obj_prof);
+		$this->assertEquals('x0003',$gp->contact->title);
+		$this->assertEquals('x0004',$gp->contact->last_name);
+		$this->assertEquals('x0005',$gp->contact->first_name);
+		$this->assertEquals('x0006',$gp->contact->primary_phone);
+
+		$this->assertInstanceOf('\Contact',$gp->contact);
+		$this->assertInstanceOf('\Address',$gp->contact->address);
+		$this->assertEquals('x0007',$gp->contact->address->address1);
+		$this->assertEquals('x0008',$gp->contact->address->address2);
+		$this->assertEquals('x0009',$gp->contact->address->city);
+		$this->assertEquals('x0010',$gp->contact->address->county);
+		$this->assertEquals('x0011',$gp->contact->address->postcode);
+		$this->assertInstanceOf('\Country',$gp->contact->address->country);
+		$this->assertEquals('United Kingdom',$gp->contact->address->country->name);
 	}
 }

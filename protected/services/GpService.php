@@ -38,7 +38,7 @@ class GpService extends DeclarativeModelService
 				'family_name' => 'contact.last_name',
 				'given_name' => 'contact.first_name',
 				'primary_phone' => 'contact.primary_phone',
-				'address' => array(self::TYPE_DATAOBJECT, 'contact.address', 'Address', 'Address', 'contact_id'),
+				'address' => array(self::TYPE_DATAOBJECT_EXCLUSIVE, 'contact.address', 'Address', 'Address', 'contact_id'),
 			),
 		),
 		'Address' => array(

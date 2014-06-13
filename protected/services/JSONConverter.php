@@ -62,6 +62,7 @@ class JSONConverter
 						break;
 					case DeclarativeModelService::TYPE_SIMPLEOBJECT:
 					case DeclarativeModelService::TYPE_DATAOBJECT:
+					case DeclarativeModelService::TYPE_DATAOBJECT_EXCLUSIVE:
 						$data_class = 'services\\'.$def[2];
 						$resource->$res_attribute = $data_class::fromObject($object->$res_attribute);
 						break;

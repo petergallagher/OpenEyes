@@ -76,110 +76,6 @@ class PatientServiceTest extends \CDbTestCase
 		$this->assertEquals('Practice', $resource->prac_ref->getServiceName());
 	}
 
-	public function testResourceToModel_NoSave_NoNewRecords()
-	{
-		$gender = \Yii::app()->service->Gender(1);
-
-		$date = new Date;
-
-		$address = new Address;
-		$address->date_start = $date;
-		$address->date_end = $date;
-		$address->line1 = 'flat 1';
-		$address->line2 = 'bleakley creek';
-		$address->city = 'flitchley';
-		$address->state = 'london';
-		$address->zip = 'ec1v 0dx';
-		$address->country = 'United States';
-		$address->correspond = false;
-		$address->transport = false;
-
-		$resource = new Patient;
-		$resource->nhs_num = '54321';
-		$resource->hos_num = '12345';
-		$resource->title = 'Mr';
-		$resource->family_name = 'Aylward';
-		$resource->given_name = 'Jim';
-		$resource->gender_ref = $gender;
-		$resource->birth_date = '1970-01-01';
-		$resource->primary_phone = '07123 456789';
-		$resource->addresses = array($address);
-		$resource->gp_ref = \Yii::app()->service->Gp(1);
-		$resource->prac_ref = \Yii::app()->service->Practice(1);
-
-		$total_patients = count(\Patient::model()->findAll());
-		$total_contacts = count(\Contact::model()->findAll());
-		$total_addresses = count(\Address::model()->findAll());
-		$total_countries = count(\Country::model()->findAll());
-		$total_genders = count(\Gender::model()->findAll());
-
-		$ps = new PatientService;
-		$patient = $ps->resourceToModel($resource, false);
-
-		$this->assertEquals($total_patients, count(\Patient::model()->findAll()));
-		$this->assertEquals($total_contacts, count(\Contact::model()->findAll()));
-		$this->assertEquals($total_addresses, count(\Address::model()->findAll()));
-		$this->assertEquals($total_countries, count(\Country::model()->findAll()));
-		$this->assertEquals($total_genders, count(\Gender::model()->findAll()));
-	}
-
-	public function testResourceToModel_NoSave_ModelIsCorrect()
-	{
-		$gender = \Yii::app()->service->Gender(1);
-
-		$date = new Date;
-
-		$address = new Address;
-		$address->date_start = $date;
-		$address->date_end = $date;
-		$address->line1 = 'flat 1';
-		$address->line2 = 'bleakley creek';
-		$address->city = 'flitchley';
-		$address->state = 'london';
-		$address->zip = 'ec1v 0dx';
-		$address->country = 'United States';
-		$address->correspond = false;
-		$address->transport = false;
-
-		$resource = new Patient;
-		$resource->nhs_num = '54321';
-		$resource->hos_num = '12345';
-		$resource->title = 'Mr';
-		$resource->family_name = 'Aylward';
-		$resource->given_name = 'Jim';
-		$resource->gender_ref = $gender;
-		$resource->birth_date = '1970-01-01';
-		$resource->primary_phone = '07123 456789';
-		$resource->addresses = array($address);
-		$resource->gp_ref = \Yii::app()->service->Gp(2);
-		$resource->prac_ref = \Yii::app()->service->Practice(1);
-
-		$ps = new PatientService;
-		$patient = $ps->resourceToModel($resource, false);
-
-		$this->assertEquals('54321',$patient->nhs_num);
-		$this->assertEquals('12345',$patient->hos_num);
-		$this->assertEquals('Mr',$patient->title);
-		$this->assertEquals('Aylward',$patient->last_name);
-		$this->assertEquals('Jim',$patient->first_name);
-		$this->assertInstanceOf('Gender', $patient->gender);
-		$this->assertEquals('Male',$patient->gender->name);
-		$this->assertEquals('1970-01-01',$patient->dob);
-		$this->assertEquals('07123 456789',$patient->contact->primary_phone);
-
-		$this->assertCount(1, $patient->contact->addresses);
-		$this->assertInstanceOf('Address', $patient->contact->addresses[0]);
-		$this->assertEquals('flat 1', $patient->contact->addresses[0]->address1);
-		$this->assertEquals('bleakley creek', $resource->addresses[0]->line2);
-		$this->assertEquals('flitchley', $resource->addresses[0]->city);
-		$this->assertEquals('london', $resource->addresses[0]->state);
-		$this->assertEquals('ec1v 0dx', $resource->addresses[0]->zip);
-		$this->assertEquals('United States', $resource->addresses[0]->country);
-
-		$this->assertEquals(2, $patient->gp_id);
-		$this->assertEquals(1, $patient->practice_id);
-	}
-
 	public function getResource()
 	{
 		$gender = \Yii::app()->service->Gender(1);
@@ -212,6 +108,57 @@ class PatientServiceTest extends \CDbTestCase
 		$resource->prac_ref = \Yii::app()->service->Practice(1);
 
 		return $resource;
+	}
+
+	public function testResourceToModel_NoSave_NoNewRecords()
+	{
+		$resource = $this->getResource();
+
+		$total_patients = count(\Patient::model()->findAll());
+		$total_contacts = count(\Contact::model()->findAll());
+		$total_addresses = count(\Address::model()->findAll());
+		$total_countries = count(\Country::model()->findAll());
+		$total_genders = count(\Gender::model()->findAll());
+
+		$ps = new PatientService;
+		$patient = $ps->resourceToModel($resource, false);
+
+		$this->assertEquals($total_patients, count(\Patient::model()->findAll()));
+		$this->assertEquals($total_contacts, count(\Contact::model()->findAll()));
+		$this->assertEquals($total_addresses, count(\Address::model()->findAll()));
+		$this->assertEquals($total_countries, count(\Country::model()->findAll()));
+		$this->assertEquals($total_genders, count(\Gender::model()->findAll()));
+	}
+
+	public function testResourceToModel_NoSave_ModelIsCorrect()
+	{
+		$resource = $this->getResource();
+
+		$ps = new PatientService;
+		$patient = $ps->resourceToModel($resource, false);
+
+		$this->assertEquals('1919',$patient->nhs_num);
+		$this->assertEquals('4545',$patient->hos_num);
+		$this->assertEquals('Mr',$patient->title);
+		$this->assertEquals('Krinkle',$patient->last_name);
+		$this->assertEquals('Henry',$patient->first_name);
+		$this->assertInstanceOf('Gender', $patient->gender);
+		$this->assertEquals('Male',$patient->gender->name);
+		$this->assertEquals('1994-04-23',$patient->dob);
+		$this->assertEquals('02332 3241959',$patient->contact->primary_phone);
+
+		$this->assertCount(1, $patient->contact->addresses);
+		$this->assertInstanceOf('Address', $patient->contact->addresses[0]);
+		$this->assertEquals('1 some road',$patient->contact->addresses[0]->address1);
+		$this->assertEquals('some place',$patient->contact->addresses[0]->address2);
+		$this->assertEquals('somewhere',$patient->contact->addresses[0]->city);
+		$this->assertEquals('someton',$patient->contact->addresses[0]->county);
+		$this->assertEquals('som3 0ne',$patient->contact->addresses[0]->postcode);
+		$this->assertInstanceOf('Country', $patient->contact->addresses[0]->country);
+		$this->assertEquals('United Kingdom', $patient->contact->addresses[0]->country->name);
+
+		$this->assertEquals(1, $patient->gp_id);
+		$this->assertEquals(1, $patient->practice_id);
 	}
 
 	public function testResourceToModel_Save_Create_ModelCountsCorrect()
@@ -299,46 +246,9 @@ class PatientServiceTest extends \CDbTestCase
 		$this->assertEquals(1, $patient->practice_id);
 	}
 
-	public function testResourceToModel_Save_Update_ModelCountsCorrect()
+	public function getModifiedResource($id)
 	{
-		$resource = \Yii::app()->service->Patient(1)->fetch();
-
-		$resource->nhs_num = 'x0000';
-		$resource->hos_num = 'x0001';
-		$resource->title = 'x0002';
-		$resource->family_name = 'x0003';
-		$resource->given_name = 'x0004';
-		$resource->gender = 'Female';
-		$resource->birth_date = '1988-04-04';
-		$resource->primary_phone = '0101010101';
-		$resource->addresses[0]->line1 = 'L1';
-		$resource->addresses[0]->line2 = 'L2';
-		$resource->addresses[0]->city = 'L3';
-		$resource->addresses[0]->state = 'L4';
-		$resource->addresses[0]->zip = 'L5';
-		$resource->addresses[0]->country = 'United Kingdom';
-		$resource->addresses[0]->correspond = 1;
-		$resource->addresses[0]->transport = 0;
-
-		$total_patients = count(\Patient::model()->findAll());
-		$total_contacts = count(\Contact::model()->findAll());
-		$total_addresses = count(\Address::model()->findAll());
-		$total_countries = count(\Country::model()->findAll());
-		$total_genders = count(\Gender::model()->findAll());
-
-		$ps = new PatientService;
-		$patient = $ps->resourceToModel($resource);
-
-		$this->assertEquals($total_patients, count(\Patient::model()->findAll()));
-		$this->assertEquals($total_contacts, count(\Contact::model()->findAll()));
-		$this->assertEquals($total_addresses, count(\Address::model()->findAll()));
-		$this->assertEquals($total_countries, count(\Country::model()->findAll()));
-		$this->assertEquals($total_genders, count(\Gender::model()->findAll()));
-	}
-
-	public function testResourceToModel_Save_Update_DBIsCorrect()
-	{
-		$resource = \Yii::app()->service->Patient(1)->fetch();
+		$resource = \Yii::app()->service->Patient($id)->fetch();
 
 		$resource->nhs_num = 'x0000';
 		$resource->hos_num = 'x0001';
@@ -358,6 +268,33 @@ class PatientServiceTest extends \CDbTestCase
 		$resource->addresses[0]->country = 'United Kingdom';
 		$resource->addresses[0]->correspond = 1;
 		$resource->addresses[0]->transport = 0;
+
+		return $resource;
+	}
+
+	public function testResourceToModel_Save_Update_ModelCountsCorrect()
+	{
+		$resource = $this->getModifiedResource(1);
+
+		$total_patients = count(\Patient::model()->findAll());
+		$total_contacts = count(\Contact::model()->findAll());
+		$total_addresses = count(\Address::model()->findAll());
+		$total_countries = count(\Country::model()->findAll());
+		$total_genders = count(\Gender::model()->findAll());
+
+		$ps = new PatientService;
+		$patient = $ps->resourceToModel($resource);
+
+		$this->assertEquals($total_patients, count(\Patient::model()->findAll()));
+		$this->assertEquals($total_contacts, count(\Contact::model()->findAll()));
+		$this->assertEquals($total_addresses, count(\Address::model()->findAll()));
+		$this->assertEquals($total_countries, count(\Country::model()->findAll()));
+		$this->assertEquals($total_genders, count(\Gender::model()->findAll()));
+	}
+
+	public function testResourceToModel_Save_Update_DBIsCorrect()
+	{
+		$resource = $this->getModifiedResource(1);
 
 		$ps = new PatientService;
 		$patient = $ps->resourceToModel($resource);
@@ -576,10 +513,24 @@ class PatientServiceTest extends \CDbTestCase
 		$this->assertEquals('L3', $patient->contact->addresses[0]->city);
 		$this->assertEquals('L4', $patient->contact->addresses[0]->county);
 		$this->assertEquals('L5', $patient->contact->addresses[0]->postcode);
+		$this->assertEquals(\AddressType::TRANSPORT, $patient->contact->addresses[0]->address_type_id);
 		$this->assertInstanceOf('\Country', $patient->contact->addresses[0]->country);
 		$this->assertEquals('United Kingdom', $patient->contact->addresses[0]->country->name);
 
 		$this->assertEquals(1, $patient->gp_id);
 		$this->assertEquals(1, $patient->practice_id);
+	}
+
+	public function testResourceToModel_Condition_Both_True_Exception()
+	{
+		$resource = $this->getResource();
+
+		$resource->addresses[0]->correspond = true;
+		$resource->addresses[0]->transport = true;
+
+		$this->setExpectedException('Exception', 'Unable to differentiate condition as more than one attribute is true.');
+
+		$ps = new PatientService;
+		$patient = $ps->resourceToModel($resource);
 	}
 }

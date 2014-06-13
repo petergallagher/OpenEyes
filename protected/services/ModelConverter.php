@@ -62,8 +62,9 @@ class ModelConverter
 							$resource->$res_attribute = null;
 						}
 						break;
-					case DeclarativeModelService::TYPE_DATAOBJECT:
 					case DeclarativeModelService::TYPE_SIMPLEOBJECT:
+					case DeclarativeModelService::TYPE_DATAOBJECT:
+					case DeclarativeModelService::TYPE_DATAOBJECT_EXCLUSIVE:
 						$data = $this->expandObjectAttribute($object, $def[1]);
 						$data_class = 'services\\'.$def[2];
 
@@ -151,6 +152,7 @@ class ModelConverter
 
 		$related_objects = array();
 		$reference_object_attributes = array();
+		$conditional_values_set = array();
 
 		foreach ($this->map[$model_class_name]['fields'] as $res_attribute => $def) {
 			if (is_array($def)) {
@@ -197,6 +199,7 @@ class ModelConverter
 						}
 						break;
 					case DeclarativeModelService::TYPE_DATAOBJECT:
+					case DeclarativeModelService::TYPE_DATAOBJECT_EXCLUSIVE:
 						if ($pos = strpos($def[1],'.')) {
 							$related_object_name = substr($def[1],0,$pos);
 							$related_object_attribute = substr($def[1],$pos+1,strlen($def[1]));
@@ -208,7 +211,12 @@ class ModelConverter
 						break;
 					case DeclarativeModelService::TYPE_CONDITION:
 						if ($resource->$res_attribute) {
-							$model->{$def[1]} = $def[3];
+							if (!in_array($def[1], $conditional_values_set)) {
+								$model->{$def[1]} = $def[3];
+								$conditional_values_set[] = $def[1];
+							} else {
+								throw new \Exception("Unable to differentiate condition as more than one attribute is true.");
+							}
 						}
 						break;
 					case DeclarativeModelService::TYPE_REF_LIST:
@@ -311,6 +319,7 @@ class ModelConverter
 						$model->$related_object_name->$related_object_attribute = $this->filterListItems($model->$related_object_name, $related_object_attribute, $related_objects[$related_object_name][$related_object_attribute], $save);
 						break;
 					case DeclarativeModelService::TYPE_DATAOBJECT:
+					case DeclarativeModelService::TYPE_DATAOBJECT_EXCLUSIVE:
 						if ($pos = strpos($def[1],'.')) {
 							$related_object_name = substr($def[1],0,$pos);
 							$related_object_attribute = substr($def[1],$pos+1,strlen($def[1]));
@@ -320,6 +329,12 @@ class ModelConverter
 							}
 						} else {
 							throw new \Exception("Unhandled");
+						}
+
+						if ($save && $def[0] == DeclarativeModelService::TYPE_DATAOBJECT_EXCLUSIVE) {
+							if ($old_object = $model->$related_object_name->$related_object_attribute) {
+								$this->deleteModel($old_object);
+							}
 						}
 
 						$model->$related_object_name->$related_object_attribute = $related_objects[$related_object_name][$related_object_attribute];
