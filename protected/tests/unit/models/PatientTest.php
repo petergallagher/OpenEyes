@@ -126,8 +126,7 @@ class PatientTest extends CDbTestCase
 		$patient->setAttributes($searchTerms);
 		$results = $patient->search($searchTerms);
 
-		$data = $results->getData();
-
+		$data = $results['data'];
 
 		$expectedResults = array();
 		if (!empty($expectedKeys)) {
