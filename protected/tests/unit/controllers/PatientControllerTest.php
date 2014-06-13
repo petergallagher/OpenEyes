@@ -50,7 +50,9 @@ class PatientControllerTest extends CDbTestCase
 
 	public function testActionValidatePatientDetails()
 	{
+		ob_start();
 		$this->controller->actionValidatePatientDetails(1);
+		ob_end_clean();
 		$this->assertTrue(true);
 	}
 
