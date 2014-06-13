@@ -60,4 +60,15 @@ class DeclarativeModelService extends ModelService
 
 		return $mc->resourceToModel($resource, $this::$primary_model, $save);
 	}
+
+	/**
+	 * @param string $json
+	 * @return Resource
+	 */
+	public function jsonToModel($json, $save=true)
+	{
+		$jc  = new JSONConverter($this::$model_map);
+
+		return $jc->jsonToModel($json, $this::$primary_model, $save);
+	}
 }
