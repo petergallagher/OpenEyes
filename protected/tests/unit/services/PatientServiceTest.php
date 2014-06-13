@@ -1,0 +1,300 @@
+<?php
+/**
+ * (C) OpenEyes Foundation, 2014
+ * This file is part of OpenEyes.
+ * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * OpenEyes is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * You should have received a copy of the GNU General Public License along with OpenEyes in a file titled COPYING. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @package OpenEyes
+ * @link http://www.openeyes.org.uk
+ * @author OpenEyes <info@openeyes.org.uk>
+ * @copyright Copyright (C) 2014, OpenEyes Foundation
+ * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
+ */
+
+namespace services;
+
+class PatientServiceTest extends \CDbTestCase
+{
+	public $fixtures = array(
+		'patients' => 'Patient',
+		'contacts' => 'Contact',
+		'addresses' => 'Address',
+		'countries' => 'Country',
+		'practices' => 'Practice',
+		'gps' => 'Gp',
+	);
+
+	public function testModelToResource()
+	{
+		$patient = $this->patients('patient1');
+		$contact = $this->contacts('contact1');
+		$address = $this->addresses('address1');
+
+		$contact->addresses = array($address);
+		$patient->contact = $contact;
+
+		$patient->gp_id = 2;
+		$patient->practice_id = 5;
+
+		$ps = new PatientService;
+
+		$resource = $ps->modelToResource($patient);
+
+		$this->assertEquals('54321',$resource->nhs_num);
+		$this->assertEquals('12345',$resource->hos_num);
+		$this->assertEquals('Mr',$resource->title);
+		$this->assertEquals('Aylward',$resource->family_name);
+		$this->assertEquals('Jim',$resource->given_name);
+		$this->assertInstanceOf('services\GenderReference', $resource->gender_ref);
+		$this->assertEquals('Male',$resource->getGender());
+		$this->assertEquals('1970-01-01',$resource->birth_date);
+		$this->assertEquals('07123 456789',$resource->primary_phone);
+
+		$this->assertCount(1, $resource->addresses);
+		$this->assertInstanceOf('services\PatientAddress', $resource->addresses[0]);
+		$this->assertEquals('flat 1', $resource->addresses[0]->line1);
+		$this->assertEquals('bleakley creek', $resource->addresses[0]->line2);
+		$this->assertEquals('flitchley', $resource->addresses[0]->city);
+		$this->assertEquals('london', $resource->addresses[0]->state);
+		$this->assertEquals('ec1v 0dx', $resource->addresses[0]->zip);
+		$this->assertEquals('United States',$resource->addresses[0]->country);
+
+		$this->assertInstanceOf('services\\Date',$resource->addresses[0]->date_start);
+		$this->assertInstanceOf('services\\Date',$resource->addresses[0]->date_end);
+		$this->assertFalse($resource->addresses[0]->correspond);
+		$this->assertFalse($resource->addresses[0]->transport);
+
+		$this->assertInstanceOf('services\\GpReference',$resource->gp_ref);
+		$this->assertEquals($patient->gp_id, $resource->gp_ref->getId());
+		$this->assertEquals('Gp', $resource->gp_ref->getServiceName());
+
+		$this->assertInstanceOf('services\\PracticeReference',$resource->prac_ref);
+		$this->assertEquals($patient->practice_id, $resource->prac_ref->getId());
+		$this->assertEquals('Practice', $resource->prac_ref->getServiceName());
+	}
+
+	public function testResourceToModel_NoSave_NoNewRecords()
+	{
+		$gender = \Yii::app()->service->Gender(1);
+
+		$date = new Date;
+
+		$address = new Address;
+		$address->date_start = $date;
+		$address->date_end = $date;
+		$address->line1 = 'flat 1';
+		$address->line2 = 'bleakley creek';
+		$address->city = 'flitchley';
+		$address->state = 'london';
+		$address->zip = 'ec1v 0dx';
+		$address->country = 'United States';
+		$address->correspond = false;
+		$address->transport = false;
+
+		$resource = new Patient;
+		$resource->nhs_num = '54321';
+		$resource->hos_num = '12345';
+		$resource->title = 'Mr';
+		$resource->family_name = 'Aylward';
+		$resource->given_name = 'Jim';
+		$resource->gender_ref = $gender;
+		$resource->birth_date = '1970-01-01';
+		$resource->primary_phone = '07123 456789';
+		$resource->addresses = array($address);
+		$resource->gp_ref = \Yii::app()->service->Gp(1);
+		$resource->prac_ref = \Yii::app()->service->Practice(1);
+
+		$total_patients = count(\Patient::model()->findAll());
+		$total_contacts = count(\Contact::model()->findAll());
+		$total_addresses = count(\Address::model()->findAll());
+		$total_countries = count(\Country::model()->findAll());
+		$total_genders = count(\Gender::model()->findAll());
+
+		$ps = new PatientService;
+		$patient = $ps->resourceToModel($resource, false);
+
+		$this->assertEquals($total_patients, count(\Patient::model()->findAll()));
+		$this->assertEquals($total_contacts, count(\Contact::model()->findAll()));
+		$this->assertEquals($total_addresses, count(\Address::model()->findAll()));
+		$this->assertEquals($total_countries, count(\Country::model()->findAll()));
+		$this->assertEquals($total_genders, count(\Gender::model()->findAll()));
+	}
+
+	public function testResourceToModel_NoSave_ModelIsCorrect()
+	{
+		$gender = \Yii::app()->service->Gender(1);
+
+		$date = new Date;
+
+		$address = new Address;
+		$address->date_start = $date;
+		$address->date_end = $date;
+		$address->line1 = 'flat 1';
+		$address->line2 = 'bleakley creek';
+		$address->city = 'flitchley';
+		$address->state = 'london';
+		$address->zip = 'ec1v 0dx';
+		$address->country = 'United States';
+		$address->correspond = false;
+		$address->transport = false;
+
+		$resource = new Patient;
+		$resource->nhs_num = '54321';
+		$resource->hos_num = '12345';
+		$resource->title = 'Mr';
+		$resource->family_name = 'Aylward';
+		$resource->given_name = 'Jim';
+		$resource->gender_ref = $gender;
+		$resource->birth_date = '1970-01-01';
+		$resource->primary_phone = '07123 456789';
+		$resource->addresses = array($address);
+		$resource->gp_ref = \Yii::app()->service->Gp(2);
+		$resource->prac_ref = \Yii::app()->service->Practice(1);
+
+		$ps = new PatientService;
+		$patient = $ps->resourceToModel($resource, false);
+
+		$this->assertEquals('54321',$patient->nhs_num);
+		$this->assertEquals('12345',$patient->hos_num);
+		$this->assertEquals('Mr',$patient->title);
+		$this->assertEquals('Aylward',$patient->last_name);
+		$this->assertEquals('Jim',$patient->first_name);
+		$this->assertInstanceOf('Gender', $patient->gender);
+		$this->assertEquals('Male',$patient->gender->name);
+		$this->assertEquals('1970-01-01',$patient->dob);
+		$this->assertEquals('07123 456789',$patient->contact->primary_phone);
+
+		$this->assertCount(1, $patient->contact->addresses);
+		$this->assertInstanceOf('Address', $patient->contact->addresses[0]);
+		$this->assertEquals('flat 1', $patient->contact->addresses[0]->address1);
+		$this->assertEquals('bleakley creek', $resource->addresses[0]->line2);
+		$this->assertEquals('flitchley', $resource->addresses[0]->city);
+		$this->assertEquals('london', $resource->addresses[0]->state);
+		$this->assertEquals('ec1v 0dx', $resource->addresses[0]->zip);
+		$this->assertEquals('United States', $resource->addresses[0]->country);
+
+		$this->assertEquals(2, $patient->gp_id);
+		$this->assertEquals(1, $patient->practice_id);
+	}
+
+	public function getResource()
+	{
+		$gender = \Yii::app()->service->Gender(1);
+
+		$date = new Date;
+
+		$address = new Address;
+		$address->date_start = $date;
+		$address->date_end = $date;
+		$address->line1 = '1 some road';
+		$address->line2 = 'some place';
+		$address->city = 'somewhere';
+		$address->state = 'someton';
+		$address->zip = 'som3 0ne';
+		$address->country = 'United Kingdom';
+		$address->correspond = false;
+		$address->transport = false;
+
+		$resource = new Patient;
+		$resource->nhs_num = '1919';
+		$resource->hos_num = '4545';
+		$resource->title = 'Mr';
+		$resource->family_name = 'Krinkle';
+		$resource->given_name = 'Henry';
+		$resource->gender_ref = $gender;
+		$resource->birth_date = '1994-04-23';
+		$resource->primary_phone = '02332 3241959';
+		$resource->addresses = array($address);
+		$resource->gp_ref = \Yii::app()->service->Gp(1);
+		$resource->prac_ref = \Yii::app()->service->Practice(1);
+
+		return $resource;
+	}
+
+	public function testResourceToModel_Save_ModelCountsCorrect()
+	{
+		$resource = $this->getResource();
+
+		$total_patients = count(\Patient::model()->findAll());
+		$total_contacts = count(\Contact::model()->findAll());
+		$total_addresses = count(\Address::model()->findAll());
+		$total_countries = count(\Country::model()->findAll());
+		$total_genders = count(\Gender::model()->findAll());
+
+		$ps = new PatientService;
+		$patient = $ps->resourceToModel($resource);
+
+		$this->assertEquals($total_patients+1, count(\Patient::model()->findAll()));
+		$this->assertEquals($total_contacts+1, count(\Contact::model()->findAll()));
+		$this->assertEquals($total_addresses+1, count(\Address::model()->findAll()));
+		$this->assertEquals($total_countries, count(\Country::model()->findAll()));
+		$this->assertEquals($total_genders, count(\Gender::model()->findAll()));
+	}
+
+	public function testResourceToModel_Save_ModelIsCorrect()
+	{
+		$resource = $this->getResource();
+
+		$ps = new PatientService;
+		$patient = $ps->resourceToModel($resource);
+
+		$this->assertInstanceOf('\Patient',$patient);
+
+		$this->assertEquals('1919',$patient->nhs_num);
+		$this->assertEquals('4545',$patient->hos_num);
+		$this->assertEquals('Mr',$patient->title);
+		$this->assertEquals('Krinkle',$patient->last_name);
+		$this->assertEquals('Henry',$patient->first_name);
+		$this->assertInstanceOf('Gender', $patient->gender);
+		$this->assertEquals('Male',$patient->gender->name);
+		$this->assertEquals('1994-04-23',$patient->dob);
+		$this->assertEquals('02332 3241959',$patient->contact->primary_phone);
+
+		$this->assertCount(1, $patient->contact->addresses);
+		$this->assertInstanceOf('Address', $patient->contact->addresses[0]);
+		$this->assertEquals('1 some road',$patient->contact->addresses[0]->address1);
+		$this->assertEquals('some place',$patient->contact->addresses[0]->address2);
+		$this->assertEquals('somewhere',$patient->contact->addresses[0]->city);
+		$this->assertEquals('someton',$patient->contact->addresses[0]->county);
+		$this->assertEquals('som3 0ne',$patient->contact->addresses[0]->postcode);
+		$this->assertInstanceOf('Country', $patient->contact->addresses[0]->country);
+		$this->assertEquals('United Kingdom', $patient->contact->addresses[0]->country->name);
+
+		$this->assertEquals(1, $patient->gp_id);
+		$this->assertEquals(1, $patient->practice_id);
+	}
+
+	public function testResourceToModel_Save_DBIsCorrect()
+	{
+		$resource = $this->getResource();
+
+		$ps = new PatientService;
+		$patient = $ps->resourceToModel($resource);
+		$patient = \Patient::model()->findByPk($patient->id);
+
+		$this->assertEquals('1919',$patient->nhs_num);
+		$this->assertEquals('4545',$patient->hos_num);
+		$this->assertEquals('Mr',$patient->title);
+		$this->assertEquals('Krinkle',$patient->last_name);
+		$this->assertEquals('Henry',$patient->first_name);
+		$this->assertInstanceOf('Gender', $patient->gender);
+		$this->assertEquals('Male',$patient->gender->name);
+		$this->assertEquals('1994-04-23',$patient->dob);
+		$this->assertEquals('02332 3241959',$patient->contact->primary_phone);
+
+		$this->assertCount(1, $patient->contact->addresses);
+		$this->assertInstanceOf('Address', $patient->contact->addresses[0]);
+		$this->assertEquals('1 some road',$patient->contact->addresses[0]->address1);
+		$this->assertEquals('some place',$patient->contact->addresses[0]->address2);
+		$this->assertEquals('somewhere',$patient->contact->addresses[0]->city);
+		$this->assertEquals('someton',$patient->contact->addresses[0]->county);
+		$this->assertEquals('som3 0ne',$patient->contact->addresses[0]->postcode);
+		$this->assertInstanceOf('Country', $patient->contact->addresses[0]->country);
+		$this->assertEquals('United Kingdom', $patient->contact->addresses[0]->country->name);
+
+		$this->assertEquals(1, $patient->gp_id);
+		$this->assertEquals(1, $patient->practice_id);
+	}
+}
