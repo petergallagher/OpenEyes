@@ -32,20 +32,23 @@ class ProcedureTest extends CDbTestCase
 
 	public function dataProvider_ProcedureSearch()
 	{
+		$foobar = array('id'=>'1','term'=>'Foobar Procedure','default_duration'=>60,'is_common'=>false);
+		$test = array('id'=>2,'term'=>'Test Procedure','default_duration'=>20,'is_common'=>false);
+
 		return array(
-			array('Foo', array('Foobar Procedure')),
-			array('Foobar', array('Foobar Procedure')),
-			array('Fo', array('Foobar Procedure')),
-			array('UB', array('Foobar Procedure')),
-			array('Bla', array('Foobar Procedure')),
-			array('wstfgl', array('Foobar Procedure')),
-			array('barfoo', array('Foobar Procedure')),
-			array('Test', array('Test Procedure')),
-			array('Test Pro', array('Test Procedure')),
-			array('Te', array('Test Procedure')),
-			array('TP', array('Test Procedure')),
-			array('leh', array('Test Procedure')),
-			array('Pro', array('Foobar Procedure', 'Test Procedure')),
+			array('Foo', array($foobar)),
+			array('Foobar', array($foobar)),
+			array('Fo', array($foobar)),
+			array('UB', array($foobar)),
+			array('Bla', array($foobar)),
+			array('wstfgl', array($foobar)),
+			array('barfoo', array($foobar)),
+			array('Test', array($test)),
+			array('Test Pro', array($test)),
+			array('Te', array($test)),
+			array('TP', array($test)),
+			array('leh', array($test)),
+			array('Pro', array($foobar, $test)),
 		);
 	}
 
@@ -93,7 +96,7 @@ class ProcedureTest extends CDbTestCase
 	public function testGetList_RestrictBooked()
 	{
 		$this->assertEquals(
-			array('Foobar Procedure'),
+			array(array('id'=>'1','term'=>'Foobar Procedure','default_duration'=>60,'is_common'=>false)),
 			Procedure::getList('Proc', 'booked')
 		);
 	}
@@ -101,7 +104,7 @@ class ProcedureTest extends CDbTestCase
 	public function testGetList_RestrictUnbooked()
 	{
 		$this->assertEquals(
-			array('Test Procedure'),
+			array(array('id'=>2,'term'=>'Test Procedure','default_duration'=>20,'is_common'=>false)),
 			Procedure::getList('Proc', 'unbooked')
 		);
 	}

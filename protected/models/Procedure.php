@@ -172,7 +172,10 @@ class Procedure extends BaseActiveRecordVersioned
 
 	public static function procIsCommon($proc, $subsection_id, $restrict_common)
 	{
-		$firm = Firm::model()->findByPk(Yii::app()->session['selected_firm_id']);
+		if (!$firm = Firm::model()->findByPk(Yii::app()->session['selected_firm_id'])) {
+			return false;
+		}
+
 		if (!$subspecialty_id = $firm->serviceSubspecialtyAssignment ? $firm->serviceSubspecialtyAssignment->subspecialty_id : null) {
 			return false;
 		}
