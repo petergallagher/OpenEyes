@@ -246,16 +246,32 @@ class JSONConverterTest extends \CDbTestCase
 		$this->assertEquals('Practice', $resource->prac_ref->getServiceName());
 	}
 
-	public function testJsonToModel_NoSave()
+	public function testJsonToModel_NoSave_NoNewRows()
 	{
 		$json = '{"nhs_num":"54321","hos_num":"12345","title":"Mr","family_name":"Aylward","given_name":"Jim","gender_ref":{"service":"Gender","id":1},"birth_date":"1970-01-01","date_of_death":null,"primary_phone":"07123 456789","addresses":[{"date_start":{"date":"2014-06-06 16:39:29","timezone_type":3,"timezone":"Europe\/London"},"date_end":{"date":"2014-06-06 16:39:29","timezone_type":3,"timezone":"Europe\/London"},"correspond":false,"transport":false,"use":null,"line1":"flat 1","line2":"bleakley creek","city":"flitchley","state":"london","zip":"ec1v 0dx","country":"United States"}],"care_providers":[],"gp_ref":{"service":"Gp","id":1},"prac_ref":{"service":"Practice","id":1},"cb_refs":[],"id":null,"last_modified":null}';
 
 		$total_patients = count(\Patient::model()->findAll());
+		$total_contacts = count(\Contact::model()->findAll());
+		$total_addresses = count(\Address::model()->findAll());
+		$total_countries = count(\Country::model()->findAll());
+		$total_genders = count(\Gender::model()->findAll());
 
 		$jc = new JSONConverter(PatientService::getModelMap());
 		$patient = $jc->jsonToModel($json, 'Patient', false);
 
 		$this->assertEquals($total_patients, count(\Patient::model()->findAll()));
+		$this->assertEquals($total_contacts, count(\Contact::model()->findAll()));
+		$this->assertEquals($total_addresses, count(\Address::model()->findAll()));
+		$this->assertEquals($total_countries, count(\Country::model()->findAll()));
+		$this->assertEquals($total_genders, count(\Gender::model()->findAll()));
+	}
+
+	public function testJsonToModel_NoSave_ModelIsCorrect()
+	{
+		$json = '{"nhs_num":"54321","hos_num":"12345","title":"Mr","family_name":"Aylward","given_name":"Jim","gender_ref":{"service":"Gender","id":1},"birth_date":"1970-01-01","date_of_death":null,"primary_phone":"07123 456789","addresses":[{"date_start":{"date":"2014-06-06 16:39:29","timezone_type":3,"timezone":"Europe\/London"},"date_end":{"date":"2014-06-06 16:39:29","timezone_type":3,"timezone":"Europe\/London"},"correspond":false,"transport":false,"use":null,"line1":"flat 1","line2":"bleakley creek","city":"flitchley","state":"london","zip":"ec1v 0dx","country":"United States"}],"care_providers":[],"gp_ref":{"service":"Gp","id":1},"prac_ref":{"service":"Practice","id":1},"cb_refs":[],"id":null,"last_modified":null}';
+
+		$jc = new JSONConverter(PatientService::getModelMap());
+		$patient = $jc->jsonToModel($json, 'Patient', false);
 
 		$this->assertEquals('54321',$patient->nhs_num);
 		$this->assertEquals('12345',$patient->hos_num);
@@ -281,17 +297,34 @@ class JSONConverterTest extends \CDbTestCase
 		$this->assertEquals(1, $patient->practice_id);
 	}
 
-	public function testJsonToModel_DBIsCorrect()
+	public function testJsonToModel_Save_ModelCountsCorrect()
 	{
 		$json = '{"nhs_num":"54321","hos_num":"12345","title":"Mr","family_name":"Aylward","given_name":"Jim","gender_ref":{"service":"Gender","id":1},"birth_date":"1970-01-01","date_of_death":null,"primary_phone":"07123 456789","addresses":[{"date_start":{"date":"2014-06-06 16:39:29","timezone_type":3,"timezone":"Europe\/London"},"date_end":{"date":"2014-06-06 16:39:29","timezone_type":3,"timezone":"Europe\/London"},"correspond":false,"transport":false,"use":null,"line1":"flat 1","line2":"bleakley creek","city":"flitchley","state":"london","zip":"ec1v 0dx","country":"United States"}],"care_providers":[],"gp_ref":{"service":"Gp","id":1},"prac_ref":{"service":"Practice","id":1},"cb_refs":[],"id":null,"last_modified":null}';
 
 		$total_patients = count(\Patient::model()->findAll());
+		$total_contacts = count(\Contact::model()->findAll());
+		$total_addresses = count(\Address::model()->findAll());
+		$total_countries = count(\Country::model()->findAll());
+		$total_genders = count(\Gender::model()->findAll());
 
 		$jc = new JSONConverter(PatientService::getModelMap());
 		$patient = $jc->jsonToModel($json, 'Patient');
 		$patient = \Patient::model()->findByPk($patient->id);
 
 		$this->assertEquals($total_patients+1, count(\Patient::model()->findAll()));
+		$this->assertEquals($total_contacts+1, count(\Contact::model()->findAll()));
+		$this->assertEquals($total_addresses+1, count(\Address::model()->findAll()));
+		$this->assertEquals($total_countries, count(\Country::model()->findAll()));
+		$this->assertEquals($total_genders, count(\Gender::model()->findAll()));
+	}
+
+	public function testJsonToModel_Save_DBIsCorrect()
+	{
+		$json = '{"nhs_num":"54321","hos_num":"12345","title":"Mr","family_name":"Aylward","given_name":"Jim","gender_ref":{"service":"Gender","id":1},"birth_date":"1970-01-01","date_of_death":null,"primary_phone":"07123 456789","addresses":[{"date_start":{"date":"2014-06-06 16:39:29","timezone_type":3,"timezone":"Europe\/London"},"date_end":{"date":"2014-06-06 16:39:29","timezone_type":3,"timezone":"Europe\/London"},"correspond":false,"transport":false,"use":null,"line1":"flat 1","line2":"bleakley creek","city":"flitchley","state":"london","zip":"ec1v 0dx","country":"United States"}],"care_providers":[],"gp_ref":{"service":"Gp","id":1},"prac_ref":{"service":"Practice","id":1},"cb_refs":[],"id":null,"last_modified":null}';
+
+		$jc = new JSONConverter(PatientService::getModelMap());
+		$patient = $jc->jsonToModel($json, 'Patient');
+		$patient = \Patient::model()->findByPk($patient->id);
 
 		$this->assertEquals('54321',$patient->nhs_num);
 		$this->assertEquals('12345',$patient->hos_num);

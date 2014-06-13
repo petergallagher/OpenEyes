@@ -311,7 +311,7 @@ class ModelConverterTest extends \CDbTestCase
 		$this->assertEquals('Practice', $resource->prac_ref->getServiceName());
 	}
 
-	public function testResourceToModel_NoSave()
+	public function testResourceToModel_NoSave_NoNewRecords()
 	{
 		$gender = \Yii::app()->service->Gender(1);
 
@@ -343,11 +343,54 @@ class ModelConverterTest extends \CDbTestCase
 		$resource->prac_ref = \Yii::app()->service->Practice(1);
 
 		$total_patients = count(\Patient::model()->findAll());
+		$total_contacts = count(\Contact::model()->findAll());
+		$total_addresses = count(\Address::model()->findAll());
+		$total_countries = count(\Country::model()->findAll());
+		$total_genders = count(\Gender::model()->findAll());
 
 		$mc = new ModelConverter(PatientService::getModelMap());
 		$patient = $mc->resourceToModel($resource, 'Patient', false);
 
 		$this->assertEquals($total_patients, count(\Patient::model()->findAll()));
+		$this->assertEquals($total_contacts, count(\Contact::model()->findAll()));
+		$this->assertEquals($total_addresses, count(\Address::model()->findAll()));
+		$this->assertEquals($total_countries, count(\Country::model()->findAll()));
+		$this->assertEquals($total_genders, count(\Gender::model()->findAll()));
+	}
+
+	public function testResourceToModel_NoSave_ModelIsCorrect()
+	{
+		$gender = \Yii::app()->service->Gender(1);
+
+		$date = new Date;
+
+		$address = new Address;
+		$address->date_start = $date;
+		$address->date_end = $date;
+		$address->line1 = 'flat 1';
+		$address->line2 = 'bleakley creek';
+		$address->city = 'flitchley';
+		$address->state = 'london';
+		$address->zip = 'ec1v 0dx';
+		$address->country = 'United States';
+		$address->correspond = false;
+		$address->transport = false;
+
+		$resource = new Patient;
+		$resource->nhs_num = '54321';
+		$resource->hos_num = '12345';
+		$resource->title = 'Mr';
+		$resource->family_name = 'Aylward';
+		$resource->given_name = 'Jim';
+		$resource->gender_ref = $gender;
+		$resource->birth_date = '1970-01-01';
+		$resource->primary_phone = '07123 456789';
+		$resource->addresses = array($address);
+		$resource->gp_ref = \Yii::app()->service->Gp(2);
+		$resource->prac_ref = \Yii::app()->service->Practice(1);
+
+		$mc = new ModelConverter(PatientService::getModelMap());
+		$patient = $mc->resourceToModel($resource, 'Patient', false);
 
 		$this->assertEquals('54321',$patient->nhs_num);
 		$this->assertEquals('12345',$patient->hos_num);
@@ -406,16 +449,34 @@ class ModelConverterTest extends \CDbTestCase
 		return $resource;
 	}
 
-	public function testResourceToModel_Save_ModelIsCorrect()
+	public function testResourceToModel_Save_ModelCountsCorrect()
 	{
 		$resource = $this->getResource();
 
 		$total_patients = count(\Patient::model()->findAll());
+		$total_contacts = count(\Contact::model()->findAll());
+		$total_addresses = count(\Address::model()->findAll());
+		$total_countries = count(\Country::model()->findAll());
+		$total_genders = count(\Gender::model()->findAll());
 
 		$mc = new ModelConverter(PatientService::getModelMap());
 		$patient = $mc->resourceToModel($resource, 'Patient');
 
 		$this->assertEquals($total_patients+1, count(\Patient::model()->findAll()));
+		$this->assertEquals($total_contacts+1, count(\Contact::model()->findAll()));
+		$this->assertEquals($total_addresses+1, count(\Address::model()->findAll()));
+		$this->assertEquals($total_countries, count(\Country::model()->findAll()));
+		$this->assertEquals($total_genders, count(\Gender::model()->findAll()));
+	}
+
+	public function testResourceToModel_Save_ModelIsCorrect()
+	{
+		$resource = $this->getResource();
+
+		$mc = new ModelConverter(PatientService::getModelMap());
+		$patient = $mc->resourceToModel($resource, 'Patient');
+
+		$this->assertInstanceOf('\Patient',$patient);
 
 		$this->assertEquals('1919',$patient->nhs_num);
 		$this->assertEquals('4545',$patient->hos_num);
