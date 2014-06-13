@@ -166,6 +166,8 @@ class JSONConverterTest extends \CDbTestCase
 		$this->assertCount(1, $resource->addresses);
 		$this->assertInstanceOf('services\\PatientAddress',$resource->addresses[0]);
 
+		date_default_timezone_set('Europe/London');
+
 		$this->assertInstanceOf('services\\Date',$resource->addresses[0]->date_start);
 		$this->assertEquals(strtotime('2012-01-01'),$resource->addresses[0]->date_start->getTimestamp());
 		$this->assertInstanceOf('services\\Date',$resource->addresses[0]->date_end);
