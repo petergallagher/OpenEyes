@@ -28,17 +28,30 @@ class PracticeService extends DeclarativeModelService
 
 	static protected $model_map = array(
 		'Practice' => array(
-			'code' => 'code',
-			'primary_phone' => 'phone',
-			'address' => array(self::TYPE_DATAOBJECT, 'contact.address', 'Address'),
+			'related_objects' => array(
+				'contact' => array('contact_id', 'Contact'),
+			),
+			'fields' => array(
+				'code' => 'code',
+				'primary_phone' => 'phone',
+				'address' => array(self::TYPE_DATAOBJECT_EXCLUSIVE, 'contact.address', 'Address', 'Address', 'contact_id'),
+			),
 		),
 		'Address' => array(
-			'line1' => 'address1',
-			'line2' => 'address2',
-			'city' => 'city',
-			'state' => 'county',
-			'zip' => 'postcode',
-			'country' => 'country.name',
+			'related_objects' => array(
+				'contact' => array('contact_id', 'Contact'),
+			),
+			'reference_objects' => array(
+				'country' => array('country_id', 'Country', array('name')),
+			),
+			'fields' => array(
+				'line1' => 'address1',
+				'line2' => 'address2',
+				'city' => 'city',
+				'state' => 'county',
+				'zip' => 'postcode',
+				'country' => 'country.name',
+			),
 		),
 	);
 

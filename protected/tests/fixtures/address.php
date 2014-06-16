@@ -76,4 +76,14 @@ return array(
 		'email' => '',
 		'contact_id' => 8,
 	),
+	'address6' => array(
+		'address1' => '1 Practice Road',
+		'address2' => '',
+		'city' => 'Practice',
+		'postcode' => 'PR4 CT3',
+		'county' => 'Kent',
+		'country_id' => 2,
+		'email' => '',
+		'contact_id' => 9,
+	),
 );

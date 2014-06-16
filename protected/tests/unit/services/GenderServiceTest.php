@@ -17,6 +17,11 @@ namespace services;
 
 class GenderServiceTest extends \CDbTestCase
 {
+	public function tearDown()
+	{
+		\Yii::app()->db->createCommand("update gender set name = 'Male' where id = 1")->query();
+	}
+
 	public function testModelToResource()
 	{
 		$gender = \Gender::model()->find('name=?',array('Female'));

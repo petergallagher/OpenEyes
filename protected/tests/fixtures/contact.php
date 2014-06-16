@@ -96,4 +96,12 @@ return array(
 		'first_name' => 'Apple',
 		'last_name' => 'Inc',
 	),
+	'contact9' => array(
+		'id' => 9,
+		'nick_name' => 'Practicey',
+		'primary_phone' => '0303032332',
+		'title' => 'Ti',
+		'first_name' => 'Prac',
+		'last_name' => 'Tiss',
+	),
 );
