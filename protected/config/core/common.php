@@ -177,6 +177,9 @@ return array(
 				'services\GpService',
 				'services\PracticeService',
 				'services\PatientService',
+				'services\InstitutionService',
+				'services\SiteService',
+				'services\PatientAssociatedContactsService',
 			),
 		),
 		'session' => array(

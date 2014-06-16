@@ -25,4 +25,11 @@ return array(
 		'institution_id' => 1,
 		'contact_id' => 1,
 	),
+	'site2' => array(
+		'id' => 2,
+		'name' => 'Ebeneezer Goode',
+		'short_name' => 'Good',
+		'institution_id' => 1,
+		'contact_id' => 1,
+	),
 );

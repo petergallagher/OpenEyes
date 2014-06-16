@@ -15,42 +15,36 @@
 
 namespace services;
 
-class PatientAssociatedContactsService extends DeclarativeModelService
+class SiteService extends DeclarativeModelService
 {
-	static protected $operations = array(self::OP_READ, self::OP_UPDATE, self::OP_CREATE, self::OP_SEARCH);
+	static protected $operations = array(self::OP_READ, self::OP_UPDATE, self::OP_DELETE, self::OP_CREATE, self::OP_SEARCH);
 
 	static protected $search_params = array(
 		'id' => self::TYPE_TOKEN,
 		'identifier' => self::TYPE_TOKEN,
-		'family' => self::TYPE_STRING,
-		'given' => self::TYPE_STRING,
 	);
 
-	static protected $primary_model = 'Patient';
+	static protected $primary_model = 'Site';
 
 	static protected $model_map = array(
-		'Patient' => array(
-			'fields' => array(
-				'contacts' => array(self::TYPE_LIST, 'contactAssignments', 'PatientAssociatedContact', 'PatientContactAssignment'),
-			),
-		),
-		'PatientAssociatedContact' => array(
-			'related_objects' => array(
-				'contact' => array('contact_id', 'Contact'),
-				'location' => array('loction_id', 'ContactLocation'),
-			),
-			'fields' => array(
-				'title' => 'contact.title',
-				'family_name' => 'contact.last_name',
-				'given_name' => 'contact.first_name',
-				'primary_phone' => 'contact.primary_phone',
-				'institution_ref' => array(self::TYPE_REF, 'location.institution_id', 'Institution'),
-				'site_ref' => array(self::TYPE_REF, 'location.site_id', 'Site'),
-			),
-		),
 	);
 
 	public function search(array $params)
 	{
+		$model = $this->getSearchModel();
+		if (isset($params['id'])) $model->id = $params['id'];
+		if (isset($params['identifier'])) $model->nat_id = $params['identifier'];
+
+		return $this->getResourcesFromDataProvider($model->search());
+	}
+
+	/**
+	 * @param string $name
+	 * @return InternalReference|null
+	 */
+	public function getReferenceByName($name)
+	{
+		$id = \Yii::app()->db->createCommand()->select('id')->from('site')->where('name = ?', array($name))->queryScalar();
+		return $id ? $this->getReference($id) : null;
 	}
 }

@@ -49,15 +49,28 @@ class ModelConverter
 						$data_items = array();
 
 						foreach ($data_list as $data_item) {
-							$data_items[] = $this->modelToResource($data_item, new $data_class);
+							$data_items[] = $this->modelToResourceParse($data_item, $def[2], new $data_class);
 						}
 
 						$resource->$res_attribute = $data_items;
 						break;
 					case DeclarativeModelService::TYPE_REF:
-						if ($object->{$def[1]}) {
+						if ($pos = strpos($def[1],'.')) {
+							$relation_name = substr($def[1],0,$pos);
+							$relation_attribute = substr($def[1],$pos+1,strlen($def[1]));
+
+							if ($object->$relation_name) {
+								$object_property = $object->$relation_name->$relation_attribute;
+							} else {
+								$object_property = null;
+							}
+						} else {
+							$object_property = $object->{$def[1]};
+						}
+
+						if ($object_property) {
 							$data_class = $def[2];
-							$resource->$res_attribute = \Yii::app()->service->$data_class($object->{$def[1]});
+							$resource->$res_attribute = \Yii::app()->service->$data_class($object_property);
 						} else {
 							$resource->$res_attribute = null;
 						}
