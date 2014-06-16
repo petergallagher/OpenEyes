@@ -55,6 +55,9 @@ class JSONConverterTest extends \CDbTestCase
 
 		$map = array(
 			'Patient' => array(
+				'related_objects' => array(
+					'contact' => array('contact_id', 'Contact'),
+				),
 				'fields' => array(
 					'title' => 'contact.title',
 					'family_name' => 'contact.last_name',
@@ -81,11 +84,20 @@ class JSONConverterTest extends \CDbTestCase
 
 		$map = array(
 			'Patient' => array(
+				'related_objects' => array(
+					'contact' => array('contact_id', 'Contact'),
+				),
 				'fields' => array(
-					'addresses' => array(DeclarativeModelService::TYPE_LIST, 'contact.addresses', 'PatientAddress', 'Address'),
+					'addresses' => array(DeclarativeModelService::TYPE_LIST, 'contact.addresses', 'PatientAddress', 'Address', 'contact_id'),
 				),
 			),
 			'Address' => array(
+				'related_objects' => array(
+					'contact' => array('contact_id', 'Contact'),
+				),
+				'reference_objects' => array(
+					'country' => array('country_id', 'Country'),
+				),
 				'fields' => array(
 					'line1' => 'address1',
 					'line2' => 'address2',
@@ -146,6 +158,9 @@ class JSONConverterTest extends \CDbTestCase
 
 		$map = array(
 			'Patient' => array(
+				'related_objects' => array(
+					'contact' => array('contact_id', 'Contact'),
+				),
 				'fields' => array(
 					'addresses' => array(DeclarativeModelService::TYPE_LIST, 'contact.addresses', 'PatientAddress', 'Address'),
 				),
@@ -180,6 +195,9 @@ class JSONConverterTest extends \CDbTestCase
 
 		$map = array(
 			'Patient' => array(
+				'related_objects' => array(
+					'contact' => array('contact_id', 'Contact'),
+				),
 				'fields' => array(
 					'addresses' => array(DeclarativeModelService::TYPE_LIST, 'contact.addresses', 'PatientAddress', 'Address'),
 				),

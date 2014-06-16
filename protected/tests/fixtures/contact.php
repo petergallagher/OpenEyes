@@ -88,4 +88,12 @@ return array(
 		'first_name' => 'Yuri',
 		'last_name' => 'Zhivago',
 	),
+	'contact8' => array(
+		'id' => 8,
+		'nick_name' => 'Apple Inc',
+		'primary_phone' => '01010101',
+		'title' => 'Mr',
+		'first_name' => 'Apple',
+		'last_name' => 'Inc',
+	),
 );

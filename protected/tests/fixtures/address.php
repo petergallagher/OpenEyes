@@ -66,4 +66,14 @@ return array(
 		'email' => 'yuri@zhiva.go',
 		'contact_id' => 7,
 	),
+	'address5' => array(
+		'address1' => '1 Infinite Loop',
+		'address2' => '',
+		'city' => 'Cupertino',
+		'postcode' => '1AA PL3',
+		'county' => 'California',
+		'country_id' => 1,
+		'email' => '',
+		'contact_id' => 8,
+	),
 );

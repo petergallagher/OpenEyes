@@ -21,7 +21,11 @@ class ModelConverter
 
 	public function __construct($map)
 	{
-		$this->map = $map;
+		if ($map instanceof ModelMap) {
+			$this->map = $map;
+		} else {
+			$this->map = new ModelMap($map);
+		}
 	}
 
 	public function modelToResource($object, &$resource)
@@ -31,11 +35,7 @@ class ModelConverter
 
 	protected function modelToResourceParse($object, $object_class_name, &$resource)
 	{
-		if (!isset($this->map[$object_class_name])) {
-			throw new \Exception("Unknown object type: $object_class_name");
-		}
-
-		foreach ($this->map[$object_class_name]['fields'] as $res_attribute => $def) {
+		foreach ($this->map->getFieldsForClass($object_class_name) as $res_attribute => $def) {
 			if (is_array($def)) {
 				switch ($def[0]) {
 					case DeclarativeModelService::TYPE_RESOURCE:
@@ -141,8 +141,8 @@ class ModelConverter
 
 		$model_relations = $model->relations();
 
-		if (isset($this->map[$model_class_name]['related_objects'])) {
-			foreach ($this->map[$model_class_name]['related_objects'] as $relation_name => $def) {
+		if ($class_related_objects = $this->map->getRelatedObjectsForClass($model_class_name)) {
+			foreach ($class_related_objects as $relation_name => $def) {
 				if (!$model->$relation_name) {
 					$class_name = '\\'.$def[1];
 					$model->$relation_name = new $class_name;
@@ -154,7 +154,7 @@ class ModelConverter
 		$reference_object_attributes = array();
 		$conditional_values_set = array();
 
-		foreach ($this->map[$model_class_name]['fields'] as $res_attribute => $def) {
+		foreach ($this->map->getFieldsForClass($model_class_name) as $res_attribute => $def) {
 			if (is_array($def)) {
 				switch ($def[0]) {
 					case DeclarativeModelService::TYPE_RESOURCE:
@@ -246,7 +246,7 @@ class ModelConverter
 					$relation_name = substr($def,0,$pos);
 					$related_object_attribute = substr($def,$pos+1,strlen($def));
 
-					if (isset($this->map[$model_class_name]['related_objects'][$relation_name])) {
+					if (isset($class_related_objects[$relation_name])) {
 						if (!$related_object = $model->$relation_name) {
 							throw new \Exception("Model has nothing for relation: $relation_name");
 						}
@@ -256,7 +256,7 @@ class ModelConverter
 					} else {
 						$reference_object_attributes[$relation_name][$related_object_attribute] = $resource->$res_attribute;
 
-						$def = $this->map[$model_class_name]['reference_objects'][$relation_name];
+						$def = $this->map->getReferenceObjectForClass($model_class_name, $relation_name);
 
 						if (array_keys($reference_object_attributes[$relation_name]) == $def[2]) {
 							// All required properties for matching the reference item have been set, so now we can associate it with the model
@@ -288,8 +288,8 @@ class ModelConverter
 			}
 		}
 
-		if (isset($this->map[$model_class_name]['related_objects'])) {
-			foreach ($this->map[$model_class_name]['related_objects'] as $relation_name => $def) {
+		if ($class_related_objects) {
+			foreach ($class_related_objects as $relation_name => $def) {
 				$save && $this->saveModel($model->$relation_name);
 
 				if (!$model->{$def[0]}) {
@@ -298,7 +298,7 @@ class ModelConverter
 			}
 		}
 
-		foreach ($this->map[$model_class_name]['fields'] as $res_attribute => $def) {
+		foreach ($this->map->getFieldsForClass($model_class_name) as $res_attribute => $def) {
 			if (is_array($def)) {
 				switch ($def[0]) {
 					case DeclarativeModelService::TYPE_LIST:
@@ -337,9 +337,11 @@ class ModelConverter
 							}
 						}
 
-						$model->$related_object_name->$related_object_attribute = $related_objects[$related_object_name][$related_object_attribute];
+						if ($model->$related_object_name) {
+							$model->$related_object_name->$related_object_attribute = $related_objects[$related_object_name][$related_object_attribute];
+							$save && $this->saveModel($model->$related_object_name->$related_object_attribute);
+						}
 
-						$save && $this->saveModel($model->$related_object_name->$related_object_attribute);
 						break;
 				}
 			}
@@ -352,8 +354,6 @@ class ModelConverter
 
 	protected function filterListItems($object, $relation, $items, $save)
 	{
-		$mc = new ModelConverter($this->map);
-
 		$items_to_keep = array();
 		$matched_ids = array();
 
@@ -363,8 +363,8 @@ class ModelConverter
 			if ($object->$relation) {
 				foreach ($object->$relation as $current_item) {
 					$class_name = 'services\\'.get_class($current_item);
-					$current_item_res = $mc->modelToResource($current_item, new $class_name);
-					$new_item_res = $mc->modelToResource($item, new $class_name);
+					$current_item_res = $this->modelToResource($current_item, new $class_name);
+					$new_item_res = $this->modelToResource($item, new $class_name);
 
 					if ($current_item_res->isEqual($new_item_res)) {
 						$found = true;

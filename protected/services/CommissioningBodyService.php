@@ -31,17 +31,34 @@ class CommissioningBodyService extends DeclarativeModelService
 
 	static protected $model_map = array(
 		'CommissioningBody' => array(
-			'code' => 'code',
-			'name' => 'name',
-			'address' => array(self::TYPE_DATAOBJECT, 'contact.address', 'Address'),
+			'related_objects' => array(
+				'contact' => array('contact_id', 'Contact'),
+			),
+			'reference_objects' => array(
+				'type' => array('commissioning_body_type_id', 'CommissioningBodyType', array('name')),
+			),
+			'fields' => array(
+				'code' => 'code',
+				'name' => 'name',
+				'address' => array(self::TYPE_DATAOBJECT_EXCLUSIVE, 'contact.address', 'Address', 'Address', 'contact_id'),
+				'type' => 'type.name',
+			),
 		),
 		'Address' => array(
-			'line1' => 'address1',
-			'line2' => 'address2',
-			'city' => 'city',
-			'state' => 'county',
-			'zip' => 'postcode',
-			'country' => 'country.name',
+			'fields' => array(
+				'line1' => 'address1',
+				'line2' => 'address2',
+				'city' => 'city',
+				'state' => 'county',
+				'zip' => 'postcode',
+				'country' => 'country.name',
+			),
+			'related_objects' => array(
+				'contact' => array('contact_id', 'Contact'),
+			),
+			'reference_objects' => array(
+				'country' => array('country_id', 'Country', array('name')),
+			),
 		),
 	);
 

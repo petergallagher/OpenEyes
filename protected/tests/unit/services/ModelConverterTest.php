@@ -73,6 +73,9 @@ class ModelConverterTest extends \CDbTestCase
 
 		$map = array(
 			'Patient' => array(
+				'related_objects' => array(
+					'contact' => array('contact_id', 'Contact'),
+				),
 				'fields' => array(
 					'title' => 'contact.title',
 					'family_name' => 'contact.last_name',
@@ -110,11 +113,20 @@ class ModelConverterTest extends \CDbTestCase
 
 		$map = array(
 			'Patient' => array(
+				'related_objects' => array(
+					'contact' => array('contact_id', 'Contact'),
+				),
 				'fields' => array(
-					'addresses' => array(DeclarativeModelService::TYPE_LIST, 'contact.addresses', 'PatientAddress', 'Address'),
+					'addresses' => array(DeclarativeModelService::TYPE_LIST, 'contact.addresses', 'PatientAddress', 'Address', 'contact_id'),
 				),
 			),
 			'Address' => array(
+				'related_objects' => array(
+					'contact' => array('contact_id', 'Contact'),
+				),
+				'reference_objects' => array(
+					'country' => array('country_id', 'Country', array('name')),
+				),
 				'fields' => array(
 					'line1' => 'address1',
 					'line2' => 'address2',
@@ -186,11 +198,17 @@ class ModelConverterTest extends \CDbTestCase
 
 		$map = array(
 			'Patient' => array(
+				'related_objects' => array(
+					'contact' => array('contact_id', 'Contact'),
+				),
 				'fields' => array(
 					'addresses' => array(DeclarativeModelService::TYPE_LIST, 'contact.addresses', 'PatientAddress', 'Address'),
 				),
 			),
 			'Address' => array(
+				'related_objects' => array(
+					'contact' => array('contact_id', 'Contact'),
+				),
 				'fields' => array(
 					'date_start' => array(DeclarativeModelService::TYPE_SIMPLEOBJECT, 'date_start', 'Date'),
 					'date_end' => array(DeclarativeModelService::TYPE_SIMPLEOBJECT, 'date_end', 'Date'),
@@ -225,6 +243,9 @@ class ModelConverterTest extends \CDbTestCase
 
 		$map = array(
 			'Patient' => array(
+				'related_objects' => array(
+					'contact' => array('contact_id', 'Contact'),
+				),
 				'fields' => array(
 					'addresses' => array(DeclarativeModelService::TYPE_LIST, 'contact.addresses', 'PatientAddress', 'Address'),
 				),

@@ -21,7 +21,7 @@ class JSONConverter
 
 	public function __construct($map)
 	{
-		$this->map = $map;
+		$this->map = new ModelMap($map);
 	}
 
 	public function jsonToResource($json, $object_class_name, &$resource)
@@ -35,11 +35,7 @@ class JSONConverter
 
 	protected function jsonToResourceParse($object, $object_class_name, &$resource)
 	{
-		if (!isset($this->map[$object_class_name])) {
-			throw new \Exception("Unknown object type: $object_class_name");
-		}
-
-		foreach ($this->map[$object_class_name]['fields'] as $res_attribute => $def) {
+		foreach ($this->map->getFieldsForClass($object_class_name) as $res_attribute => $def) {
 			if (is_array($def)) {
 				switch ($def[0]) {
 					case DeclarativeModelService::TYPE_RESOURCE:
