@@ -110,9 +110,9 @@ class ModelConverter
 						$resource->$res_attribute = $refs;
 						break;
 					case DeclarativeModelService::TYPE_OR:
-						foreach ($def[1] as $or_field) {
+						foreach ($def[2] as $or_field) {
 							if ($or_value = $this->expandOrField($object, explode('.',$or_field))) {
-								$resource->$res_attribute = $or_value;
+								$resource->$res_attribute = $or_value->{$def[1]};
 								break;
 							}
 						}
@@ -181,9 +181,34 @@ class ModelConverter
 
 		if ($class_related_objects = $this->map->getRelatedObjectsForClass($model_class_name)) {
 			foreach ($class_related_objects as $relation_name => $def) {
-				if (!$model->$relation_name) {
-					$class_name = '\\'.$def[1];
-					$model->$relation_name = new $class_name;
+				$class_name = '\\'.$def[1];
+
+				if (is_array($def[0])) {
+					$allnull = true;
+
+					foreach ($def[2] as $attribute) {
+						if ($resource->$attribute !== null) {
+							$allnull = false;
+						}
+					}
+
+					$target = $allnull ? $def[0][1] : $def[0][0];
+
+					if ($pos = strpos($target,'.')) {
+						$target = substr($target,0,$pos);
+
+						if (!$model->$target->$relation_name) {
+							$model->$target->$relation_name = new $class_name;
+						}
+					} else {
+						if (!$model->$relation_name) {
+							$model->$relation_name = new $class_name;
+						}
+					}
+				} else {
+					if (!$model->$relation_name) {
+						$model->$relation_name = new $class_name;
+					}
 				}
 			}
 		}
@@ -282,6 +307,36 @@ class ModelConverter
 
 						$model->$model_assignment_relation = $assignments;
 						break;
+					case DeclarativeModelService::TYPE_OR:
+						$rule = $this->map->getRuleForOrClause($model_class_name, $res_attribute);
+
+						switch ($rule[0]) {
+							case DeclarativeModelService::RULE_TYPE_ALLNULL:
+								$allnull = true;
+
+								foreach ($rule[1] as $attribute) {
+									if ($resource->$attribute !== null) {
+										$allnull = false;
+									}
+								}
+
+								$target = $allnull ? $rule['then'] : $rule['else'];
+
+								if ($pos = strpos($target,'.')) {
+									$related_object_name = substr($target,0,$pos);
+									$related_object_attribute = substr($target,$pos+1,strlen($target)+1);
+
+									$_related_object = $model->$related_object_name->$related_object_attribute;
+									$_related_object->{$def[1]} = $resource->$res_attribute;
+									$model->$related_object_name->$related_object_attribute = $_related_object;
+								} else {
+									$model->$target->{$def[1]} = $resource->$res_attribute;
+								}
+								break;
+							default:
+								throw new \Exception("Unknown rule type: {$rule[0]}");
+						}
+						break;
 					default:
 						throw new \Exception("Unknown declarative type: {$def[0]}");
 				}
@@ -334,10 +389,39 @@ class ModelConverter
 
 		if ($class_related_objects) {
 			foreach ($class_related_objects as $relation_name => $def) {
-				$save && $this->saveModel($model->$relation_name);
+				if (is_array($def[0])) {
+					$allnull = true;
 
-				if (!$model->{$def[0]}) {
-					$model->{$def[0]} = $model->$relation_name->primaryKey;
+					foreach ($def[2] as $attribute) {
+						if ($resource->$attribute !== null) {
+							$allnull = false;
+						}
+					}
+
+					$target = $allnull ? $def[0][1] : $def[0][0];
+
+					if ($pos = strpos($target,'.')) {
+						$_target = substr($target,0,$pos);
+						$_attribute = substr($target,$pos+1,strlen($target));
+
+						$save && $this->saveModel($model->$_target->$relation_name);
+
+						if (!$model->$_target->$_attribute) {
+							$model->$_target->$_attribute = $model->$_target->$relation_name->primaryKey;
+						}
+					} else {
+						$save && $this->saveModel($model->$relation_name);
+
+						if (!$model->$target) {
+							$model->$target = $model->$relation_name->primaryKey;
+						}
+					}
+				} else {
+					$save && $this->saveModel($model->$relation_name);
+
+					if (!$model->{$def[0]}) {
+						$model->{$def[0]} = $model->$relation_name->primaryKey;
+					}
 				}
 			}
 		}
@@ -357,7 +441,13 @@ class ModelConverter
 						if (isset($def[4])) {
 							// Set extra fields on list items (currently used to set Address.contact_id)
 							foreach ($related_objects[$related_object_name][$related_object_attribute] as $i => $item) {
-								$related_objects[$related_object_name][$related_object_attribute][$i]->{$def[4]} = $model->{$def[4]};
+								if (is_array($def[4])) {
+									foreach ($def[4] as $_key => $_value) {
+										$related_objects[$related_object_name][$related_object_attribute][$i]->$_key = $model->$_value;
+									}
+								} else {
+									$related_objects[$related_object_name][$related_object_attribute][$i]->{$def[4]} = $model->{$def[4]};
+								}
 							}
 						}
 

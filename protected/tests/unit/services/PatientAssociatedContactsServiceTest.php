@@ -139,7 +139,6 @@ class PatientAssociatedContactsServiceTest extends \CDbTestCase
 		$this->assertNull($resource->contacts[2]->site_ref);
 	}
 
-/*
 	public function getResource()
 	{
 		$resource = new PatientAssociatedContacts(1);

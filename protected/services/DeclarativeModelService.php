@@ -27,6 +27,8 @@ class DeclarativeModelService extends ModelService
 	const TYPE_REF_LIST = 7;
 	const TYPE_OR = 8;
 
+	const RULE_TYPE_ALLNULL = 0;
+
 	/**
 	 * @param BaseActiveRecord $model
 	 * @return Resource

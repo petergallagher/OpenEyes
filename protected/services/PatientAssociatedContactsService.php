@@ -31,23 +31,29 @@ class PatientAssociatedContactsService extends DeclarativeModelService
 	static protected $model_map = array(
 		'Patient' => array(
 			'fields' => array(
-				'contacts' => array(self::TYPE_LIST, 'contactAssignments', 'PatientAssociatedContact', 'PatientContactAssignment', 'patient_id'),
+				'contacts' => array(self::TYPE_LIST, 'contactAssignments', 'PatientAssociatedContact', 'PatientContactAssignment', array('patient_id' => 'primaryKey')),
 			),
 		),
 		'PatientAssociatedContact' => array(
 			'ar_class' => 'PatientContactAssignment',
 			'related_objects' => array(
 				'patient' => array('patient_id', 'Patient'),
-				'contact' => array('contact_id', 'Contact'),
 				'location' => array('location_id', 'ContactLocation'),
+				'contact' => array(array('location.contact_id', 'contact_id'), 'Contact', array('site_ref', 'institution_ref')),
 			),
 			'fields' => array(
-				'title' => array(self::TYPE_OR, array('location.contact.title', 'contact.title')),
-				'given_name' => array(self::TYPE_OR, array('location.contact.first_name', 'contact.first_name')),
-				'family_name' => array(self::TYPE_OR, array('location.contact.last_name', 'contact.last_name')),
-				'primary_phone' => array(self::TYPE_OR, array('location.contact.primary_phone', 'contact.primary_phone')),
+				'title' => array(self::TYPE_OR, 'title', array('location.contact','contact')),
+				'given_name' => array(self::TYPE_OR, 'first_name', array('location.contact', 'contact')),
+				'family_name' => array(self::TYPE_OR, 'last_name', array('location.contact', 'contact')),
+				'primary_phone' => array(self::TYPE_OR, 'primary_phone', array('location.contact', 'contact')),
 				'site_ref' => array(self::TYPE_REF, 'location.site_id', 'Site'),
 				'institution_ref' => array(self::TYPE_REF, 'location.institution_id', 'Institution'),
+			),
+			'rules' => array(
+				'title' => array(self::RULE_TYPE_ALLNULL, array('site_ref', 'institution_ref'), 'then' => 'contact', 'else' => 'location.contact'),
+				'given_name' => array(self::RULE_TYPE_ALLNULL, array('site_ref', 'institution_ref'), 'then' => 'contact', 'else' => 'location.contact'),
+				'family_name' => array(self::RULE_TYPE_ALLNULL, array('site_ref', 'institution_ref'), 'then' => 'contact', 'else' => 'location.contact'),
+				'primary_phone' => array(self::RULE_TYPE_ALLNULL, array('site_ref', 'institution_ref'), 'then' => 'contact', 'else' => 'location.contact'),
 			),
 		),
 	);

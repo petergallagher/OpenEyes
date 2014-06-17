@@ -109,4 +109,19 @@ class ModelMap
 
 		return @$this->map[$class_name]['reference_objects'][$relation_name];
 	}
+
+	public function getRuleForOrClause($class_name, $attribute)
+	{
+		if (!isset($this->map[$class_name]['rules'][$attribute])) {
+			foreach ($this->map as $_class_name => $_def) {
+				if (@$_def['ar_class'] == $class_name) {
+					return $this->getRuleForOrClause($_class_name, $attribute);
+				}
+			}
+
+			throw new \Exception("Missing 'or' rule for $class_name.$attribute");
+		}
+
+		return $this->map[$class_name]['rules'][$attribute];
+	}
 }
