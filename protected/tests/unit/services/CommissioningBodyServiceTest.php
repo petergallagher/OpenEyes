@@ -21,6 +21,7 @@ class CommissioningBodyServiceTest extends \CDbTestCase
 		'commisioning_bodies' => 'CommissioningBody',
 		'contacts' => 'Contact',
 		'addresses' => 'Address',
+		'countries' => 'Country',
 	);
 
 	public function testModelToResource()

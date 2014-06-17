@@ -21,6 +21,7 @@ class JSONConverterTest extends \CDbTestCase
 		'patients' => 'Patient',
 		'contacts' => 'Contact',
 		'addresses' => 'Address',
+		'practices' => 'Practice',
 	);
 
 	public function testParse_DirectKeys()

@@ -120,7 +120,8 @@ class ModelConverterTest extends \CDbTestCase
 					'addresses' => array(DeclarativeModelService::TYPE_LIST, 'contact.addresses', 'PatientAddress', 'Address', 'contact_id'),
 				),
 			),
-			'Address' => array(
+			'PatientAddress' => array(
+				'ar_model' => 'Address',
 				'related_objects' => array(
 					'contact' => array('contact_id', 'Contact'),
 				),
@@ -205,7 +206,8 @@ class ModelConverterTest extends \CDbTestCase
 					'addresses' => array(DeclarativeModelService::TYPE_LIST, 'contact.addresses', 'PatientAddress', 'Address'),
 				),
 			),
-			'Address' => array(
+			'PatientAddress' => array(
+				'ar_model' => 'Address',
 				'related_objects' => array(
 					'contact' => array('contact_id', 'Contact'),
 				),
@@ -250,7 +252,8 @@ class ModelConverterTest extends \CDbTestCase
 					'addresses' => array(DeclarativeModelService::TYPE_LIST, 'contact.addresses', 'PatientAddress', 'Address'),
 				),
 			),
-			'Address' => array(
+			'PatientAddress' => array(
+				'ar_model' => 'Address',
 				'fields' => array(
 					'correspond' => array(DeclarativeModelService::TYPE_CONDITION, 'address_type_id', 'equals', \AddressType::CORRESPOND),
 					'transport' => array(DeclarativeModelService::TYPE_CONDITION, 'address_type_id', 'equals', \AddressType::TRANSPORT),

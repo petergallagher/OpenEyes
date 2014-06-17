@@ -62,6 +62,12 @@ class ModelMap
 	public function getFieldsForClass($class_name)
 	{
 		if (!isset($this->map[$class_name]['fields'])) {
+			foreach ($this->map as $_class_name => $_def) {
+				if (@$_def['ar_model'] == $class_name) {
+					return $_def['fields'];
+				}
+			}
+
 			throw new \Exception("Unknown object type: $class_name");
 		}
 
@@ -70,11 +76,27 @@ class ModelMap
 
 	public function getRelatedObjectsForClass($class_name)
 	{
+		if (!@$this->map[$class_name]['related_objects']) {
+			foreach ($this->map as $_class_name => $_def) {
+				if (@$_def['ar_model'] == $class_name) {
+					return @$_def['related_objects'];
+				}
+			}
+		}
+
 		return @$this->map[$class_name]['related_objects'];
 	}
 
 	public function getReferenceObjectForClass($class_name, $relation_name)
 	{
+		if (!@$this->map[$class_name]['reference_objects'][$relation_name]) {
+			foreach ($this->map as $_class_name => $_def) {
+				if (@$_def['ar_model'] == $class_name) {
+					return @$_def['reference_objects'][$relation_name];
+				}
+			}
+		}
+
 		return @$this->map[$class_name]['reference_objects'][$relation_name];
 	}
 }

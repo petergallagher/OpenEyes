@@ -49,7 +49,8 @@ class PatientService extends DeclarativeModelService
 				'cb_refs' => array(self::TYPE_REF_LIST, 'commissioningbody_assignments', 'commissioning_body_id', 'CommissioningBody'),
 			),
 		),
-		'Address' => array(
+		'PatientAddress' => array(
+			'ar_model' => 'Address',
 			'related_objects' => array(
 				'contact' => array('contact_id', 'Contact'),
 			),
