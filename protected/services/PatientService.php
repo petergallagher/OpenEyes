@@ -50,7 +50,7 @@ class PatientService extends DeclarativeModelService
 			),
 		),
 		'PatientAddress' => array(
-			'ar_model' => 'Address',
+			'ar_class' => 'Address',
 			'related_objects' => array(
 				'contact' => array('contact_id', 'Contact'),
 			),

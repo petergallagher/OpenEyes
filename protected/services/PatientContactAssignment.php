@@ -15,16 +15,9 @@
 
 namespace services;
 
-class PatientAssociatedContacts extends Resource
+class PatientContactAssignment extends Resource
 {
-	public $contacts;
-
-	public function __construct($patient_id=null)
-	{
-		if (!$patient_id) {
-			throw new \Exception("patient_id is required");
-		}
-
-		parent::__construct(array('id'=>$patient_id));
-	}
+	public $patient_id;
+	public $contact_id;
+	public $location_id;
 }

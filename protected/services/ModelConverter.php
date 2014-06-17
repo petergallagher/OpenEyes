@@ -178,29 +178,35 @@ class ModelConverter
 						break;
 					case DeclarativeModelService::TYPE_LIST:
 						if (($pos = strpos($def[1],'.')) !== FALSE) {
-							$items = array();
-
 							$related_object_name = substr($def[1],0,$pos);
 							$related_object_attribute = substr($def[1],$pos+1,strlen($def[1]));
-
-							$extra_fields = array();
-
-							foreach ($resource->$res_attribute as $item) {
-								$related_objects[$related_object_name][$related_object_attribute][] = $this->resourceToModel($item, $def[3], false);
-							}
 						} else {
-							throw new \Exception("Unhandled");
+							$related_object_name = $def[1];
+							$related_object_attribute = null;
+						}
+
+						foreach ($resource->$res_attribute as $item) {
+							$related_objects[$related_object_name][$related_object_attribute][] = $this->resourceToModel($item, $def[3], false);
 						}
 						break;
 					case DeclarativeModelService::TYPE_REF:
 						if ($resource->$res_attribute) {
 							if (method_exists($resource->$res_attribute,'getId')) {
-								$model->{$def[1]} = $resource->$res_attribute->getId();
+								$id_value = $resource->$res_attribute->getId();
 							} else {
-								$model->{$def[1]} = $resource->$res_attribute->id;
+								$id_value = $resource->$res_attribute->id;
 							}
 						} else {
-							$model->{$def[1]} = null;
+							$id_value = null;
+						}
+
+						if ($pos = strpos($def[1],'.')) {
+							$related_object_name = substr($def[1],0,$pos);
+							$related_object_attribute = substr($def[1],$pos+1,strlen($def[1]));
+
+							$related_objects[$related_object_name][$related_object_attribute] = $id_value;
+						} else {
+							$model->{$def[1]} = $id_value;
 						}
 						break;
 					case DeclarativeModelService::TYPE_SIMPLEOBJECT:
@@ -318,18 +324,23 @@ class ModelConverter
 						if ($pos = strpos($def[1],'.')) {
 							$related_object_name = substr($def[1],0,$pos);
 							$related_object_attribute = substr($def[1],$pos+1,strlen($def[1]));
-
-							if (isset($def[4])) {
-								// Set extra fields on list items (currently used to set Address.contact_id)
-								foreach ($related_objects[$related_object_name][$related_object_attribute] as $i => $item) {
-									$related_objects[$related_object_name][$related_object_attribute][$i]->{$def[4]} = $model->{$def[4]};
-								}
-							}
 						} else {
-							throw new \Exception("Unhandled");
+							$related_object_name = $def[1];
+							$related_object_attribute = null;
 						}
 
-						$model->$related_object_name->$related_object_attribute = $this->filterListItems($model->$related_object_name, $related_object_attribute, $related_objects[$related_object_name][$related_object_attribute], $save);
+						if (isset($def[4])) {
+							// Set extra fields on list items (currently used to set Address.contact_id)
+							foreach ($related_objects[$related_object_name][$related_object_attribute] as $i => $item) {
+								$related_objects[$related_object_name][$related_object_attribute][$i]->{$def[4]} = $model->{$def[4]};
+							}
+						}
+
+						if ($related_object_attribute) {
+							$model->$related_object_name->$related_object_attribute = $this->filterListItems($model->$related_object_name, $related_object_attribute, $related_objects[$related_object_name][$related_object_attribute], $save);
+						} else {
+							$model->$related_object_name = $this->filterListItems($model->$related_object_name, $related_object_attribute, $related_objects[$related_object_name][$related_object_attribute], $save);
+						}
 						break;
 					case DeclarativeModelService::TYPE_DATAOBJECT:
 					case DeclarativeModelService::TYPE_DATAOBJECT_EXCLUSIVE:
@@ -370,11 +381,13 @@ class ModelConverter
 		$items_to_keep = array();
 		$matched_ids = array();
 
+		$data = $relation ? $object->$relation : $object;
+
 		foreach ($items as $item) {
 			$found = false;
 
-			if ($object->$relation) {
-				foreach ($object->$relation as $current_item) {
+			if ($data) {
+				foreach ($data as $current_item) {
 					$class_name = 'services\\'.get_class($current_item);
 					$current_item_res = $this->modelToResource($current_item, new $class_name);
 					$new_item_res = $this->modelToResource($item, new $class_name);

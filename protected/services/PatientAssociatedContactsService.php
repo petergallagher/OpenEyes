@@ -35,9 +35,10 @@ class PatientAssociatedContactsService extends DeclarativeModelService
 			),
 		),
 		'PatientAssociatedContact' => array(
+			'ar_class' => 'PatientContactAssignment',
 			'related_objects' => array(
 				'contact' => array('contact_id', 'Contact'),
-				'location' => array('loction_id', 'ContactLocation'),
+				'location' => array('location_id', 'ContactLocation'),
 			),
 			'fields' => array(
 				'title' => 'contact.title',

@@ -63,7 +63,7 @@ class ModelMap
 	{
 		if (!isset($this->map[$class_name]['fields'])) {
 			foreach ($this->map as $_class_name => $_def) {
-				if (@$_def['ar_model'] == $class_name) {
+				if (@$_def['ar_class'] == $class_name) {
 					return $_def['fields'];
 				}
 			}
@@ -78,7 +78,7 @@ class ModelMap
 	{
 		if (!@$this->map[$class_name]['related_objects']) {
 			foreach ($this->map as $_class_name => $_def) {
-				if (@$_def['ar_model'] == $class_name) {
+				if (@$_def['ar_class'] == $class_name) {
 					return @$_def['related_objects'];
 				}
 			}
@@ -91,7 +91,7 @@ class ModelMap
 	{
 		if (!@$this->map[$class_name]['reference_objects'][$relation_name]) {
 			foreach ($this->map as $_class_name => $_def) {
-				if (@$_def['ar_model'] == $class_name) {
+				if (@$_def['ar_class'] == $class_name) {
 					return @$_def['reference_objects'][$relation_name];
 				}
 			}
