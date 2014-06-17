@@ -20,6 +20,7 @@ class CommissioningBody extends Resource
 	static protected $fhir_type = 'Organization';
 	static protected $fhir_prefix = 'cb';
 
+	public $type;
 	public $code;
 	public $name;
 	public $address = null;
