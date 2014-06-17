@@ -39,9 +39,19 @@ class ModelMap
 
 			foreach ($map['fields'] as $res_attribute => $def) {
 				if (is_array($def)) {
-					if ($pos = strpos($def[1],'.')) {
-						$relation = substr($def[1],0,$pos);
+					$relations = array();
 
+					if (is_array($def[1])) {
+						foreach ($def[1] as $field) {
+							if ($pos = strpos($field,'.')) {
+								$relations[] = substr($field,0,$pos);
+							}
+						}
+					} else if ($pos = strpos($def[1],'.')) {
+						$relations = array(substr($def[1],0,$pos));
+					}
+
+					foreach ($relations as $relation) {
 						if (!isset($map['related_objects'][$relation]) && !isset($map['reference_objects'][$relation])) {
 							throw new \Exception("Relation '$relation' used in field definitions for $model_class but not declared as a related object or a reference object.");
 						}

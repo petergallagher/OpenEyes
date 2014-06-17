@@ -26,7 +26,7 @@ class PatientAssociatedContactsServiceTest extends \CDbTestCase
 		'sites' => 'Site',
 	);
 
-	public function testModelToResource()
+	public function testModelToResource_JustContact()
 	{
 		$patient = $this->patients('patient1');
 
@@ -42,8 +42,7 @@ class PatientAssociatedContactsServiceTest extends \CDbTestCase
 		$this->assertEquals('Zhivago',$resource->contacts[0]->family_name);
 		$this->assertEquals('Yuri',$resource->contacts[0]->given_name);
 		$this->assertEquals('999',$resource->contacts[0]->primary_phone);
-		$this->assertInstanceOf('services\SiteReference',$resource->contacts[0]->site_ref);
-		$this->assertEquals(1,$resource->contacts[0]->site_ref->getId());
+		$this->assertNull($resource->contacts[0]->site_ref);
 		$this->assertNull($resource->contacts[0]->institution_ref);
 
 		$this->assertInstanceOf('services\PatientAssociatedContact',$resource->contacts[1]);
@@ -51,8 +50,7 @@ class PatientAssociatedContactsServiceTest extends \CDbTestCase
 		$this->assertEquals('Inc',$resource->contacts[1]->family_name);
 		$this->assertEquals('Apple',$resource->contacts[1]->given_name);
 		$this->assertEquals('01010101',$resource->contacts[1]->primary_phone);
-		$this->assertInstanceOf('services\SiteReference',$resource->contacts[1]->site_ref);
-		$this->assertEquals(2,$resource->contacts[1]->site_ref->getId());
+		$this->assertNull($resource->contacts[1]->site_ref);
 		$this->assertNull($resource->contacts[1]->institution_ref);
 
 		$this->assertInstanceOf('services\PatientAssociatedContact',$resource->contacts[2]);
@@ -61,10 +59,10 @@ class PatientAssociatedContactsServiceTest extends \CDbTestCase
 		$this->assertEquals('Prac',$resource->contacts[2]->given_name);
 		$this->assertEquals('0303032332',$resource->contacts[2]->primary_phone);
 		$this->assertNull($resource->contacts[2]->site_ref);
-		$this->assertInstanceOf('services\InstitutionReference',$resource->contacts[2]->institution_ref);
-		$this->assertEquals(2,$resource->contacts[2]->institution_ref->getId());
+		$this->assertNull($resource->contacts[2]->institution_ref);
 	}
 
+/*
 	public function getResource()
 	{
 		$resource = new PatientAssociatedContacts(1);

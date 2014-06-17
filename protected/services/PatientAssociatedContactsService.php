@@ -31,22 +31,23 @@ class PatientAssociatedContactsService extends DeclarativeModelService
 	static protected $model_map = array(
 		'Patient' => array(
 			'fields' => array(
-				'contacts' => array(self::TYPE_LIST, 'contactAssignments', 'PatientAssociatedContact', 'PatientContactAssignment'),
+				'contacts' => array(self::TYPE_LIST, 'contactAssignments', 'PatientAssociatedContact', 'PatientContactAssignment', 'patient_id'),
 			),
 		),
 		'PatientAssociatedContact' => array(
 			'ar_class' => 'PatientContactAssignment',
 			'related_objects' => array(
+				'patient' => array('patient_id', 'Patient'),
 				'contact' => array('contact_id', 'Contact'),
 				'location' => array('location_id', 'ContactLocation'),
 			),
 			'fields' => array(
-				'title' => 'contact.title',
-				'family_name' => 'contact.last_name',
-				'given_name' => 'contact.first_name',
-				'primary_phone' => 'contact.primary_phone',
-				'institution_ref' => array(self::TYPE_REF, 'location.institution_id', 'Institution'),
+				'title' => array(self::TYPE_OR, array('location.contact.title', 'contact.title')),
+				'given_name' => array(self::TYPE_OR, array('location.contact.first_name', 'contact.first_name')),
+				'family_name' => array(self::TYPE_OR, array('location.contact.last_name', 'contact.last_name')),
+				'primary_phone' => array(self::TYPE_OR, array('location.contact.primary_phone', 'contact.primary_phone')),
 				'site_ref' => array(self::TYPE_REF, 'location.site_id', 'Site'),
+				'institution_ref' => array(self::TYPE_REF, 'location.institution_id', 'Institution'),
 			),
 		),
 	);

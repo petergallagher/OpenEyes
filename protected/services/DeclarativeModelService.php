@@ -25,6 +25,7 @@ class DeclarativeModelService extends ModelService
 	const TYPE_CONDITION = 5;
 	const TYPE_RESOURCE = 6;
 	const TYPE_REF_LIST = 7;
+	const TYPE_OR = 8;
 
 	/**
 	 * @param BaseActiveRecord $model

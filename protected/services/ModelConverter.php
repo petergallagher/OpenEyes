@@ -109,6 +109,15 @@ class ModelConverter
 
 						$resource->$res_attribute = $refs;
 						break;
+					case DeclarativeModelService::TYPE_OR:
+						foreach ($def[1] as $or_field) {
+							if ($or_value = $this->expandOrField($object, explode('.',$or_field))) {
+								$resource->$res_attribute = $or_value;
+								break;
+							}
+						}
+
+						break;
 					default:
 						throw new \Exception("Unknown declarative type: {$def[0]}");
 				}
@@ -130,6 +139,22 @@ class ModelConverter
 		}
 
 		return $object->$ar_attribute;
+	}
+
+	protected function expandOrField($object, $or_fields)
+	{
+		$field = array_shift($or_fields);
+
+		if (count($or_fields) >0) {
+
+			if (!$object->$field) {
+				return false;
+			}
+
+			return $this->expandOrField($object->$field, $or_fields);
+		}
+
+		return $object->$field;
 	}
 
 	public function resourceToModel($resource, $model_class_name, $save=true, $extra_fields=false)

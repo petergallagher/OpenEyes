@@ -21,16 +21,16 @@ return array(
 	'patientcontactassignment1' => array(
 		'patient_id' => 1,
 		'contact_id' => 7,
-		'location_id' => 1,
+		'location_id' => null,
 	),
 	'patientcontactassignment2' => array(
 		'patient_id' => 1,
 		'contact_id' => 8,
-		'location_id' => 2,
+		'location_id' => null,
 	),
 	'patientcontactassignment3' => array(
 		'patient_id' => 1,
 		'contact_id' => 9,
-		'location_id' => 3,
+		'location_id' => null,
 	),
 );
