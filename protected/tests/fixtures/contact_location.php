@@ -20,19 +20,19 @@
 return array(
 	'contactlocation1' => array(
 		'id' => 1,
-		'contact_id' => 1,
+		'contact_id' => 7,
 		'site_id' => 1,
 		'institution_id' => null, 
 	),
 	'contactlocation2' => array(
 		'id' => 2,
-		'contact_id' => 2,
+		'contact_id' => 8,
 		'site_id' => 2,
 		'institution_id' => null, 
 	),
 	'contactlocation3' => array(
 		'id' => 3,
-		'contact_id' => 3,
+		'contact_id' => 9,
 		'site_id' => null,
 		'institution_id' => 2
 	),

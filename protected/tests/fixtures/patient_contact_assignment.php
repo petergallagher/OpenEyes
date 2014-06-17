@@ -33,4 +33,34 @@ return array(
 		'contact_id' => 9,
 		'location_id' => null,
 	),
+	'patientcontactassignment4' => array(
+		'patient_id' => 2,
+		'contact_id' => null,
+		'location_id' => 1,
+	),
+	'patientcontactassignment5' => array(
+		'patient_id' => 2,
+		'contact_id' => null,
+		'location_id' => 2,
+	),
+	'patientcontactassignment6' => array(
+		'patient_id' => 2,
+		'contact_id' => null,
+		'location_id' => 3,
+	),
+	'patientcontactassignment7' => array(
+		'patient_id' => 3,
+		'contact_id' => 7,
+		'location_id' => null,
+	),
+	'patientcontactassignment8' => array(
+		'patient_id' => 3,
+		'contact_id' => null,
+		'location_id' => 2,
+	),
+	'patientcontactassignment9' => array(
+		'patient_id' => 3,
+		'contact_id' => null,
+		'location_id' => 3,
+	),
 );
