@@ -187,22 +187,14 @@ class ModelConverter
 					$allnull = $this->attributesAllNull($resource, $def[2]);
 					$target = $allnull ? $def[0][1] : $def[0][0];
 
-					if ($pos = strpos($target,'.')) {
-						$_target = substr($target,0,$pos);
-						$_attribute = substr($target,$pos+1,strlen($target));
+					$target_object = ($pos = strpos($target,'.')) ? substr($target,0,$pos) . '.' . $relation_name : $relation_name;
+					$target_value = $this->expandObjectAttribute($model, $target_object.'.primaryKey');
 
-						$save && $this->saveModel($model->$_target->$relation_name);
+					$save && $this->saveModel($this->expandObjectAttribute($model, $target_object));
 
-						if (!$model->$_target->$_attribute) {
-							$model->$_target->$_attribute = $model->$_target->$relation_name->primaryKey;
-						}
-					} else {
-						$save && $this->saveModel($model->$relation_name);
+					$target_object = ($pos = strpos($target,'.')) ? substr($target,0,$pos) . '.' . substr($target,$pos+1,strlen($target)) : $target;
 
-						if (!$model->$target) {
-							$model->$target = $model->$relation_name->primaryKey;
-						}
-					}
+					$this->setObjectAttribute($model, $target_object, $target_value, false);
 				} else {
 					if ($model->$relation_name) {
 						$save && $this->saveModel($model->$relation_name);
