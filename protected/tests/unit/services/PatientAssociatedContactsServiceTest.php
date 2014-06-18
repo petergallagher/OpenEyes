@@ -176,7 +176,7 @@ class PatientAssociatedContactsServiceTest extends \CDbTestCase
 		$total_contacts = count(\Contact::model()->findAll());
 
 		$ps = new PatientAssociatedContactsService;
-		$patient = $ps->resourceToModel($resource, false);
+		$patient = $ps->resourceToModel($resource, new \Patient, false);
 
 		$this->assertEquals($total_pcas, count(\PatientContactAssignment::model()->findAll()));
 		$this->assertEquals($total_contacts, count(\Contact::model()->findAll()));
@@ -187,7 +187,7 @@ class PatientAssociatedContactsServiceTest extends \CDbTestCase
 		$resource = $this->getResource();
 
 		$ps = new PatientAssociatedContactsService;
-		$patient = $ps->resourceToModel($resource, false);
+		$patient = $ps->resourceToModel($resource, new \Patient, false);
 
 		$this->assertInstanceOf('Patient',$patient);
 		$this->assertCount(3,$patient->contactAssignments);
