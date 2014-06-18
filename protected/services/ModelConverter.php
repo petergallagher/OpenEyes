@@ -113,22 +113,11 @@ class ModelConverter
 					}
 
 					$target = ($allnull ? $def[0][1] : $def[0][0]);
+					$target = ($pos = strpos($target,'.')) ? substr($target,0,$pos) . '.' . $relation_name : $relation_name;
 
-					if ($pos = strpos($target,'.')) {
-						$target = substr($target,0,$pos);
-
-						if (!$model->$target->$relation_name) {
-							$model->$target->$relation_name = new $class_name;
-						}
-					} else {
-						if (!$model->$relation_name) {
-							$model->$relation_name = new $class_name;
-						}
-					}
+					$this->setObjectAttribute($model, $target, new $class_name, false);
 				} else {
-					if (!$model->$relation_name) {
-						$model->$relation_name = new $class_name;
-					}
+					$this->setObjectAttribute($model, $relation_name, new $class_name, false);
 
 					$model->$relation_name = $this->applyRulesForNewRelatedObject($model_class_name, $model, $relation_name, $resource);
 				}
