@@ -36,7 +36,11 @@ class DataObjectTest extends \CDbTestCase
 					'bar' => array(
 						'type' => 'FhirType2',
 						'plural' => true,
-					)
+					),
+					'dte' => array(
+						'type' => 'date',
+						'plural' => false,
+					),
 				),
 			),
 			array(
@@ -69,7 +73,8 @@ class DataObjectTest extends \CDbTestCase
 					'bar' => array(
 						(object)array('baz' => 2),
 						(object)array('baz' => 3),
-					)
+					),
+					'dte' => '2001-01-01',
 				),
 				new DataObjectTest_Obj1(
 					array(
@@ -78,6 +83,7 @@ class DataObjectTest extends \CDbTestCase
 							new DataObjectTest_Obj2(array('baz' => 2)),
 							new DataObjectTest_Obj2(array('baz' => 3)),
 						),
+						'dte' => new Date('2001-01-01'),
 					)
 				),
 			)
@@ -149,6 +155,7 @@ class DataObjectTest_Obj1 extends DataObjectTest_BaseObj
 
 	public $foo;
 	public $bar;
+	public $dte;
 }
 
 class DataObjectTest_Obj2 extends DataObjectTest_BaseObj

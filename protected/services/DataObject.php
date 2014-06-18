@@ -66,14 +66,12 @@ abstract class DataObject implements FhirCompatible
 			$class = static::getServiceClass($valueType);
 			if (!$class) continue;
 
-			switch (gettype($value)) {
-				case "object":
-					$value = $class::fromFhir($value);
-					break;
-				case "array":
-					foreach ($value as &$v) {
-						$v = $class::fromFhir($v);
-					}
+			if (is_array($value)) {
+				foreach ($value as &$v) {
+					$v = $class::fromFhir($v);
+				}
+			} else {
+				$value = $class::fromFhir($value);
 			}
 		}
 
@@ -87,8 +85,15 @@ abstract class DataObject implements FhirCompatible
 
 	static protected function getServiceClass($fhir_type)
 	{
-		$class = "services\\{$fhir_type}";
-		return @class_exists($class) ? $class : null;
+		switch ($fhir_type) {
+			case 'date':
+			case 'dateTime':
+				return 'services\\' . ucfirst($fhir_type);
+				break;
+			default:
+				$class = "services\\{$fhir_type}";
+				return @class_exists($class) ? $class : null;
+		}
 	}
 
 	static protected function getFhirTemplate()
