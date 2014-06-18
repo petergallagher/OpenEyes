@@ -466,7 +466,7 @@ class ModelConverter
 							$related_object_name = substr($def[1],0,$pos);
 							$related_object_attribute = substr($def[1],$pos+1,strlen($def[1]));
 
-							if (isset($def[4])) {
+							if ($related_objects[$related_object_name][$related_object_attribute] && isset($def[4])) {
 								$related_objects[$related_object_name][$related_object_attribute]->{$def[4]} = $model->{$def[4]};
 							}
 						} else {
@@ -479,7 +479,7 @@ class ModelConverter
 							}
 						}
 
-						if ($model->$related_object_name) {
+						if ($model->$related_object_name && $related_objects[$related_object_name][$related_object_attribute]) {
 							$model->$related_object_name->$related_object_attribute = $related_objects[$related_object_name][$related_object_attribute];
 							$save && $this->saveModel($model->$related_object_name->$related_object_attribute);
 						}
