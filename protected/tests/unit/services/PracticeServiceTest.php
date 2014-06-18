@@ -163,13 +163,14 @@ class PracticeServiceTest extends \CDbTestCase
 		$this->assertEquals('United Kingdom', $practice->contact->address->country->name);
 	}
 
-	public function getModifiedResource($id)
+	public function getModifiedResource()
 	{
-		$resource = \Yii::app()->service->Practice($id)->fetch();
+		$resource = new Practice;
 
 		$resource->code = 'x0001';
 		$resource->primary_phone = 'x0002';
 
+		$resource->address = new Address;
 		$resource->address->line1 = 'L1';
 		$resource->address->line2 = 'L2';
 		$resource->address->city = 'L3';
@@ -182,7 +183,7 @@ class PracticeServiceTest extends \CDbTestCase
 
 	public function testResourceToModel_Save_Update_ModelCountsCorrect()
 	{
-		$resource = $this->getModifiedResource(1);
+		$resource = $this->getModifiedResource();
 		$model = \Practice::model()->findByPk(1);
 
 		$total_practices = count(\Practice::model()->findAll());
@@ -201,7 +202,7 @@ class PracticeServiceTest extends \CDbTestCase
 
 	public function testResourceToModel_Save_Update_DBIsCorrect()
 	{
-		$resource = $this->getModifiedResource(1);
+		$resource = $this->getModifiedResource();
 		$model = \Practice::model()->findByPk(1);
 
 		$ps = new PracticeService;
@@ -224,7 +225,7 @@ class PracticeServiceTest extends \CDbTestCase
 
 	public function testJsonToResource()
 	{
-		$json = '{"code":"x0001","primary_phone":"x0002","address":{"use":null,"line1":"x0003","line2":"x0004","city":"x0005","state":"x0006","zip":"x0007","country":"United Kingdom"},"id":"1","last_modified":-2208988800}';
+		$json = '{"code":"x0001","primary_phone":"x0002","address":{"use":null,"line1":"x0003","line2":"x0004","city":"x0005","state":"x0006","zip":"x0007","country":"United Kingdom"}}';
 
 		$ps = new PracticeService;
 		$resource = $ps->jsonToResource($json);
@@ -244,7 +245,7 @@ class PracticeServiceTest extends \CDbTestCase
 
 	public function jsonToModel_NoSave_NoNewRows()
 	{
-		$json = '{"code":"x0001","primary_phone":"x0002","address":{"use":null,"line1":"x0003","line2":"x0004","city":"x0005","state":"x0006","zip":"x0007","country":"United Kingdom"},"id":null,"last_modified":-2208988800}';
+		$json = '{"code":"x0001","primary_phone":"x0002","address":{"use":null,"line1":"x0003","line2":"x0004","city":"x0005","state":"x0006","zip":"x0007","country":"United Kingdom"}}';
 
 		$total_practices = count(\Practice::model()->findAll());
 		$total_contacts = count(\Contact::model()->findAll());
@@ -262,7 +263,7 @@ class PracticeServiceTest extends \CDbTestCase
 
 	public function testJsonToModel_NoSave_ModelIsCorrect()
 	{
-		$json = '{"code":"x0001","primary_phone":"x0002","address":{"use":null,"line1":"x0003","line2":"x0004","city":"x0005","state":"x0006","zip":"x0007","country":"United Kingdom"},"id":null,"last_modified":-2208988800}';
+		$json = '{"code":"x0001","primary_phone":"x0002","address":{"use":null,"line1":"x0003","line2":"x0004","city":"x0005","state":"x0006","zip":"x0007","country":"United Kingdom"}}';
 
 		$ps = new PracticeService;
 		$practice = $ps->jsonToModel($json, new \Practice, false);
@@ -283,7 +284,7 @@ class PracticeServiceTest extends \CDbTestCase
 
 	public function testJsonToModel_Save_Create_ModelCountsCorrect()
 	{
-		$json = '{"code":"x0001","primary_phone":"x0002","address":{"use":null,"line1":"x0003","line2":"x0004","city":"x0005","state":"x0006","zip":"x0007","country":"United Kingdom"},"id":null,"last_modified":-2208988800}';
+		$json = '{"code":"x0001","primary_phone":"x0002","address":{"use":null,"line1":"x0003","line2":"x0004","city":"x0005","state":"x0006","zip":"x0007","country":"United Kingdom"}}';
 
 		$total_practices = count(\Practice::model()->findAll());
 		$total_contacts = count(\Contact::model()->findAll());
@@ -301,7 +302,7 @@ class PracticeServiceTest extends \CDbTestCase
 
 	public function testJsonToModel_Save_Create_DBIsCorrect()
 	{
-		$json = '{"code":"x0001","primary_phone":"x0002","address":{"use":null,"line1":"x0003","line2":"x0004","city":"x0005","state":"x0006","zip":"x0007","country":"United Kingdom"},"id":null,"last_modified":-2208988800}';
+		$json = '{"code":"x0001","primary_phone":"x0002","address":{"use":null,"line1":"x0003","line2":"x0004","city":"x0005","state":"x0006","zip":"x0007","country":"United Kingdom"}}';
 
 		$ps = new PracticeService;
 		$practice = $ps->jsonToModel($json, new \Practice);
@@ -323,7 +324,7 @@ class PracticeServiceTest extends \CDbTestCase
 
 	public function testJsonToModel_Save_Update_ModelCountsCorrect()
 	{
-		$json = '{"code":"x0001","primary_phone":"x0002","address":{"use":null,"line1":"x0003","line2":"x0004","city":"x0005","state":"x0006","zip":"x0007","country":"United Kingdom"},"id":"1","last_modified":-2208988800}';
+		$json = '{"code":"x0001","primary_phone":"x0002","address":{"use":null,"line1":"x0003","line2":"x0004","city":"x0005","state":"x0006","zip":"x0007","country":"United Kingdom"}}';
 
 		$total_practices = count(\Practice::model()->findAll());
 		$total_contacts = count(\Contact::model()->findAll());
@@ -344,7 +345,7 @@ class PracticeServiceTest extends \CDbTestCase
 
 	public function testJsonToModel_Save_Update_DBIsCorrect()
 	{
-		$json = '{"code":"x0001","primary_phone":"x0002","address":{"use":null,"line1":"x0003","line2":"x0004","city":"x0005","state":"x0006","zip":"x0007","country":"United Kingdom"},"id":"1","last_modified":-2208988800}';
+		$json = '{"code":"x0001","primary_phone":"x0002","address":{"use":null,"line1":"x0003","line2":"x0004","city":"x0005","state":"x0006","zip":"x0007","country":"United Kingdom"}}';
 
 		$model = \Practice::model()->findByPk(1);
 
