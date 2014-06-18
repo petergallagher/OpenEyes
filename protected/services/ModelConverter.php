@@ -57,7 +57,6 @@ class ModelConverter
 		$field = array_shift($object_field);
 
 		if (count($object_field) >0) {
-
 			if (!$object->$field) {
 				return false;
 			}
