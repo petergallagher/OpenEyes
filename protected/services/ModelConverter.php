@@ -257,7 +257,7 @@ class ModelConverter
 						}
 						break;
 					case DeclarativeModelService::TYPE_SIMPLEOBJECT:
-						if (method_exists($resource->$res_attribute,'toModelValue')) {
+						if (is_object($resource->$res_attribute) && method_exists($resource->$res_attribute,'toModelValue')) {
 							$model->{$def[1]} = $resource->$res_attribute->toModelValue();
 						} else {
 							$data_class = 'services\\'.$def[2];
