@@ -137,7 +137,7 @@ class ModelConverter
 
 		$related_objects = array();
 		$reference_object_attributes = array();
-		$conditional_values_set = array();
+		$this->conditional_values_set = array();
 
 		foreach ($this->map->getFieldsForClass($model_class_name) as $res_attribute => $def) {
 			if (is_array($def)) {
@@ -175,7 +175,7 @@ class ModelConverter
 					case DeclarativeModelService::TYPE_CONDITION:
 						$class = 'services\\'.$def[0];
 						$parser = new $class($this);
-						$parser->resourceToModelParse($model, $resource, $def[1], $res_attribute, $def[2], @$def[3], $conditional_values_set);
+						$parser->resourceToModelParse($model, $resource, $def[1], $res_attribute, $def[2], @$def[3], $this->conditional_values_set);
 						break;
 					case DeclarativeModelService::TYPE_REF_LIST:
 						$class = 'services\\'.$def[0];
