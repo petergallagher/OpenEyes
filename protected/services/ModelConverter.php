@@ -270,7 +270,11 @@ class ModelConverter
 							$related_object_name = substr($def[1],0,$pos);
 							$related_object_attribute = substr($def[1],$pos+1,strlen($def[1]));
 
-							$related_objects[$related_object_name][$related_object_attribute] = $this->resourceToModel($resource->$res_attribute, new $def[3], false);
+							if (is_object($resource->$res_attribute)) {
+								$related_objects[$related_object_name][$related_object_attribute] = $this->resourceToModel($resource->$res_attribute, new $def[3], false);
+							} else {
+								$related_objects[$related_object_name][$related_object_attribute] = null;
+							}
 						} else {
 							throw new \Exception("Unhandled");
 						}
