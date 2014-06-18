@@ -141,55 +141,9 @@ class ModelConverter
 
 		foreach ($this->map->getFieldsForClass($model_class_name) as $res_attribute => $def) {
 			if (is_array($def)) {
-				switch ($def[0]) {
-					case DeclarativeModelService::TYPE_RESOURCE:
-						$class = 'services\\'.$def[0];
-						$parser = new $class($this);
-						$parser->resourceToModelParse($model, $resource, $def[1], $res_attribute, $def[2], @$def[3], $related_objects);
-						break;
-					case DeclarativeModelService::TYPE_LIST:
-						$class = 'services\\'.$def[0];
-						$parser = new $class($this);
-						$parser->resourceToModelParse($model, $resource, $def[1], $res_attribute, $def[2], @$def[3], $related_objects);
-						break;
-					case DeclarativeModelService::TYPE_REF:
-						$class = 'services\\'.$def[0];
-						$parser = new $class($this);
-						$parser->resourceToModelParse($model, $resource, $def[1], $res_attribute, $def[2], @$def[3], $related_objects);
-						break;
-					case DeclarativeModelService::TYPE_SIMPLEOBJECT:
-						$class = 'services\\'.$def[0];
-						$parser = new $class($this);
-						$parser->resourceToModelParse($model, $resource, $def[1], $res_attribute, $def[2], @$def[3], $related_objects);
-						break;
-					case DeclarativeModelService::TYPE_DATAOBJECT:
-						$class = 'services\\'.$def[0];
-						$parser = new $class($this);
-						$parser->resourceToModelParse($model, $resource, $def[1], $res_attribute, $def[2], @$def[3], $related_objects);
-						break;
-					case DeclarativeModelService::TYPE_DATAOBJECT_EXCLUSIVE:
-						$class = 'services\\'.$def[0];
-						$parser = new $class($this);
-						$parser->resourceToModelParse($model, $resource, $def[1], $res_attribute, $def[2], @$def[3], $related_objects);
-						break;
-					case DeclarativeModelService::TYPE_CONDITION:
-						$class = 'services\\'.$def[0];
-						$parser = new $class($this);
-						$parser->resourceToModelParse($model, $resource, $def[1], $res_attribute, $def[2], @$def[3], $this->conditional_values_set);
-						break;
-					case DeclarativeModelService::TYPE_REF_LIST:
-						$class = 'services\\'.$def[0];
-						$parser = new $class($this);
-						$parser->resourceToModelParse($model, $resource, $def[1], $res_attribute, $def[2], @$def[3], $related_objects);
-						break;
-					case DeclarativeModelService::TYPE_OR:
-						$class = 'services\\'.$def[0];
-						$parser = new $class($this);
-						$parser->resourceToModelParse($model, $resource, $def[1], $res_attribute, $def[2], @$def[3], $related_objects);
-						break;
-					default:
-						throw new \Exception("Unknown declarative type: {$def[0]}");
-				}
+				$class = 'services\\'.$def[0];
+				$parser = new $class($this);
+				$parser->resourceToModelParse($model, $resource, $def[1], $res_attribute, $def[2], @$def[3], $related_objects);
 			} else {
 				if (($pos = strpos($def,'.')) !== FALSE) {
 					$relation_name = substr($def,0,$pos);
