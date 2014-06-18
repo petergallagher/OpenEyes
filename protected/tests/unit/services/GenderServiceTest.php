@@ -51,7 +51,7 @@ class GenderServiceTest extends \CDbTestCase
 		$total_addresses = count(\Address::model()->findAll());
 
 		$gs = new GenderService;
-		$gender = $gs->resourceToModel($resource, false);
+		$gender = $gs->resourceToModel($resource, new \Gender, false);
 
 		$this->assertEquals($total_genders, count(\Gender::model()->findAll()));
 		$this->assertEquals($total_contacts, count(\Contact::model()->findAll()));
@@ -63,7 +63,7 @@ class GenderServiceTest extends \CDbTestCase
 		$resource = $this->getResource();
 
 		$gs = new GenderService;
-		$gender = $gs->resourceToModel($resource, false);
+		$gender = $gs->resourceToModel($resource, new \Gender, false);
 
 		$this->assertInstanceOf('\Gender',$gender);
 		$this->assertEquals('Female',$gender->name);
@@ -76,7 +76,7 @@ class GenderServiceTest extends \CDbTestCase
 		$total_genders = count(\Gender::model()->findAll());
 
 		$gs = new GenderService;
-		$gender = $gs->resourceToModel($resource);
+		$gender = $gs->resourceToModel($resource, new \Gender);
 
 		$this->assertEquals($total_genders+1, count(\Gender::model()->findAll()));
 	}
@@ -86,7 +86,7 @@ class GenderServiceTest extends \CDbTestCase
 		$resource = $this->getResource();
 
 		$gs = new GenderService;
-		$gender = $gs->resourceToModel($resource);
+		$gender = $gs->resourceToModel($resource, new \Gender);
 
 		$this->assertInstanceOf('\Gender',$gender);
 		$this->assertEquals('Female',$gender->name);
@@ -97,7 +97,7 @@ class GenderServiceTest extends \CDbTestCase
 		$resource = $this->getResource();
 
 		$gs = new GenderService;
-		$gender = $gs->resourceToModel($resource);
+		$gender = $gs->resourceToModel($resource, new \Gender);
 		$gender = \Gender::model()->findByPk($gender->id);
 
 		$this->assertInstanceOf('\Gender',$gender);
@@ -115,11 +115,12 @@ class GenderServiceTest extends \CDbTestCase
 	public function testResourceToModel_Save_Update_ModelCountsCorrect()
 	{
 		$resource = $this->getModifiedResource(1);
+		$model = \Gender::model()->findByPk(1);
 
 		$total_genders = count(\Gender::model()->findAll());
 
 		$gs = new GenderService;
-		$gender = $gs->resourceToModel($resource);
+		$gender = $gs->resourceToModel($resource, $model);
 
 		$this->assertEquals($total_genders, count(\Gender::model()->findAll()));
 	}
@@ -127,9 +128,10 @@ class GenderServiceTest extends \CDbTestCase
 	public function testResourceToModel_Save_Update_ModelIsCorrect()
 	{
 		$resource = $this->getModifiedResource(1);
+		$model = \Gender::model()->findByPk(1);
 
 		$gs = new GenderService;
-		$gender = $gs->resourceToModel($resource);
+		$gender = $gs->resourceToModel($resource, $model);
 
 		$this->assertInstanceOf('\Gender',$gender);
 		$this->assertEquals('Test',$gender->name);
@@ -138,9 +140,10 @@ class GenderServiceTest extends \CDbTestCase
 	public function testResourceToModel_Save_Update_DBIsCorrect()
 	{
 		$resource = $this->getModifiedResource(1);
+		$model = \Gender::model()->findByPk(1);
 
 		$gs = new GenderService;
-		$gender = $gs->resourceToModel($resource);
+		$gender = $gs->resourceToModel($resource, $model);
 		$gender = \Gender::model()->findByPk(1);
 
 		$this->assertInstanceOf('\Gender',$gender);
@@ -167,7 +170,7 @@ class GenderServiceTest extends \CDbTestCase
 		$total_addresses = count(\Address::model()->findAll());
 
 		$gs = new GenderService;
-		$gender = $gs->jsonToModel($json, false);
+		$gender = $gs->jsonToModel($json, new \Gender, false);
 
 		$this->assertEquals($total_genders, count(\Gender::model()->findAll()));
 		$this->assertEquals($total_contacts, count(\Contact::model()->findAll()));
@@ -179,7 +182,7 @@ class GenderServiceTest extends \CDbTestCase
 		$json = '{"name":"Male","id":"1","last_modified":-2208988800}';
 
 		$gs = new GenderService;
-		$gender = $gs->jsonToModel($json, false);
+		$gender = $gs->jsonToModel($json, new \Gender, false);
 
 		$this->assertInstanceOf('\Gender',$gender);
 		$this->assertEquals('Male',$gender->name);
@@ -192,7 +195,7 @@ class GenderServiceTest extends \CDbTestCase
 		$total_genders = count(\Gender::model()->findAll());
 
 		$gs = new GenderService;
-		$gender = $gs->jsonToModel($json);
+		$gender = $gs->jsonToModel($json, new \Gender);
 
 		$this->assertEquals($total_genders+1, count(\Gender::model()->findAll()));
 	}
@@ -202,7 +205,7 @@ class GenderServiceTest extends \CDbTestCase
 		$json = '{"name":"Test","id":null,"last_modified":-2208988800}';
 
 		$gs = new GenderService;
-		$gender = $gs->jsonToModel($json);
+		$gender = $gs->jsonToModel($json, new \Gender);
 
 		$this->assertInstanceOf('\Gender',$gender);
 		$this->assertEquals('Test',$gender->name);
@@ -213,7 +216,7 @@ class GenderServiceTest extends \CDbTestCase
 		$json = '{"name":"Test","id":null,"last_modified":-2208988800}';
 
 		$gs = new GenderService;
-		$gender = $gs->jsonToModel($json);
+		$gender = $gs->jsonToModel($json, new \Gender);
 		$gender = \Gender::model()->findByPk($gender->id);
 
 		$this->assertInstanceOf('\Gender',$gender);
@@ -226,8 +229,10 @@ class GenderServiceTest extends \CDbTestCase
 
 		$total_genders = count(\Gender::model()->findAll());
 
+		$model = \Gender::model()->findByPk(1);
+
 		$gs = new GenderService;
-		$gender = $gs->jsonToModel($json);
+		$gender = $gs->jsonToModel($json, $model);
 		$gender = \Gender::model()->findByPk($gender->id);
 
 		$this->assertEquals($total_genders, count(\Gender::model()->findAll()));
@@ -237,8 +242,10 @@ class GenderServiceTest extends \CDbTestCase
 	{
 		$json = '{"name":"Test","id":"1","last_modified":-2208988800}';
 
+		$model = \Gender::model()->findByPk(1);
+
 		$gs = new GenderService;
-		$gender = $gs->jsonToModel($json);
+		$gender = $gs->jsonToModel($json, $model);
 
 		$this->assertInstanceOf('\Gender',$gender);
 		$this->assertEquals('Test',$gender->name);
@@ -248,8 +255,10 @@ class GenderServiceTest extends \CDbTestCase
 	{
 		$json = '{"name":"Test","id":"1","last_modified":-2208988800}';
 
+		$model = \Gender::model()->findByPk(1);
+
 		$gs = new GenderService;
-		$gender = $gs->jsonToModel($json);
+		$gender = $gs->jsonToModel($json, $model);
 		$gender = \Gender::model()->findByPk($gender->id);
 
 		$this->assertInstanceOf('\Gender',$gender);
