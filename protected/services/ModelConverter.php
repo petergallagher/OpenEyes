@@ -157,26 +157,15 @@ class ModelConverter
 		return $object->$field;
 	}
 
-	public function resourceToModel($resource, $model_class_name, $save=true, $extra_fields=false)
+	public function resourceToModel($resource, $model, $save=true, $extra_fields=false)
 	{
-		$_model_class_name = '\\'.$model_class_name;
-
-		if (get_class($resource) == 'stdClass') {
-			if (!isset($resource->id) || (!$model = $_model_class_name::model()->findByPk($resource->id))) {
-				$model = new $_model_class_name;
-			}
-		} else {
-			if (!method_exists($resource,'getId') || (!$model = $_model_class_name::model()->findByPk($resource->getId()))) {
-				$model = new $_model_class_name;
-			}
-		}
-
 		if (is_array($extra_fields)) {
 			foreach ($extra_fields as $key => $value) {
 				$model->$key = $value;
 			}
 		}
 
+		$model_class_name = get_class($model);
 		$model_relations = $model->relations();
 
 		if ($class_related_objects = $this->map->getRelatedObjectsForClass($model_class_name)) {
@@ -223,7 +212,11 @@ class ModelConverter
 			if (is_array($def)) {
 				switch ($def[0]) {
 					case DeclarativeModelService::TYPE_RESOURCE:
-						$model->{$def[1]} = $this->resourceToModel($resource->$res_attribute, $def[2], $save);
+						$_model_class_name = '\\'.$def[2];
+
+						$new_model = new $_model_class_name;
+
+						$model->{$def[1]} = $this->resourceToModel($resource->$res_attribute, $new_model, $save);
 						if (isset($model_relations[$def[1]]) && $model_relations[$def[1]][0] == 'CBelongsToRelation') {
 							$model->{$model_relations[$def[1]][2]} = $model->{$def[1]}->id;
 						}
@@ -238,7 +231,7 @@ class ModelConverter
 						}
 
 						foreach ($resource->$res_attribute as $item) {
-							$related_objects[$related_object_name][$related_object_attribute][] = $this->resourceToModel($item, $def[3], false);
+							$related_objects[$related_object_name][$related_object_attribute][] = $this->resourceToModel($item, new $def[3], false);
 						}
 						break;
 					case DeclarativeModelService::TYPE_REF:
@@ -277,7 +270,7 @@ class ModelConverter
 							$related_object_name = substr($def[1],0,$pos);
 							$related_object_attribute = substr($def[1],$pos+1,strlen($def[1]));
 
-							$related_objects[$related_object_name][$related_object_attribute] = $this->resourceToModel($resource->$res_attribute, $def[3], false);
+							$related_objects[$related_object_name][$related_object_attribute] = $this->resourceToModel($resource->$res_attribute, new $def[3], false);
 						} else {
 							throw new \Exception("Unhandled");
 						}

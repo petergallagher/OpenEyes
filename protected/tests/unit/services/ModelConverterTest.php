@@ -375,7 +375,7 @@ class ModelConverterTest extends \CDbTestCase
 		$total_genders = count(\Gender::model()->findAll());
 
 		$mc = new ModelConverter(PatientService::getModelMap());
-		$patient = $mc->resourceToModel($resource, 'Patient', false);
+		$patient = $mc->resourceToModel($resource, new \Patient, false);
 
 		$this->assertEquals($total_patients, count(\Patient::model()->findAll()));
 		$this->assertEquals($total_contacts, count(\Contact::model()->findAll()));
@@ -416,7 +416,7 @@ class ModelConverterTest extends \CDbTestCase
 		$resource->prac_ref = \Yii::app()->service->Practice(1);
 
 		$mc = new ModelConverter(PatientService::getModelMap());
-		$patient = $mc->resourceToModel($resource, 'Patient', false);
+		$patient = $mc->resourceToModel($resource, new \Patient, false);
 
 		$this->assertEquals('54321',$patient->nhs_num);
 		$this->assertEquals('12345',$patient->hos_num);
@@ -486,7 +486,7 @@ class ModelConverterTest extends \CDbTestCase
 		$total_genders = count(\Gender::model()->findAll());
 
 		$mc = new ModelConverter(PatientService::getModelMap());
-		$patient = $mc->resourceToModel($resource, 'Patient');
+		$patient = $mc->resourceToModel($resource, new \Patient);
 
 		$this->assertEquals($total_patients+1, count(\Patient::model()->findAll()));
 		$this->assertEquals($total_contacts+1, count(\Contact::model()->findAll()));
@@ -500,7 +500,7 @@ class ModelConverterTest extends \CDbTestCase
 		$resource = $this->getResource();
 
 		$mc = new ModelConverter(PatientService::getModelMap());
-		$patient = $mc->resourceToModel($resource, 'Patient');
+		$patient = $mc->resourceToModel($resource, new \Patient);
 
 		$this->assertInstanceOf('\Patient',$patient);
 
@@ -533,7 +533,7 @@ class ModelConverterTest extends \CDbTestCase
 		$resource = $this->getResource();
 
 		$mc = new ModelConverter(PatientService::getModelMap());
-		$patient = $mc->resourceToModel($resource, 'Patient');
+		$patient = $mc->resourceToModel($resource, new \Patient);
 		$patient = \Patient::model()->findByPk($patient->id);
 
 		$this->assertEquals('1919',$patient->nhs_num);

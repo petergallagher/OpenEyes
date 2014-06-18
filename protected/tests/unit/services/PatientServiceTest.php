@@ -121,7 +121,7 @@ class PatientServiceTest extends \CDbTestCase
 		$total_genders = count(\Gender::model()->findAll());
 
 		$ps = new PatientService;
-		$patient = $ps->resourceToModel($resource, false);
+		$patient = $ps->resourceToModel($resource, new \Patient, false);
 
 		$this->assertEquals($total_patients, count(\Patient::model()->findAll()));
 		$this->assertEquals($total_contacts, count(\Contact::model()->findAll()));
@@ -135,7 +135,7 @@ class PatientServiceTest extends \CDbTestCase
 		$resource = $this->getResource();
 
 		$ps = new PatientService;
-		$patient = $ps->resourceToModel($resource, false);
+		$patient = $ps->resourceToModel($resource, new \Patient, false);
 
 		$this->assertEquals('1919',$patient->nhs_num);
 		$this->assertEquals('4545',$patient->hos_num);
@@ -172,7 +172,7 @@ class PatientServiceTest extends \CDbTestCase
 		$total_genders = count(\Gender::model()->findAll());
 
 		$ps = new PatientService;
-		$patient = $ps->resourceToModel($resource);
+		$patient = $ps->resourceToModel($resource, new \Patient);
 
 		$this->assertEquals($total_patients+1, count(\Patient::model()->findAll()));
 		$this->assertEquals($total_contacts+1, count(\Contact::model()->findAll()));
@@ -186,7 +186,7 @@ class PatientServiceTest extends \CDbTestCase
 		$resource = $this->getResource();
 
 		$ps = new PatientService;
-		$patient = $ps->resourceToModel($resource);
+		$patient = $ps->resourceToModel($resource, new \Patient);
 
 		$this->assertInstanceOf('\Patient',$patient);
 
@@ -219,7 +219,7 @@ class PatientServiceTest extends \CDbTestCase
 		$resource = $this->getResource();
 
 		$ps = new PatientService;
-		$patient = $ps->resourceToModel($resource);
+		$patient = $ps->resourceToModel($resource, new \Patient);
 		$patient = \Patient::model()->findByPk($patient->id);
 
 		$this->assertEquals('1919',$patient->nhs_num);
@@ -275,6 +275,7 @@ class PatientServiceTest extends \CDbTestCase
 	public function testResourceToModel_Save_Update_ModelCountsCorrect()
 	{
 		$resource = $this->getModifiedResource(1);
+		$model = \Patient::model()->findByPk(1);
 
 		$total_patients = count(\Patient::model()->findAll());
 		$total_contacts = count(\Contact::model()->findAll());
@@ -283,7 +284,7 @@ class PatientServiceTest extends \CDbTestCase
 		$total_genders = count(\Gender::model()->findAll());
 
 		$ps = new PatientService;
-		$patient = $ps->resourceToModel($resource);
+		$patient = $ps->resourceToModel($resource, $model);
 
 		$this->assertEquals($total_patients, count(\Patient::model()->findAll()));
 		$this->assertEquals($total_contacts, count(\Contact::model()->findAll()));
@@ -295,9 +296,10 @@ class PatientServiceTest extends \CDbTestCase
 	public function testResourceToModel_Save_Update_DBIsCorrect()
 	{
 		$resource = $this->getModifiedResource(1);
+		$model = \Patient::model()->findByPk(1);
 
 		$ps = new PatientService;
-		$patient = $ps->resourceToModel($resource);
+		$patient = $ps->resourceToModel($resource, $model);
 		$patient = \Patient::model()->findByPk($patient->id);
 
 		$this->assertEquals('x0000',$patient->nhs_num);
@@ -374,7 +376,7 @@ class PatientServiceTest extends \CDbTestCase
 		$total_genders = count(\Gender::model()->findAll());
 
 		$ps = new PatientService;
-		$patient = $ps->jsonToModel($json, false);
+		$patient = $ps->jsonToModel($json, new \Patient, false);
 
 		$this->assertEquals($total_patients, count(\Patient::model()->findAll()));
 		$this->assertEquals($total_contacts, count(\Contact::model()->findAll()));
@@ -388,7 +390,7 @@ class PatientServiceTest extends \CDbTestCase
 		$json = '{"nhs_num":"54321","hos_num":"12345","title":"Mr","family_name":"Aylward","given_name":"Jim","gender_ref":{"service":"Gender","id":1},"birth_date":"1970-01-01","date_of_death":null,"primary_phone":"07123 456789","addresses":[{"date_start":{"date":"2014-06-06 16:39:29","timezone_type":3,"timezone":"Europe\/London"},"date_end":{"date":"2014-06-06 16:39:29","timezone_type":3,"timezone":"Europe\/London"},"correspond":false,"transport":false,"use":null,"line1":"flat 1","line2":"bleakley creek","city":"flitchley","state":"london","zip":"ec1v 0dx","country":"United States"}],"care_providers":[],"gp_ref":{"service":"Gp","id":1},"prac_ref":{"service":"Practice","id":1},"cb_refs":[],"id":null,"last_modified":null}';
 
 		$ps = new PatientService;
-		$patient = $ps->jsonToModel($json, false);
+		$patient = $ps->jsonToModel($json, new \Patient, false);
 
 		$this->assertEquals('54321',$patient->nhs_num);
 		$this->assertEquals('12345',$patient->hos_num);
@@ -425,7 +427,7 @@ class PatientServiceTest extends \CDbTestCase
 		$total_genders = count(\Gender::model()->findAll());
 
 		$ps = new PatientService;
-		$patient = $ps->jsonToModel($json);
+		$patient = $ps->jsonToModel($json, new \Patient);
 		$patient = \Patient::model()->findByPk($patient->id);
 
 		$this->assertEquals($total_patients+1, count(\Patient::model()->findAll()));
@@ -440,7 +442,7 @@ class PatientServiceTest extends \CDbTestCase
 		$json = '{"nhs_num":"54321","hos_num":"12345","title":"Mr","family_name":"Aylward","given_name":"Jim","gender_ref":{"service":"Gender","id":1},"birth_date":"1970-01-01","date_of_death":null,"primary_phone":"07123 456789","addresses":[{"date_start":{"date":"2014-06-06 16:39:29","timezone_type":3,"timezone":"Europe\/London"},"date_end":{"date":"2014-06-06 16:39:29","timezone_type":3,"timezone":"Europe\/London"},"correspond":false,"transport":false,"use":null,"line1":"flat 1","line2":"bleakley creek","city":"flitchley","state":"london","zip":"ec1v 0dx","country":"United States"}],"care_providers":[],"gp_ref":{"service":"Gp","id":1},"prac_ref":{"service":"Practice","id":1},"cb_refs":[],"id":null,"last_modified":null}';
 
 		$ps = new PatientService;
-		$patient = $ps->jsonToModel($json);
+		$patient = $ps->jsonToModel($json, new \Patient);
 		$patient = \Patient::model()->findByPk($patient->id);
 
 		$this->assertEquals('54321',$patient->nhs_num);
@@ -477,8 +479,10 @@ class PatientServiceTest extends \CDbTestCase
 		$total_countries = count(\Country::model()->findAll());
 		$total_genders = count(\Gender::model()->findAll());
 
+		$model = \Patient::model()->findByPk(1);
+
 		$ps = new PatientService;
-		$patient = $ps->jsonToModel($json);
+		$patient = $ps->jsonToModel($json, $model);
 		$patient = \Patient::model()->findByPk($patient->id);
 
 		$this->assertEquals($total_patients, count(\Patient::model()->findAll()));
@@ -492,8 +496,10 @@ class PatientServiceTest extends \CDbTestCase
 	{
 		$json = '{"nhs_num":"x0001","hos_num":"x0002","title":"x0003","family_name":"x0004","given_name":"x0005","gender_ref":{"service":"Gender","id":2},"birth_date":"1996-04-20","date_of_death":null,"primary_phone":"03333 343434","addresses":[{"date_start":{"date":"2014-06-06 16:39:29","timezone_type":3,"timezone":"Europe\/London"},"date_end":{"date":"2014-06-06 16:39:29","timezone_type":3,"timezone":"Europe\/London"},"correspond":false,"transport":true,"use":null,"line1":"L1","line2":"L2","city":"L3","state":"L4","zip":"L5","country":"United Kingdom"}],"care_providers":[],"gp_ref":{"service":"Gp","id":1},"prac_ref":{"service":"Practice","id":1},"cb_refs":[],"id":1,"last_modified":null}';
 
+		$model = \Patient::model()->findByPk(1);
+
 		$ps = new PatientService;
-		$patient = $ps->jsonToModel($json);
+		$patient = $ps->jsonToModel($json, $model);
 		$patient = \Patient::model()->findByPk($patient->id);
 
 		$this->assertEquals('x0001',$patient->nhs_num);
@@ -531,6 +537,6 @@ class PatientServiceTest extends \CDbTestCase
 		$this->setExpectedException('Exception', 'Unable to differentiate condition as more than one attribute is true.');
 
 		$ps = new PatientService;
-		$patient = $ps->resourceToModel($resource);
+		$patient = $ps->resourceToModel($resource, new \Patient);
 	}
 }
