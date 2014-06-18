@@ -88,13 +88,17 @@ class ModelConverter
 		}
 	}
 
+	public function setObjectAttributes(&$object, $attributes)
+	{
+		foreach ($attributes as $key => $value) {
+			$object->$key = $value;
+		}
+	}
+
 	public function resourceToModel($resource, $model, $save=true, $extra_fields=false)
 	{
-		if (is_array($extra_fields)) {
-			foreach ($extra_fields as $key => $value) {
-				$model->$key = $value;
-			}
-		}
+		is_array($extra_fields) &&
+			$this->setObjectAttributes($model, $extra_fields);
 
 		$model_class_name = get_class($model);
 		$model_relations = $model->relations();
@@ -158,9 +162,7 @@ class ModelConverter
 							if (!$related_object = $related_object_class::model()->find($criteria)) {
 								$related_object = new $related_object_class;
 
-								foreach ($reference_object_attributes[$relation_name] as $key => $value) {
-									$related_object->$key = $value;
-								}
+								$this->setObjectAttributes($related_object, $reference_object_attributes[$relation_name]);
 
 								$save && $this->saveModel($related_object);
 							}
