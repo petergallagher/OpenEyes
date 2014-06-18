@@ -139,12 +139,7 @@ class ModelConverter
 					$related_object_attribute = substr($def,$pos+1,strlen($def));
 
 					if (isset($class_related_objects[$relation_name])) {
-						if (!$related_object = $model->$relation_name) {
-							throw new \Exception("Model has nothing for relation: $relation_name");
-						}
-
-						$related_object->$related_object_attribute = $resource->$res_attribute;
-						$model->$relation_name = $related_object;
+						$this->setObjectAttribute($model, $relation_name.'.'.$related_object_attribute, $resource->$res_attribute);
 					} else {
 						$reference_object_attributes[$relation_name][$related_object_attribute] = $resource->$res_attribute;
 
