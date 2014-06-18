@@ -22,6 +22,14 @@ class PatientAddress extends Address
 {
 	static protected $fhir_type = 'Address';
 
+	static public function fromFhirValues(array $values)
+	{
+		if (isset($values['date_start'])) $values['date_start'] = new Date($values['date_start']);
+		if (isset($values['date_end'])) $values['date_end'] = new Date($values['date_end']);
+
+		return parent::fromFhirValues($values);
+	}
+
 	/*static public function fromModel(\Address $address)
 	{
 		$pa = parent::fromModel($address);
