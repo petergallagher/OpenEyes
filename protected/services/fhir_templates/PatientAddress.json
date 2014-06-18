@@ -10,10 +10,7 @@
 		}
 	],
 	"use": {":subst": "use"},
-	"line": [
-		{":subst": "line1"},
-		{":subst": "line2"}
-	],
+	"line": {":subst": "lines"},
 	"city": {":subst": "city"},
 	"state": {":subst": "state"},
 	"zip": {":subst": "zip"},
