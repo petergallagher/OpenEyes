@@ -114,7 +114,7 @@ abstract class ModelService extends InternalService
 			throw new Exception("Invalid json encountered: $json");
 		}
 
-		return new $class(array('id' => $model->id, 'last_modified' => $model->last_modified));
+		return new $class(array());
 	}
 
 	/**

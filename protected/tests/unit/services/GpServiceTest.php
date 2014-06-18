@@ -183,9 +183,9 @@ class GpServiceTest extends \CDbTestCase
 		$this->assertEquals('United States',$gp->contact->address->country->name);
 	}
 
-	public function getModifiedResource($id)
+	public function getModifiedResource()
 	{
-		$resource = \Yii::app()->service->Gp($id)->fetch();
+		$resource = new Gp;
 
 		$resource->gnc = 'x0001';
 		$resource->obj_prof = 'x0002';
@@ -193,6 +193,7 @@ class GpServiceTest extends \CDbTestCase
 		$resource->family_name = 'x0004';
 		$resource->given_name = 'x0005';
 		$resource->primary_phone = 'x0006';
+		$resource->address = new Address;
 		$resource->address->line1 = 'x0007';
 		$resource->address->line2 = 'x0008';
 		$resource->address->city = 'x0009';
@@ -205,7 +206,7 @@ class GpServiceTest extends \CDbTestCase
 
 	public function testResourceToModel_Save_Update_ModelCountsCorrect()
 	{
-		$resource = $this->getModifiedResource(1);
+		$resource = $this->getModifiedResource();
 		$model = \Gp::model()->findByPk(1);
 
 		$total_gps = count(\Gp::model()->findAll());
@@ -222,7 +223,7 @@ class GpServiceTest extends \CDbTestCase
 
 	public function testResourceToModel_Save_Update_ModelIsCorrect()
 	{
-		$resource = $this->getModifiedResource(1);
+		$resource = $this->getModifiedResource();
 		$model = \Gp::model()->findByPk(1);
 
 		$gs = new GpService;
@@ -248,7 +249,7 @@ class GpServiceTest extends \CDbTestCase
 
 	public function testResourceToModel_Save_Update_DBIsCorrect()
 	{
-		$resource = $this->getModifiedResource(1);
+		$resource = $this->getModifiedResource();
 		$model = \Gp::model()->findByPk(1);
 
 		$gs = new GpService;
@@ -275,7 +276,7 @@ class GpServiceTest extends \CDbTestCase
 
 	public function testJsonToResource()
 	{
-		$json = '{"gnc":"AII2E2F","obj_prof":"AA1134","title":"Dr","family_name":"Zhivago","given_name":"Yuri","primary_phone":"999","address":{"use":null,"line1":"Staplegun","line2":"Staplegun Creek","city":"Stapleton","state":"staple","zip":"st44 pl3","country":"United States"},"id":"1","last_modified":-2208988800}';
+		$json = '{"gnc":"AII2E2F","obj_prof":"AA1134","title":"Dr","family_name":"Zhivago","given_name":"Yuri","primary_phone":"999","address":{"use":null,"line1":"Staplegun","line2":"Staplegun Creek","city":"Stapleton","state":"staple","zip":"st44 pl3","country":"United States"}}';
 
 		$gs = new GpService;
 		$resource = $gs->jsonToResource($json);
@@ -294,12 +295,11 @@ class GpServiceTest extends \CDbTestCase
 		$this->assertEquals('staple',$resource->address->state);
 		$this->assertEquals('st44 pl3',$resource->address->zip);
 		$this->assertEquals('United States',$resource->address->country);
-		$this->assertEquals(1, $resource->getId());
 	}
 
 	public function jsonToModel_NoSave_NoNewRows()
 	{
-		$json = '{"gnc":"AII2E2F","obj_prof":"AA1134","title":"Dr","family_name":"Zhivago","given_name":"Yuri","primary_phone":"999","address":{"use":null,"line1":"Staplegun","line2":"Staplegun Creek","city":"Stapleton","state":"staple","zip":"st44 pl3","country":"United States"},"id":"1","last_modified":-2208988800}';
+		$json = '{"gnc":"AII2E2F","obj_prof":"AA1134","title":"Dr","family_name":"Zhivago","given_name":"Yuri","primary_phone":"999","address":{"use":null,"line1":"Staplegun","line2":"Staplegun Creek","city":"Stapleton","state":"staple","zip":"st44 pl3","country":"United States"}}';
 
 		$total_gps = count(\Gp::model()->findAll());
 		$total_contacts = count(\Contact::model()->findAll());
@@ -315,7 +315,7 @@ class GpServiceTest extends \CDbTestCase
 
 	public function testJsonToModel_NoSave_ModelIsCorrect()
 	{
-		$json = '{"gnc":"AII2E2F","obj_prof":"AA1134","title":"Dr","family_name":"Zhivago","given_name":"Yuri","primary_phone":"999","address":{"use":null,"line1":"Staplegun","line2":"Staplegun Creek","city":"Stapleton","state":"staple","zip":"st44 pl3","country":"United States"},"id":"1","last_modified":-2208988800}';
+		$json = '{"gnc":"AII2E2F","obj_prof":"AA1134","title":"Dr","family_name":"Zhivago","given_name":"Yuri","primary_phone":"999","address":{"use":null,"line1":"Staplegun","line2":"Staplegun Creek","city":"Stapleton","state":"staple","zip":"st44 pl3","country":"United States"}}';
 
 		$gs = new GpService;
 		$gp = $gs->jsonToModel($json, new \Gp, false);
@@ -411,7 +411,7 @@ class GpServiceTest extends \CDbTestCase
 
 	public function testJsonToModel_Save_Update_ModelCountsCorrect()
 	{
-		$json = '{"gnc":"x0001","obj_prof":"x0002","title":"x0003","family_name":"x0004","given_name":"x0005","primary_phone":"x0006","address":{"use":null,"line1":"x0007","line2":"x0008","city":"x0009","state":"x0010","zip":"x0011","country":"United Kingdom"},"id":"1","last_modified":-2208988800}';
+		$json = '{"gnc":"x0001","obj_prof":"x0002","title":"x0003","family_name":"x0004","given_name":"x0005","primary_phone":"x0006","address":{"use":null,"line1":"x0007","line2":"x0008","city":"x0009","state":"x0010","zip":"x0011","country":"United Kingdom"}}';
 
 		$total_gps = count(\Gp::model()->findAll());
 		$total_contacts = count(\Contact::model()->findAll());
@@ -430,7 +430,7 @@ class GpServiceTest extends \CDbTestCase
 
 	public function testJsonToModel_Save_Update_ModelIsCorrect()
 	{
-		$json = '{"gnc":"x0001","obj_prof":"x0002","title":"x0003","family_name":"x0004","given_name":"x0005","primary_phone":"x0006","address":{"use":null,"line1":"x0007","line2":"x0008","city":"x0009","state":"x0010","zip":"x0011","country":"United Kingdom"},"id":"1","last_modified":-2208988800}';
+		$json = '{"gnc":"x0001","obj_prof":"x0002","title":"x0003","family_name":"x0004","given_name":"x0005","primary_phone":"x0006","address":{"use":null,"line1":"x0007","line2":"x0008","city":"x0009","state":"x0010","zip":"x0011","country":"United Kingdom"}}';
 
 		$model = \Gp::model()->findByPk(1);
 
@@ -458,7 +458,7 @@ class GpServiceTest extends \CDbTestCase
 
 	public function testJsonToModel_Save_Update_DBIsCorrect()
 	{
-		$json = '{"gnc":"x0001","obj_prof":"x0002","title":"x0003","family_name":"x0004","given_name":"x0005","primary_phone":"x0006","address":{"use":null,"line1":"x0007","line2":"x0008","city":"x0009","state":"x0010","zip":"x0011","country":"United Kingdom"},"id":"1","last_modified":-2208988800}';
+		$json = '{"gnc":"x0001","obj_prof":"x0002","title":"x0003","family_name":"x0004","given_name":"x0005","primary_phone":"x0006","address":{"use":null,"line1":"x0007","line2":"x0008","city":"x0009","state":"x0010","zip":"x0011","country":"United Kingdom"}}';
 
 		$model = \Gp::model()->findByPk(1);
 

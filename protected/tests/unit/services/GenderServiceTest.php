@@ -104,9 +104,9 @@ class GenderServiceTest extends \CDbTestCase
 		$this->assertEquals('Female',$gender->name);
 	}
 
-	public function getModifiedResource($id)
+	public function getModifiedResource()
 	{
-		$resource = \Yii::app()->service->Gender($id)->fetch();
+		$resource = new Gender;
 		$resource->name = 'Test';
 
 		return $resource;
@@ -114,7 +114,7 @@ class GenderServiceTest extends \CDbTestCase
 
 	public function testResourceToModel_Save_Update_ModelCountsCorrect()
 	{
-		$resource = $this->getModifiedResource(1);
+		$resource = $this->getModifiedResource();
 		$model = \Gender::model()->findByPk(1);
 
 		$total_genders = count(\Gender::model()->findAll());
@@ -127,7 +127,7 @@ class GenderServiceTest extends \CDbTestCase
 
 	public function testResourceToModel_Save_Update_ModelIsCorrect()
 	{
-		$resource = $this->getModifiedResource(1);
+		$resource = $this->getModifiedResource();
 		$model = \Gender::model()->findByPk(1);
 
 		$gs = new GenderService;
@@ -139,7 +139,7 @@ class GenderServiceTest extends \CDbTestCase
 
 	public function testResourceToModel_Save_Update_DBIsCorrect()
 	{
-		$resource = $this->getModifiedResource(1);
+		$resource = $this->getModifiedResource();
 		$model = \Gender::model()->findByPk(1);
 
 		$gs = new GenderService;
@@ -152,7 +152,7 @@ class GenderServiceTest extends \CDbTestCase
 
 	public function testJsonToResource()
 	{
-		$json = '{"name":"Male","id":"1","last_modified":-2208988800}';
+		$json = '{"name":"Male"}';
 
 		$gs = new GenderService;
 		$resource = $gs->jsonToResource($json);
@@ -163,7 +163,7 @@ class GenderServiceTest extends \CDbTestCase
 
 	public function jsonToModel_NoSave_NoNewRows()
 	{
-		$json = '{"name":"Male","id":"1","last_modified":-2208988800}';
+		$json = '{"name":"Male"}';
 
 		$total_genders = count(\Gender::model()->findAll());
 		$total_contacts = count(\Contact::model()->findAll());
@@ -179,7 +179,7 @@ class GenderServiceTest extends \CDbTestCase
 
 	public function testJsonToModel_NoSave_ModelIsCorrect()
 	{
-		$json = '{"name":"Male","id":"1","last_modified":-2208988800}';
+		$json = '{"name":"Male"}';
 
 		$gs = new GenderService;
 		$gender = $gs->jsonToModel($json, new \Gender, false);
@@ -190,7 +190,7 @@ class GenderServiceTest extends \CDbTestCase
 
 	public function testJsonToModel_Save_Create_ModelCountsCorrect()
 	{
-		$json = '{"name":"Test","id":null,"last_modified":-2208988800}';
+		$json = '{"name":"Test"}';
 
 		$total_genders = count(\Gender::model()->findAll());
 
@@ -202,7 +202,7 @@ class GenderServiceTest extends \CDbTestCase
 
 	public function testJsonToModel_Save_Create_ModelIsCorrect()
 	{
-		$json = '{"name":"Test","id":null,"last_modified":-2208988800}';
+		$json = '{"name":"Test"}';
 
 		$gs = new GenderService;
 		$gender = $gs->jsonToModel($json, new \Gender);
@@ -213,7 +213,7 @@ class GenderServiceTest extends \CDbTestCase
 
 	public function testJsonToModel_Save_Create_DBIsCorrect()
 	{
-		$json = '{"name":"Test","id":null,"last_modified":-2208988800}';
+		$json = '{"name":"Test"}';
 
 		$gs = new GenderService;
 		$gender = $gs->jsonToModel($json, new \Gender);
@@ -225,7 +225,7 @@ class GenderServiceTest extends \CDbTestCase
 
 	public function testJsonToModel_Save_Update_ModelCountsCorrect()
 	{
-		$json = '{"name":"Test","id":"1","last_modified":-2208988800}';
+		$json = '{"name":"Test"}';
 
 		$total_genders = count(\Gender::model()->findAll());
 
@@ -240,7 +240,7 @@ class GenderServiceTest extends \CDbTestCase
 
 	public function testJsonToModel_Save_Update_ModelIsCorrect()
 	{
-		$json = '{"name":"Test","id":"1","last_modified":-2208988800}';
+		$json = '{"name":"Test"}';
 
 		$model = \Gender::model()->findByPk(1);
 
@@ -253,7 +253,7 @@ class GenderServiceTest extends \CDbTestCase
 
 	public function testJsonToModel_Save_Update_DBIsCorrect()
 	{
-		$json = '{"name":"Test","id":"1","last_modified":-2208988800}';
+		$json = '{"name":"Test"}';
 
 		$model = \Gender::model()->findByPk(1);
 
