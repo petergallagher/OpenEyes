@@ -84,7 +84,7 @@ class GpServiceTest extends \CDbTestCase
 		$total_addresses = count(\Address::model()->findAll());
 
 		$gs = new GpService;
-		$gp = $gs->resourceToModel($resource, false);
+		$gp = $gs->resourceToModel($resource, new \Gp, false);
 
 		$this->assertEquals($total_gps, count(\Gp::model()->findAll()));
 		$this->assertEquals($total_contacts, count(\Contact::model()->findAll()));
@@ -96,7 +96,7 @@ class GpServiceTest extends \CDbTestCase
 		$resource = $this->getResource();
 
 		$gs = new GpService;
-		$gp = $gs->resourceToModel($resource, false);
+		$gp = $gs->resourceToModel($resource, new \Gp, false);
 
 		$this->assertInstanceOf('\Gp',$gp);
 		$this->assertEquals('1337',$gp->nat_id);
@@ -125,7 +125,7 @@ class GpServiceTest extends \CDbTestCase
 		$total_addresses = count(\Address::model()->findAll());
 
 		$gs = new GpService;
-		$gp = $gs->resourceToModel($resource);
+		$gp = $gs->resourceToModel($resource, new \Gp);
 
 		$this->assertEquals($total_gps+1, count(\Gp::model()->findAll()));
 		$this->assertEquals($total_contacts+1, count(\Contact::model()->findAll()));
@@ -137,7 +137,7 @@ class GpServiceTest extends \CDbTestCase
 		$resource = $this->getResource();
 
 		$gs = new GpService;
-		$gp = $gs->resourceToModel($resource);
+		$gp = $gs->resourceToModel($resource, new \Gp);
 
 		$this->assertInstanceOf('\Gp',$gp);
 		$this->assertEquals('1337',$gp->nat_id);
@@ -162,7 +162,7 @@ class GpServiceTest extends \CDbTestCase
 		$resource = $this->getResource();
 
 		$gs = new GpService;
-		$gp = $gs->resourceToModel($resource);
+		$gp = $gs->resourceToModel($resource, new \Gp);
 		$gp = \Gp::model()->findByPk($gp->id);
 
 		$this->assertInstanceOf('\Gp',$gp);
@@ -206,13 +206,14 @@ class GpServiceTest extends \CDbTestCase
 	public function testResourceToModel_Save_Update_ModelCountsCorrect()
 	{
 		$resource = $this->getModifiedResource(1);
+		$model = \Gp::model()->findByPk(1);
 
 		$total_gps = count(\Gp::model()->findAll());
 		$total_contacts = count(\Contact::model()->findAll());
 		$total_addresses = count(\Address::model()->findAll());
 
 		$gs = new GpService;
-		$gp = $gs->resourceToModel($resource);
+		$gp = $gs->resourceToModel($resource, $model);
 
 		$this->assertEquals($total_gps, count(\Gp::model()->findAll()));
 		$this->assertEquals($total_contacts, count(\Contact::model()->findAll()));
@@ -222,9 +223,10 @@ class GpServiceTest extends \CDbTestCase
 	public function testResourceToModel_Save_Update_ModelIsCorrect()
 	{
 		$resource = $this->getModifiedResource(1);
+		$model = \Gp::model()->findByPk(1);
 
 		$gs = new GpService;
-		$gp = $gs->resourceToModel($resource);
+		$gp = $gs->resourceToModel($resource, $model);
 
 		$this->assertInstanceOf('\Gp',$gp);
 		$this->assertEquals('x0001',$gp->nat_id);
@@ -247,9 +249,10 @@ class GpServiceTest extends \CDbTestCase
 	public function testResourceToModel_Save_Update_DBIsCorrect()
 	{
 		$resource = $this->getModifiedResource(1);
+		$model = \Gp::model()->findByPk(1);
 
 		$gs = new GpService;
-		$gp = $gs->resourceToModel($resource);
+		$gp = $gs->resourceToModel($resource, $model);
 		$gp = \Gp::model()->findByPk(1);
 
 		$this->assertInstanceOf('\Gp',$gp);
@@ -303,7 +306,7 @@ class GpServiceTest extends \CDbTestCase
 		$total_addresses = count(\Address::model()->findAll());
 
 		$gs = new GpService;
-		$gp = $gs->jsonToModel($json, false);
+		$gp = $gs->jsonToModel($json, new \Gp, false);
 
 		$this->assertEquals($total_gps, count(\Gp::model()->findAll()));
 		$this->assertEquals($total_contacts, count(\Contact::model()->findAll()));
@@ -315,7 +318,7 @@ class GpServiceTest extends \CDbTestCase
 		$json = '{"gnc":"AII2E2F","obj_prof":"AA1134","title":"Dr","family_name":"Zhivago","given_name":"Yuri","primary_phone":"999","address":{"use":null,"line1":"Staplegun","line2":"Staplegun Creek","city":"Stapleton","state":"staple","zip":"st44 pl3","country":"United States"},"id":"1","last_modified":-2208988800}';
 
 		$gs = new GpService;
-		$gp = $gs->jsonToModel($json, false);
+		$gp = $gs->jsonToModel($json, new \Gp, false);
 
 		$this->assertInstanceOf('\Gp',$gp);
 		$this->assertEquals('AII2E2F',$gp->nat_id);
@@ -345,7 +348,7 @@ class GpServiceTest extends \CDbTestCase
 		$total_addresses = count(\Address::model()->findAll());
 
 		$gs = new GpService;
-		$gp = $gs->jsonToModel($json);
+		$gp = $gs->jsonToModel($json, new \Gp);
 		$gp = \Gp::model()->findByPk($gp->id);
 
 		$this->assertEquals($total_gps+1, count(\Gp::model()->findAll()));
@@ -358,7 +361,7 @@ class GpServiceTest extends \CDbTestCase
 		$json = '{"gnc":"AII2E2F","obj_prof":"AA1134","title":"Dr","family_name":"Zhivago","given_name":"Yuri","primary_phone":"999","address":{"use":null,"line1":"Staplegun","line2":"Staplegun Creek","city":"Stapleton","state":"staple","zip":"st44 pl3","country":"United States"},"id":null,"last_modified":-2208988800}';
 
 		$gs = new GpService;
-		$gp = $gs->jsonToModel($json);
+		$gp = $gs->jsonToModel($json, new \Gp);
 
 		$this->assertInstanceOf('\Gp',$gp);
 		$this->assertEquals('AII2E2F',$gp->nat_id);
@@ -384,7 +387,7 @@ class GpServiceTest extends \CDbTestCase
 		$json = '{"gnc":"AII2E2F","obj_prof":"AA1134","title":"Dr","family_name":"Zhivago","given_name":"Yuri","primary_phone":"999","address":{"use":null,"line1":"Staplegun","line2":"Staplegun Creek","city":"Stapleton","state":"staple","zip":"st44 pl3","country":"United States"},"id":null,"last_modified":-2208988800}';
 
 		$gs = new GpService;
-		$gp = $gs->jsonToModel($json);
+		$gp = $gs->jsonToModel($json, new \Gp);
 		$gp = \Gp::model()->findByPk($gp->id);
 
 		$this->assertInstanceOf('\Gp',$gp);
@@ -414,8 +417,10 @@ class GpServiceTest extends \CDbTestCase
 		$total_contacts = count(\Contact::model()->findAll());
 		$total_addresses = count(\Address::model()->findAll());
 
+		$model = \Gp::model()->findByPk(1);
+
 		$gs = new GpService;
-		$gp = $gs->jsonToModel($json);
+		$gp = $gs->jsonToModel($json, $model);
 		$gp = \Gp::model()->findByPk($gp->id);
 
 		$this->assertEquals($total_gps, count(\Gp::model()->findAll()));
@@ -427,8 +432,10 @@ class GpServiceTest extends \CDbTestCase
 	{
 		$json = '{"gnc":"x0001","obj_prof":"x0002","title":"x0003","family_name":"x0004","given_name":"x0005","primary_phone":"x0006","address":{"use":null,"line1":"x0007","line2":"x0008","city":"x0009","state":"x0010","zip":"x0011","country":"United Kingdom"},"id":"1","last_modified":-2208988800}';
 
+		$model = \Gp::model()->findByPk(1);
+
 		$gs = new GpService;
-		$gp = $gs->jsonToModel($json);
+		$gp = $gs->jsonToModel($json, $model);
 
 		$this->assertInstanceOf('\Gp',$gp);
 		$this->assertEquals('x0001',$gp->nat_id);
@@ -453,8 +460,10 @@ class GpServiceTest extends \CDbTestCase
 	{
 		$json = '{"gnc":"x0001","obj_prof":"x0002","title":"x0003","family_name":"x0004","given_name":"x0005","primary_phone":"x0006","address":{"use":null,"line1":"x0007","line2":"x0008","city":"x0009","state":"x0010","zip":"x0011","country":"United Kingdom"},"id":"1","last_modified":-2208988800}';
 
+		$model = \Gp::model()->findByPk(1);
+
 		$gs = new GpService;
-		$gp = $gs->jsonToModel($json);
+		$gp = $gs->jsonToModel($json, $model);
 		$gp = \Gp::model()->findByPk($gp->id);
 
 		$this->assertInstanceOf('\Gp',$gp);
