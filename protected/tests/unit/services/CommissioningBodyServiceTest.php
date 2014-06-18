@@ -79,7 +79,7 @@ class CommissioningBodyServiceTest extends \CDbTestCase
 		$total_addresses = count(\Address::model()->findAll());
 
 		$cs = new CommissioningBodyService;
-		$cb = $cs->resourceToModel($resource, false);
+		$cb = $cs->resourceToModel($resource, new \CommissioningBody, false);
 
 		$this->assertEquals($total_cbs, count(\CommissioningBody::model()->findAll()));
 		$this->assertEquals($total_contacts, count(\Contact::model()->findAll()));
@@ -91,7 +91,7 @@ class CommissioningBodyServiceTest extends \CDbTestCase
 		$resource = $this->getResource();
 
 		$cs = new CommissioningBodyService;
-		$cb = $cs->resourceToModel($resource, false);
+		$cb = $cs->resourceToModel($resource, new \CommissioningBody, false);
 
 		$this->assertInstanceOf('\CommissioningBody',$cb);
 		$this->assertEquals('Frogtown',$cb->name);
@@ -120,7 +120,7 @@ class CommissioningBodyServiceTest extends \CDbTestCase
 		$total_addresses = count(\Address::model()->findAll());
 
 		$cs = new CommissioningBodyService;
-		$cb = $cs->resourceToModel($resource);
+		$cb = $cs->resourceToModel($resource, new \CommissioningBody);
 
 		$this->assertEquals($total_cbs+1, count(\CommissioningBody::model()->findAll()));
 		$this->assertEquals($total_contacts+1, count(\Contact::model()->findAll()));
@@ -132,7 +132,7 @@ class CommissioningBodyServiceTest extends \CDbTestCase
 		$resource = $this->getResource();
 
 		$cs = new CommissioningBodyService;
-		$cb = $cs->resourceToModel($resource);
+		$cb = $cs->resourceToModel($resource, new \CommissioningBody);
 
 		$this->assertInstanceOf('\CommissioningBody',$cb);
 		$this->assertEquals('Frogtown',$cb->name);
@@ -157,7 +157,7 @@ class CommissioningBodyServiceTest extends \CDbTestCase
 		$resource = $this->getResource();
 
 		$cs = new CommissioningBodyService;
-		$cb = $cs->resourceToModel($resource);
+		$cb = $cs->resourceToModel($resource, new \CommissioningBody);
 		$cb = \CommissioningBody::model()->findByPk($cb->id);
 
 		$this->assertInstanceOf('\CommissioningBody',$cb);
@@ -203,7 +203,7 @@ class CommissioningBodyServiceTest extends \CDbTestCase
 		$total_addresses = count(\Address::model()->findAll());
 
 		$cs = new CommissioningBodyService;
-		$cb = $cs->resourceToModel($resource);
+		$cb = $cs->resourceToModel($resource, \CommissioningBody::model()->findByPk(1));
 
 		$this->assertEquals($total_cbs, count(\CommissioningBody::model()->findAll()));
 		$this->assertEquals($total_contacts, count(\Contact::model()->findAll()));
@@ -215,7 +215,7 @@ class CommissioningBodyServiceTest extends \CDbTestCase
 		$resource = $this->getModifiedResource(1);
 
 		$cs = new CommissioningBodyService;
-		$cb = $cs->resourceToModel($resource);
+		$cb = $cs->resourceToModel($resource, \CommissioningBody::model()->findByPk(1));
 
 		$this->assertInstanceOf('\CommissioningBody',$cb);
 		$this->assertEquals('x0001',$cb->name);
@@ -236,7 +236,7 @@ class CommissioningBodyServiceTest extends \CDbTestCase
 		$resource = $this->getModifiedResource(1);
 
 		$cs = new CommissioningBodyService;
-		$cb = $cs->resourceToModel($resource);
+		$cb = $cs->resourceToModel($resource, \CommissioningBody::model()->findByPk(1));
 		$cb = \CommissioningBody::model()->findByPk($cb->id);
 
 		$this->assertInstanceOf('\CommissioningBody',$cb);
@@ -295,7 +295,7 @@ class CommissioningBodyServiceTest extends \CDbTestCase
 		$json = '{"code":"AAPL","name":"Apple","address":{"use":null,"line1":"1 Infinite Loop","line2":"","city":"Cupertino","state":"California","zip":"1AA PL3","country":"United States"},"id":null,"last_modified":-2208988800,"type":"Clinical Commissioning Group"}';
 
 		$cs = new CommissioningBodyService;
-		$cb = $cs->jsonToModel($json, false);
+		$cb = $cs->jsonToModel($json, new \CommissioningBody, false);
 
 		$this->assertInstanceOf('\CommissioningBody',$cb);
 		$this->assertEquals('AAPL',$cb->code);
@@ -321,7 +321,7 @@ class CommissioningBodyServiceTest extends \CDbTestCase
 		$total_addresses = count(\Address::model()->findAll());
 
 		$cs = new CommissioningBodyService;
-		$cb = $cs->jsonToModel($json);
+		$cb = $cs->jsonToModel($json, new \CommissioningBody);
 
 		$this->assertEquals($total_cbs+1, count(\CommissioningBody::model()->findAll()));
 		$this->assertEquals($total_contacts+1, count(\Contact::model()->findAll()));
@@ -333,7 +333,7 @@ class CommissioningBodyServiceTest extends \CDbTestCase
 		$json = '{"code":"x0001","name":"x0002","address":{"use":null,"line1":"x0003","line2":"x0004","city":"x0005","state":"x0006","zip":"x0007","country":"United Kingdom"},"id":null,"last_modified":-2208988800,"type":"Clinical Commissioning Group"}';
 
 		$cs = new CommissioningBodyService;
-		$cb = $cs->jsonToModel($json);
+		$cb = $cs->jsonToModel($json, new \CommissioningBody);
 
 		$this->assertInstanceOf('\CommissioningBody',$cb);
 		$this->assertEquals('x0001',$cb->code);
@@ -355,7 +355,7 @@ class CommissioningBodyServiceTest extends \CDbTestCase
 		$json = '{"code":"x0001","name":"x0002","address":{"use":null,"line1":"x0003","line2":"x0004","city":"x0005","state":"x0006","zip":"x0007","country":"United Kingdom"},"id":null,"last_modified":-2208988800,"type":"Clinical Commissioning Group"}';
 
 		$cs = new CommissioningBodyService;
-		$cb = $cs->jsonToModel($json);
+		$cb = $cs->jsonToModel($json, new \CommissioningBody);
 		$cb = \CommissioningBody::model()->findByPk($cb->id);
 
 		$this->assertInstanceOf('\CommissioningBody',$cb);
@@ -382,7 +382,7 @@ class CommissioningBodyServiceTest extends \CDbTestCase
 		$total_addresses = count(\Address::model()->findAll());
 
 		$cs = new CommissioningBodyService;
-		$cb = $cs->jsonToModel($json);
+		$cb = $cs->jsonToModel($json, \CommissioningBody::model()->findByPk(1));
 		$cb = \CommissioningBody::model()->findByPk($cb->id);
 
 		$this->assertEquals($total_cbs, count(\CommissioningBody::model()->findAll()));
@@ -395,7 +395,7 @@ class CommissioningBodyServiceTest extends \CDbTestCase
 		$json = '{"code":"x0001","name":"x0002","address":{"use":null,"line1":"x0003","line2":"x0004","city":"x0005","state":"x0006","zip":"x0007","country":"United Kingdom"},"id":"1","last_modified":-2208988800,"type":"Clinical Commissioning Group"}';
 
 		$cs = new CommissioningBodyService;
-		$cb = $cs->jsonToModel($json);
+		$cb = $cs->jsonToModel($json, \CommissioningBody::model()->findByPk(1));
 
 		$this->assertInstanceOf('\CommissioningBody',$cb);
 		$this->assertEquals('x0001',$cb->code);
@@ -417,7 +417,7 @@ class CommissioningBodyServiceTest extends \CDbTestCase
 		$json = '{"code":"x0001","name":"x0002","address":{"use":null,"line1":"x0003","line2":"x0004","city":"x0005","state":"x0006","zip":"x0007","country":"United Kingdom"},"id":"1","last_modified":-2208988800,"type":"Clinical Commissioning Group"}';
 
 		$cs = new CommissioningBodyService;
-		$cb = $cs->jsonToModel($json);
+		$cb = $cs->jsonToModel($json, \CommissioningBody::model()->findByPk(1));
 		$cb = \CommissioningBody::model()->findByPk($cb->id);
 
 		$this->assertInstanceOf('\CommissioningBody',$cb);
