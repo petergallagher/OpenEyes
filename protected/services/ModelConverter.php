@@ -33,94 +33,13 @@ class ModelConverter
 		return $this->modelToResourceParse($object, get_class($object), $resource);
 	}
 
-	protected function modelToResourceParse($object, $object_class_name, &$resource)
+	public function modelToResourceParse($object, $object_class_name, &$resource)
 	{
 		foreach ($this->map->getFieldsForClass($object_class_name) as $res_attribute => $def) {
 			if (is_array($def)) {
-				switch ($def[0]) {
-					case DeclarativeModelService::TYPE_RESOURCE:
-						$resource_class = 'services\\'.$def[2];
-						$resource->$res_attribute = $this->modelToResource($object->{$def[1]}, new $resource_class(array('id' => $object->{$def[1]}->id, 'last_modified' => strtotime($object->{$def[1]}->last_modified_date))));
-						break;
-					case DeclarativeModelService::TYPE_LIST:
-						$data_list = $this->expandObjectAttribute($object, $def[1]);
-						$data_class = 'services\\'.$def[2];
-
-						$data_items = array();
-
-						foreach ($data_list as $data_item) {
-							$data_items[] = $this->modelToResourceParse($data_item, $def[2], new $data_class);
-						}
-
-						$resource->$res_attribute = $data_items;
-						break;
-					case DeclarativeModelService::TYPE_REF:
-						if ($pos = strpos($def[1],'.')) {
-							$relation_name = substr($def[1],0,$pos);
-							$relation_attribute = substr($def[1],$pos+1,strlen($def[1]));
-
-							if ($object->$relation_name) {
-								$object_property = $object->$relation_name->$relation_attribute;
-							} else {
-								$object_property = null;
-							}
-						} else {
-							$object_property = $object->{$def[1]};
-						}
-
-						if ($object_property) {
-							$data_class = $def[2];
-							$resource->$res_attribute = \Yii::app()->service->$data_class($object_property);
-						} else {
-							$resource->$res_attribute = null;
-						}
-						break;
-					case DeclarativeModelService::TYPE_SIMPLEOBJECT:
-					case DeclarativeModelService::TYPE_DATAOBJECT:
-					case DeclarativeModelService::TYPE_DATAOBJECT_EXCLUSIVE:
-						$data = $this->expandObjectAttribute($object, $def[1]);
-						$data_class = 'services\\'.$def[2];
-
-						if (is_object($data)) {
-							$resource->$res_attribute = $this->modelToResource($data, new $data_class);
-						} else {
-							$resource->$res_attribute = is_null($data) ? null : new $data_class($data);
-						}
-						break;
-					case DeclarativeModelService::TYPE_CONDITION:
-						switch ($def[2]) {
-							case 'equals':
-								$resource->$res_attribute = $object->{$def[1]} == $def[3];
-								break;
-							default:
-								throw new Exception("Unknown condition type: {$def[2]}");
-						}
-						break;
-					case DeclarativeModelService::TYPE_REF_LIST:
-						$model_assignment_relation = $def[1];
-						$model_assignment_field = $def[2];
-						$ref_class = $def[3];
-
-						$refs = array();
-
-						foreach ($object->$model_assignment_relation as $ref_assignment_model) {
-							$refs[] = \Yii::app()->service->$ref_class($ref_assignment_model->$model_assignment_field);
-						}
-
-						$resource->$res_attribute = $refs;
-						break;
-					case DeclarativeModelService::TYPE_OR:
-						foreach ($def[2] as $or_field) {
-							if ($or_value = $this->expandOrField($object, explode('.',$or_field))) {
-								$resource->$res_attribute = $or_value->{$def[1]};
-								break;
-							}
-						}
-
-						break;
-					default:
-						throw new \Exception("Unknown declarative type: {$def[0]}");
-				}
+				$class = 'services\\'.$def[0];
+				$parser = new $class($this);
+				$resource->$res_attribute = $parser->modelToResourceParse($object, $def[1], $def[2], @$def[3]);
 			} else {
 				$resource->$res_attribute = $this->expandObjectAttribute($object, $def);
 			}
@@ -129,29 +48,21 @@ class ModelConverter
 		return $resource;
 	}
 
-	protected function expandObjectAttribute($object, $ar_attribute)
+	public function expandObjectAttribute($object, $object_field)
 	{
-		if ($dot = strpos($ar_attribute,'.')) {
-			$relation = substr($ar_attribute,0,$dot);
-			$attribute = substr($ar_attribute,$dot+1,strlen($ar_attribute));
-
-			return $object->$relation ? $object->$relation->$attribute : null;
+		if (!is_array($object_field)) {
+			$object_field = explode('.',$object_field);
 		}
 
-		return $object->$ar_attribute;
-	}
+		$field = array_shift($object_field);
 
-	protected function expandOrField($object, $or_fields)
-	{
-		$field = array_shift($or_fields);
-
-		if (count($or_fields) >0) {
+		if (count($object_field) >0) {
 
 			if (!$object->$field) {
 				return false;
 			}
 
-			return $this->expandOrField($object->$field, $or_fields);
+			return $this->expandObjectAttribute($object->$field, $object_field);
 		}
 
 		return $object->$field;

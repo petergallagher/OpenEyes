@@ -17,15 +17,15 @@ namespace services;
 
 class DeclarativeModelService extends ModelService
 {
-	const TYPE_LIST = 0;
-	const TYPE_REF = 1;
-	const TYPE_SIMPLEOBJECT = 2;
-	const TYPE_DATAOBJECT = 3;
-	const TYPE_DATAOBJECT_EXCLUSIVE = 4;
-	const TYPE_CONDITION = 5;
-	const TYPE_RESOURCE = 6;
-	const TYPE_REF_LIST = 7;
-	const TYPE_OR = 8;
+	const TYPE_LIST = 'DeclarativeTypeParser_List';
+	const TYPE_REF = 'DeclarativeTypeParser_Reference';
+	const TYPE_SIMPLEOBJECT = 'DeclarativeTypeParser_SimpleObject';
+	const TYPE_DATAOBJECT = 'DeclarativeTypeParser_DataObject';
+	const TYPE_DATAOBJECT_EXCLUSIVE = 'DeclarativeTypeParser_DataObjectExclusive';
+	const TYPE_CONDITION = 'DeclarativeTypeParser_Condition';
+	const TYPE_RESOURCE = 'DeclarativeTypeParser_Resource';
+	const TYPE_REF_LIST = 'DeclarativeTypeParser_RefList';
+	const TYPE_OR = 'DeclarativeTypeParser_Or';
 
 	const RULE_TYPE_ALLNULL = 0;
 	const RULE_TYPE_NULLIFNULL = 1;
