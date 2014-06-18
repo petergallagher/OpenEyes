@@ -95,6 +95,17 @@ class ModelConverter
 		}
 	}
 
+	public function attributesAllNull($object, $attributes)
+	{
+		foreach ($attributes as $attribute) {
+			if ($object->$attribute !== null) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
 	public function resourceToModel($resource, $model, $save=true, $extra_fields=false)
 	{
 		is_array($extra_fields) &&
@@ -108,14 +119,7 @@ class ModelConverter
 				$class_name = '\\'.$def[1];
 
 				if (is_array($def[0])) {
-					$allnull = true;
-
-					foreach ($def[2] as $attribute) {
-						if ($resource->$attribute !== null) {
-							$allnull = false;
-						}
-					}
-
+					$allnull = $this->attributesAllNull($resource, $def[2]);
 					$target = ($allnull ? $def[0][1] : $def[0][0]);
 					$target = ($pos = strpos($target,'.')) ? substr($target,0,$pos) . '.' . $relation_name : $relation_name;
 
@@ -147,9 +151,9 @@ class ModelConverter
 					} else {
 						$reference_object_attributes[$relation_name][$related_object_attribute] = $resource->$res_attribute;
 
-						$def = $this->map->getReferenceObjectForClass($model_class_name, $relation_name);
+						$reference_def = $this->map->getReferenceObjectForClass($model_class_name, $relation_name);
 
-						if (array_keys($reference_object_attributes[$relation_name]) == $def[2]) {
+						if (array_keys($reference_object_attributes[$relation_name]) == $reference_def[2]) {
 							// All required properties for matching the reference item have been set, so now we can associate it with the model
 							$criteria = new \CDbCriteria;
 
@@ -157,7 +161,7 @@ class ModelConverter
 								$criteria->compare($key, $value);
 							}
 
-							$related_object_class = '\\'.$def[1];
+							$related_object_class = '\\'.$reference_def[1];
 
 							if (!$related_object = $related_object_class::model()->find($criteria)) {
 								$related_object = new $related_object_class;
@@ -167,7 +171,7 @@ class ModelConverter
 								$save && $this->saveModel($related_object);
 							}
 
-							$model->{$def[0]} = $related_object->primaryKey;
+							$model->{$reference_def[0]} = $related_object->primaryKey;
 							$model->$relation_name = $related_object;
 						}
 					}
@@ -180,14 +184,7 @@ class ModelConverter
 		if ($class_related_objects) {
 			foreach ($class_related_objects as $relation_name => $def) {
 				if (is_array($def[0])) {
-					$allnull = true;
-
-					foreach ($def[2] as $attribute) {
-						if ($resource->$attribute !== null) {
-							$allnull = false;
-						}
-					}
-
+					$allnull = $this->attributesAllNull($resource, $def[2]);
 					$target = $allnull ? $def[0][1] : $def[0][0];
 
 					if ($pos = strpos($target,'.')) {
@@ -357,15 +354,7 @@ class ModelConverter
 			foreach ($rules as $rule) {
 				switch ($rule[0]) {
 					case DeclarativeModelService::RULE_TYPE_NULLIFNULL:
-						$allnull = true;
-
-						foreach ($rule[1] as $attribute) {
-							if ($resource->$attribute !== null) {
-								$allnull = false;
-							}
-						}
-
-						if ($allnull) return null;
+						if ($this->attributesAllNull($resource, $rule[1])) return null;
 						break;
 					default:
 						throw new \Exception("Unknown related object rule type: {$rule[0]}");
