@@ -81,7 +81,7 @@ class Gp extends BaseActiveRecordVersioned
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('obj_prof, nat_id', 'required'),
+			array('nat_id', 'required'),
 			array('obj_prof, nat_id', 'length', 'max'=>20),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
