@@ -35,7 +35,7 @@ class PracticeServiceTest extends \CDbTestCase
 
 		$ps = new PracticeService;
 
-		$resource = $ps->modelToResource($practice);
+		$resource = $ps->modelToResource($practice, new \Practice);
 
 		$this->assertInstanceOf('services\Practice',$resource);
 		$this->assertEquals(1,$resource->getId());
@@ -71,7 +71,7 @@ class PracticeServiceTest extends \CDbTestCase
 		$total_countries = count(\Country::model()->findAll());
 
 		$ps = new PracticeService;
-		$practice = $ps->resourceToModel($resource, false);
+		$practice = $ps->resourceToModel($resource, new \Practice, false);
 
 		$this->assertEquals($total_practices, count(\Practice::model()->findAll()));
 		$this->assertEquals($total_contacts, count(\Contact::model()->findAll()));
@@ -84,7 +84,7 @@ class PracticeServiceTest extends \CDbTestCase
 		$resource = $this->getResource();
 
 		$ps = new PracticeService;
-		$practice = $ps->resourceToModel($resource, false);
+		$practice = $ps->resourceToModel($resource, new \Practice, false);
 
 		$this->assertInstanceOf('Practice',$practice);
 		$this->assertEquals('5512A',$practice->code);
@@ -110,7 +110,7 @@ class PracticeServiceTest extends \CDbTestCase
 		$total_countries = count(\Country::model()->findAll());
 
 		$ps = new PracticeService;
-		$practice = $ps->resourceToModel($resource);
+		$practice = $ps->resourceToModel($resource, new \Practice);
 
 		$this->assertEquals($total_practices+1, count(\Practice::model()->findAll()));
 		$this->assertEquals($total_contacts+1, count(\Contact::model()->findAll()));
@@ -123,7 +123,7 @@ class PracticeServiceTest extends \CDbTestCase
 		$resource = $this->getResource();
 
 		$ps = new PracticeService;
-		$practice = $ps->resourceToModel($resource);
+		$practice = $ps->resourceToModel($resource, new \Practice);
 
 		$this->assertInstanceOf('\Practice',$practice);
 
@@ -145,7 +145,7 @@ class PracticeServiceTest extends \CDbTestCase
 		$resource = $this->getResource();
 
 		$ps = new PracticeService;
-		$practice = $ps->resourceToModel($resource);
+		$practice = $ps->resourceToModel($resource, new \Practice);
 		$practice = \Practice::model()->findByPk($practice->id);
 
 		$this->assertInstanceOf('\Practice',$practice);
@@ -183,6 +183,7 @@ class PracticeServiceTest extends \CDbTestCase
 	public function testResourceToModel_Save_Update_ModelCountsCorrect()
 	{
 		$resource = $this->getModifiedResource(1);
+		$model = \Practice::model()->findByPk(1);
 
 		$total_practices = count(\Practice::model()->findAll());
 		$total_contacts = count(\Contact::model()->findAll());
@@ -190,7 +191,7 @@ class PracticeServiceTest extends \CDbTestCase
 		$total_countries = count(\Country::model()->findAll());
 
 		$ps = new PracticeService;
-		$practice = $ps->resourceToModel($resource);
+		$practice = $ps->resourceToModel($resource, $model);
 
 		$this->assertEquals($total_practices, count(\Practice::model()->findAll()));
 		$this->assertEquals($total_contacts, count(\Contact::model()->findAll()));
@@ -201,9 +202,10 @@ class PracticeServiceTest extends \CDbTestCase
 	public function testResourceToModel_Save_Update_DBIsCorrect()
 	{
 		$resource = $this->getModifiedResource(1);
+		$model = \Practice::model()->findByPk(1);
 
 		$ps = new PracticeService;
-		$practice = $ps->resourceToModel($resource);
+		$practice = $ps->resourceToModel($resource, $model);
 		$practice = \Practice::model()->findByPk($practice->id);
 
 		$this->assertInstanceOf('Practice',$practice);
@@ -250,7 +252,7 @@ class PracticeServiceTest extends \CDbTestCase
 		$total_countries = count(\Country::model()->findAll());
 
 		$ps = new PracticeService;
-		$practice = $ps->jsonToModel($json, false);
+		$practice = $ps->jsonToModel($json, new \Practice, false);
 
 		$this->assertEquals($total_practices, count(\Practice::model()->findAll()));
 		$this->assertEquals($total_contacts, count(\Contact::model()->findAll()));
@@ -263,7 +265,7 @@ class PracticeServiceTest extends \CDbTestCase
 		$json = '{"code":"x0001","primary_phone":"x0002","address":{"use":null,"line1":"x0003","line2":"x0004","city":"x0005","state":"x0006","zip":"x0007","country":"United Kingdom"},"id":null,"last_modified":-2208988800}';
 
 		$ps = new PracticeService;
-		$practice = $ps->jsonToModel($json, false);
+		$practice = $ps->jsonToModel($json, new \Practice, false);
 
 		$this->assertInstanceOf('Practice',$practice);
 		$this->assertEquals('x0001',$practice->code);
@@ -289,7 +291,7 @@ class PracticeServiceTest extends \CDbTestCase
 		$total_countries = count(\Country::model()->findAll());
 
 		$ps = new PracticeService;
-		$practice = $ps->jsonToModel($json);
+		$practice = $ps->jsonToModel($json, new \Practice);
 
 		$this->assertEquals($total_practices+1, count(\Practice::model()->findAll()));
 		$this->assertEquals($total_contacts+1, count(\Contact::model()->findAll()));
@@ -302,7 +304,7 @@ class PracticeServiceTest extends \CDbTestCase
 		$json = '{"code":"x0001","primary_phone":"x0002","address":{"use":null,"line1":"x0003","line2":"x0004","city":"x0005","state":"x0006","zip":"x0007","country":"United Kingdom"},"id":null,"last_modified":-2208988800}';
 
 		$ps = new PracticeService;
-		$practice = $ps->jsonToModel($json);
+		$practice = $ps->jsonToModel($json, new \Practice);
 		$practice = \Practice::model()->findByPk($practice->id);
 
 		$this->assertInstanceOf('Practice',$practice);
@@ -328,8 +330,10 @@ class PracticeServiceTest extends \CDbTestCase
 		$total_addresses = count(\Address::model()->findAll());
 		$total_countries = count(\Country::model()->findAll());
 
+		$model = \Practice::model()->findByPk(1);
+
 		$ps = new PracticeService;
-		$practice = $ps->jsonToModel($json);
+		$practice = $ps->jsonToModel($json, $model);
 		$practice = \Practice::model()->findByPk($practice->id);
 
 		$this->assertEquals($total_practices, count(\Practice::model()->findAll()));
@@ -342,8 +346,10 @@ class PracticeServiceTest extends \CDbTestCase
 	{
 		$json = '{"code":"x0001","primary_phone":"x0002","address":{"use":null,"line1":"x0003","line2":"x0004","city":"x0005","state":"x0006","zip":"x0007","country":"United Kingdom"},"id":"1","last_modified":-2208988800}';
 
+		$model = \Practice::model()->findByPk(1);
+
 		$ps = new PracticeService;
-		$practice = $ps->jsonToModel($json);
+		$practice = $ps->jsonToModel($json, $model);
 		$practice = \Practice::model()->findByPk($practice->id);
 
 		$this->assertInstanceOf('Practice',$practice);
