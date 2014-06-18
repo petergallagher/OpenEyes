@@ -155,14 +155,13 @@ class PatientAssociatedContactsServiceTest extends \CDbTestCase
 		$contact2->given_name = 'Hughie';
 		$contact2->family_name = 'Louie';
 		$contact2->primary_phone = '3024302149';
-		$contact2->site_ref = \Yii::app()->service->Site(2);
+		$contact2->institution_ref = \Yii::app()->service->Institution(2);
 
 		$contact3 = new PatientAssociatedContact;
 		$contact3->title = 'Dr';
 		$contact3->given_name = 'Ted';
 		$contact3->family_name = 'Baker';
 		$contact3->primary_phone = '123123123';
-		$contact3->institution_ref = \Yii::app()->service->Institution(1);
 
 		$resource->contacts = array($contact1,$contact2,$contact3);
 
@@ -183,7 +182,6 @@ class PatientAssociatedContactsServiceTest extends \CDbTestCase
 		$this->assertEquals($total_contacts, count(\Contact::model()->findAll()));
 	}
 
-/*
 	public function testResourceToModel_NoSave_ModelIsCorrect()
 	{
 		$resource = $this->getResource();
@@ -194,31 +192,33 @@ class PatientAssociatedContactsServiceTest extends \CDbTestCase
 		$this->assertInstanceOf('Patient',$patient);
 		$this->assertCount(3,$patient->contactAssignments);
 
-		$this->assertInstanceOf('Contact',$patient->contactAssignments[0]->contact);
-		$this->assertEquals('Dr',$patient->contactAssignments[0]->contact->title);
-		$this->assertEquals('Hunter',$patient->contactAssignments[0]->contact->first_name);
-		$this->assertEquals('Thompson',$patient->contactAssignments[0]->contact->last_name);
+		$this->assertNull($patient->contactAssignments[0]->contact);
 		$this->assertInstanceOf('ContactLocation',$patient->contactAssignments[0]->location);
+		$this->assertInstanceOf('Contact',$patient->contactAssignments[0]->location->contact);
+		$this->assertEquals('Dr',$patient->contactAssignments[0]->location->contact->title);
+		$this->assertEquals('Hunter',$patient->contactAssignments[0]->location->contact->first_name);
+		$this->assertEquals('Thompson',$patient->contactAssignments[0]->location->contact->last_name);
 		$this->assertEquals(1,$patient->contactAssignments[0]->location->site_id);
 		$this->assertNull($patient->contactAssignments[0]->location->institution_id);
 
-		$this->assertInstanceOf('Contact',$patient->contactAssignments[1]->contact);
-		$this->assertEquals('Dr',$patient->contactAssignments[1]->contact->title);
-		$this->assertEquals('Hughie',$patient->contactAssignments[1]->contact->first_name);
-		$this->assertEquals('Louie',$patient->contactAssignments[1]->contact->last_name);
+		$this->assertNull($patient->contactAssignments[1]->contact);
 		$this->assertInstanceOf('ContactLocation',$patient->contactAssignments[1]->location);
-		$this->assertEquals(2,$patient->contactAssignments[1]->location->site_id);
-		$this->assertNull($patient->contactAssignments[1]->location->institution_id);
+		$this->assertInstanceOf('Contact',$patient->contactAssignments[1]->location->contact);
+		$this->assertEquals('Dr',$patient->contactAssignments[1]->location->contact->title);
+		$this->assertEquals('Hughie',$patient->contactAssignments[1]->location->contact->first_name);
+		$this->assertEquals('Louie',$patient->contactAssignments[1]->location->contact->last_name);
+		$this->assertInstanceOf('ContactLocation',$patient->contactAssignments[1]->location);
+		$this->assertEquals(2,$patient->contactAssignments[1]->location->institution_id);
+		$this->assertNull($patient->contactAssignments[1]->location->site_id);
 
+		$this->assertNull($patient->contactAssignments[2]->location);
 		$this->assertInstanceOf('Contact',$patient->contactAssignments[2]->contact);
 		$this->assertEquals('Dr',$patient->contactAssignments[2]->contact->title);
 		$this->assertEquals('Ted',$patient->contactAssignments[2]->contact->first_name);
 		$this->assertEquals('Baker',$patient->contactAssignments[2]->contact->last_name);
-		$this->assertInstanceOf('ContactLocation',$patient->contactAssignments[2]->location);
-		$this->assertNull($patient->contactAssignments[2]->location->site_id);
-		$this->assertEquals(1,$patient->contactAssignments[2]->location->institution_id);
 	}
 
+/*
 	public function testResourceToModel_Save_Create_ModelCountsCorrect()
 	{
 		$resource = $this->getResource();

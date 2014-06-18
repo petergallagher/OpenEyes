@@ -28,6 +28,7 @@ class DeclarativeModelService extends ModelService
 	const TYPE_OR = 8;
 
 	const RULE_TYPE_ALLNULL = 0;
+	const RULE_TYPE_NULLIFNULL = 1;
 
 	/**
 	 * @param BaseActiveRecord $model

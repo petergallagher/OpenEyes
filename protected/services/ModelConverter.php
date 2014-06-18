@@ -209,6 +209,8 @@ class ModelConverter
 					if (!$model->$relation_name) {
 						$model->$relation_name = new $class_name;
 					}
+
+					$model->$relation_name = $this->applyRulesForNewRelatedObject($model_class_name, $model, $relation_name, $resource);
 				}
 			}
 		}
@@ -254,7 +256,9 @@ class ModelConverter
 							$related_object_name = substr($def[1],0,$pos);
 							$related_object_attribute = substr($def[1],$pos+1,strlen($def[1]));
 
-							$related_objects[$related_object_name][$related_object_attribute] = $id_value;
+							if ($model->$related_object_name) {
+								$model->$related_object_name->$related_object_attribute = $id_value;
+							}
 						} else {
 							$model->{$def[1]} = $id_value;
 						}
@@ -417,10 +421,12 @@ class ModelConverter
 						}
 					}
 				} else {
-					$save && $this->saveModel($model->$relation_name);
+					if ($model->$relation_name) {
+						$save && $this->saveModel($model->$relation_name);
 
-					if (!$model->{$def[0]}) {
-						$model->{$def[0]} = $model->$relation_name->primaryKey;
+						if (!$model->{$def[0]}) {
+							$model->{$def[0]} = $model->$relation_name->primaryKey;
+						}
 					}
 				}
 			}
@@ -557,5 +563,30 @@ class ModelConverter
 		if (!$model->delete()) {
 			throw new \Exception("Unable to delete: " . get_class($model), $model->errors);
 		}
+	}
+
+	protected function applyRulesForNewRelatedObject($class_name, $model, $relation_name, $resource)
+	{
+		if ($rules = $this->map->getRulesForRelatedObject($class_name, $relation_name)) {
+			foreach ($rules as $rule) {
+				switch ($rule[0]) {
+					case DeclarativeModelService::RULE_TYPE_NULLIFNULL:
+						$allnull = true;
+
+						foreach ($rule[1] as $attribute) {
+							if ($resource->$attribute !== null) {
+								$allnull = false;
+							}
+						}
+
+						if ($allnull) return null;
+						break;
+					default:
+						throw new \Exception("Unknown related object rule type: {$rule[0]}");
+				}
+			}
+		}
+
+		return $model->$relation_name;
 	}
 }

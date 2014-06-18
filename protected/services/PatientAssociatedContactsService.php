@@ -50,10 +50,17 @@ class PatientAssociatedContactsService extends DeclarativeModelService
 				'institution_ref' => array(self::TYPE_REF, 'location.institution_id', 'Institution'),
 			),
 			'rules' => array(
-				'title' => array(self::RULE_TYPE_ALLNULL, array('site_ref', 'institution_ref'), 'then' => 'contact', 'else' => 'location.contact'),
-				'given_name' => array(self::RULE_TYPE_ALLNULL, array('site_ref', 'institution_ref'), 'then' => 'contact', 'else' => 'location.contact'),
-				'family_name' => array(self::RULE_TYPE_ALLNULL, array('site_ref', 'institution_ref'), 'then' => 'contact', 'else' => 'location.contact'),
-				'primary_phone' => array(self::RULE_TYPE_ALLNULL, array('site_ref', 'institution_ref'), 'then' => 'contact', 'else' => 'location.contact'),
+				'fields' => array(
+					'title' => array(self::RULE_TYPE_ALLNULL, array('site_ref', 'institution_ref'), 'then' => 'contact', 'else' => 'location.contact'),
+					'given_name' => array(self::RULE_TYPE_ALLNULL, array('site_ref', 'institution_ref'), 'then' => 'contact', 'else' => 'location.contact'),
+					'family_name' => array(self::RULE_TYPE_ALLNULL, array('site_ref', 'institution_ref'), 'then' => 'contact', 'else' => 'location.contact'),
+					'primary_phone' => array(self::RULE_TYPE_ALLNULL, array('site_ref', 'institution_ref'), 'then' => 'contact', 'else' => 'location.contact'),
+				),
+				'related_objects' => array(
+					'location' => array(
+						array(self::RULE_TYPE_NULLIFNULL, array('site_ref', 'institution_ref')),
+					),
+				),
 			),
 		),
 	);
