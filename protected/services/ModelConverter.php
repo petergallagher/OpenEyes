@@ -17,7 +17,7 @@ namespace services;
 
 class ModelConverter
 {
-	protected $map;
+	public $map;
 
 	public function __construct($map)
 	{
@@ -48,23 +48,44 @@ class ModelConverter
 		return $resource;
 	}
 
-	public function expandObjectAttribute($object, $object_field)
+	public function expandObjectAttribute($object, $attributes)
 	{
-		if (!is_array($object_field)) {
-			$object_field = explode('.',$object_field);
+		if (!is_array($attributes)) {
+			$attributes = explode('.',$attributes);
 		}
 
-		$field = array_shift($object_field);
+		$attribute = array_shift($attributes);
 
-		if (count($object_field) >0) {
-			if (!$object->$field) {
+		if (count($attributes) >0) {
+			if (!$object->$attribute) {
 				return false;
 			}
 
-			return $this->expandObjectAttribute($object->$field, $object_field);
+			return $this->expandObjectAttribute($object->$attribute, $attributes);
 		}
 
-		return $object->$field;
+		return $object->$attribute;
+	}
+
+	public function setObjectAttribute(&$object, $attributes, $value, $force=true)
+	{
+		if (!is_array($attributes)) {
+			$attributes = explode('.',$attributes);
+		}
+
+		$attribute = array_shift($attributes);
+
+		if (count($attributes) >0) {
+			if (!$object->$attribute) {
+				return false;
+			}
+
+			return $this->setObjectAttribute($object->$attribute, $attributes, $value, $force);
+		}
+
+		if ($force || !$object->$attribute) {
+			$object->$attribute = $value;
+		}
 	}
 
 	public function resourceToModel($resource, $model, $save=true, $extra_fields=false)
@@ -91,7 +112,7 @@ class ModelConverter
 						}
 					}
 
-					$target = $allnull ? $def[0][1] : $def[0][0];
+					$target = ($allnull ? $def[0][1] : $def[0][0]);
 
 					if ($pos = strpos($target,'.')) {
 						$target = substr($target,0,$pos);
@@ -122,131 +143,49 @@ class ModelConverter
 			if (is_array($def)) {
 				switch ($def[0]) {
 					case DeclarativeModelService::TYPE_RESOURCE:
-						$_model_class_name = '\\'.$def[2];
-
-						$new_model = new $_model_class_name;
-
-						$model->{$def[1]} = $this->resourceToModel($resource->$res_attribute, $new_model, $save);
-						if (isset($model_relations[$def[1]]) && $model_relations[$def[1]][0] == 'CBelongsToRelation') {
-							$model->{$model_relations[$def[1]][2]} = $model->{$def[1]}->id;
-						}
+						$class = 'services\\'.$def[0];
+						$parser = new $class($this);
+						$parser->resourceToModelParse($model, $resource, $def[1], $res_attribute, $def[2], @$def[3], $related_objects);
 						break;
 					case DeclarativeModelService::TYPE_LIST:
-						if (($pos = strpos($def[1],'.')) !== FALSE) {
-							$related_object_name = substr($def[1],0,$pos);
-							$related_object_attribute = substr($def[1],$pos+1,strlen($def[1]));
-						} else {
-							$related_object_name = $def[1];
-							$related_object_attribute = null;
-						}
-
-						foreach ($resource->$res_attribute as $item) {
-							$related_objects[$related_object_name][$related_object_attribute][] = $this->resourceToModel($item, new $def[3], false);
-						}
+						$class = 'services\\'.$def[0];
+						$parser = new $class($this);
+						$parser->resourceToModelParse($model, $resource, $def[1], $res_attribute, $def[2], @$def[3], $related_objects);
 						break;
 					case DeclarativeModelService::TYPE_REF:
-						if ($resource->$res_attribute) {
-							if (method_exists($resource->$res_attribute,'getId')) {
-								$id_value = $resource->$res_attribute->getId();
-							} else {
-								$id_value = $resource->$res_attribute->id;
-							}
-						} else {
-							$id_value = null;
-						}
-
-						if ($pos = strpos($def[1],'.')) {
-							$related_object_name = substr($def[1],0,$pos);
-							$related_object_attribute = substr($def[1],$pos+1,strlen($def[1]));
-
-							if ($model->$related_object_name) {
-								$model->$related_object_name->$related_object_attribute = $id_value;
-							}
-						} else {
-							$model->{$def[1]} = $id_value;
-						}
+						$class = 'services\\'.$def[0];
+						$parser = new $class($this);
+						$parser->resourceToModelParse($model, $resource, $def[1], $res_attribute, $def[2], @$def[3], $related_objects);
 						break;
 					case DeclarativeModelService::TYPE_SIMPLEOBJECT:
-						if (is_object($resource->$res_attribute) && method_exists($resource->$res_attribute,'toModelValue')) {
-							$model->{$def[1]} = $resource->$res_attribute->toModelValue();
-						} else {
-							$data_class = 'services\\'.$def[2];
-							$model->{$def[1]} = is_null($resource->$res_attribute) ? null : $data_class::fromObject($resource->$res_attribute)->toModelValue();
-						}
+						$class = 'services\\'.$def[0];
+						$parser = new $class($this);
+						$parser->resourceToModelParse($model, $resource, $def[1], $res_attribute, $def[2], @$def[3], $related_objects);
 						break;
 					case DeclarativeModelService::TYPE_DATAOBJECT:
+						$class = 'services\\'.$def[0];
+						$parser = new $class($this);
+						$parser->resourceToModelParse($model, $resource, $def[1], $res_attribute, $def[2], @$def[3], $related_objects);
+						break;
 					case DeclarativeModelService::TYPE_DATAOBJECT_EXCLUSIVE:
-						if ($pos = strpos($def[1],'.')) {
-							$related_object_name = substr($def[1],0,$pos);
-							$related_object_attribute = substr($def[1],$pos+1,strlen($def[1]));
-
-							if (is_object($resource->$res_attribute)) {
-								$related_objects[$related_object_name][$related_object_attribute] = $this->resourceToModel($resource->$res_attribute, new $def[3], false);
-							} else {
-								$related_objects[$related_object_name][$related_object_attribute] = null;
-							}
-						} else {
-							throw new \Exception("Unhandled");
-						}
+						$class = 'services\\'.$def[0];
+						$parser = new $class($this);
+						$parser->resourceToModelParse($model, $resource, $def[1], $res_attribute, $def[2], @$def[3], $related_objects);
 						break;
 					case DeclarativeModelService::TYPE_CONDITION:
-						if ($resource->$res_attribute) {
-							if (!in_array($def[1], $conditional_values_set)) {
-								$model->{$def[1]} = $def[3];
-								$conditional_values_set[] = $def[1];
-							} else {
-								throw new \Exception("Unable to differentiate condition as more than one attribute is true.");
-							}
-						}
+						$class = 'services\\'.$def[0];
+						$parser = new $class($this);
+						$parser->resourceToModelParse($model, $resource, $def[1], $res_attribute, $def[2], @$def[3], $conditional_values_set);
 						break;
 					case DeclarativeModelService::TYPE_REF_LIST:
-						$model_assignment_relation = $def[1];
-						$model_assignment_field = $def[2];
-
-						$assignment_model = $model_relations[$model_assignment_relation][1];
-						$assignment_field = $model_relations[$model_assignment_relation][2];
-
-						$assignments = array();
-
-						foreach ($resource->$res_attribute as $ref) {
-							$assignment = new $assignment_model;
-							$assignment->$assignment_field = $resource->id;
-							$assignment->$model_assignment_field = $ref->getId();
-
-							$assignments[] = $assignment;
-						}
-
-						$model->$model_assignment_relation = $assignments;
+						$class = 'services\\'.$def[0];
+						$parser = new $class($this);
+						$parser->resourceToModelParse($model, $resource, $def[1], $res_attribute, $def[2], @$def[3], $related_objects);
 						break;
 					case DeclarativeModelService::TYPE_OR:
-						$rule = $this->map->getRuleForOrClause($model_class_name, $res_attribute);
-
-						switch ($rule[0]) {
-							case DeclarativeModelService::RULE_TYPE_ALLNULL:
-								$allnull = true;
-
-								foreach ($rule[1] as $attribute) {
-									if ($resource->$attribute !== null) {
-										$allnull = false;
-									}
-								}
-
-								$target = $allnull ? $rule['then'] : $rule['else'];
-
-								if ($pos = strpos($target,'.')) {
-									$related_object_name = substr($target,0,$pos);
-									$related_object_attribute = substr($target,$pos+1,strlen($target)+1);
-
-									$_related_object = $model->$related_object_name->$related_object_attribute;
-									$_related_object->{$def[1]} = $resource->$res_attribute;
-									$model->$related_object_name->$related_object_attribute = $_related_object;
-								} else {
-									$model->$target->{$def[1]} = $resource->$res_attribute;
-								}
-								break;
-							default:
-								throw new \Exception("Unknown rule type: {$rule[0]}");
-						}
+						$class = 'services\\'.$def[0];
+						$parser = new $class($this);
+						$parser->resourceToModelParse($model, $resource, $def[1], $res_attribute, $def[2], @$def[3], $related_objects);
 						break;
 					default:
 						throw new \Exception("Unknown declarative type: {$def[0]}");

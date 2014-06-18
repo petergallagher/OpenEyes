@@ -28,4 +28,20 @@ class DeclarativeTypeParser_DataObjectExclusive extends DeclarativeTypeParser
 			return is_null($data) ? null : new $data_class($data);
 		}
 	}
+
+	public function resourceToModelParse(&$model, $resource, $model_attribute, $res_attribute, $param1, $model_class, &$related_objects)
+	{
+		if ($pos = strpos($model_attribute,'.')) {
+			$related_object_name = substr($model_attribute,0,$pos);
+			$related_object_attribute = substr($model_attribute,$pos+1,strlen($model_attribute));
+
+			if (is_object($resource->$res_attribute)) {
+				$related_objects[$related_object_name][$related_object_attribute] = $this->mc->resourceToModel($resource->$res_attribute, new $model_class, false);
+			} else {
+				$related_objects[$related_object_name][$related_object_attribute] = null;
+			}
+		} else {
+			throw new \Exception("Unhandled");
+		}				
+	}
 }

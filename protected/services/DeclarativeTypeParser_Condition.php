@@ -27,4 +27,16 @@ class DeclarativeTypeParser_Condition extends DeclarativeTypeParser
 				throw new Exception("Unknown condition type: $condition_type");
 		}
 	}
+
+	public function resourceToModelParse(&$model, $resource, $model_attribute, $res_attribute, $param1, $model_class, &$conditional_values_set)
+	{
+		if ($resource->$res_attribute) {
+			if (!in_array($model_attribute, $conditional_values_set)) {
+				$model->{$model_attribute} = $model_class;
+				$conditional_values_set[] = $model_attribute;
+			} else {
+				throw new \Exception("Unable to differentiate condition as more than one attribute is true.");
+			}
+		}
+	}
 }

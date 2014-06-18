@@ -30,4 +30,19 @@ class DeclarativeTypeParser_List extends DeclarativeTypeParser
 
 		return $data_items;
 	}
+
+	public function resourceToModelParse(&$model, $resource, $model_attribute, $res_attribute, $param1, $model_class, &$related_objects)
+	{
+		if (($pos = strpos($model_attribute,'.')) !== FALSE) {
+			$related_object_name = substr($model_attribute,0,$pos);
+			$related_object_attribute = substr($model_attribute,$pos+1,strlen($model_attribute));
+		} else {
+			$related_object_name = $model_attribute;
+			$related_object_attribute = null;
+		}
+
+		foreach ($resource->$res_attribute as $item) {
+			$related_objects[$related_object_name][$related_object_attribute][] = $this->mc->resourceToModel($item, new $model_class, false);
+		}
+	}
 }

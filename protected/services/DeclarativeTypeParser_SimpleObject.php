@@ -28,4 +28,14 @@ class DeclarativeTypeParser_SimpleObject extends DeclarativeTypeParser
 			return is_null($data) ? null : new $data_class($data);
 		}
 	}
+
+	public function resourceToModelParse(&$model, $resource, $model_attribute, $res_attribute, $model_class, $param1, &$param2)
+	{
+		if (is_object($resource->$res_attribute) && method_exists($resource->$res_attribute,'toModelValue')) {
+			$model->$model_attribute = $resource->$res_attribute->toModelValue();
+		} else {
+			$data_class = 'services\\'.$model_class;
+			$model->$model_attribute = is_null($resource->$res_attribute) ? null : $data_class::fromObject($resource->$res_attribute)->toModelValue();
+		}
+	}
 }

@@ -25,4 +25,19 @@ class DeclarativeTypeParser_Reference extends DeclarativeTypeParser
 
 		return null;
 	}
+
+	public function resourceToModelParse(&$model, $resource, $model_attribute, $res_attribute, $model_class, $param1, &$param2)
+	{
+		if ($resource->$res_attribute) {
+			if (method_exists($resource->$res_attribute,'getId')) {
+				$id_value = $resource->$res_attribute->getId();
+			} else {
+				$id_value = $resource->$res_attribute->id;
+			}
+		} else {
+			$id_value = null;
+		}
+
+		$this->mc->setObjectAttribute($model, $model_attribute, $id_value);
+	}
 }

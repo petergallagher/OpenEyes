@@ -25,4 +25,27 @@ class DeclarativeTypeParser_Or extends DeclarativeTypeParser
 			}
 		}
 	}
+
+	public function resourceToModelParse(&$model, $resource, $model_attribute, $res_attribute, $model_class, $param1, &$param2)
+	{
+		$rule = $this->mc->map->getRuleForOrClause(get_class($model), $res_attribute);
+
+		switch ($rule[0]) {
+			case DeclarativeModelService::RULE_TYPE_ALLNULL:
+				$allnull = true;
+
+				foreach ($rule[1] as $attribute) {
+					if ($resource->$attribute !== null) {
+						$allnull = false;
+					}
+				}
+
+				$target = ($allnull ? $rule['then'] : $rule['else']) . '.' . $model_attribute;
+
+				$this->mc->setObjectAttribute($model, $target, $resource->$res_attribute);
+				break;
+			default:
+				throw new \Exception("Unknown rule type: {$rule[0]}");
+		}
+	}
 }
