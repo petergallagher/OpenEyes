@@ -45,4 +45,78 @@ class DeclarativeTypeParser_List extends DeclarativeTypeParser
 			$related_objects[$related_object_name][$related_object_attribute][] = $this->mc->resourceToModel($item, new $model_class, false);
 		}
 	}
+
+	public function resourceToModel_RelatedObjects(&$model, $model_attribute, $copy_attribute, $related_objects, $save)
+	{
+		if ($pos = strpos($model_attribute,'.')) {
+			$related_object_name = substr($model_attribute,0,$pos);
+			$related_object_attribute = substr($model_attribute,$pos+1,strlen($model_attribute));
+		} else {
+			$related_object_name = $model_attribute;
+			$related_object_attribute = null;
+		}
+
+		if (isset($copy_attribute)) {
+			// Set extra fields on list items (currently used to set Address.contact_id)
+			foreach ($related_objects[$related_object_name][$related_object_attribute] as $i => $item) {
+				if (is_array($copy_attribute)) {
+					foreach ($copy_attribute as $_key => $_value) {
+						$related_objects[$related_object_name][$related_object_attribute][$i]->$_key = $model->$_value;
+					}
+				} else {
+					$related_objects[$related_object_name][$related_object_attribute][$i]->{$copy_attribute} = $model->{$copy_attribute};
+				}
+			}
+		}
+
+		if ($related_object_attribute) {
+			$model->$related_object_name->$related_object_attribute = $this->filterListItems($model->$related_object_name, $related_object_attribute, $related_objects[$related_object_name][$related_object_attribute], $save);
+		} else {
+			$model->$related_object_name = $this->filterListItems($model->$related_object_name, $related_object_attribute, $related_objects[$related_object_name][$related_object_attribute], $save);
+		}
+	}
+
+	protected function filterListItems($object, $relation, $items, $save)
+	{
+		$items_to_keep = array();
+		$matched_ids = array();
+
+		$data = $relation ? $object->$relation : $object;
+
+		foreach ($items as $item) {
+			$found = false;
+
+			if ($data) {
+				foreach ($data as $current_item) {
+					$class_name = 'services\\'.get_class($current_item);
+					$current_item_res = $this->mc->modelToResource($current_item, new $class_name);
+					$new_item_res = $this->mc->modelToResource($item, new $class_name);
+
+					if ($current_item_res->isEqual($new_item_res)) {
+						$found = true;
+						$items_to_keep[] = $current_item;
+						$matched_ids[] = $current_item->id;
+					}
+				}
+			}
+
+			if (!$found) {
+				$items_to_keep[] = $item;
+
+				$save && $this->mc->saveModel($item);
+			}
+		}
+
+		if ($save) {
+			if ($object->$relation) {
+				foreach ($object->$relation as $current_item) {
+					if (!in_array($current_item->id,$matched_ids)) {
+						$this->mc->deleteModel($current_item);
+					}
+				}
+			}
+		}
+
+		return $items_to_keep;
+	}
 }

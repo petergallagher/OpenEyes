@@ -44,4 +44,23 @@ class DeclarativeTypeParser_DataObject extends DeclarativeTypeParser
 			throw new \Exception("Unhandled");
 		}
 	}
+
+	public function resourceToModel_RelatedObjects(&$model, $model_attribute, $copy_attribute, $related_objects, $save)
+	{
+		if ($pos = strpos($model_attribute,'.')) {
+			$related_object_name = substr($model_attribute,0,$pos);
+			$related_object_attribute = substr($model_attribute,$pos+1,strlen($model_attribute));
+
+			if ($related_objects[$related_object_name][$related_object_attribute] && isset($copy_attribute)) {
+				$related_objects[$related_object_name][$related_object_attribute]->{$copy_attribute} = $model->{$copy_attribute};
+			}
+		} else {
+			throw new \Exception("Unhandled");
+		}
+
+		if ($model->$related_object_name && $related_objects[$related_object_name][$related_object_attribute]) {
+			$model->$related_object_name->$related_object_attribute = $related_objects[$related_object_name][$related_object_attribute];
+			$save && $this->mc->saveModel($model->$related_object_name->$related_object_attribute);
+		}
+	}
 }

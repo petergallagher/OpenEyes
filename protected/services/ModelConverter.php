@@ -209,60 +209,10 @@ class ModelConverter
 
 		foreach ($this->map->getFieldsForClass($model_class_name) as $res_attribute => $def) {
 			if (is_array($def)) {
-				switch ($def[0]) {
-					case DeclarativeModelService::TYPE_LIST:
-						if ($pos = strpos($def[1],'.')) {
-							$related_object_name = substr($def[1],0,$pos);
-							$related_object_attribute = substr($def[1],$pos+1,strlen($def[1]));
-						} else {
-							$related_object_name = $def[1];
-							$related_object_attribute = null;
-						}
-
-						if (isset($def[4])) {
-							// Set extra fields on list items (currently used to set Address.contact_id)
-							foreach ($related_objects[$related_object_name][$related_object_attribute] as $i => $item) {
-								if (is_array($def[4])) {
-									foreach ($def[4] as $_key => $_value) {
-										$related_objects[$related_object_name][$related_object_attribute][$i]->$_key = $model->$_value;
-									}
-								} else {
-									$related_objects[$related_object_name][$related_object_attribute][$i]->{$def[4]} = $model->{$def[4]};
-								}
-							}
-						}
-
-						if ($related_object_attribute) {
-							$model->$related_object_name->$related_object_attribute = $this->filterListItems($model->$related_object_name, $related_object_attribute, $related_objects[$related_object_name][$related_object_attribute], $save);
-						} else {
-							$model->$related_object_name = $this->filterListItems($model->$related_object_name, $related_object_attribute, $related_objects[$related_object_name][$related_object_attribute], $save);
-						}
-						break;
-					case DeclarativeModelService::TYPE_DATAOBJECT:
-					case DeclarativeModelService::TYPE_DATAOBJECT_EXCLUSIVE:
-						if ($pos = strpos($def[1],'.')) {
-							$related_object_name = substr($def[1],0,$pos);
-							$related_object_attribute = substr($def[1],$pos+1,strlen($def[1]));
-
-							if ($related_objects[$related_object_name][$related_object_attribute] && isset($def[4])) {
-								$related_objects[$related_object_name][$related_object_attribute]->{$def[4]} = $model->{$def[4]};
-							}
-						} else {
-							throw new \Exception("Unhandled");
-						}
-
-						if ($save && $def[0] == DeclarativeModelService::TYPE_DATAOBJECT_EXCLUSIVE) {
-							if ($old_object = $model->$related_object_name->$related_object_attribute) {
-								$this->deleteModel($old_object);
-							}
-						}
-
-						if ($model->$related_object_name && $related_objects[$related_object_name][$related_object_attribute]) {
-							$model->$related_object_name->$related_object_attribute = $related_objects[$related_object_name][$related_object_attribute];
-							$save && $this->saveModel($model->$related_object_name->$related_object_attribute);
-						}
-
-						break;
+				$class = 'services\\'.$def[0];
+				$parser = new $class($this);
+				if (method_exists($parser,'resourceToModel_RelatedObjects')) {
+					$parser->resourceToModel_RelatedObjects($model, $def[1], $def[4], $related_objects, $save);
 				}
 			}
 		}
@@ -272,56 +222,12 @@ class ModelConverter
 		return $model;
 	}
 
-	protected function filterListItems($object, $relation, $items, $save)
-	{
-		$items_to_keep = array();
-		$matched_ids = array();
-
-		$data = $relation ? $object->$relation : $object;
-
-		foreach ($items as $item) {
-			$found = false;
-
-			if ($data) {
-				foreach ($data as $current_item) {
-					$class_name = 'services\\'.get_class($current_item);
-					$current_item_res = $this->modelToResource($current_item, new $class_name);
-					$new_item_res = $this->modelToResource($item, new $class_name);
-
-					if ($current_item_res->isEqual($new_item_res)) {
-						$found = true;
-						$items_to_keep[] = $current_item;
-						$matched_ids[] = $current_item->id;
-					}
-				}
-			}
-
-			if (!$found) {
-				$items_to_keep[] = $item;
-
-				$save && $this->saveModel($item);
-			}
-		}
-
-		if ($save) {
-			if ($object->$relation) {
-				foreach ($object->$relation as $current_item) {
-					if (!in_array($current_item->id,$matched_ids)) {
-						$this->deleteModel($current_item);
-					}
-				}
-			}
-		}
-
-		return $items_to_keep;
-	}
-
 	/*
 	 * Save model object and throw a service layer exception on failure
 	 *
 	 * @param BaseActiveRecord $model
 	 */
-	protected function saveModel(\BaseActiveRecord $model)
+	public function saveModel(\BaseActiveRecord $model)
 	{
 		if (!$model->save()) {
 			throw new ValidationFailure("Validation failure on " . get_class($model).": ".print_r($model->errors,true), $model->errors);
@@ -333,7 +239,7 @@ class ModelConverter
 	 *
 	 * @param BaseActiveRecord $model
 	 */
-	protected function deleteModel(\BaseActiveRecord $model)
+	public function deleteModel(\BaseActiveRecord $model)
 	{
 		if (!$model->delete()) {
 			throw new \Exception("Unable to delete: " . get_class($model), $model->errors);
