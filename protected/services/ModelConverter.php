@@ -41,69 +41,11 @@ class ModelConverter
 				$parser = new $class($this);
 				$resource->$res_attribute = $parser->modelToResourceParse($object, $def[1], $def[2], @$def[3]);
 			} else {
-				$resource->$res_attribute = $this->expandObjectAttribute($object, $def);
+				$resource->$res_attribute = DeclarativeTypeParser::expandObjectAttribute($object, $def);
 			}
 		}
 
 		return $resource;
-	}
-
-	public function expandObjectAttribute($object, $attributes)
-	{
-		if (!is_array($attributes)) {
-			$attributes = explode('.',$attributes);
-		}
-
-		$attribute = array_shift($attributes);
-
-		if (count($attributes) >0) {
-			if (!$object->$attribute) {
-				return false;
-			}
-
-			return $this->expandObjectAttribute($object->$attribute, $attributes);
-		}
-
-		return $object->$attribute;
-	}
-
-	public function setObjectAttribute(&$object, $attributes, $value, $force=true)
-	{
-		if (!is_array($attributes)) {
-			$attributes = explode('.',$attributes);
-		}
-
-		$attribute = array_shift($attributes);
-
-		if (count($attributes) >0) {
-			if (!$object->$attribute) {
-				return false;
-			}
-
-			return $this->setObjectAttribute($object->$attribute, $attributes, $value, $force);
-		}
-
-		if ($force || !$object->$attribute) {
-			$object->$attribute = $value;
-		}
-	}
-
-	public function setObjectAttributes(&$object, $attributes)
-	{
-		foreach ($attributes as $key => $value) {
-			$object->$key = $value;
-		}
-	}
-
-	public function attributesAllNull($object, $attributes)
-	{
-		foreach ($attributes as $attribute) {
-			if ($object->$attribute !== null) {
-				return false;
-			}
-		}
-
-		return true;
 	}
 
 	public function resourceToModel($resource, $model, $save=true, $extra_fields=false)
@@ -196,12 +138,12 @@ class ModelConverter
 			foreach ($related_object_def['rules'] as $rule) {
 				switch ($rule[0]) {
 					case DeclarativeModelService::RULE_TYPE_NULLIFNULL:
-						if ($this->attributesAllNull($resource, $rule[1])) {
+						if (DeclarativeTypeParser::attributesAllNull($resource, $rule[1])) {
 							$related_object_value = null;
 						}
 						break;
 					case DeclarativeModelService::RULE_TYPE_ATTRIBUTE_IFNULL:
-						if ($this->attributesAllNull($resource, $rule[1])) {
+						if (DeclarativeTypeParser::attributesAllNull($resource, $rule[1])) {
 							$attribute = $rule[2];
 						}
 						break;

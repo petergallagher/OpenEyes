@@ -19,7 +19,7 @@ class DeclarativeTypeParser_Reference extends DeclarativeTypeParser
 {
 	public function modelToResourceParse($object, $attribute, $data_class, $param=null)
 	{
-		if ($object_property = $this->mc->expandObjectAttribute($object, $attribute)) {
+		if ($object_property = DeclarativeTypeParser::expandObjectAttribute($object, $attribute)) {
 			return \Yii::app()->service->$data_class($object_property);
 		}
 

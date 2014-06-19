@@ -20,7 +20,7 @@ class DeclarativeTypeParser_Or extends DeclarativeTypeParser
 	public function modelToResourceParse($object, $relation, $or_fields, $ref_class=null)
 	{
 		foreach ($or_fields as $or_field) {
-			if ($or_value = $this->mc->expandObjectAttribute($object, $or_field)) {
+			if ($or_value = DeclarativeTypeParser::expandObjectAttribute($object, $or_field)) {
 				return $or_value->$relation;
 			}
 		}

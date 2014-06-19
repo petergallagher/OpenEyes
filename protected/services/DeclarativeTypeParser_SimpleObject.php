@@ -19,7 +19,7 @@ class DeclarativeTypeParser_SimpleObject extends DeclarativeTypeParser
 {
 	public function modelToResourceParse($object, $attribute, $data_class, $param=null)
 	{
-		$data = $this->mc->expandObjectAttribute($object, $attribute);
+		$data = DeclarativeTypeParser::expandObjectAttribute($object, $attribute);
 		$data_class = 'services\\'.$data_class;
 
 		if (is_object($data)) {

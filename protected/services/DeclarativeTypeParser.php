@@ -24,4 +24,66 @@ abstract class DeclarativeTypeParser
 	{
 		$this->mc = $mc;
 	}
+
+	static public function expandObjectAttribute(&$object, $attributes)
+	{
+		if (!is_array($attributes)) {
+			$attributes = explode('.',$attributes);
+		}
+
+		$attribute = array_shift($attributes);
+
+		if (count($attributes) >0) {
+			if (!$object->$attribute) {
+				return false;
+			}
+
+			return self::expandObjectAttribute($object->$attribute, $attributes);
+		}
+
+		return $object->$attribute;
+	}
+
+	static public function setObjectAttribute(&$object, $attributes, $value, $force=true)
+	{
+		if (!is_array($attributes)) {
+			$attributes = explode('.',$attributes);
+		}
+
+		$attribute = array_shift($attributes);
+
+		if (count($attributes) >0) {
+			if (!$object->$attribute) {
+				return false;
+			}
+
+			return self::setObjectAttribute($object->$attribute, $attributes, $value, $force);
+		}
+
+		if ($force || !$object->$attribute) {
+			$object->$attribute = $value;
+		}
+	}
+
+	static public function setObjectAttributes(&$object, $attributes)
+	{
+		foreach ($attributes as $key => $value) {
+			if (method_exists($object,'setAttribute')) {
+				$object->setAttribute($key,$value);
+			} else {
+				$object->$key = $value;
+			}
+		}
+	}
+
+	static public function attributesAllNull($object, $attributes)
+	{
+		foreach ($attributes as $attribute) {
+			if ($object->$attribute !== null) {
+				return false;
+			}
+		}
+
+		return true;
+	}
 }

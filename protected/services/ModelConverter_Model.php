@@ -104,59 +104,19 @@ class ModelConverter_Model
 		}
 	}
 
-	public function expandAttribute($attributes, &$object=null)
+	public function expandAttribute($attributes)
 	{
-		if (!is_array($attributes)) {
-			$attributes = explode('.',$attributes);
-		}
-
-		if (is_null($object)) {
-			$object = &$this->model;
-		}
-
-		$attribute = array_shift($attributes);
-
-		if (count($attributes) >0) {
-			if (!$object->$attribute) {
-				return false;
-			}
-
-			return $this->expandAttribute($attributes, $object->$attribute);
-		}
-
-		return $object->$attribute;
+		return DeclarativeTypeParser::expandObjectAttribute($this->model, $attributes);
 	}
 
-	public function setAttribute($attributes, $value, $force=true, &$object=null)
+	public function setAttribute($attributes, $value, $force=true)
 	{
-		if (!is_array($attributes)) {
-			$attributes = explode('.',$attributes);
-		}
-
-		if (is_null($object)) {
-			$object = &$this->model;
-		}
-
-		$attribute = array_shift($attributes);
-
-		if (count($attributes) >0) {
-			if (!$object->$attribute) {
-				return false;
-			}
-
-			return $this->setAttribute($attributes, $value, $force, $object->$attribute);
-		}
-
-		if ($force || !$object->$attribute) {
-			$object->$attribute = $value;
-		}
+		return DeclarativeTypeParser::setObjectAttribute($this->model, $attributes, $value, $force);
 	}
 
 	public function setAttributes($attributes)
 	{
-		foreach ($attributes as $key => $value) {
-			$this->setAttribute($key, $value);
-		}
+		return DeclarativeTypeParser::setObjectAttributes($this->model, $attributes);
 	}
 
 	public function addReferenceObjectAttribute($relation_name, $attribute, $value)

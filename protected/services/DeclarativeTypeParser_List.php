@@ -19,7 +19,7 @@ class DeclarativeTypeParser_List extends DeclarativeTypeParser
 {
 	public function modelToResourceParse($object, $attribute, $data_class, $param=null)
 	{
-		$data_list = $this->mc->expandObjectAttribute($object, $attribute);
+		$data_list = DeclarativeTypeParser::expandObjectAttribute($object, $attribute);
 		$_data_class = 'services\\'.$data_class;
 
 		$data_items = array();
