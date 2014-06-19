@@ -66,7 +66,7 @@ class ModelConverter_ModelWrapper
 	public function save()
 	{
 		if (!$this->model->save()) {
-			throw new ValidationFailure("Validation failure on " . $this->class.": ".print_r($this->model->errors,true), $this->model->errors);
+			throw new ValidationFailure("Validation failure on " . $this->getClass().": ".print_r($this->model->errors,true), $this->model->errors);
 		}
 	}
 
