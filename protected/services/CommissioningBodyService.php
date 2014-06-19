@@ -34,14 +34,11 @@ class CommissioningBodyService extends DeclarativeModelService
 			'related_objects' => array(
 				'contact' => array('contact_id', 'Contact'),
 			),
-			'reference_objects' => array(
-				'type' => array('commissioning_body_type_id', 'CommissioningBodyType', array('name')),
-			),
 			'fields' => array(
+				'type_ref' => array(self::TYPE_REF, 'commissioning_body_type_id', 'CommissioningBodyType'),
 				'code' => 'code',
 				'name' => 'name',
 				'address' => array(self::TYPE_DATAOBJECT_EXCLUSIVE, 'contact.address', 'Address', 'Address', 'contact_id'),
-				'type' => 'type.name',
 			),
 		),
 		'Address' => array(

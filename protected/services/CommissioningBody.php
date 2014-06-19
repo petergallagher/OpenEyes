@@ -20,7 +20,13 @@ class CommissioningBody extends Resource
 	static protected $fhir_type = 'Organization';
 	static protected $fhir_prefix = 'cb';
 
-	public $type;
+	static public function fromFhirValues(array $values)
+	{
+		$values['type_ref'] = \Yii::app()->service->CommissioningBodyType->getReferenceByShortName('CCG');
+		return parent::fromFhirValues($values);
+	}
+
+	public $type_ref;
 	public $code;
 	public $name;
 	public $address = null;
