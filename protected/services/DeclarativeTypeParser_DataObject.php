@@ -55,7 +55,7 @@ class DeclarativeTypeParser_DataObject extends DeclarativeTypeParser
 
 		if ($model->expandAttribute($related_object_name) && $model->getRelatedObject($related_object_name,$related_object_attribute)) {
 			$model->setAttribute($related_object_name.'.'.$related_object_attribute, $model->getRelatedObject($related_object_name,$related_object_attribute));
-			$save && $this->mc->saveModel($model->expandAttribute($model,$related_object_name.'.'.$related_object_attribute));
+			$save && $this->mc->saveModel($model->expandAttribute($related_object_name.'.'.$related_object_attribute));
 		}
 	}
 
