@@ -115,7 +115,7 @@ class ModelConverter
 		$model_relations = $model->relations();
 
 		if ($class_related_objects = $this->map->getRelatedObjectsForClass($model_class_name)) {
-			$this->createRelatedObjects($model, $resource, $class_related_objects);
+			$this->processRelatedObjects($model, $resource, $class_related_objects);
 		}
 
 		$related_objects = array();
@@ -168,7 +168,7 @@ class ModelConverter
 		}
 
 		if ($class_related_objects && $save) {
-			$this->saveRelatedObjects($model, $resource, $class_related_objects);
+			$this->processRelatedObjects($model, $resource, $class_related_objects, true);
 		}
 
 		foreach ($this->map->getFieldsForClass($model_class_name) as $res_attribute => $def) {
@@ -186,7 +186,7 @@ class ModelConverter
 		return $model;
 	}
 
-	protected function createRelatedObjects(&$model, $resource, $class_related_objects)
+	protected function processRelatedObjects(&$model, $resource, $class_related_objects, $save=false)
 	{
 		foreach ($class_related_objects as $relation_name => $def) {
 			$class_name = '\\'.$def[1];
@@ -200,23 +200,8 @@ class ModelConverter
 			}
 
 			$this->setObjectAttribute($model, $object_relation, $related_object_value, false);
-		}
-	}
 
-	protected function saveRelatedObjects(&$model, $resource, $class_related_objects)
-	{
-		foreach ($class_related_objects as $relation_name => $def) {
-			$class_name = '\\'.$def[1];
-
-			list($attribute, $related_object_value) = $this->processRelatedObjectRules($def, $resource);
-
-			if ($pos = strpos($attribute,'.')) {
-				$object_relation = substr($attribute,0,$pos).'.'.$relation_name;
-			} else {
-				$object_relation = $relation_name;
-			}
-
-			if ($related_object = $this->expandObjectAttribute($model, $object_relation)) {
+			if ($save && $related_object = $this->expandObjectAttribute($model, $object_relation)) {
 				$this->saveModel($related_object);
 
 				$this->setObjectAttribute($model, $attribute, $related_object->id);
