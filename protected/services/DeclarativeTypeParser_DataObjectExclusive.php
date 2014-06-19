@@ -66,6 +66,6 @@ class DeclarativeTypeParser_DataObjectExclusive extends DeclarativeTypeParser
 	{
 		$data_class = 'services\\'.$data_class;
 
-		return $object->$attribute : $data_class::fromObject($object->$attribute) : null;
+		return $object->$attribute ? $data_class::fromObject($object->$attribute) : null;
 	}
 }
