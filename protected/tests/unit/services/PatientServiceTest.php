@@ -24,6 +24,7 @@ class PatientServiceTest extends \CDbTestCase
 		'countries' => 'Country',
 		'practices' => 'Practice',
 		'gps' => 'Gp',
+		'cbs' => 'CommissioningBody',
 	);
 
 	public function testModelToResource()
