@@ -50,7 +50,7 @@ class PatientServiceTest extends \CDbTestCase
 		$this->assertEquals('Jim',$resource->given_name);
 		$this->assertInstanceOf('services\GenderReference', $resource->gender_ref);
 		$this->assertEquals('Male',$resource->getGender());
-		$this->assertEquals('1970-01-01',$resource->birth_date);
+		$this->assertEquals('1970-01-01',$resource->birth_date->toModelValue());
 		$this->assertEquals('07123 456789',$resource->primary_phone);
 
 		$this->assertCount(1, $resource->addresses);
@@ -101,7 +101,7 @@ class PatientServiceTest extends \CDbTestCase
 		$resource->family_name = 'Krinkle';
 		$resource->given_name = 'Henry';
 		$resource->gender_ref = $gender;
-		$resource->birth_date = '1994-04-23';
+		$resource->birth_date = new Date('1994-04-23');
 		$resource->primary_phone = '02332 3241959';
 		$resource->addresses = array($address);
 		$resource->gp_ref = \Yii::app()->service->Gp(1);
@@ -256,7 +256,7 @@ class PatientServiceTest extends \CDbTestCase
 		$resource->family_name = 'x0003';
 		$resource->given_name = 'x0004';
 		$resource->gender_ref = \Yii::app()->service->Gender(\Gender::model()->find('name=?',array('Female'))->id);
-		$resource->birth_date = '1988-04-04';
+		$resource->birth_date = new Date('1988-04-04');
 		$resource->primary_phone = '0101010101';
 		$resource->gp_ref = \Yii::app()->service->Gp(1);
 		$resource->prac_ref = \Yii::app()->service->Practice(1);
@@ -329,7 +329,7 @@ class PatientServiceTest extends \CDbTestCase
 
 	public function testJsonToResource()
 	{
-		$json = '{"nhs_num":"54321","hos_num":"12345","title":"Mr","family_name":"Aylward","given_name":"Jim","gender_ref":{"service":"Gender","id":1},"birth_date":"1970-01-01","date_of_death":null,"primary_phone":"07123 456789","addresses":[{"date_start":{"date":"2014-06-06 16:39:29","timezone_type":3,"timezone":"Europe\/London"},"date_end":{"date":"2014-06-06 16:39:29","timezone_type":3,"timezone":"Europe\/London"},"correspond":false,"transport":false,"use":null,"line1":"flat 1","line2":"bleakley creek","city":"flitchley","state":"london","zip":"ec1v 0dx","country":"United States"}],"care_providers":[],"gp_ref":{"service":"Gp","id":2},"prac_ref":{"service":"Practice","id":5},"cb_refs":[]}';
+		$json = '{"nhs_num":"54321","hos_num":"12345","title":"Mr","family_name":"Aylward","given_name":"Jim","gender_ref":{"service":"Gender","id":1},"birth_date":{"date":"1970-01-01","timezone_type":3,"timezone":"Europe\/London"},"date_of_death":null,"primary_phone":"07123 456789","addresses":[{"date_start":{"date":"2014-06-06 16:39:29","timezone_type":3,"timezone":"Europe\/London"},"date_end":{"date":"2014-06-06 16:39:29","timezone_type":3,"timezone":"Europe\/London"},"correspond":false,"transport":false,"use":null,"line1":"flat 1","line2":"bleakley creek","city":"flitchley","state":"london","zip":"ec1v 0dx","country":"United States"}],"care_providers":[],"gp_ref":{"service":"Gp","id":2},"prac_ref":{"service":"Practice","id":5},"cb_refs":[]}';
 
 		$ps = new PatientService;
 		$resource = $ps->jsonToResource($json);
