@@ -144,4 +144,203 @@ class DeclarativeTypeParser_DataObjectTest extends \CDbTestCase
 		$p = new DeclarativeTypeParser_DataObject($a);
 		$p->resourceToModelParse($a, null, 'one', 'sticks', null, 'Address');
 	}
+
+	public function testResourceToModel_RelatedObjects_CopyAttribute()
+	{
+		$model = $this->getMockBuilder('services\ModelConverter_ModelWrapper')
+			->disableOriginalConstructor()
+			->setMethods(array('relatedObjectCopyAttributeFromModel','expandAttribute'))
+			->getMock();
+
+		$model->expects($this->once())
+			->method('relatedObjectCopyAttributeFromModel')
+			->with('bodger','badger','away');
+
+		$p = new DeclarativeTypeParser_DataObject($model);
+		$p->resourceToModel_RelatedObjects($model, 'bodger.badger', 'away', null);
+	}
+
+	public function testResourceToModel_RelatedObjects_NoCopyAttribute()
+	{
+		$model = $this->getMockBuilder('services\ModelConverter_ModelWrapper')
+			->disableOriginalConstructor()
+			->setMethods(array('relatedObjectCopyAttributeFromModel','expandAttribute'))
+			->getMock();
+
+		$model->expects($this->never())
+			->method('relatedObjectCopyAttributeFromModel');
+
+		$p = new DeclarativeTypeParser_DataObject($model);
+		$p->resourceToModel_RelatedObjects($model, 'bodger.badger', false, null);
+	}
+
+	public function testResourceToModel_RelatedObjects_UnhandledAttributeType()
+	{
+		$a = 1;
+		$this->setExpectedException('Exception','Unhandled');
+		$p = new DeclarativeTypeParser_DataObject($a);
+		$p->resourceToModel_RelatedObjects($a, 'bodger', false, null);
+	}
+
+	public function testResourceToModel_RelatedObjects_False_True_NoSetAttribute()
+	{
+		$model = $this->getMockBuilder('services\ModelConverter_ModelWrapper')
+			->disableOriginalConstructor()
+			->setMethods(array('relatedObjectCopyAttributeFromModel', 'expandAttribute', 'getRelatedObject', 'setAttribute'))
+			->getMock();
+
+		$model->expects($this->once())
+			->method('expandAttribute')
+			->with('bodger')
+			->will($this->returnValue(false));
+
+		$model->expects($this->any())
+			->method('getRelatedObject')
+			->with('bodger','badger')
+			->will($this->returnValue(true));
+
+		$model->expects($this->never()) 
+			->method('setAttribute');
+
+		$mc = $this->getMockBuilder('services\ModelConverter')
+			->disableOriginalConstructor()
+			->setMethods(array('expandObjectAttribute','modelToResource'))
+			->getMock();
+
+		$mc->expects($this->never())
+			->method('saveModel');
+
+		$p = new DeclarativeTypeParser_DataObject($mc);
+		$p->resourceToModel_RelatedObjects($model, 'bodger.badger', 'away', null);
+	}
+
+	public function testResourceToModel_RelatedObjects_True_False_NoSetAttribute()
+	{
+		$model = $this->getMockBuilder('services\ModelConverter_ModelWrapper')
+			->disableOriginalConstructor()
+			->setMethods(array('relatedObjectCopyAttributeFromModel', 'expandAttribute', 'getRelatedObject', 'setAttribute'))
+			->getMock();
+
+		$model->expects($this->once())
+			->method('expandAttribute')
+			->with('bodger')
+			->will($this->returnValue(true));
+
+		$model->expects($this->once())
+			->method('getRelatedObject')
+			->with('bodger','badger')
+			->will($this->returnValue(false));
+
+		$model->expects($this->never())
+			->method('setAttribute');
+
+		$mc = $this->getMockBuilder('services\ModelConverter')
+			->disableOriginalConstructor()
+			->setMethods(array('expandObjectAttribute','modelToResource'))
+			->getMock();
+
+		$mc->expects($this->never())
+			->method('saveModel');
+
+		$p = new DeclarativeTypeParser_DataObject($mc);
+		$p->resourceToModel_RelatedObjects($model, 'bodger.badger', 'away', null);
+	}
+
+	public function testResourceToModel_RelatedObjects_BothTrue_SetAttribute()
+	{
+		$model = $this->getMockBuilder('services\ModelConverter_ModelWrapper')
+			->disableOriginalConstructor()
+			->setMethods(array('relatedObjectCopyAttributeFromModel', 'expandAttribute', 'getRelatedObject', 'setAttribute'))
+			->getMock();
+
+		$model->expects($this->once())
+			->method('expandAttribute')
+			->with('bodger')
+			->will($this->returnValue(true));
+
+		$model->expects($this->exactly(2))
+			->method('getRelatedObject')
+			->with('bodger','badger')
+			->will($this->returnValue('never far away'));
+
+		$model->expects($this->once()) 
+			->method('setAttribute')
+			->with('bodger.badger','never far away');
+
+		$mc = $this->getMockBuilder('services\ModelConverter')
+			->disableOriginalConstructor()
+			->setMethods(array('expandObjectAttribute','modelToResource'))
+			->getMock();
+
+		$mc->expects($this->never())
+			->method('saveModel');
+
+		$p = new DeclarativeTypeParser_DataObject($mc);
+		$p->resourceToModel_RelatedObjects($model, 'bodger.badger', 'away', null);
+	}
+
+	public function testResourceToModel_RelatedObjects_BothTrue_Save()
+	{
+		$model = $this->getMockBuilder('services\ModelConverter_ModelWrapper')
+			->disableOriginalConstructor()
+			->setMethods(array('relatedObjectCopyAttributeFromModel', 'expandAttribute', 'getRelatedObject', 'setAttribute'))
+			->getMock();
+
+		$model->expects($this->any())
+			->method('expandAttribute')
+			->will($this->returnValue(new \Address));
+
+		$model->expects($this->exactly(2))
+			->method('getRelatedObject')
+			->with('bodger','badger')
+			->will($this->returnValue('never far away'));
+
+		$model->expects($this->once())
+			->method('setAttribute')
+			->with('bodger.badger','never far away');
+
+		$mc = $this->getMockBuilder('services\ModelConverter')
+			->disableOriginalConstructor()
+			->setMethods(array('expandObjectAttribute','modelToResource','saveModel'))
+			->getMock();
+
+		$mc->expects($this->once())
+			->method('saveModel')
+			->with(new \Address);
+
+		$p = new DeclarativeTypeParser_DataObject($mc);
+		$p->resourceToModel_RelatedObjects($model, 'bodger.badger', 'away', true);
+	}
+
+	public function testJsonToResourceParse_HasData()
+	{
+		$a = 1;
+		$p = new DeclarativeTypeParser_DataObject($a);
+
+		$obj = (object)array(
+			'one' => 'two'
+		);
+
+		$this->assertEquals('three', $p->jsonToResourceParse($obj, 'one', 'testJsonToResourceParse_HasData_DataClass', null));
+	}
+
+	public function testJsonToResourceParse_HasNoData()
+	{
+		$a = 1;
+		$p = new DeclarativeTypeParser_DataObject($a);
+
+		$obj = (object)array(
+			'one' => null
+		);
+
+		$this->assertNull($p->jsonToResourceParse($obj, 'one', 'test', 'test'));
+	}
+}
+
+class testJsonToResourceParse_HasData_DataClass
+{
+	static public function fromObject($param)
+	{
+		return 'three';
+	}
 }
