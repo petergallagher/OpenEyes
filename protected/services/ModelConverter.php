@@ -60,7 +60,7 @@ class ModelConverter
 				$parser = new $class($this);
 				$parser->resourceToModelParse($model, $resource, $def[1], $res_attribute, $def[2], @$def[3]);
 			} else {
-				$this->mapResourceAttributeToModel($model, $resource->$res_attribute, $def, $model->getRelatedObjectDefinitions(), $save);
+				$this->mapResourceAttributeToModel($model, $resource->$res_attribute, $def, $save);
 			}
 		}
 
@@ -81,12 +81,12 @@ class ModelConverter
 		return $model->getModel();
 	}
 
-	protected function mapResourceAttributeToModel(&$model, $resource_value, $attribute_def, $class_related_objects, $save)
+	protected function mapResourceAttributeToModel(&$model, $resource_value, $attribute_def, $save)
 	{
 		if ((strpos($attribute_def,'.')) !== FALSE) {
 			list($relation_name, $related_object_attribute) = explode('.',$attribute_def);
 
-			if (!isset($class_related_objects[$relation_name])) {
+			if (!$model->isRelatedObject($relation_name)) {
 				return $this->mapResourceReferenceObjectToModel($model, $relation_name, $related_object_attribute, $resource_value, $save);
 			}
 		}

@@ -58,6 +58,11 @@ class ModelConverter_Model
 		return $this->related_object_definitions ? $this->related_object_definitions : array();
 	}
 
+	public function isRelatedObject($relation_name)
+	{
+		return isset($this->related_object_definitions[$relation_name]);
+	}
+
 	public function save()
 	{
 		if (!$this->model->save()) {
