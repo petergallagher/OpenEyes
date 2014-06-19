@@ -127,6 +127,12 @@ class DataObjectTest extends \CDbTestCase
 		$this->assertCount(1,$data->addresses);
 		$this->assertEquals('BLAH',$data->addresses[0]->line2);
 	}
+
+	public function testToFhirValues_EmptyStringsRemoved()
+	{
+		$obj = new DataObjectTest_Obj2(array('baz' => ''));
+		$this->assertEmpty($obj->toFhirValues());
+	}
 }
 
 abstract class DataObjectTest_BaseObj extends DataObject
