@@ -199,12 +199,12 @@ class ModelConverter
 				$object_relation = $relation_name;
 			}
 
-			$this->setObjectAttribute($model, $object_relation, $related_object_value, false);
-
 			if ($save && $related_object = $this->expandObjectAttribute($model, $object_relation)) {
 				$this->saveModel($related_object);
 
 				$this->setObjectAttribute($model, $attribute, $related_object->id);
+			} else {
+				$this->setObjectAttribute($model, $object_relation, $related_object_value, false);
 			}
 		}
 	}
