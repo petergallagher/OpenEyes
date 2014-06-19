@@ -31,47 +31,32 @@ class DeclarativeTypeParser_List extends DeclarativeTypeParser
 		return $data_items;
 	}
 
-	public function resourceToModelParse(&$model, $resource, $model_attribute, $res_attribute, $param1, $model_class, &$related_objects)
+	public function resourceToModelParse(&$model, $resource, $model_attribute, $res_attribute, $param1, $model_class)
 	{
-		if (($pos = strpos($model_attribute,'.')) !== FALSE) {
-			$related_object_name = substr($model_attribute,0,$pos);
-			$related_object_attribute = substr($model_attribute,$pos+1,strlen($model_attribute));
+		if ((strpos($model_attribute,'.')) !== FALSE) {
+			list($related_object_name, $related_object_attribute) = explode('.',$model_attribute);
 		} else {
-			$related_object_name = $model_attribute;
-			$related_object_attribute = null;
+			list($related_object_name, $related_object_attribute) = array($model_attribute,null);
 		}
 
 		foreach ($resource->$res_attribute as $item) {
-			$related_objects[$related_object_name][$related_object_attribute][] = $this->mc->resourceToModel($item, new $model_class, false);
+			$model->addToRelatedObjectArray($related_object_name,$related_object_attribute,$this->mc->resourceToModel($item, new $model_class, false));
 		}
 	}
 
-	public function resourceToModel_RelatedObjects(&$model, $model_attribute, $copy_attribute, $related_objects, $save)
+	public function resourceToModel_RelatedObjects(&$model, $model_attribute, $copy_attribute, $save)
 	{
-		if ($pos = strpos($model_attribute,'.')) {
-			$related_object_name = substr($model_attribute,0,$pos);
-			$related_object_attribute = substr($model_attribute,$pos+1,strlen($model_attribute));
+		if ((strpos($model_attribute,'.')) !== FALSE) {
+			list($related_object_name, $related_object_attribute) = explode('.',$model_attribute);
 		} else {
-			$related_object_name = $model_attribute;
-			$related_object_attribute = null;
+			list($related_object_name, $related_object_attribute) = array($model_attribute,null);
 		}
 
-		if (isset($copy_attribute)) {
-			// Set extra fields on list items (currently used to set Address.contact_id)
-			foreach ($related_objects[$related_object_name][$related_object_attribute] as $i => $item) {
-				if (is_array($copy_attribute)) {
-					foreach ($copy_attribute as $_key => $_value) {
-						$related_objects[$related_object_name][$related_object_attribute][$i]->$_key = $model->expandAttribute($_value);
-					}
-				} else {
-					$related_objects[$related_object_name][$related_object_attribute][$i]->{$copy_attribute} = $model->expandAttribute($copy_attribute);
-				}
-			}
-		}
+		$copy_attribute && $model->relatedObjectCopyAttributeFromModel($related_object_name,$related_object_attribute,$copy_attribute);
 
 		$attribute = $related_object_attribute ? $related_object_name.'.'.$related_object_attribute : $related_object_name;
 
-		$model->setAttribute($attribute, $this->filterListItems($model->expandAttribute($related_object_name), $related_object_attribute, $related_objects[$related_object_name][$related_object_attribute], $save));
+		$model->setAttribute($attribute, $this->filterListItems($model->expandAttribute($related_object_name), $related_object_attribute, $model->getRelatedObject($related_object_name,$related_object_attribute), $save));
 	}
 
 	protected function filterListItems($object, $relation, $items, $save)

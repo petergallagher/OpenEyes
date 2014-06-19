@@ -26,7 +26,7 @@ class DeclarativeTypeParser_Reference extends DeclarativeTypeParser
 		return null;
 	}
 
-	public function resourceToModelParse(&$model, $resource, $model_attribute, $res_attribute, $model_class, $param1, &$param2)
+	public function resourceToModelParse(&$model, $resource, $model_attribute, $res_attribute, $model_class, $param1)
 	{
 		if ($resource->$res_attribute) {
 			if (method_exists($resource->$res_attribute,'getId')) {

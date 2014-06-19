@@ -108,36 +108,28 @@ class ModelConverter
 
 	public function resourceToModel($resource, $model, $save=true, $extra_fields=false)
 	{
-		$model = new ModelConverter_Model($model, $extra_fields);
+		$model = new ModelConverter_Model($this->map, $model, $extra_fields);
 
-		if ($class_related_objects = $this->map->getRelatedObjectsForClass($model->getClass())) {
-			$this->processRelatedObjects($model, $resource, $class_related_objects);
-		}
-
-		$related_objects = array();
-		$reference_object_attributes = array();
-		$this->conditional_values_set = array();
+		$this->processRelatedObjects($model, $resource);
 
 		foreach ($this->map->getFieldsForClass($model->getClass()) as $res_attribute => $def) {
 			if (is_array($def)) {
 				$class = 'services\\'.$def[0];
 				$parser = new $class($this);
-				$parser->resourceToModelParse($model, $resource, $def[1], $res_attribute, $def[2], @$def[3], $related_objects);
+				$parser->resourceToModelParse($model, $resource, $def[1], $res_attribute, $def[2], @$def[3]);
 			} else {
-				$this->mapResourceAttributeToModel($model, $resource->$res_attribute, $def, $class_related_objects);
+				$this->mapResourceAttributeToModel($model, $resource->$res_attribute, $def, $model->getRelatedObjectDefinitions());
 			}
 		}
 
-		if ($class_related_objects && $save) {
-			$this->processRelatedObjects($model, $resource, $class_related_objects, true);
-		}
+		$save && $this->processRelatedObjects($model, $resource, true);
 
 		foreach ($this->map->getFieldsForClass($model->getClass()) as $res_attribute => $def) {
 			if (is_array($def)) {
 				$class = 'services\\'.$def[0];
 				$parser = new $class($this);
 				if (method_exists($parser,'resourceToModel_RelatedObjects')) {
-					$parser->resourceToModel_RelatedObjects($model, $def[1], $def[4], $related_objects, $save);
+					$parser->resourceToModel_RelatedObjects($model, $def[1], $def[4], $save);
 				}
 			}
 		}
@@ -189,9 +181,9 @@ class ModelConverter
 		}
 	}
 
-	protected function processRelatedObjects(&$model, $resource, $class_related_objects, $save=false)
+	protected function processRelatedObjects(&$model, $resource, $save=false)
 	{
-		foreach ($class_related_objects as $relation_name => $def) {
+		foreach ($model->getRelatedObjectDefinitions() as $relation_name => $def) {
 			$class_name = '\\'.$def[1];
 
 			list($attribute, $related_object_value) = $this->processRelatedObjectRules($def, $resource);

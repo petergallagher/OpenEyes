@@ -17,13 +17,20 @@ namespace services;
 
 class ModelConverter_Model
 {
+	protected $map;
 	protected $model;
+	protected $related_objects = array();
+	protected $reference_object_attributes = array();
+	protected $conditional_attributes = array();
 
-	public function __construct($model, $extra_fields=null)
+	public function __construct($map, $model, $extra_fields=null)
 	{
+		$this->map = $map;
 		$this->model = $model;
 
 		is_array($extra_fields) && $this->setAttributes($extra_fields);
+
+		$this->related_object_definitions = $this->map->getRelatedObjectsForClass($this->getClass());
 	}
 
 	public function getClass()
@@ -41,10 +48,59 @@ class ModelConverter_Model
 		return $this->model;
 	}
 
+	public function getRelatedObjectDefinitions()
+	{
+		return $this->related_object_definitions ? $this->related_object_definitions : array();
+	}
+
 	public function save()
 	{
 		if (!$this->model->save()) {
 			throw new ValidationFailure("Validation failure on " . $this->class.": ".print_r($this->model->errors,true), $this->model->errors);
+		}
+	}
+
+	public function hasConditionalAttribute($attribute)
+	{
+		return in_array($attribute, $this->conditional_attributes);
+	}
+
+	public function addConditionalAttribute($attribute)
+	{
+		$this->conditional_attributes[] = $attribute;
+	}
+
+	public function setRelatedObject($related_object_one, $related_object_two, $value)
+	{
+		$this->related_objects[$related_object_one][$related_object_two] = $value;
+	}
+
+	public function getRelatedObject($related_object_one, $related_object_two)
+	{
+		return $this->related_objects[$related_object_one][$related_object_two];
+	}
+
+	public function addToRelatedObjectArray($related_object_one, $related_object_two, $item)
+	{
+		$this->related_objects[$related_object_one][$related_object_two][] = $item;
+	}
+
+	public function relatedObjectCopyAttributeFromModel($related_object_one, $related_object_two, $attribute)
+	{
+		if ($this->related_objects[$related_object_one][$related_object_two]) {
+			if (is_array($this->related_objects[$related_object_one][$related_object_two])) {
+				foreach ($this->related_objects[$related_object_one][$related_object_two] as $i => $item) {
+					if (is_array($attribute)) {
+						foreach ($attribute as $key => $value) {
+							$this->related_objects[$related_object_one][$related_object_two][$i]->$key= $this->expandAttribute($value);
+						}
+					} else {
+						$this->related_objects[$related_object_one][$related_object_two][$i]->$attribute = $this->expandAttribute($attribute);
+					}
+				}
+			} else {
+				$this->related_objects[$related_object_one][$related_object_two]->$attribute = $this->expandAttribute($attribute);
+			}
 		}
 	}
 

@@ -29,31 +29,23 @@ class DeclarativeTypeParser_DataObjectExclusive extends DeclarativeTypeParser
 		}
 	}
 
-	public function resourceToModelParse(&$model, $resource, $model_attribute, $res_attribute, $param1, $model_class, &$related_objects)
+	public function resourceToModelParse(&$model, $resource, $model_attribute, $res_attribute, $param1, $model_class)
 	{
-		if ($pos = strpos($model_attribute,'.')) {
-			$related_object_name = substr($model_attribute,0,$pos);
-			$related_object_attribute = substr($model_attribute,$pos+1,strlen($model_attribute));
+		if (strpos($model_attribute,'.')) {
+			list($related_object_name,$related_object_attribute) = explode('.',$model_attribute);
 
-			if (is_object($resource->$res_attribute)) {
-				$related_objects[$related_object_name][$related_object_attribute] = $this->mc->resourceToModel($resource->$res_attribute, new $model_class, false);
-			} else {
-				$related_objects[$related_object_name][$related_object_attribute] = null;
-			}
+			$model->setRelatedObject($related_object_name, $related_object_attribute, is_object($resource->$res_attribute) ? $this->mc->resourceToModel($resource->$res_attribute, new $model_class, false) : null);
 		} else {
 			throw new \Exception("Unhandled");
 		}				
 	}
 
-	public function resourceToModel_RelatedObjects(&$model, $model_attribute, $copy_attribute, $related_objects, $save)
+	public function resourceToModel_RelatedObjects(&$model, $model_attribute, $copy_attribute, $save)
 	{
-		if ($pos = strpos($model_attribute,'.')) {
-			$related_object_name = substr($model_attribute,0,$pos);
-			$related_object_attribute = substr($model_attribute,$pos+1,strlen($model_attribute));
+		if (strpos($model_attribute,'.')) {
+			list($related_object_name,$related_object_attribute) = explode('.',$model_attribute);
 
-			if ($related_objects[$related_object_name][$related_object_attribute] && isset($copy_attribute)) {
-				$related_objects[$related_object_name][$related_object_attribute]->{$copy_attribute} = $model->expandAttribute($copy_attribute);
-			}
+			$copy_attribute && $model->relatedObjectCopyAttributeFromModel($related_object_name, $related_object_attribute, $copy_attribute);
 		} else {
 			throw new \Exception("Unhandled");
 		}
@@ -64,8 +56,8 @@ class DeclarativeTypeParser_DataObjectExclusive extends DeclarativeTypeParser
 			}
 		}
 
-		if ($model->expandAttribute($related_object_name) && $related_objects[$related_object_name][$related_object_attribute]) {
-			$model->setAttribute($related_object_name.'.'.$related_object_attribute, $related_objects[$related_object_name][$related_object_attribute]);
+		if ($model->expandAttribute($related_object_name) && $model->getRelatedObject($related_object_name,$related_object_attribute)) {
+			$model->setAttribute($related_object_name.'.'.$related_object_attribute, $model->getRelatedObject($related_object_name,$related_object_attribute));
 			$save && $this->mc->saveModel($model->expandAttribute($related_object_name.'.'.$related_object_attribute));
 		}
 	}

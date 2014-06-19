@@ -23,7 +23,7 @@ class DeclarativeTypeParser_Resource extends DeclarativeTypeParser
 		return $this->mc->modelToResource($object->$attribute, new $resource_class(array('id' => $object->$attribute->id, 'last_modified' => strtotime($object->$attribute->last_modified_date))));
 	}
 
-	public function resourceToModelParse(&$model, $resource, $model_attribute, $res_attribute, $model_class, $param1, &$param2)
+	public function resourceToModelParse(&$model, $resource, $model_attribute, $res_attribute, $model_class, $param1)
 	{
 		$_model_class_name = '\\'.$model_class;
 

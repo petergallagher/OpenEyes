@@ -18,7 +18,7 @@ namespace services;
 abstract class DeclarativeTypeParser
 {
 	abstract public function modelToResourceParse($object, $attribute, $data_class, $param=null);
-	abstract public function resourceToModelParse(&$model, $resource, $model_attribute, $res_attribute, $model_class, $param1, &$param2);
+	abstract public function resourceToModelParse(&$model, $resource, $model_attribute, $res_attribute, $model_class, $param1);
 
 	public function __construct(&$mc)
 	{
