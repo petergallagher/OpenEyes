@@ -128,10 +128,10 @@ class DataObjectTest extends \CDbTestCase
 		$this->assertEquals('BLAH',$data->addresses[0]->line2);
 	}
 
-	public function testToFhirValues_EmptyStringsRemoved()
+	public function testToFhirValues_EmptyStringsNulled()
 	{
 		$obj = new DataObjectTest_Obj2(array('baz' => ''));
-		$this->assertEmpty($obj->toFhirValues());
+		$this->assertEquals(array('baz' => null), $obj->toFhirValues());
 	}
 }
 
