@@ -111,10 +111,9 @@ class ModelConverter
 		is_array($extra_fields) &&
 			$this->setObjectAttributes($model, $extra_fields);
 
-		$model_class_name = get_class($model);
 		$model_relations = $model->relations();
 
-		if ($class_related_objects = $this->map->getRelatedObjectsForClass($model_class_name)) {
+		if ($class_related_objects = $this->map->getRelatedObjectsForClass(get_class($model))) {
 			$this->processRelatedObjects($model, $resource, $class_related_objects);
 		}
 
@@ -122,48 +121,13 @@ class ModelConverter
 		$reference_object_attributes = array();
 		$this->conditional_values_set = array();
 
-		foreach ($this->map->getFieldsForClass($model_class_name) as $res_attribute => $def) {
+		foreach ($this->map->getFieldsForClass(get_class($model)) as $res_attribute => $def) {
 			if (is_array($def)) {
 				$class = 'services\\'.$def[0];
 				$parser = new $class($this);
 				$parser->resourceToModelParse($model, $resource, $def[1], $res_attribute, $def[2], @$def[3], $related_objects);
 			} else {
-				if (($pos = strpos($def,'.')) !== FALSE) {
-					$relation_name = substr($def,0,$pos);
-					$related_object_attribute = substr($def,$pos+1,strlen($def));
-
-					if (isset($class_related_objects[$relation_name])) {
-						$this->setObjectAttribute($model, $relation_name.'.'.$related_object_attribute, $resource->$res_attribute);
-					} else {
-						$reference_object_attributes[$relation_name][$related_object_attribute] = $resource->$res_attribute;
-
-						$reference_def = $this->map->getReferenceObjectForClass($model_class_name, $relation_name);
-
-						if (array_keys($reference_object_attributes[$relation_name]) == $reference_def[2]) {
-							// All required properties for matching the reference item have been set, so now we can associate it with the model
-							$criteria = new \CDbCriteria;
-
-							foreach ($reference_object_attributes[$relation_name] as $key => $value) {
-								$criteria->compare($key, $value);
-							}
-
-							$related_object_class = '\\'.$reference_def[1];
-
-							if (!$related_object = $related_object_class::model()->find($criteria)) {
-								$related_object = new $related_object_class;
-
-								$this->setObjectAttributes($related_object, $reference_object_attributes[$relation_name]);
-
-								$save && $this->saveModel($related_object);
-							}
-
-							$model->{$reference_def[0]} = $related_object->primaryKey;
-							$model->$relation_name = $related_object;
-						}
-					}
-				} else {
-					$model->$def = $resource->$res_attribute;
-				}
+				$this->mapResourceAttributeToModel($model, $resource->$res_attribute, $def, $class_related_objects);
 			}
 		}
 
@@ -171,7 +135,7 @@ class ModelConverter
 			$this->processRelatedObjects($model, $resource, $class_related_objects, true);
 		}
 
-		foreach ($this->map->getFieldsForClass($model_class_name) as $res_attribute => $def) {
+		foreach ($this->map->getFieldsForClass(get_class($model)) as $res_attribute => $def) {
 			if (is_array($def)) {
 				$class = 'services\\'.$def[0];
 				$parser = new $class($this);
@@ -184,6 +148,46 @@ class ModelConverter
 		$save && $this->saveModel($model);
 
 		return $model;
+	}
+
+	protected function mapResourceAttributeToModel(&$model, $resource_value, $attribute_def, $class_related_objects)
+	{
+		if (($pos = strpos($attribute_def,'.')) !== FALSE) {
+			$relation_name = substr($attribute_def,0,$pos);
+			$related_object_attribute = substr($attribute_def,$pos+1,strlen($attribute_def));
+
+			if (isset($class_related_objects[$relation_name])) {
+				$this->setObjectAttribute($model, $relation_name.'.'.$related_object_attribute, $resource_value);
+			} else {
+				$reference_object_attributes[$relation_name][$related_object_attribute] = $resource_value;
+
+				$reference_def = $this->map->getReferenceObjectForClass(get_class($model), $relation_name);
+
+				if (array_keys($reference_object_attributes[$relation_name]) == $reference_def[2]) {
+					// All required properties for matching the reference item have been set, so now we can associate it with the model
+					$criteria = new \CDbCriteria;
+
+					foreach ($reference_object_attributes[$relation_name] as $key => $value) {
+						$criteria->compare($key, $value);
+					}
+
+					$related_object_class = '\\'.$reference_def[1];
+
+					if (!$related_object = $related_object_class::model()->find($criteria)) {
+						$related_object = new $related_object_class;
+
+						$this->setObjectAttributes($related_object, $reference_object_attributes[$relation_name]);
+
+						$save && $this->saveModel($related_object);
+					}
+
+					$model->{$reference_def[0]} = $related_object->primaryKey;
+					$model->$relation_name = $related_object;
+				}
+			}
+		} else {
+			$model->$attribute_def = $resource_value;
+		}
 	}
 
 	protected function processRelatedObjects(&$model, $resource, $class_related_objects, $save=false)
