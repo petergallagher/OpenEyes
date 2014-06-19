@@ -27,7 +27,7 @@ class JSONConverter
 	public function jsonToResource($json, $object_class_name, &$resource)
 	{
 		if (!$object = @json_decode($json)) {
-			throw new Exception("Unable to parse JSON: $json");
+			throw new \Exception("Unable to parse JSON: $json");
 		}
 
 		return $this->jsonToResourceParse($object, $object_class_name, $resource);
