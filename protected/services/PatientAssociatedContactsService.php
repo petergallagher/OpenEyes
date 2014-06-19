@@ -41,7 +41,9 @@ class PatientAssociatedContactsService extends DeclarativeModelService
 				'location' => array('location_id', 'ContactLocation', 'rules' => array(
 					array(self::RULE_TYPE_NULLIFNULL, array('site_ref', 'institution_ref')),
 				)),
-				'contact' => array(array('location.contact_id', 'contact_id'), 'Contact', array('site_ref', 'institution_ref')),
+				'contact' => array('location.contact_id', 'Contact', 'rules' => array(
+					array(self::RULE_TYPE_ATTRIBUTE_IFNULL, array('site_ref', 'institution_ref'), 'contact_id'),
+				)),
 			),
 			'fields' => array(
 				'title' => array(self::TYPE_OR, 'title', array('location.contact','contact')),

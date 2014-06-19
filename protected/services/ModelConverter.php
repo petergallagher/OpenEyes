@@ -115,7 +115,7 @@ class ModelConverter
 		$model_relations = $model->relations();
 
 		if ($class_related_objects = $this->map->getRelatedObjectsForClass($model_class_name)) {
-			$this->createdRelatedObjects($model, $resource, $class_related_objects);
+			$this->createRelatedObjects($model, $resource, $class_related_objects);
 		}
 
 		$related_objects = array();
@@ -167,30 +167,8 @@ class ModelConverter
 			}
 		}
 
-		if ($class_related_objects) {
-			foreach ($class_related_objects as $relation_name => $def) {
-				if (is_array($def[0])) {
-					$allnull = $this->attributesAllNull($resource, $def[2]);
-					$target = $allnull ? $def[0][1] : $def[0][0];
-
-					$target_object = ($pos = strpos($target,'.')) ? substr($target,0,$pos) . '.' . $relation_name : $relation_name;
-					$target_value = $this->expandObjectAttribute($model, $target_object.'.primaryKey');
-
-					$save && $this->saveModel($this->expandObjectAttribute($model, $target_object));
-
-					$target_object = ($pos = strpos($target,'.')) ? substr($target,0,$pos) . '.' . substr($target,$pos+1,strlen($target)) : $target;
-
-					$this->setObjectAttribute($model, $target_object, $target_value, false);
-				} else {
-					if ($model->$relation_name) {
-						$save && $this->saveModel($model->$relation_name);
-
-						if (!$model->{$def[0]}) {
-							$model->{$def[0]} = $model->$relation_name->primaryKey;
-						}
-					}
-				}
-			}
+		if ($class_related_objects && $save) {
+			$this->saveRelatedObjects($model, $resource, $class_related_objects);
 		}
 
 		foreach ($this->map->getFieldsForClass($model_class_name) as $res_attribute => $def) {
@@ -208,33 +186,61 @@ class ModelConverter
 		return $model;
 	}
 
-	public function createdRelatedObjects(&$model, $resource, $class_related_objects)
+	protected function createRelatedObjects(&$model, $resource, $class_related_objects)
 	{
 		foreach ($class_related_objects as $relation_name => $def) {
 			$class_name = '\\'.$def[1];
 
-			if (is_array($def[0])) {
-				$allnull = $this->attributesAllNull($resource, $def[2]);
-				$target = ($allnull ? $def[0][1] : $def[0][0]);
-				$target = ($pos = strpos($target,'.')) ? substr($target,0,$pos) . '.' . $relation_name : $relation_name;
+			list($attribute, $related_object_value) = $this->processRelatedObjectRules($def, $resource);
 
-				$this->setObjectAttribute($model, $target, new $class_name, false);
+			if ($pos = strpos($attribute,'.')) {
+				$object_relation = substr($attribute,0,$pos).'.'.$relation_name;
 			} else {
-				$related_object_value = $this->processRelatedObjectRules($def, $resource, $class_name);
+				$object_relation = $relation_name;
+			}
 
-				$this->setObjectAttribute($model, $relation_name, $related_object_value, false);
+			$this->setObjectAttribute($model, $object_relation, $related_object_value, false);
+		}
+	}
+
+	protected function saveRelatedObjects(&$model, $resource, $class_related_objects)
+	{
+		foreach ($class_related_objects as $relation_name => $def) {
+			$class_name = '\\'.$def[1];
+
+			list($attribute, $related_object_value) = $this->processRelatedObjectRules($def, $resource);
+
+			if ($pos = strpos($attribute,'.')) {
+				$object_relation = substr($attribute,0,$pos).'.'.$relation_name;
+			} else {
+				$object_relation = $relation_name;
+			}
+
+			if ($related_object = $this->expandObjectAttribute($model, $object_relation)) {
+				$this->saveModel($related_object);
+
+				$this->setObjectAttribute($model, $attribute, $related_object->id);
 			}
 		}
 	}
 
-	protected function processRelatedObjectRules($related_object_def, $resource, $class_name)
+	protected function processRelatedObjectRules($related_object_def, $resource)
 	{
+		$attribute = $related_object_def[0];
+		$class_name = '\\'.$related_object_def[1];
+		$related_object_value = new $class_name;
+
 		if (isset($related_object_def['rules'])) {
 			foreach ($related_object_def['rules'] as $rule) {
 				switch ($rule[0]) {
 					case DeclarativeModelService::RULE_TYPE_NULLIFNULL:
 						if ($this->attributesAllNull($resource, $rule[1])) {
-							return null;
+							$related_object_value = null;
+						}
+						break;
+					case DeclarativeModelService::RULE_TYPE_ATTRIBUTE_IFNULL:
+						if ($this->attributesAllNull($resource, $rule[1])) {
+							$attribute = $rule[2];
 						}
 						break;
 					default:
@@ -243,7 +249,7 @@ class ModelConverter
 			}
 		}
 
-		return new $class_name;
+		return array($attribute, $related_object_value);
 	}
 
 	/*
