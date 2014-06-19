@@ -15,29 +15,17 @@
 
 namespace services;
 
-class Address extends DataObject
+class PatientAddressTest extends \PHPUnit_Framework_TestCase
 {
-	public $use = null;
-	public $line1;
-	public $line2 = null;
-	public $city;
-	public $state = null;
-	public $zip;
-	public $country;
-
-	static public function fromFhirValues(array $values)
+	public function testToFhirValues_DoesntDropFlags()
 	{
-		$values['line1'] = array_shift($values['lines']);
-		$values['line2'] = array_shift($values['lines']);
-		unset($values['lines']);
+		$a = new PatientAddress(array('correspond' => false, 'transport' => false));
+		$values = $a->toFhirValues();
 
-		return new static($values);
-	}
+		$this->assertArrayHasKey('correspond', $values);
+		$this->assertFalse($values['correspond']);
 
-	public function toFhirValues()
-	{
-		$values = parent::toFhirValues();
-		$values['lines'] = array_filter(array($values['line1'], $values['line2']));
-		return $values;
+		$this->assertArrayHasKey('transport', $values);
+		$this->assertFalse($values['transport']);
 	}
 }
