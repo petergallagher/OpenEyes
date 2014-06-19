@@ -309,7 +309,7 @@ class ModelConverterTest extends \CDbTestCase
 		$this->assertEquals('Jim',$resource->given_name);
 		$this->assertInstanceOf('services\GenderReference', $resource->gender_ref);
 		$this->assertEquals('Male',$resource->getGender());
-		$this->assertEquals('1970-01-01',$resource->birth_date);
+		$this->assertEquals('1970-01-01',$resource->birth_date->toModelValue());
 		$this->assertEquals('07123 456789',$resource->primary_phone);
 
 		$this->assertCount(1, $resource->addresses);
@@ -362,7 +362,7 @@ class ModelConverterTest extends \CDbTestCase
 		$resource->family_name = 'Aylward';
 		$resource->given_name = 'Jim';
 		$resource->gender_ref = $gender;
-		$resource->birth_date = '1970-01-01';
+		$resource->birth_date = new Date('1970-01-01');
 		$resource->primary_phone = '07123 456789';
 		$resource->addresses = array($address);
 		$resource->gp_ref = \Yii::app()->service->Gp(2);
@@ -409,7 +409,7 @@ class ModelConverterTest extends \CDbTestCase
 		$resource->family_name = 'Aylward';
 		$resource->given_name = 'Jim';
 		$resource->gender_ref = $gender;
-		$resource->birth_date = '1970-01-01';
+		$resource->birth_date = new Date('1970-01-01');
 		$resource->primary_phone = '07123 456789';
 		$resource->addresses = array($address);
 		$resource->gp_ref = \Yii::app()->service->Gp(2);
@@ -466,7 +466,7 @@ class ModelConverterTest extends \CDbTestCase
 		$resource->family_name = 'Krinkle';
 		$resource->given_name = 'Henry';
 		$resource->gender_ref = $gender;
-		$resource->birth_date = '1994-04-23';
+		$resource->birth_date = new Date('1994-04-23');
 		$resource->primary_phone = '02332 3241959';
 		$resource->addresses = array($address);
 		$resource->gp_ref = \Yii::app()->service->Gp(1);
