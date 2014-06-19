@@ -34,7 +34,10 @@ class DeclarativeTypeParser_DataObject extends DeclarativeTypeParser
 		if (strpos($model_attribute,'.')) {
 			list($related_object_name,$related_object_attribute) = explode('.',$model_attribute);
 
-			$model->setRelatedObject($related_object_name, $related_object_attribute, is_object($resource->$res_attribute) ? $this->mc->resourceToModel($resource->$res_attribute, new $model_class, false) : null);
+			$model->setRelatedObject($related_object_name, $related_object_attribute, is_object($resource->$res_attribute)
+				? $this->mc->resourceToModel($resource->$res_attribute, new $model_class, false)
+				: null
+			);
 		} else {
 			throw new \Exception("Unhandled");
 		}
