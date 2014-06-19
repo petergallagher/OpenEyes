@@ -158,4 +158,53 @@ class ModelConverter_Model
 			$this->setAttribute($key, $value);
 		}
 	}
+
+	public function addReferenceObjectAttribute($relation_name, $attribute, $value)
+	{
+		$this->reference_object_attributes[$relation_name][$attribute] = $value;
+	}
+
+	public function haveAllKeysForReferenceObject($relation_name)
+	{
+		list($reference_key, $reference_class, $required_keys) = $this->map->getReferenceObjectForClass($this->getClass(), $relation_name);
+
+		foreach ($required_keys as $key) {
+			if (!@$this->reference_object_attributes[$relation_name][$key]) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	public function associateReferenceObjectWithModel($relation_name)
+	{
+		list($reference_key, $reference_class, $required_keys) = $this->map->getReferenceObjectForClass($this->getClass(), $relation_name);
+
+		$criteria = new \CDbCriteria;
+
+		foreach ($this->reference_object_attributes[$relation_name] as $key => $value) {
+			$criteria->compare($key, $value);
+		}
+
+		$reference_class = '\\'.$reference_class;
+
+		if (!$related_object = $reference_class::model()->find($criteria)) {
+			$related_object = new $reference_class;
+		}
+
+		$this->setObjectAttributes($related_object, $this->reference_object_attributes[$relation_name]);
+
+		$this->setAttribute($reference_key, $related_object->primaryKey);
+		$this->setAttribute($relation_name, $related_object);
+
+		return $related_object;
+	}
+
+	protected function setObjectAttributes(&$object, $attributes)
+	{
+		foreach ($attributes as $key => $value) {
+			$object->$key = $value;
+		}
+	}
 }
