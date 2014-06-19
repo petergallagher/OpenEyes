@@ -15,28 +15,13 @@
 
 namespace services;
 
-class DateTime extends \DateTime implements FhirCompatible
+class DateTimeTest extends \PHPUnit_Framework_TestCase
 {
-	static public function fromFhir($value)
+	public function testToDate()
 	{
-		return new self($value);
-	}
-
-	public function toFhir()
-	{
-		return $this->format(DATE_RFC3339);
-	}
-
-	public function toModelValue()
-	{
-		return $this->format('Y-m-d H:i:s');
-	}
-
-	/**
-	 * @return Date
-	 */
-	public function toDate()
-	{
-		return new Date($this->format('Y-m-d'), $this->getTimezone());
+		$dt = new DateTime('2001-01-01 12:52:32');
+		$d = $dt->toDate();
+		$this->assertInstanceOf('services\Date', $d);
+		$this->assertEquals('2001-01-01', $d->toModelValue());
 	}
 }
