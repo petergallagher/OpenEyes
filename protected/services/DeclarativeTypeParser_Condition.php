@@ -39,4 +39,9 @@ class DeclarativeTypeParser_Condition extends DeclarativeTypeParser
 			}
 		}
 	}
+
+	public function jsonToResourceParse($object, $attribute, $data_class, $model_class)
+	{
+		return $object->$attribute;
+	}
 }

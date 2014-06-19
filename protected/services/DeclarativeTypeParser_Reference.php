@@ -40,4 +40,9 @@ class DeclarativeTypeParser_Reference extends DeclarativeTypeParser
 
 		$model->setAttribute($model_attribute, $id_value);
 	}
+
+	public function jsonToResourceParse($object, $attribute, $data_class, $model_class)
+	{
+		return \Yii::app()->service->{$object->$attribute->service}($object->$attribute->id);
+	}
 }

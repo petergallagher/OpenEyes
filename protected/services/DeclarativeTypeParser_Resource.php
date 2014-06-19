@@ -33,4 +33,9 @@ class DeclarativeTypeParser_Resource extends DeclarativeTypeParser
 			$model->setAttributeForBelongsToRelation($model_attribute);
 		}
 	}
+
+	public function jsonToResourceParse($object, $attribute, $data_class, $model_class)
+	{
+		return $object->$attribute;
+	}
 }

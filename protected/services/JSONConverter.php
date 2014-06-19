@@ -33,50 +33,13 @@ class JSONConverter
 		return $this->jsonToResourceParse($object, $object_class_name, $resource);
 	}
 
-	protected function jsonToResourceParse($object, $object_class_name, &$resource)
+	public function jsonToResourceParse($object, $object_class_name, &$resource)
 	{
 		foreach ($this->map->getFieldsForClass($object_class_name) as $res_attribute => $def) {
 			if (is_array($def)) {
-				switch ($def[0]) {
-					case DeclarativeModelService::TYPE_RESOURCE:
-						$resource->$res_attribute = $object->$res_attribute;
-						break;
-					case DeclarativeModelService::TYPE_LIST:
-						$data_class = 'services\\'.$def[2];
-						$model_class = $def[3];
-
-						$data_items = array();
-
-						foreach ($object->$res_attribute as $data_item) {
-							$data_items[] = $this->jsonToResourceParse($data_item, $model_class, new $data_class);
-						}
-
-						$resource->$res_attribute = $data_items;
-						break;
-					case DeclarativeModelService::TYPE_REF:
-						$resource->$res_attribute = \Yii::app()->service->{$object->$res_attribute->service}($object->$res_attribute->id);
-						break;
-					case DeclarativeModelService::TYPE_SIMPLEOBJECT:
-					case DeclarativeModelService::TYPE_DATAOBJECT:
-					case DeclarativeModelService::TYPE_DATAOBJECT_EXCLUSIVE:
-						$data_class = 'services\\'.$def[2];
-						$resource->$res_attribute = $data_class::fromObject($object->$res_attribute);
-						break;
-					case DeclarativeModelService::TYPE_CONDITION:
-						$resource->$res_attribute = $object->$res_attribute;
-						break;
-					case DeclarativeModelService::TYPE_REF_LIST:
-						$refs = array();
-
-						foreach ($object->$res_attribute as $ref) {
-							$refs[] = \Yii::app()->service->{$def->service}($ref->id);
-						}
-
-						$resource->$res_attribute = $refs;
-						break;
-					default:
-						throw new \Exception("Unknown declarative type: {$def[0]}");
-				}
+				$class = 'services\\'.$def[0];
+				$parser = new $class($this);
+				$resource->$res_attribute = $parser->jsonToResourceParse($object,$res_attribute,@$def[2],@$def[3]);
 			} else {
 				$resource->$res_attribute = $object->$res_attribute;
 			}

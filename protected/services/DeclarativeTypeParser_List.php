@@ -102,4 +102,17 @@ class DeclarativeTypeParser_List extends DeclarativeTypeParser
 
 		return $items_to_keep;
 	}
+
+	public function jsonToResourceParse($object, $attribute, $data_class, $model_class)
+	{
+		$data_class = 'services\\'.$data_class;
+
+		$data_items = array();
+
+		foreach ($object->$attribute as $data_item) {
+			$data_items[] = $this->mc->jsonToResourceParse($data_item, $model_class, new $data_class);
+		}
+
+		return $data_items;
+	}
 }

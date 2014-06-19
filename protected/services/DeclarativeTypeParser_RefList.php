@@ -32,4 +32,15 @@ class DeclarativeTypeParser_RefList extends DeclarativeTypeParser
 	{
 		$model->setReferenceListForRelation($model_assignment_relation, $resource->$res_attribute);
 	}
+
+	public function jsonToResourceParse($object, $attribute, $data_class, $model_class)
+	{
+		$refs = array();
+
+		foreach ($object->$attribute as $ref) {
+			$refs[] = \Yii::app()->service->{$def->service}($ref->id);
+		}
+
+		return $refs;
+	}
 }

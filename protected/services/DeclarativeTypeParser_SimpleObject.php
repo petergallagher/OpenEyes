@@ -38,4 +38,11 @@ class DeclarativeTypeParser_SimpleObject extends DeclarativeTypeParser
 			$model->setAttribute($model_attribute,is_null($resource->$res_attribute) ? null : $data_class::fromObject($resource->$res_attribute)->toModelValue());
 		}
 	}
+
+	public function jsonToResourceParse($object, $attribute, $data_class, $model_class)
+	{
+		$data_class = 'services\\'.$data_class;
+
+		return $data_class::fromObject($object->$attribute);
+	}
 }

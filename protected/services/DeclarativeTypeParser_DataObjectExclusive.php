@@ -61,4 +61,11 @@ class DeclarativeTypeParser_DataObjectExclusive extends DeclarativeTypeParser
 			$save && $this->mc->saveModel($model->expandAttribute($related_object_name.'.'.$related_object_attribute));
 		}
 	}
+
+	public function jsonToResourceParse($object, $attribute, $data_class, $model_class)
+	{
+		$data_class = 'services\\'.$data_class;
+
+		return $data_class::fromObject($object->$attribute);
+	}
 }
