@@ -39,6 +39,8 @@ class DeclarativeTypeParser_List extends DeclarativeTypeParser
 			list($related_object_name, $related_object_attribute) = array($model_attribute,null);
 		}
 
+		$model->setRelatedObject($related_object_name, $related_object_attribute, array());
+
 		foreach ($resource->$res_attribute as $item) {
 			$model->addToRelatedObjectArray($related_object_name,$related_object_attribute,$this->mc->resourceToModel($item, new $model_class, false));
 		}
