@@ -33,6 +33,11 @@ class ModelConverter_Model
 		$this->related_object_definitions = $this->map->getRelatedObjectsForClass($this->getClass());
 	}
 
+	public function getId()
+	{
+		return $this->model->id;
+	}
+
 	public function getClass()
 	{
 		return \CHtml::modelName($this->model);

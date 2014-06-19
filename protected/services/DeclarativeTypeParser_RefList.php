@@ -39,7 +39,7 @@ class DeclarativeTypeParser_RefList extends DeclarativeTypeParser
 
 		foreach ($resource->$res_attribute as $ref) {
 			$assignment = new $assignment_model;
-			$assignment->$assignment_field = $resource->id;
+			$assignment->$assignment_field = $model->getId();
 			$assignment->$model_assignment_field = $ref->getId();
 
 			$assignments[] = $assignment;
