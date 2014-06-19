@@ -201,7 +201,7 @@ class ModelConverter_ModelWrapper
 
 		foreach ($ref_list as $ref) {
 			$assignment = new $assignment_model;
-			$assignment->$assignment_field = $model->getId();
+			$assignment->$assignment_field = $this->getId();
 			$assignment->$model_assignment_field = $ref->getId();
 
 			$assignments[] = $assignment;
