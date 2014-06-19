@@ -108,15 +108,9 @@ class ModelConverter
 	protected function processRelatedObjects(&$model, $resource, $save=false)
 	{
 		foreach ($model->getRelatedObjectDefinitions() as $relation_name => $def) {
-			$class_name = '\\'.$def[1];
-
 			list($attribute, $related_object_value) = $this->processRelatedObjectRules($def, $resource);
 
-			if ($pos = strpos($attribute,'.')) {
-				$object_relation = substr($attribute,0,$pos).'.'.$relation_name;
-			} else {
-				$object_relation = $relation_name;
-			}
+			$object_relation = ($pos = strpos($attribute,'.')) ? substr($attribute,0,$pos).'.'.$relation_name : $relation_name;
 
 			if ($save && $related_object = $model->expandAttribute($object_relation)) {
 				$this->saveModel($related_object);
