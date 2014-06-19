@@ -40,4 +40,8 @@ class DeclarativeTypeParser_Or extends DeclarativeTypeParser
 				throw new \Exception("Unknown rule type: {$rule[0]}");
 		}
 	}
+
+	public function jsonToResourceParse($object, $attribute, $data_class, $model_class)
+	{
+	}
 }
