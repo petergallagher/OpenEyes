@@ -50,7 +50,7 @@ class ModelConverter
 
 	public function resourceToModel($resource, $model, $save=true, $extra_fields=false)
 	{
-		$model = new ModelConverter_Model($this->map, $model, $extra_fields);
+		$model = new ModelConverter_ModelWrapper($this->map, $model, $extra_fields);
 
 		$this->processRelatedObjects($model, $resource);
 

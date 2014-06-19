@@ -15,7 +15,7 @@
 
 namespace services;
 
-class ModelConverter_Model
+class ModelConverter_ModelWrapper
 {
 	protected $map;
 	protected $model;
