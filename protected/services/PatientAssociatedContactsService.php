@@ -38,7 +38,9 @@ class PatientAssociatedContactsService extends DeclarativeModelService
 			'ar_class' => 'PatientContactAssignment',
 			'related_objects' => array(
 				'patient' => array('patient_id', 'Patient'),
-				'location' => array('location_id', 'ContactLocation'),
+				'location' => array('location_id', 'ContactLocation', 'rules' => array(
+					array(self::RULE_TYPE_NULLIFNULL, array('site_ref', 'institution_ref')),
+				)),
 				'contact' => array(array('location.contact_id', 'contact_id'), 'Contact', array('site_ref', 'institution_ref')),
 			),
 			'fields' => array(
@@ -55,11 +57,6 @@ class PatientAssociatedContactsService extends DeclarativeModelService
 					'given_name' => array(self::RULE_TYPE_ALLNULL, array('site_ref', 'institution_ref'), 'then' => 'contact', 'else' => 'location.contact'),
 					'family_name' => array(self::RULE_TYPE_ALLNULL, array('site_ref', 'institution_ref'), 'then' => 'contact', 'else' => 'location.contact'),
 					'primary_phone' => array(self::RULE_TYPE_ALLNULL, array('site_ref', 'institution_ref'), 'then' => 'contact', 'else' => 'location.contact'),
-				),
-				'related_objects' => array(
-					'location' => array(
-						array(self::RULE_TYPE_NULLIFNULL, array('site_ref', 'institution_ref')),
-					),
 				),
 			),
 		),

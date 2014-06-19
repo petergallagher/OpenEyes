@@ -220,20 +220,22 @@ class ModelConverter
 
 				$this->setObjectAttribute($model, $target, new $class_name, false);
 			} else {
-				$this->setObjectAttribute($model, $relation_name, new $class_name, false);
+				$related_object_value = $this->processRelatedObjectRules($def, $resource, $class_name);
 
-				$model->$relation_name = $this->applyRulesForNewRelatedObject($model, $relation_name, $resource);
+				$this->setObjectAttribute($model, $relation_name, $related_object_value, false);
 			}
 		}
 	}
 
-	protected function applyRulesForNewRelatedObject($model, $relation_name, $resource)
+	protected function processRelatedObjectRules($related_object_def, $resource, $class_name)
 	{
-		if ($rules = $this->map->getRulesForRelatedObject(get_class($model), $relation_name)) {
-			foreach ($rules as $rule) {
+		if (isset($related_object_def['rules'])) {
+			foreach ($related_object_def['rules'] as $rule) {
 				switch ($rule[0]) {
 					case DeclarativeModelService::RULE_TYPE_NULLIFNULL:
-						if ($this->attributesAllNull($resource, $rule[1])) return null;
+						if ($this->attributesAllNull($resource, $rule[1])) {
+							return null;
+						}
 						break;
 					default:
 						throw new \Exception("Unknown related object rule type: {$rule[0]}");
@@ -241,7 +243,7 @@ class ModelConverter
 			}
 		}
 
-		return $model->$relation_name;
+		return new $class_name;
 	}
 
 	/*
