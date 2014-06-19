@@ -340,7 +340,7 @@ class PatientServiceTest extends \CDbTestCase
 		$this->assertEquals('Aylward',$resource->family_name);
 		$this->assertEquals('Jim',$resource->given_name);
 		$this->assertEquals('Male',$resource->getGender());
-		$this->assertEquals('1970-01-01',$resource->birth_date);
+		$this->assertEquals('1970-01-01',$resource->birth_date->toModelValue());
 		$this->assertEquals('07123 456789',$resource->primary_phone);
 
 		$this->assertCount(1, $resource->addresses);
@@ -388,7 +388,7 @@ class PatientServiceTest extends \CDbTestCase
 
 	public function testJsonToModel_NoSave_ModelIsCorrect()
 	{
-		$json = '{"nhs_num":"54321","hos_num":"12345","title":"Mr","family_name":"Aylward","given_name":"Jim","gender_ref":{"service":"Gender","id":1},"birth_date":"1970-01-01","date_of_death":null,"primary_phone":"07123 456789","addresses":[{"date_start":{"date":"2014-06-06 16:39:29","timezone_type":3,"timezone":"Europe\/London"},"date_end":{"date":"2014-06-06 16:39:29","timezone_type":3,"timezone":"Europe\/London"},"correspond":false,"transport":false,"use":null,"line1":"flat 1","line2":"bleakley creek","city":"flitchley","state":"london","zip":"ec1v 0dx","country":"United States"}],"care_providers":[],"gp_ref":{"service":"Gp","id":1},"prac_ref":{"service":"Practice","id":1},"cb_refs":[]}';
+		$json = '{"nhs_num":"54321","hos_num":"12345","title":"Mr","family_name":"Aylward","given_name":"Jim","gender_ref":{"service":"Gender","id":1},"birth_date":{"date":"1970-01-01","timezone_type":3,"timezone":"Europe/London"},"date_of_death":null,"primary_phone":"07123 456789","addresses":[{"date_start":{"date":"2014-06-06 16:39:29","timezone_type":3,"timezone":"Europe\/London"},"date_end":{"date":"2014-06-06 16:39:29","timezone_type":3,"timezone":"Europe\/London"},"correspond":false,"transport":false,"use":null,"line1":"flat 1","line2":"bleakley creek","city":"flitchley","state":"london","zip":"ec1v 0dx","country":"United States"}],"care_providers":[],"gp_ref":{"service":"Gp","id":1},"prac_ref":{"service":"Practice","id":1},"cb_refs":[]}';
 
 		$ps = new PatientService;
 		$patient = $ps->jsonToModel($json, new \Patient, false);
@@ -419,7 +419,7 @@ class PatientServiceTest extends \CDbTestCase
 
 	public function testJsonToModel_Save_Create_ModelCountsCorrect()
 	{
-		$json = '{"nhs_num":"54321","hos_num":"12345","title":"Mr","family_name":"Aylward","given_name":"Jim","gender_ref":{"service":"Gender","id":1},"birth_date":"1970-01-01","date_of_death":null,"primary_phone":"07123 456789","addresses":[{"date_start":{"date":"2014-06-06 16:39:29","timezone_type":3,"timezone":"Europe\/London"},"date_end":{"date":"2014-06-06 16:39:29","timezone_type":3,"timezone":"Europe\/London"},"correspond":false,"transport":false,"use":null,"line1":"flat 1","line2":"bleakley creek","city":"flitchley","state":"london","zip":"ec1v 0dx","country":"United States"}],"care_providers":[],"gp_ref":{"service":"Gp","id":1},"prac_ref":{"service":"Practice","id":1},"cb_refs":[]}';
+		$json = '{"nhs_num":"54321","hos_num":"12345","title":"Mr","family_name":"Aylward","given_name":"Jim","gender_ref":{"service":"Gender","id":1},"birth_date":{"date":"1970-01-01","timezone_type":3,"timezone":"Europe/London"},"date_of_death":null,"primary_phone":"07123 456789","addresses":[{"date_start":{"date":"2014-06-06 16:39:29","timezone_type":3,"timezone":"Europe\/London"},"date_end":{"date":"2014-06-06 16:39:29","timezone_type":3,"timezone":"Europe\/London"},"correspond":false,"transport":false,"use":null,"line1":"flat 1","line2":"bleakley creek","city":"flitchley","state":"london","zip":"ec1v 0dx","country":"United States"}],"care_providers":[],"gp_ref":{"service":"Gp","id":1},"prac_ref":{"service":"Practice","id":1},"cb_refs":[]}';
 
 		$total_patients = count(\Patient::model()->findAll());
 		$total_contacts = count(\Contact::model()->findAll());
@@ -440,7 +440,7 @@ class PatientServiceTest extends \CDbTestCase
 
 	public function testJsonToModel_Save_Create_DBIsCorrect()
 	{
-		$json = '{"nhs_num":"54321","hos_num":"12345","title":"Mr","family_name":"Aylward","given_name":"Jim","gender_ref":{"service":"Gender","id":1},"birth_date":"1970-01-01","date_of_death":null,"primary_phone":"07123 456789","addresses":[{"date_start":{"date":"2014-06-06 16:39:29","timezone_type":3,"timezone":"Europe\/London"},"date_end":{"date":"2014-06-06 16:39:29","timezone_type":3,"timezone":"Europe\/London"},"correspond":false,"transport":false,"use":null,"line1":"flat 1","line2":"bleakley creek","city":"flitchley","state":"london","zip":"ec1v 0dx","country":"United States"}],"care_providers":[],"gp_ref":{"service":"Gp","id":1},"prac_ref":{"service":"Practice","id":1},"cb_refs":[]}';
+		$json = '{"nhs_num":"54321","hos_num":"12345","title":"Mr","family_name":"Aylward","given_name":"Jim","gender_ref":{"service":"Gender","id":1},"birth_date":{"date":"1970-01-01","timezone_type":3,"timezone":"Europe/London"},"date_of_death":null,"primary_phone":"07123 456789","addresses":[{"date_start":{"date":"2014-06-06 16:39:29","timezone_type":3,"timezone":"Europe\/London"},"date_end":{"date":"2014-06-06 16:39:29","timezone_type":3,"timezone":"Europe\/London"},"correspond":false,"transport":false,"use":null,"line1":"flat 1","line2":"bleakley creek","city":"flitchley","state":"london","zip":"ec1v 0dx","country":"United States"}],"care_providers":[],"gp_ref":{"service":"Gp","id":1},"prac_ref":{"service":"Practice","id":1},"cb_refs":[]}';
 
 		$ps = new PatientService;
 		$patient = $ps->jsonToModel($json, new \Patient);
@@ -472,7 +472,7 @@ class PatientServiceTest extends \CDbTestCase
 
 	public function testJsonToModel_Save_Update_ModelCountsCorrect()
 	{
-		$json = '{"nhs_num":"x0001","hos_num":"x0002","title":"x0003","family_name":"x0004","given_name":"x0005","gender_ref":{"service":"Gender","id":2},"birth_date":"1996-04-20","date_of_death":null,"primary_phone":"03333 343434","addresses":[{"date_start":{"date":"2014-06-06 16:39:29","timezone_type":3,"timezone":"Europe\/London"},"date_end":{"date":"2014-06-06 16:39:29","timezone_type":3,"timezone":"Europe\/London"},"correspond":false,"transport":true,"use":null,"line1":"flat 1","line2":"bleakley creek","city":"flitchley","state":"london","zip":"ec1v 0dx","country":"United States"}],"care_providers":[],"gp_ref":{"service":"Gp","id":1},"prac_ref":{"service":"Practice","id":1},"cb_refs":[]}';
+		$json = '{"nhs_num":"x0001","hos_num":"x0002","title":"x0003","family_name":"x0004","given_name":"x0005","gender_ref":{"service":"Gender","id":2},"birth_date":{"date":"1996-04-20","timezone_type":3,"timezone":"Europe/London"},"date_of_death":null,"primary_phone":"03333 343434","addresses":[{"date_start":{"date":"2014-06-06 16:39:29","timezone_type":3,"timezone":"Europe\/London"},"date_end":{"date":"2014-06-06 16:39:29","timezone_type":3,"timezone":"Europe\/London"},"correspond":false,"transport":true,"use":null,"line1":"flat 1","line2":"bleakley creek","city":"flitchley","state":"london","zip":"ec1v 0dx","country":"United States"}],"care_providers":[],"gp_ref":{"service":"Gp","id":1},"prac_ref":{"service":"Practice","id":1},"cb_refs":[]}';
 
 		$total_patients = count(\Patient::model()->findAll());
 		$total_contacts = count(\Contact::model()->findAll());
@@ -495,7 +495,7 @@ class PatientServiceTest extends \CDbTestCase
 
 	public function testJsonToModel_Save_Update_DBIsCorrect()
 	{
-		$json = '{"nhs_num":"x0001","hos_num":"x0002","title":"x0003","family_name":"x0004","given_name":"x0005","gender_ref":{"service":"Gender","id":2},"birth_date":"1996-04-20","date_of_death":null,"primary_phone":"03333 343434","addresses":[{"date_start":{"date":"2014-06-06 16:39:29","timezone_type":3,"timezone":"Europe\/London"},"date_end":{"date":"2014-06-06 16:39:29","timezone_type":3,"timezone":"Europe\/London"},"correspond":false,"transport":true,"use":null,"line1":"L1","line2":"L2","city":"L3","state":"L4","zip":"L5","country":"United Kingdom"}],"care_providers":[],"gp_ref":{"service":"Gp","id":1},"prac_ref":{"service":"Practice","id":1},"cb_refs":[]}';
+		$json = '{"nhs_num":"x0001","hos_num":"x0002","title":"x0003","family_name":"x0004","given_name":"x0005","gender_ref":{"service":"Gender","id":2},"birth_date":{"date":"1996-04-20","timezone_type":3,"timezone":"Europe/London"},"date_of_death":null,"primary_phone":"03333 343434","addresses":[{"date_start":{"date":"2014-06-06 16:39:29","timezone_type":3,"timezone":"Europe\/London"},"date_end":{"date":"2014-06-06 16:39:29","timezone_type":3,"timezone":"Europe\/London"},"correspond":false,"transport":true,"use":null,"line1":"L1","line2":"L2","city":"L3","state":"L4","zip":"L5","country":"United Kingdom"}],"care_providers":[],"gp_ref":{"service":"Gp","id":1},"prac_ref":{"service":"Practice","id":1},"cb_refs":[]}';
 
 		$model = \Patient::model()->findByPk(1);
 
