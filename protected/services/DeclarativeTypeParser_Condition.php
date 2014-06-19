@@ -24,7 +24,7 @@ class DeclarativeTypeParser_Condition extends DeclarativeTypeParser
 				return $object->$attribute == $condition_value;
 				break;
 			default:
-				throw new Exception("Unknown condition type: $condition_type");
+				throw new \Exception("Unknown condition type: $condition_type");
 		}
 	}
 
