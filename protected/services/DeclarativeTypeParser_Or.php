@@ -32,15 +32,7 @@ class DeclarativeTypeParser_Or extends DeclarativeTypeParser
 
 		switch ($rule[0]) {
 			case DeclarativeModelService::RULE_TYPE_ALLNULL:
-				$allnull = true;
-
-				foreach ($rule[1] as $attribute) {
-					if ($resource->$attribute !== null) {
-						$allnull = false;
-					}
-				}
-
-				$attribute = ($allnull ? $rule['then'] : $rule['else']) . '.' . $model_attribute;
+				$attribute = (DeclarativeTypeParser::attributesAllNull($resource, $rule[1]) ? $rule['then'] : $rule['else']) . '.' . $model_attribute;
 
 				$model->setAttribute($attribute, $resource->$res_attribute);
 				break;
