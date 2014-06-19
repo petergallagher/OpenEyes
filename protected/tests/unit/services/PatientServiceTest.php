@@ -540,4 +540,19 @@ class PatientServiceTest extends \CDbTestCase
 		$ps = new PatientService;
 		$patient = $ps->resourceToModel($resource, new \Patient);
 	}
+
+	public function testResourceToModel_Use_Transport_Address()
+	{
+		$resource = $this->getResource();
+		$resource->addresses[0]->correspond = false;
+		$resource->addresses[0]->transport = true;
+
+		$ps = new PatientService;
+		$patient = $ps->resourceToModel($resource, new \Patient, false);
+
+		$this->assertCount(1, $patient->contact->addresses);
+		$this->assertInstanceOf('Address', $patient->contact->addresses[0]);
+		$this->assertInstanceOf('AddressType', $patient->contact->addresses[0]->type);
+		$this->assertEquals('Transport', $patient->contact->addresses[0]->type->name);
+	}
 }
