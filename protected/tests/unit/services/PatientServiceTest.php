@@ -570,4 +570,55 @@ class PatientServiceTest extends \CDbTestCase
 		$this->assertInstanceOf('AddressType', $patient->contact->addresses[0]->type);
 		$this->assertEquals('Home', $patient->contact->addresses[0]->type->name);
 	}
+
+	public function testResourceToModel_Save_Commissioning_Body_Refs_NoSave_ModelCountsCorrect()
+	{
+		$resource = $this->getResource();
+		$resource->cb_refs = array(\Yii::app()->service->CommissioningBody(1));
+
+		$cb_refs = count(\CommissioningBodyPatientAssignment::model()->findAll());
+
+		$ps = new PatientService;
+		$patient = $ps->resourceToModel($resource, new \Patient, false);
+
+		$this->assertEquals($cb_refs, count(\CommissioningBodyPatientAssignment::model()->findAll()));
+	}
+
+	public function testResourceToModel_Save_Commissioning_Body_Refs_NoSave_ModelIsCorrect()
+	{
+		$resource = $this->getResource();
+		$resource->cb_refs = array(\Yii::app()->service->CommissioningBody(1));
+
+		$ps = new PatientService;
+		$patient = $ps->resourceToModel($resource, new \Patient, false);
+
+		$this->assertCount(1, $patient->commissioningbody_assignments);
+		$this->assertEquals('Apple', $patient->commissioningbody_assignments[0]->commissioning_body->name);
+	}
+
+	public function testResourceToModel_Save_Commissioning_Body_Refs_Save_ModelCountsCorrect()
+	{
+		$resource = $this->getResource();
+		$resource->cb_refs = array(\Yii::app()->service->CommissioningBody(1));
+
+		$cb_refs = count(\CommissioningBodyPatientAssignment::model()->findAll());
+
+		$ps = new PatientService;
+		$patient = $ps->resourceToModel($resource, new \Patient);
+
+		$this->assertEquals($cb_refs+1, count(\CommissioningBodyPatientAssignment::model()->findAll()));
+	}
+
+	public function testResourceToModel_Save_Commissioning_Body_Refs_Save_ModelIsCorrect()
+	{
+		$resource = $this->getResource();
+		$resource->cb_refs = array(\Yii::app()->service->CommissioningBody(1));
+
+		$ps = new PatientService;
+		$patient = $ps->resourceToModel($resource, new \Patient);
+		$patient = \Patient::model()->findByPk($patient->id);
+		
+		$this->assertCount(1, $patient->commissioningbody_assignments);
+		$this->assertEquals('Apple', $patient->commissioningbody_assignments[0]->commissioning_body->name);
+	}
 }
