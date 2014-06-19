@@ -191,7 +191,7 @@ class ModelConverter_ModelWrapper
 		$this->setAttribute($relations[$relation_name][2], $this->model->$relation_name->id);
 	}
 
-	public function setReferenceListForRelation($relation_name, $ref_list)
+	public function setReferenceListForRelation($relation_name, $model_assignment_field, $ref_list)
 	{
 		$relations = $this->getRelations();
 

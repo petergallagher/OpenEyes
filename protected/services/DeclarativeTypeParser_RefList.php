@@ -30,7 +30,7 @@ class DeclarativeTypeParser_RefList extends DeclarativeTypeParser
 
 	public function resourceToModelParse(&$model, $resource, $model_assignment_relation, $res_attribute, $model_assignment_field, $param1)
 	{
-		$model->setReferenceListForRelation($model_assignment_relation, $resource->$res_attribute);
+		$model->setReferenceListForRelation($model_assignment_relation, $model_assignment_field, $resource->$res_attribute);
 	}
 
 	public function jsonToResourceParse($object, $attribute, $data_class, $model_class)
