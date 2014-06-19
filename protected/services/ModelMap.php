@@ -137,4 +137,17 @@ class ModelMap
 
 		return @$this->map[$class_name]['rules']['related_objects'][$relation_name];
 	}
+
+	public function getModelDefaultsForClass($class_name)
+	{
+		if (!isset($this->map[$class_name]['model_defaults'])) {
+			foreach ($this->map as $_class_name => $_def) {
+				if (@$_def['ar_class'] == $class_name) {
+					return $this->getModelDefaultsForClass($_class_name);
+				}
+			}
+		}
+
+		return @$this->map[$class_name]['model_defaults'];
+	}
 }

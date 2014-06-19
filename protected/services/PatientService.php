@@ -69,6 +69,9 @@ class PatientService extends DeclarativeModelService
 				'correspond' => array(self::TYPE_CONDITION, 'address_type_id', 'equals', \AddressType::CORRESPOND),
 				'transport' => array(self::TYPE_CONDITION, 'address_type_id', 'equals', \AddressType::TRANSPORT),
 			),
+			'model_defaults' => array(
+				'address_type_id' => \AddressType::HOME
+			),
 		),
 		'Gender' => array(
 			'fields' => array(

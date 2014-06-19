@@ -31,6 +31,17 @@ class ModelConverter_ModelWrapper
 		is_array($extra_fields) && $this->setAttributes($extra_fields);
 
 		$this->related_object_definitions = $this->map->getRelatedObjectsForClass($this->getClass());
+
+		$this->setDefaults();
+	}
+
+	public function setDefaults()
+	{
+		if ($defaults = $this->map->getModelDefaultsForClass($this->getClass())) {
+			foreach ($defaults as $key => $value) {
+				$this->model->$key = $value;
+			}
+		}
 	}
 
 	public function getId()
