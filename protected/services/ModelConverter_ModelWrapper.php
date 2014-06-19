@@ -161,9 +161,9 @@ class ModelConverter_ModelWrapper
 
 		if (!$related_object = $reference_class::model()->find($criteria)) {
 			$related_object = new $reference_class;
-		}
 
-		$this->setObjectAttributes($related_object, $this->reference_object_attributes[$relation_name]);
+			$this->setObjectAttributes($related_object, $this->reference_object_attributes[$relation_name]);
+		}
 
 		$this->setAttribute($reference_key, $related_object->primaryKey);
 		$this->setAttribute($relation_name, $related_object);
@@ -176,5 +176,37 @@ class ModelConverter_ModelWrapper
 		foreach ($attributes as $key => $value) {
 			$object->$key = $value;
 		}
+	}
+
+	public function hasBelongsToRelation($relation_name)
+	{
+		$relations = $this->getRelations();
+		return isset($relations[$relation_name]);
+	}
+
+	public function setAttributeForBelongsToRelation($relation_name)
+	{
+		$relations = $this->getRelations();
+
+		$this->setAttribute($relations[$relation_name][2], $this->model->$relation_name->id);
+	}
+
+	public function setReferenceListForRelation($relation_name, $ref_list)
+	{
+		$relations = $this->getRelations();
+
+		list($junk, $assignment_model, $assignment_field) = $relations[$relation_name];
+
+		$assignments = array();
+
+		foreach ($ref_list as $ref) {
+			$assignment = new $assignment_model;
+			$assignment->$assignment_field = $model->getId();
+			$assignment->$model_assignment_field = $ref->getId();
+
+			$assignments[] = $assignment;
+		}
+
+		$this->setAttribute($relation_name, $assignments);
 	}
 }

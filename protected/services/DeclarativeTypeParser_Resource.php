@@ -29,10 +29,8 @@ class DeclarativeTypeParser_Resource extends DeclarativeTypeParser
 
 		$model->setAttribute($model_attribute,$this->mc->resourceToModel($resource->$res_attribute, new $_model_class_name, $save));
 
-		$model_relations = $model->relations();
-
-		if (isset($model_relations[$model_attribute]) && $model_relations[$model_attribute][0] == 'CBelongsToRelation') {
-			$model->setAttribute($model_relations[$model_attribute][2], $model->$model_attribute->id);
+		if ($model->hasBelongsToRelation($model_attribute)) {
+			$model->setAttributeForBelongsToRelation($model_attribute);
 		}
 	}
 }
