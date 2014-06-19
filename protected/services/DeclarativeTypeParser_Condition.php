@@ -32,7 +32,7 @@ class DeclarativeTypeParser_Condition extends DeclarativeTypeParser
 	{
 		if ($resource->$res_attribute) {
 			if (!in_array($model_attribute, $this->mc->conditional_values_set)) {
-				$model->{$model_attribute} = $model_class;
+				$model->setAttribute($model_attribute, $model_class);
 				$this->mc->conditional_values_set[] = $model_attribute;
 			} else {
 				throw new \Exception("Unable to differentiate condition as more than one attribute is true.");

@@ -27,12 +27,12 @@ class DeclarativeTypeParser_Resource extends DeclarativeTypeParser
 	{
 		$_model_class_name = '\\'.$model_class;
 
-		$model->$model_attribute = $this->mc->resourceToModel($resource->$res_attribute, new $_model_class_name, $save);
+		$model->setAttribute($model_attribute,$this->mc->resourceToModel($resource->$res_attribute, new $_model_class_name, $save));
 
 		$model_relations = $model->relations();
 
 		if (isset($model_relations[$model_attribute]) && $model_relations[$model_attribute][0] == 'CBelongsToRelation') {
-			$model->{$model_relations[$model_attribute][2]} = $model->$model_attribute->id;
+			$model->setAttribute($model_relations[$model_attribute][2], $model->$model_attribute->id);
 		}
 	}
 }

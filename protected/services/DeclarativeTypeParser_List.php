@@ -61,19 +61,17 @@ class DeclarativeTypeParser_List extends DeclarativeTypeParser
 			foreach ($related_objects[$related_object_name][$related_object_attribute] as $i => $item) {
 				if (is_array($copy_attribute)) {
 					foreach ($copy_attribute as $_key => $_value) {
-						$related_objects[$related_object_name][$related_object_attribute][$i]->$_key = $model->$_value;
+						$related_objects[$related_object_name][$related_object_attribute][$i]->$_key = $model->expandAttribute($_value);
 					}
 				} else {
-					$related_objects[$related_object_name][$related_object_attribute][$i]->{$copy_attribute} = $model->{$copy_attribute};
+					$related_objects[$related_object_name][$related_object_attribute][$i]->{$copy_attribute} = $model->expandAttribute($copy_attribute);
 				}
 			}
 		}
 
-		if ($related_object_attribute) {
-			$model->$related_object_name->$related_object_attribute = $this->filterListItems($model->$related_object_name, $related_object_attribute, $related_objects[$related_object_name][$related_object_attribute], $save);
-		} else {
-			$model->$related_object_name = $this->filterListItems($model->$related_object_name, $related_object_attribute, $related_objects[$related_object_name][$related_object_attribute], $save);
-		}
+		$attribute = $related_object_attribute ? $related_object_name.'.'.$related_object_attribute : $related_object_name;
+
+		$model->setAttribute($attribute, $this->filterListItems($model->expandAttribute($related_object_name), $related_object_attribute, $related_objects[$related_object_name][$related_object_attribute], $save));
 	}
 
 	protected function filterListItems($object, $relation, $items, $save)

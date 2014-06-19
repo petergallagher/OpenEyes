@@ -30,7 +30,7 @@ class DeclarativeTypeParser_RefList extends DeclarativeTypeParser
 
 	public function resourceToModelParse(&$model, $resource, $model_assignment_relation, $res_attribute, $model_assignment_field, $param1, &$param2)
 	{
-		$model_relations = $model->relations();
+		$model_relations = $model->getRelations();
 
 		$assignment_model = $model_relations[$model_assignment_relation][1];
 		$assignment_field = $model_relations[$model_assignment_relation][2];
@@ -45,6 +45,6 @@ class DeclarativeTypeParser_RefList extends DeclarativeTypeParser
 			$assignments[] = $assignment;
 		}
 
-		$model->$model_assignment_relation = $assignments;
+		$model->setAttribute($model_assignment_relation,$assignments);
 	}
 }

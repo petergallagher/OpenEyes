@@ -52,21 +52,21 @@ class DeclarativeTypeParser_DataObjectExclusive extends DeclarativeTypeParser
 			$related_object_attribute = substr($model_attribute,$pos+1,strlen($model_attribute));
 
 			if ($related_objects[$related_object_name][$related_object_attribute] && isset($copy_attribute)) {
-				$related_objects[$related_object_name][$related_object_attribute]->{$copy_attribute} = $model->{$copy_attribute};
+				$related_objects[$related_object_name][$related_object_attribute]->{$copy_attribute} = $model->expandAttribute($copy_attribute);
 			}
 		} else {
 			throw new \Exception("Unhandled");
 		}
 
 		if ($save) {
-			if ($old_object = $model->$related_object_name->$related_object_attribute) {
+			if ($old_object = $model->expandAttribute($related_object_name.'.'.$related_object_attribute)) {
 				$this->mc->deleteModel($old_object);
 			}
 		}
 
-		if ($model->$related_object_name && $related_objects[$related_object_name][$related_object_attribute]) {
-			$model->$related_object_name->$related_object_attribute = $related_objects[$related_object_name][$related_object_attribute];
-			$save && $this->mc->saveModel($model->$related_object_name->$related_object_attribute);
+		if ($model->expandAttribute($related_object_name) && $related_objects[$related_object_name][$related_object_attribute]) {
+			$model->setAttribute($related_object_name.'.'.$related_object_attribute, $related_objects[$related_object_name][$related_object_attribute]);
+			$save && $this->mc->saveModel($model->expandAttribute($related_object_name.'.'.$related_object_attribute));
 		}
 	}
 }

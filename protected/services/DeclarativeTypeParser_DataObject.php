@@ -58,9 +58,9 @@ class DeclarativeTypeParser_DataObject extends DeclarativeTypeParser
 			throw new \Exception("Unhandled");
 		}
 
-		if ($model->$related_object_name && $related_objects[$related_object_name][$related_object_attribute]) {
-			$model->$related_object_name->$related_object_attribute = $related_objects[$related_object_name][$related_object_attribute];
-			$save && $this->mc->saveModel($model->$related_object_name->$related_object_attribute);
+		if ($model->expandAttribute($related_object_name) && $related_objects[$related_object_name][$related_object_attribute]) {
+			$model->setAttribute($related_object_name.'.'.$related_object_attribute, $related_objects[$related_object_name][$related_object_attribute]);
+			$save && $this->mc->saveModel($model->expandAttribute($model,$related_object_name.'.'.$related_object_attribute));
 		}
 	}
 }

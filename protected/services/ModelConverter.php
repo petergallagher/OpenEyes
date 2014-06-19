@@ -108,12 +108,9 @@ class ModelConverter
 
 	public function resourceToModel($resource, $model, $save=true, $extra_fields=false)
 	{
-		is_array($extra_fields) &&
-			$this->setObjectAttributes($model, $extra_fields);
+		$model = new ModelConverter_Model($model, $extra_fields);
 
-		$model_relations = $model->relations();
-
-		if ($class_related_objects = $this->map->getRelatedObjectsForClass(get_class($model))) {
+		if ($class_related_objects = $this->map->getRelatedObjectsForClass($model->getClass())) {
 			$this->processRelatedObjects($model, $resource, $class_related_objects);
 		}
 
@@ -121,7 +118,7 @@ class ModelConverter
 		$reference_object_attributes = array();
 		$this->conditional_values_set = array();
 
-		foreach ($this->map->getFieldsForClass(get_class($model)) as $res_attribute => $def) {
+		foreach ($this->map->getFieldsForClass($model->getClass()) as $res_attribute => $def) {
 			if (is_array($def)) {
 				$class = 'services\\'.$def[0];
 				$parser = new $class($this);
@@ -135,7 +132,7 @@ class ModelConverter
 			$this->processRelatedObjects($model, $resource, $class_related_objects, true);
 		}
 
-		foreach ($this->map->getFieldsForClass(get_class($model)) as $res_attribute => $def) {
+		foreach ($this->map->getFieldsForClass($model->getClass()) as $res_attribute => $def) {
 			if (is_array($def)) {
 				$class = 'services\\'.$def[0];
 				$parser = new $class($this);
@@ -145,9 +142,9 @@ class ModelConverter
 			}
 		}
 
-		$save && $this->saveModel($model);
+		$save && $model->save();
 
-		return $model;
+		return $model->getModel();
 	}
 
 	protected function mapResourceAttributeToModel(&$model, $resource_value, $attribute_def, $class_related_objects)
@@ -160,14 +157,14 @@ class ModelConverter
 			}
 		}
 
-		$this->setObjectAttribute($model, $attribute_def, $resource_value);
+		$model->setAttribute($attribute_def, $resource_value);
 	}
 
 	protected function mapResourceReferenceObjectToModel(&$model, $relation_name, $related_object_attribute, $resource_value)
 	{
 		$reference_object_attributes[$relation_name][$related_object_attribute] = $resource_value;
 
-		$reference_def = $this->map->getReferenceObjectForClass(get_class($model), $relation_name);
+		$reference_def = $this->map->getReferenceObjectForClass($model->getClass(), $relation_name);
 
 		if (array_keys($reference_object_attributes[$relation_name]) == $reference_def[2]) {
 			// All required properties for matching the reference item have been set, so now we can associate it with the model
@@ -187,8 +184,8 @@ class ModelConverter
 				$save && $this->saveModel($related_object);
 			}
 
-			$model->{$reference_def[0]} = $related_object->primaryKey;
-			$model->$relation_name = $related_object;
+			$model->setAttribute($reference_def[0], $related_object->primaryKey);
+			$model->setAttribute($relation_name, $related_object);
 		}
 	}
 
@@ -205,12 +202,12 @@ class ModelConverter
 				$object_relation = $relation_name;
 			}
 
-			if ($save && $related_object = $this->expandObjectAttribute($model, $object_relation)) {
+			if ($save && $related_object = $model->expandAttribute($object_relation)) {
 				$this->saveModel($related_object);
 
-				$this->setObjectAttribute($model, $attribute, $related_object->id);
+				$model->setAttribute($attribute, $related_object->id);
 			} else {
-				$this->setObjectAttribute($model, $object_relation, $related_object_value, false);
+				$model->setAttribute($object_relation, $related_object_value, false);
 			}
 		}
 	}

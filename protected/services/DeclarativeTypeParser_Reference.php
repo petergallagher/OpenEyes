@@ -38,6 +38,6 @@ class DeclarativeTypeParser_Reference extends DeclarativeTypeParser
 			$id_value = null;
 		}
 
-		$this->mc->setObjectAttribute($model, $model_attribute, $id_value);
+		$model->setAttribute($model_attribute, $id_value);
 	}
 }
