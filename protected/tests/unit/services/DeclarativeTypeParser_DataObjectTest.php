@@ -81,4 +81,67 @@ class DeclarativeTypeParser_DataObjectTest extends \CDbTestCase
 
 		$this->assertEquals(new Address($data), $p->modelToResourceParse('pencil','sharpener','Address'));
 	}
+
+	public function testResourceToModelParse_IsObject()
+	{
+		$mc = $this->getMockBuilder('services\ModelConverter')
+			->disableOriginalConstructor()
+			->setMethods(array('resourceToModel'))
+			->getMock();
+
+		$mc->expects($this->once())
+			->method('resourceToModel')
+			->with(new \stdClass, new \Address, false)
+			->will($this->returnValue('crane'));
+
+		$model = $this->getMockBuilder('services\ModelConverter_ModelWrapper')
+			->disableOriginalConstructor()
+			->setMethods(array('setRelatedObject'))
+			->getMock();
+
+		$model->expects($this->once())
+			->method('setRelatedObject')
+			->with('one','two','crane');
+
+		$p = new DeclarativeTypeParser_DataObject($mc);
+
+		$resource = (object)array(
+			'sticks' => new \stdClass
+		);
+
+		$p->resourceToModelParse($model, $resource, 'one.two', 'sticks', null, 'Address');
+	}
+
+	public function testResourceToModelParse_NotObject()
+	{
+		$mc = $this->getMockBuilder('services\ModelConverter')
+			->disableOriginalConstructor()
+			->setMethods(array('resourceToModel'))
+			->getMock();
+
+		$model = $this->getMockBuilder('services\ModelConverter_ModelWrapper')
+			->disableOriginalConstructor()
+			->setMethods(array('setRelatedObject'))
+			->getMock();
+
+		$model->expects($this->once())
+			->method('setRelatedObject')
+			->with('one','two',null);
+
+		$p = new DeclarativeTypeParser_DataObject($mc);
+
+		$resource = (object)array(
+			'sticks' => 'test'
+		);
+
+		$p->resourceToModelParse($model, $resource, 'one.two', 'sticks', null, 'Address');
+	}
+
+	public function testResourceToModelParse_UnhandledAttributeType()
+	{
+		$this->setExpectedException('Exception','Unhandled');
+		$a = 1;
+		$p = new DeclarativeTypeParser_DataObject($a);
+		$p->resourceToModelParse($a, null, 'one', 'sticks', null, 'Address');
+	}
 }
