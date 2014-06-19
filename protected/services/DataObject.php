@@ -143,7 +143,11 @@ abstract class DataObject implements FhirCompatible
 	 */
 	public function toFhirValues()
 	{
-		return array_filter(get_object_vars($this), function ($v) { return $v !== ''; });
+		$values = get_object_vars($this);
+		foreach ($values as &$value) {
+			if ($value === '') $value = null;
+		}
+		return $values;
 	}
 
 	/**
