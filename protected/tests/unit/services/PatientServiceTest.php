@@ -602,12 +602,10 @@ class PatientServiceTest extends \CDbTestCase
 		$resource = $this->getResource();
 		$resource->cb_refs = array(\Yii::app()->service->CommissioningBody(1));
 
-		$cb_refs = count(\CommissioningBodyPatientAssignment::model()->findAll());
-
 		$ps = new PatientService;
 		$patient = $ps->resourceToModel($resource, new \Patient);
 
-		$this->assertEquals($cb_refs+1, count(\CommissioningBodyPatientAssignment::model()->findAll()));
+		$this->assertEquals(1, count(\CommissioningBodyPatientAssignment::model()->findAll('patient_id=?',array($patient->id))));
 	}
 
 	public function testResourceToModel_Save_Commissioning_Body_Refs_Save_ModelIsCorrect()

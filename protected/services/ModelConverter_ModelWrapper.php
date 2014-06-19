@@ -22,6 +22,7 @@ class ModelConverter_ModelWrapper
 	protected $related_objects = array();
 	protected $reference_object_attributes = array();
 	protected $conditional_attributes = array();
+	protected $assignment_relations = array();
 
 	public function __construct($map, $model, $extra_fields=null)
 	{
@@ -79,6 +80,8 @@ class ModelConverter_ModelWrapper
 		if (!$this->model->save()) {
 			throw new ValidationFailure("Validation failure on " . $this->getClass().": ".print_r($this->model->errors,true), $this->model->errors);
 		}
+
+		$this->saveAssignmentRelations();
 	}
 
 	public function hasConditionalAttribute($attribute)
@@ -212,12 +215,45 @@ class ModelConverter_ModelWrapper
 
 		foreach ($ref_list as $ref) {
 			$assignment = new $assignment_model;
-			$assignment->$assignment_field = $this->getId();
 			$assignment->$model_assignment_field = $ref->getId();
 
 			$assignments[] = $assignment;
 		}
 
+		if (!empty($ref_list)) {
+			$this->assignment_relations[$relation_name] = array(
+				'assignment_field' => $assignment_field,
+				'assignment_model' => $assignment_model,
+			);
+		}
+
 		$this->setAttribute($relation_name, $assignments);
+	}
+
+	protected function saveAssignmentRelations()
+	{
+		$saved_ids = array();
+
+		foreach ($this->assignment_relations as $relation => $params) {
+			foreach ($this->model->$relation as $item) {
+				$item->{$params['assignment_field']} = $this->getId();
+
+				if (!$item->save()) {
+					throw new \Exception("Unable to save assignment model ".get_class($item).": ".print_r($item->errors,true));
+				}
+
+				$saved_ids[] = $item->id;
+			}
+
+			$criteria = new \CDbCriteria;
+			$criteria->addCondition($params['assignment_field'].' = :id');
+			$criteria->params[':id'] = $this->getId();
+
+			!empty($saved_ids) && $criteria->addNotInCondition('id',$saved_ids);
+
+			$assignment_model = $params['assignment_model'];
+
+			$assignment_model::model()->deleteAll($criteria);
+		}
 	}
 }
