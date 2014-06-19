@@ -31,6 +31,9 @@ class Patient extends Resource
 		}
 		unset($values['gender']);
 
+		if (isset($values['birth_date'])) $values['birth_date'] = $values['birth_date']->toDate();
+		if (isset($values['date_of_death'])) $values['date_of_death'] = $values['date_of_death']->toDate();
+
 		foreach ($values['care_providers'] as $ref) {
 			switch ($ref->getServiceName()) {
 				case 'Gp':
