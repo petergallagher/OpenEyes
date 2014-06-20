@@ -18,7 +18,7 @@ namespace services;
 /**
  * Internally implemented services
  */
-abstract class InternalService extends Service
+abstract class InternalService implements Service
 {
 	// Available operations (values taken from http://hl7.org/implement/standards/fhir/type-restful-operation.html)
 	const OP_READ = 'read';
@@ -45,6 +45,15 @@ abstract class InternalService extends Service
 	 * Search parameters supported by this service as a map of name => type
 	 */
 	static protected $search_params = array();
+
+	/**
+	 * @param array $params
+	 * @return InternalService
+	 */
+	static public function load(array $params = array())
+	{
+        return new static($params);
+	}
 
 	/**
 	 * Get the name of this service, ie the unqualified class name of the resource type it handles

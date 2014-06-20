@@ -15,15 +15,13 @@
 
 namespace services;
 
-abstract class Service
+interface Service
 {
 	/**
+	 * @param array $params
 	 * @return Service
 	 */
-	static public function load(array $params = array())
-	{
-		return new static($params);
-	}
+	static public function load(array $params = array());
 
 	/**
 	 * Get a reference to the resource with the specified ID
@@ -31,7 +29,7 @@ abstract class Service
 	 * @param scalar $id
 	 * @return ResourceReference
 	 */
-	abstract public function getReference($id);
+	public function getReference($id);
 
 	/**
 	 * Create a new resource and return a reference to it
@@ -39,7 +37,7 @@ abstract class Service
 	 * @param Resource $resource
 	 * @return ResourceReference
 	 */
-	abstract public function create(Resource $resource);
+	public function create(Resource $resource);
 
 	/**
 	 * Search for resources according to the parameters passed
@@ -47,5 +45,5 @@ abstract class Service
 	 * @param array $params
 	 * @return Resource[]
 	 */
-	abstract public function search(array $params);
+	public function search(array $params);
 }
