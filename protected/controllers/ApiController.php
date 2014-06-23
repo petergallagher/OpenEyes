@@ -161,7 +161,8 @@ class ApiController extends CController
 		}
 
 		header('Content-Location: ' . $this->createAbsoluteUrl('api/') . '/' . Yii::app()->service->referenceToFhirUrl($ref) . "/_history/{$vid}");
-		header("ETag: \"{$vid}\"");
+		$this->sendLastModified($ref);
+		$this->sendEtag($ref);
 		$this->sendResource($ref->fetch());
 	}
 
@@ -182,6 +183,8 @@ class ApiController extends CController
 		if ($vid != $current_vid) {
 			$this->sendError("Only accessing the current version of a resource is supported: latest is '{$current_vid}', attempted to fetch '{$vid}'", 405);
 		}
+
+		$this->sendLastModified($ref);
 		$this->sendResource($ref->fetch());
 	}
 
@@ -232,9 +235,8 @@ class ApiController extends CController
 
 		header("Location: {$vurl}");
 		header("Content-Location: {$vurl}");
-		header("Last-modified: " . date(DATE_RFC1123, $ref->getLastModified()));
-		header("ETag: \"{$vid}\"");
-
+		$this->sendLastModified($ref);
+		$this->sendEtag($ref);
 		$this->sendInfo("Resource {$resource_type}/{$id} successfully updated");
 	}
 
@@ -280,11 +282,9 @@ class ApiController extends CController
 		$tx->commit();
 
 		$url = Yii::app()->service->referenceToFhirUrl($ref);
-		$vid = $ref->getVersionId();
 
-		header('Location: ' . $this->createAbsoluteUrl('api/') . "/{$url}/_history/{$vid}");
-		header("ETag: \"{$vid}\"");
-
+		header('Location: ' . $this->createAbsoluteUrl('api/') . "/{$url}/_history/{$ref->getVersionId()}");
+		$this->sendEtag($ref);
 		$this->sendInfo("Resource '{$url}' successfully created", 201);
 	}
 
@@ -432,6 +432,16 @@ class ApiController extends CController
 		return $input;
 	}
 
+	protected function sendLastModified(services\InternalReference $ref)
+	{
+		header("Last-modified: " . date(DATE_RFC1123, $ref->getLastModified()));
+	}
+
+	protected function sendEtag(services\InternalReference $ref)
+	{
+		header("ETag: \"{$ref->getVersionId()}\"");
+	}
+
 	protected function sendInfo($message, $status = 200)
 	{
 		$this->sendResource(services\FhirOutcome::singleIssue(FhirValueSet::ISSUESEVERITY_INFORMATION, null, $message), $status);
@@ -445,10 +455,6 @@ class ApiController extends CController
 	protected function sendResource(services\Resource $resource, $status = 200)
 	{
 		header("Category: {$resource->getOeFhirProfile()}; scheme=http://hl7.org/fhir/tag/profile");
-
-		if (($last_modified = $resource->getLastModified())) {
-			header("Last-modified: " . date(DATE_RFC1123, $last_modified));
-		}
 
 		$data = $resource->toFhir();
 
