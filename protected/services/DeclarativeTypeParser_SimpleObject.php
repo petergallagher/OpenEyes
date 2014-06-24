@@ -29,7 +29,7 @@ class DeclarativeTypeParser_SimpleObject extends DeclarativeTypeParser
 		}
 	}
 
-	public function resourceToModelParse(&$model, $resource, $model_attribute, $res_attribute, $model_class, $param1)
+	public function resourceToModelParse(&$model, $resource, $model_attribute, $res_attribute, $model_class, $param1, $save)
 	{
 		if (is_object($resource->$res_attribute) && method_exists($resource->$res_attribute,'toModelValue')) {
 			$model->setAttribute($model_attribute,$resource->$res_attribute->toModelValue());

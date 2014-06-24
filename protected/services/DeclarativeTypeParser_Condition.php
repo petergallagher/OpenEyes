@@ -28,7 +28,7 @@ class DeclarativeTypeParser_Condition extends DeclarativeTypeParser
 		}
 	}
 
-	public function resourceToModelParse(&$model, $resource, $model_attribute, $res_attribute, $param1, $model_class)
+	public function resourceToModelParse(&$model, $resource, $model_attribute, $res_attribute, $param1, $model_class, $save)
 	{
 		if ($resource->$res_attribute) {
 			if (!$model->hasConditionalAttribute($model_attribute)) {

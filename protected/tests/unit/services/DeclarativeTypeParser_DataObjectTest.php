@@ -109,7 +109,7 @@ class DeclarativeTypeParser_DataObjectTest extends \CDbTestCase
 			'sticks' => new \stdClass
 		);
 
-		$p->resourceToModelParse($model, $resource, 'one.two', 'sticks', null, 'Address');
+		$p->resourceToModelParse($model, $resource, 'one.two', 'sticks', null, 'Address', false);
 	}
 
 	public function testResourceToModelParse_NotObject()
@@ -134,7 +134,7 @@ class DeclarativeTypeParser_DataObjectTest extends \CDbTestCase
 			'sticks' => 'test'
 		);
 
-		$p->resourceToModelParse($model, $resource, 'one.two', 'sticks', null, 'Address');
+		$p->resourceToModelParse($model, $resource, 'one.two', 'sticks', null, 'Address', false);
 	}
 
 	public function testResourceToModelParse_UnhandledAttributeType()
@@ -142,7 +142,7 @@ class DeclarativeTypeParser_DataObjectTest extends \CDbTestCase
 		$this->setExpectedException('Exception','Unhandled');
 		$a = 1;
 		$p = new DeclarativeTypeParser_DataObject($a);
-		$p->resourceToModelParse($a, null, 'one', 'sticks', null, 'Address');
+		$p->resourceToModelParse($a, null, 'one', 'sticks', null, 'Address', false);
 	}
 
 	public function testResourceToModel_RelatedObjects_CopyAttribute()

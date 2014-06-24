@@ -58,7 +58,7 @@ class ModelConverter
 			if (is_array($def)) {
 				$class = 'services\\'.$def[0];
 				$parser = new $class($this);
-				$parser->resourceToModelParse($model, $resource, $def[1], $res_attribute, $def[2], @$def[3]);
+				$parser->resourceToModelParse($model, $resource, $def[1], $res_attribute, $def[2], @$def[3], $save);
 			} else {
 				$this->mapResourceAttributeToModel($model, $resource->$res_attribute, $def, $save);
 			}

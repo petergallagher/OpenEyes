@@ -65,7 +65,7 @@ class DeclarativeTypeParser_ReferenceTest extends \CDbTestCase
 		$resource = new \stdClass;
 		$resource->patient = \Yii::app()->service->Patient(1);
 
-		$p->resourceToModelParse($model, $resource, 'air', 'patient', null, null);
+		$p->resourceToModelParse($model, $resource, 'air', 'patient', null, null, false);
 	}
 
 	public function testResourceToModelParse_NoIdMethod()
@@ -85,7 +85,7 @@ class DeclarativeTypeParser_ReferenceTest extends \CDbTestCase
 		$resource = new \stdClass;
 		$resource->patient = (object)array('id' => 2);
 
-		$p->resourceToModelParse($model, $resource, 'air', 'patient', null, null);
+		$p->resourceToModelParse($model, $resource, 'air', 'patient', null, null, false);
 	}
 
 	public function testResourceToModelParse_NullResAttribute()
@@ -105,7 +105,7 @@ class DeclarativeTypeParser_ReferenceTest extends \CDbTestCase
 		$resource = new \stdClass;
 		$resource->patient = null;
 
-		$p->resourceToModelParse($model, $resource, 'air', 'patient', null, null);
+		$p->resourceToModelParse($model, $resource, 'air', 'patient', null, null, false);
 	}
 
 	public function testJsonToResourceParse()

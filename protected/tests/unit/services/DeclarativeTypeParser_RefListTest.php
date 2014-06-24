@@ -71,7 +71,7 @@ class DeclarativeTypeParser_RefListTest extends \CDbTestCase
 			'linux' => 'kernel'
 		);
 
-		$p->resourceToModelParse($model, $resource, 'mac', 'linux', 'penguin', null);
+		$p->resourceToModelParse($model, $resource, 'mac', 'linux', 'penguin', null, false);
 	}
 
 	public function testJsonToResourceParse()

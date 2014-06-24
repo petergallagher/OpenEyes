@@ -76,7 +76,7 @@ class DeclarativeTypeParser_ConditionTest extends \CDbTestCase
 			'carrot' => 'orange'
 		);
 
-		$this->p->resourceToModelParse($mock, $resource, 'carrot', 'carrot', null, 'stick');
+		$this->p->resourceToModelParse($mock, $resource, 'carrot', 'carrot', null, 'stick', false);
 	}
 
 	public function testResourceToModelParse_ConditionalAttributeAlreadySet()
@@ -97,7 +97,7 @@ class DeclarativeTypeParser_ConditionTest extends \CDbTestCase
 			'carrot' => 'orange'
 		);
 
-		$this->p->resourceToModelParse($mock, $resource, 'carrot', 'carrot', null, 'stick');
+		$this->p->resourceToModelParse($mock, $resource, 'carrot', 'carrot', null, 'stick', false);
 	}
 
 	public function testJsonToResourceParse()

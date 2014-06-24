@@ -81,7 +81,7 @@ class DeclarativeTypeParser_ListTest extends \CDbTestCase
 		);
 
 		$p = new DeclarativeTypeParser_List($mc);
-		$p->resourceToModelParse($model, $resource, 'testing.iscool', 'data', null, 'Address');
+		$p->resourceToModelParse($model, $resource, 'testing.iscool', 'data', null, 'Address', false);
 	}
 
 	public function testResourceToModelParse_WithoutDot()
@@ -119,7 +119,7 @@ class DeclarativeTypeParser_ListTest extends \CDbTestCase
 		);
 
 		$p = new DeclarativeTypeParser_List($mc);
-		$p->resourceToModelParse($model, $resource, 'testing', 'data', null, 'Address');
+		$p->resourceToModelParse($model, $resource, 'testing', 'data', null, 'Address', false);
 	}
 
 	public function testResourceToModel_RelatedObjects_WithDot_NoCopy()

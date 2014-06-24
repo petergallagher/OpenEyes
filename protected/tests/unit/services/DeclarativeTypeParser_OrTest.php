@@ -82,7 +82,7 @@ class DeclarativeTypeParser_OrTest extends \CDbTestCase
 
 		$p = new DeclarativeTypeParser_Or($mc);
 
-		$p->resourceToModelParse($model, $resource, 'name', 'iphone', null, null);
+		$p->resourceToModelParse($model, $resource, 'name', 'iphone', null, null, false);
 	}
 
 	public function testResourceToModelParse_AllNull_Else()
@@ -127,7 +127,7 @@ class DeclarativeTypeParser_OrTest extends \CDbTestCase
 
 		$p = new DeclarativeTypeParser_Or($mc);
 
-		$p->resourceToModelParse($model, $resource, 'name', 'iphone', null, null);
+		$p->resourceToModelParse($model, $resource, 'name', 'iphone', null, null, false);
 	}
 
 	public function testResourceToModelParse_UnknownRuleType()
@@ -170,6 +170,6 @@ class DeclarativeTypeParser_OrTest extends \CDbTestCase
 
 		$this->setExpectedException('Exception', 'Unknown rule type: 1');
 
-		$p->resourceToModelParse($model, $resource, 'name', 'iphone', null, null);
+		$p->resourceToModelParse($model, $resource, 'name', 'iphone', null, null, false);
 	}
 }

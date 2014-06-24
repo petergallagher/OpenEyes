@@ -31,7 +31,7 @@ class DeclarativeTypeParser_List extends DeclarativeTypeParser
 		return $data_items;
 	}
 
-	public function resourceToModelParse(&$model, $resource, $model_attribute, $res_attribute, $param1, $model_class)
+	public function resourceToModelParse(&$model, $resource, $model_attribute, $res_attribute, $param1, $model_class, $save)
 	{
 		if ((strpos($model_attribute,'.')) !== FALSE) {
 			list($related_object_name, $related_object_attribute) = explode('.',$model_attribute);
