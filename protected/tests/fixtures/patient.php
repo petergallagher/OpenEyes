@@ -62,6 +62,7 @@ return array(
 		'contact_id' => 3
 	),
 	'patient4' => array(
+		'id' => 4,
 		'pas_key' => '123',
 		'title' => 'Mrs.',
 		'first_name' => 'Carla',

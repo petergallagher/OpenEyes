@@ -38,7 +38,7 @@ class DeclarativeTypeParser_RefList extends DeclarativeTypeParser
 		$refs = array();
 
 		foreach ($object->$attribute as $ref) {
-			$refs[] = \Yii::app()->service->{$def->service}($ref->id);
+			$refs[] = \Yii::app()->service->$model_class($ref->id);
 		}
 
 		return $refs;
