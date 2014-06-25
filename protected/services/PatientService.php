@@ -52,7 +52,7 @@ class PatientService extends DeclarativeModelService
 		'PatientAddress' => array(
 			'ar_class' => 'Address',
 			'related_objects' => array(
-				'contact' => array('contact_id', 'Contact'),
+				'contact' => array('contact_id', 'Contact', 'save' => 'no'),
 			),
 			'reference_objects' => array(
 				'country' => array('country_id', 'Country', array('name')),
