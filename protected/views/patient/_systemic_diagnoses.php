@@ -44,7 +44,7 @@
 			<?php foreach ($this->patient->systemicDiagnoses as $diagnosis) {?>
 				<tr>
 					<td><?php echo $diagnosis->dateText?></td>
-					<td><?php echo $diagnosis->eye ? $diagnosis->eye->adjective : ''?> <?php echo $diagnosis->disorder->term?></td>
+					<td><?php echo $diagnosis->systemicDescription;?></td>
 					<?php if ($this->checkAccess('OprnEditSystemicDiagnosis')) { ?>
 						<td><a href="#" class="removeDiagnosis" rel="<?php echo $diagnosis->id?>">Remove</a></td>
 					<?php } ?>

@@ -96,6 +96,32 @@ $warnings = $this->patient->getWarnings($clinical);
 					'firm' => $firm,
 				))?>
 			<?php }?>
+			<?php
+			try {
+				echo $this->renderPartial('custom/info');
+			} catch (Exception $e) {
+				// This is our default layout
+				$codes = $this->patient->getSpecialtyCodes();
+				// specialist diagnoses
+				foreach ($codes as $code) {
+					try {
+						echo $this->renderPartial('_' . $code . '_diagnoses');
+					} catch (Exception $e) {}
+				}
+				$this->renderPartial('_systemic_diagnoses');
+				$this->renderPartial('_previous_operations');
+				$this->renderPartial('_medications');
+				// specialist extra data
+				foreach ($codes as $code) {
+					try {
+						echo $this->renderPartial('_' . $code . '_info');
+					} catch (Exception $e) {}
+				}
+				$this->renderPartial('_allergies');
+				$this->renderPartial('_family_history');
+				$this->renderPartial('_social_history');
+			}
+			?>
 		</div>
 	</div>
 </div>
