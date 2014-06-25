@@ -113,4 +113,12 @@ class SecondaryDiagnosis extends BaseActiveRecordVersioned
 	{
 		return Helper::formatFuzzyDate($this->date);
 	}
+
+	public function getOphthalmicDescription() {
+		return $this->eye->adjective.' '.$this->disorder->term;
+	}
+
+	public function getSystemicDescription() {
+		return ($this->eye ? $this->eye->adjective.' ' : '').$this->disorder->term;
+	}
 }
