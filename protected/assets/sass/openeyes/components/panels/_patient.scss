@@ -60,7 +60,7 @@
 			padding: {
 				top: 2px;
 				bottom: 2px;
-			}
+			};
 		}
 		background: {
 			position: 98% 2px, top;
@@ -108,12 +108,9 @@
 		.hospital-number, .nhs-number {
 			font-size: rem-calc(12px);
 		}
-		.patient-summary-anchor  {
-			bottom: 12px;
+		.patient-summary-anchor {
 			font-size: rem-calc(11px);
-			padding-right: 8px;
-			position: absolute;
-			right: 0;
+			padding-top: 5px;
 			@media screen {
 				.stuck & {
 					display: none;
@@ -161,5 +158,20 @@
 				}
 			}
 		}
+	}
+}
+
+// PATIENT POPUP
+.panel {
+	&.patient-popup {
+		border: {
+			color: #ffb212;
+			style: solid;
+			width: 2px;
+		};
+		left: 0.75rem;
+		position: absolute;
+		right: 0.75rem;
+		z-index: 1;
 	}
 }
