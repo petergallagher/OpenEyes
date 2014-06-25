@@ -185,7 +185,7 @@ class ContactTest extends CDbTestCase {
 		$label = $this->contactlabels('contactlabel1');
 		$res = Contact::model()->findByLabel('aylw%', $label->name);
 		$c1 = $this->contacts('contact1');
-		$expected = array(array('line' => $c1->ContactLine('City Road, flat 1, flitchley'), 'contact_location_id' => $this->contactlocations('contactlocation1')->id));
+		$expected = array(array('line' => $c1->ContactLine('City Road, flat 1, flitchley'), 'contact_location_id' => $this->contactlocations('contactlocation4')->id));
 
 		$this->assertEquals($expected, $res, 'Should match the first contact with wildcard appended to term');
 	}

@@ -25,6 +25,7 @@
 
 return array(
 	'address1' => array(
+		'id' => 1,
 		'address1' => 'flat 1',
 		'address2' => 'bleakley creek',
 		'city' => 'flitchley',
@@ -37,6 +38,7 @@ return array(
 		'date_end' => '2014-05-05',
 	),
 	'address2' => array(
+		'id' => 2,
 		'address1' => 'flat 2',
 		'address2' => 'bleakley creek',
 		'city' => 'flitchley',
@@ -47,6 +49,7 @@ return array(
 		'contact_id' => 2,
 	),
 	'address3' => array(
+		'id' => 3,
 		'address1' => 'flat 3',
 		'address2' => 'bleakley creek',
 		'city' => 'flitchley',
@@ -57,6 +60,7 @@ return array(
 		'contact_id' => 3,
 	),
 	'address4' => array(
+		'id' => 4,
 		'address1' => 'Staplegun',
 		'address2' => 'Staplegun Creek',
 		'city' => 'Stapleton',
@@ -67,6 +71,7 @@ return array(
 		'contact_id' => 7,
 	),
 	'address5' => array(
+		'id' => 5,
 		'address1' => '1 Infinite Loop',
 		'address2' => '',
 		'city' => 'Cupertino',
@@ -77,6 +82,7 @@ return array(
 		'contact_id' => 8,
 	),
 	'address6' => array(
+		'id' => 6,
 		'address1' => '1 Practice Road',
 		'address2' => '',
 		'city' => 'Practice',

@@ -78,7 +78,7 @@ class ModelConverter_ModelWrapper
 	public function save()
 	{
 		if (!$this->model->save()) {
-			throw new ValidationFailure("Validation failure on " . $this->getClass().": ".print_r($this->model->errors,true), $this->model->errors);
+			throw new \Exception("Validation failure on " . $this->getClass().": ".print_r($this->model->errors,true));
 		}
 
 		$this->saveAssignmentRelations();
@@ -101,7 +101,7 @@ class ModelConverter_ModelWrapper
 
 	public function getRelatedObject($related_object_one, $related_object_two)
 	{
-		return $this->related_objects[$related_object_one][$related_object_two];
+		return @$this->related_objects[$related_object_one][$related_object_two];
 	}
 
 	public function addToRelatedObjectArray($related_object_one, $related_object_two, $item)
@@ -111,7 +111,7 @@ class ModelConverter_ModelWrapper
 
 	public function relatedObjectCopyAttributeFromModel($related_object_one, $related_object_two, $attribute)
 	{
-		if ($this->related_objects[$related_object_one][$related_object_two]) {
+		if (@$this->related_objects[$related_object_one][$related_object_two]) {
 			if (is_array($this->related_objects[$related_object_one][$related_object_two])) {
 				foreach ($this->related_objects[$related_object_one][$related_object_two] as $i => $item) {
 					if (is_array($attribute)) {
@@ -146,6 +146,11 @@ class ModelConverter_ModelWrapper
 	public function addReferenceObjectAttribute($relation_name, $attribute, $value)
 	{
 		$this->reference_object_attributes[$relation_name][$attribute] = $value;
+	}
+
+	public function getReferenceObject($relation_name, $attribute)
+	{
+		return @$this->reference_object_attributes[$relation_name][$attribute];
 	}
 
 	public function haveAllKeysForReferenceObject($relation_name)

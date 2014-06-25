@@ -113,7 +113,7 @@ class ContactLocationTest extends CDbTestCase
 		$conLoc->id = 2;
 		$result = $this->contactlocations('contactlocation1')->search();
 		$result = $result->getData();
-		$this->assertEquals('Collin', $result[0]->contact->nick_name);
+		$this->assertEquals('Apple Inc', $result[0]->contact->nick_name);
 	}
 
 	/**

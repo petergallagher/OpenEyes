@@ -36,4 +36,10 @@ return array(
 		'site_id' => null,
 		'institution_id' => 2
 	),
+	'contactlocation4' => array(
+		'id' => 4,
+		'contact_id' => 1,
+		'site_id' => 1,
+		'institution_id' => null,
+	),
 );

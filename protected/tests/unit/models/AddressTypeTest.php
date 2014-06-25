@@ -19,7 +19,6 @@
  */
 class AddressTypeTest extends CDbTestCase
 {
-
 	/**
 	 * @var AddressType
 	 */
@@ -30,10 +29,9 @@ class AddressTypeTest extends CDbTestCase
 
 	public function dataProvider_Search()
 	{
-
 		return array(
-			array(array('id' => 1, 'name' => 'addresstype 1'), 1, array('addresstype1')),
-			array(array('id' => 2, 'name' => 'addresstype 2'), 1, array('addresstype2')),
+			array(array('id' => 1, 'name' => 'ReplyTo'), 1, array('ReplyTo')),
+			array(array('id' => 2, 'name' => 'Home'), 1, array('Home')),
 		);
 	}
 
@@ -60,7 +58,6 @@ class AddressTypeTest extends CDbTestCase
 	 */
 	public function testTableName()
 	{
-
 		$this->assertEquals('address_type', $this->model->tableName());
 	}
 
@@ -69,9 +66,8 @@ class AddressTypeTest extends CDbTestCase
 	 */
 	public function testRules()
 	{
-
-		$this->assertTrue($this->addresstype('addresstype1')->validate());
-		$this->assertEmpty($this->addresstype('addresstype1')->errors);
+		$this->assertTrue($this->addresstype('ReplyTo')->validate());
+		$this->assertEmpty($this->addresstype('ReplyTo')->errors);
 	}
 
 	/**
@@ -89,8 +85,6 @@ class AddressTypeTest extends CDbTestCase
 	 */
 	public function testSearch_WithValidTerms_ReturnsExpectedResults($searchTerms, $numResults, $expectedKeys)
 	{
-
-
 		$addresstype = new AddressType;
 		$addresstype->setAttributes($searchTerms);
 		$addresstyperesults = $addresstype->search();
@@ -107,5 +101,4 @@ class AddressTypeTest extends CDbTestCase
 		$this->assertEquals($numResults, $addresstyperesults->getItemCount());
 		$this->assertEquals($expectedResults, $addresstypedata);
 	}
-
 }
