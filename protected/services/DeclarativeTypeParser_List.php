@@ -58,7 +58,38 @@ class DeclarativeTypeParser_List extends DeclarativeTypeParser
 
 		$attribute = $related_object_attribute ? $related_object_name.'.'.$related_object_attribute : $related_object_name;
 
-		$model->setAttribute($attribute, $this->filterListItems($model->expandAttribute($related_object_name), $related_object_attribute, $model->getRelatedObject($related_object_name,$related_object_attribute), $save));
+		$related_objects = $model->getRelatedObject($related_object_name,$related_object_attribute);
+
+		if ($save) {
+			if (is_array($related_objects) && !empty($related_objects)) {
+				foreach ($related_objects as $related_object) {
+					$this->saveRelatedObject_RelatedObjects($related_object);
+				}
+			}
+		}
+
+		$model->setAttribute(
+			$attribute,
+			$this->filterListItems(
+				$model->expandAttribute($related_object_name),
+				$related_object_attribute,
+				$related_objects,
+				$save
+			)
+		);
+	}
+
+	protected function saveRelatedObject_RelatedObjects(&$related_object)
+	{
+		foreach ($this->mc->map->getRelatedObjectsForClass(\CHtml::modelName($related_object)) as $related_object_name => $def) {
+			if ($related_object->$related_object_name) {
+				if (@$def['save'] != 'no') {
+					$this->mc->saveModel($related_object->$related_object_name);
+
+					DeclarativeTypeParser::setObjectAttribute($related_object,$def[0],$related_object->$related_object_name->primaryKey);
+				}
+			}
+		}
 	}
 
 	protected function filterListItems($object, $relation, $items, $save)
@@ -93,8 +124,8 @@ class DeclarativeTypeParser_List extends DeclarativeTypeParser
 		}
 
 		if ($save) {
-			if ($object->$relation) {
-				foreach ($object->$relation as $current_item) {
+			if ($data) {
+				foreach ($data as $current_item) {
 					if (!in_array($current_item->id,$matched_ids)) {
 						$this->mc->deleteModel($current_item);
 					}
