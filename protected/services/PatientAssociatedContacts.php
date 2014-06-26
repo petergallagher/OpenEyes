@@ -21,10 +21,12 @@ class PatientAssociatedContacts extends Resource
 
 	public function __construct($patient_id=null)
 	{
-		if (!$patient_id) {
-			throw new \Exception("patient_id is required");
+		$params = array();
+
+		if ($patient_id) {
+			$params['patient_id'] = $patient_id;
 		}
 
-		parent::__construct(array('id'=>$patient_id));
+		parent::__construct($params);
 	}
 }

@@ -43,6 +43,10 @@ class DeclarativeTypeParser_Reference extends DeclarativeTypeParser
 
 	public function jsonToResourceParse($object, $attribute, $data_class, $model_class)
 	{
-		return \Yii::app()->service->{$object->$attribute->service}($object->$attribute->id);
+		if ($object->$attribute && isset($object->$attribute->id)) {
+			return \Yii::app()->service->{$object->$attribute->service}($object->$attribute->id);
+		}
+
+		return null;
 	}
 }
