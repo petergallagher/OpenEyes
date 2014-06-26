@@ -109,6 +109,11 @@ class ModelConverter_ModelWrapper
 		$this->related_objects[$related_object_one][$related_object_two][] = $item;
 	}
 
+	public function getRelatedObjects()
+	{
+		return $this->related_objects;
+	}
+
 	public function relatedObjectCopyAttributeFromModel($related_object_one, $related_object_two, $attribute)
 	{
 		if (@$this->related_objects[$related_object_one][$related_object_two]) {

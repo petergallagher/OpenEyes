@@ -155,7 +155,7 @@ class PatientAssociatedContactsServiceTest extends \CDbTestCase
 		$contact2->given_name = 'Hughie';
 		$contact2->family_name = 'Louie';
 		$contact2->primary_phone = '3024302149';
-		$contact2->institution_ref = \Yii::app()->service->Institution(2);
+		$contact2->institution_ref = \Yii::app()->service->Institution(1);
 
 		$contact3 = new PatientAssociatedContact;
 		$contact3->title = 'Dr';
@@ -176,7 +176,7 @@ class PatientAssociatedContactsServiceTest extends \CDbTestCase
 		$total_contacts = count(\Contact::model()->findAll());
 
 		$ps = new PatientAssociatedContactsService;
-		$patient = $ps->resourceToModel($resource, new \Patient, false);
+		$patient = $ps->resourceToModel($resource, $this->patients('patient1'), false);
 
 		$this->assertEquals($total_pcas, count(\PatientContactAssignment::model()->findAll()));
 		$this->assertEquals($total_contacts, count(\Contact::model()->findAll()));
@@ -208,7 +208,7 @@ class PatientAssociatedContactsServiceTest extends \CDbTestCase
 		$this->assertEquals('Hughie',$patient->contactAssignments[1]->location->contact->first_name);
 		$this->assertEquals('Louie',$patient->contactAssignments[1]->location->contact->last_name);
 		$this->assertInstanceOf('ContactLocation',$patient->contactAssignments[1]->location);
-		$this->assertEquals(2,$patient->contactAssignments[1]->location->institution_id);
+		$this->assertEquals(1,$patient->contactAssignments[1]->location->institution_id);
 		$this->assertNull($patient->contactAssignments[1]->location->site_id);
 
 		$this->assertNull($patient->contactAssignments[2]->location);

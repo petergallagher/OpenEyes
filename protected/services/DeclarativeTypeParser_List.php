@@ -48,6 +48,8 @@ class DeclarativeTypeParser_List extends DeclarativeTypeParser
 
 	public function resourceToModel_RelatedObjects(&$model, $model_attribute, $copy_attribute, $save)
 	{
+		"resourceToModel_RelatedObjects for ".get_class($model)."\n";
+
 		if ((strpos($model_attribute,'.')) !== FALSE) {
 			list($related_object_name, $related_object_attribute) = explode('.',$model_attribute);
 		} else {
@@ -88,7 +90,7 @@ class DeclarativeTypeParser_List extends DeclarativeTypeParser
 			if (!$found) {
 				$items_to_keep[] = $item;
 
-				$save && $this->mc->saveModel($item);
+				$save && $this->saveListItem($item);
 			}
 		}
 
@@ -114,5 +116,23 @@ class DeclarativeTypeParser_List extends DeclarativeTypeParser
 		}
 
 		return $data_items;
+	}
+
+	public function saveListItem($item)
+	{
+		foreach ($this->mc->map->getRelatedObjectsForClass(get_class($item)) as $relation => $def) {
+			if (@$def['save'] != 'no') {
+				if ($item->$relation) {
+					if (!empty($def['related'])) {
+						$this->mc->saveModel($item->$relation->{$def['related'][1]});
+						$item->$relation->{$def['related'][0]} = $item->$relation->{$def['related'][1]}->primaryKey;
+					}
+
+					$this->mc->saveModel($item->$relation);
+				}
+			}
+		}
+
+		$this->mc->saveModel($item);
 	}
 }
