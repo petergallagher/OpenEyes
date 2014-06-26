@@ -84,6 +84,14 @@ class FhirValueSet
 	const SUPPLYDISPENSESTATUS_ABANDONED = 'abandoned';  // Dispensing was not completed.
 
 
+	// http://hl7.org/fhir/participantrequired
+	// Is the Participant required to attend the appointment
+
+	const PARTICIPANTREQUIRED_REQUIRED = 'required';  // The participant is required to attend the appointment.
+	const PARTICIPANTREQUIRED_OPTIONAL = 'optional';  // The participant may optionally attend the appointment.
+	const PARTICIPANTREQUIRED_INFORMATION_ONLY = 'information-only';  // The participant is not required to attend the appointment (appointment is about them, not for them).
+
+
 	// http://hl7.org/fhir/procedure-relationship-type
 	// The nature of the relationship with this procedure
 
@@ -96,6 +104,17 @@ class FhirValueSet
 
 	const CONFORMANCEEVENTMODE_SENDER = 'sender';  // The application sends requests and receives responses.
 	const CONFORMANCEEVENTMODE_RECEIVER = 'receiver';  // The application receives requests and sends responses.
+
+
+	// http://hl7.org/fhir/participationstatus
+	// The Participation status of an appointment
+
+	const PARTICIPATIONSTATUS_ACCEPTED = 'accepted';  // The participant has accepted the appointment.
+	const PARTICIPATIONSTATUS_DECLINED = 'declined';  // The participant has declined the appointment and will not participate in the appointment.
+	const PARTICIPATIONSTATUS_TENTATIVE = 'tentative';  // The participant has  tentatively accepted the appointment. This could be automatically created by a system and requires further processing before it can be accepted. There is no commitment that attendance will occur.
+	const PARTICIPATIONSTATUS_IN_PROCESS = 'in-process';  // The participant has started the appointment.
+	const PARTICIPATIONSTATUS_COMPLETED = 'completed';  // The participant's involvement in the appointment has been completed.
+	const PARTICIPATIONSTATUS_NEEDS_ACTION = 'needs-action';  // The participant needs to indicate if they accept the appointment by changing this status to one of the other statuses.
 
 
 	// http://hl7.org/fhir/identifier-use
@@ -203,6 +222,24 @@ class FhirValueSet
 	const RESTFULCONFORMANCEMODE_SERVER = 'server';  // The application acts as a client for this resource.
 
 
+	// http://hl7.org/fhir/appointmentstatus
+	// The free/busy status of an appointment
+
+	const APPOINTMENTSTATUS_BUSY = 'busy';  // The participant(s) will be unavailable during this appointment.
+	const APPOINTMENTSTATUS_FREE = 'free';  // The participant(s) will still be available during this appointment.
+	const APPOINTMENTSTATUS_TENTATIVE = 'tentative';  // This appointment has not been confirmed, and may become available.
+	const APPOINTMENTSTATUS_OUTOFOFFICE = 'outofoffice';  // The participant(s) will not be at the usual location.
+
+
+	// http://hl7.org/fhir/namespace-identifier-type
+	// Identifies the style of unique identifier used to identify a namepace
+
+	const NAMESPACEIDENTIFIERTYPE_OID = 'oid';  // An ISO object identifier.  E.g. 1.2.3.4.5.
+	const NAMESPACEIDENTIFIERTYPE_UUID = 'uuid';  // A universally unique identifier of the form a5afddf4-e880-459b-876e-e4591b0acc11.
+	const NAMESPACEIDENTIFIERTYPE_URI = 'uri';  // A uniform resource identifier (ideally a URL - uniform resource locator).  E.g. http://unitsofmeasure.org.
+	const NAMESPACEIDENTIFIERTYPE_OTHER = 'other';  // Some other type of unique identifier.  E.g HL7-assigned reserved string such as LN for LOINC.
+
+
 	// http://hl7.org/fhir/special-values
 	// A set of generally useful codes defined so they can be included in value sets
 
@@ -212,6 +249,14 @@ class FhirValueSet
 	const SPECIALVALUES_SUFFICIENT = 'sufficient';  // The specific quantity is not known, but is known to be non-zero and is not specified because it makes up the bulk of the material
 	const SPECIALVALUES_WITHDRAWN = 'withdrawn';  // The value is no longer available
 	const SPECIALVALUES_NIL_KNOWN = 'nil known';  // The are no known applicable values in this context
+
+
+	// http://hl7.org/fhir/namespace-status
+	// Indicates whether the namespace should be used
+
+	const NAMESPACESTATUS_PROPOSED = 'proposed';  // System has been submitted but not yet approved.
+	const NAMESPACESTATUS_ACTIVE = 'active';  // System is valid for use.
+	const NAMESPACESTATUS_RETIRED = 'retired';  // System should no longer be used.
 
 
 	// http://hl7.org/fhir/narrative-status
@@ -366,6 +411,9 @@ class FhirValueSet
 	const FHIRDEFINEDTYPE_ADVERSEREACTION = 'AdverseReaction';  // Records an unexpected reaction suspected to be related to the exposure of the reaction subject to a substance.
 	const FHIRDEFINEDTYPE_ALERT = 'Alert';  // Prospective warnings of potential issues when providing care to the patient.
 	const FHIRDEFINEDTYPE_ALLERGYINTOLERANCE = 'AllergyIntolerance';  // Indicates the patient has a susceptibility to an adverse reaction upon exposure to a specified substance.
+	const FHIRDEFINEDTYPE_APPOINTMENT = 'Appointment';  // (informative) A scheduled appointment for a patient and/or practitioner(s) where a service may take place.
+	const FHIRDEFINEDTYPE_APPOINTMENTRESPONSE = 'AppointmentResponse';  // (informative) A response to a scheduled appointment for a patient and/or practitioner(s).
+	const FHIRDEFINEDTYPE_AVAILABILITY = 'Availability';  // (informative) A container for slot(s) of time that may be available for booking appointments.
 	const FHIRDEFINEDTYPE_CAREPLAN = 'CarePlan';  // Describes the intention of how one or more practitioners intend to deliver care for a particular patient for a period of time, possibly limited to care for a specific condition or set of conditions.
 	const FHIRDEFINEDTYPE_COMPOSITION = 'Composition';  // A set of healthcare-related information that is assembled together into a single logical document that provides a single coherent statement of meaning, establishes its own context and that has clinical attestation with regard to who is making the statement.
 	const FHIRDEFINEDTYPE_CONCEPTMAP = 'ConceptMap';  // A statement of relationships from one set of concepts to one or more other concept systems.
@@ -392,6 +440,7 @@ class FhirValueSet
 	const FHIRDEFINEDTYPE_MEDICATIONPRESCRIPTION = 'MedicationPrescription';  // An order for both supply of the medication and the instructions for administration of the medicine to a patient.
 	const FHIRDEFINEDTYPE_MEDICATIONSTATEMENT = 'MedicationStatement';  // A record of medication being taken by a patient, or that the medication has been given to a patient where the record is the result of a report from the patient or another clinician.
 	const FHIRDEFINEDTYPE_MESSAGEHEADER = 'MessageHeader';  // The header for a message exchange that is either requesting or responding to an action.  The resource(s) that are the subject of the action as well as other Information related to the action are typically transmitted in a bundle in which the MessageHeader resource instance is the first resource in the bundle.
+	const FHIRDEFINEDTYPE_NAMESPACE = 'Namespace';  // A curated namespace that issues unique symbols within that namespace for the identification of concepts, people, devices, etc.  Represents a "System" used within the Identifier and Coding data types.
 	const FHIRDEFINEDTYPE_OBSERVATION = 'Observation';  // Measurements and simple assertions made about a patient, device or other subject.
 	const FHIRDEFINEDTYPE_OPERATIONOUTCOME = 'OperationOutcome';  // A collection of error, warning or information messages that result from a system action.
 	const FHIRDEFINEDTYPE_ORDER = 'Order';  // A request to perform an action.
@@ -407,6 +456,7 @@ class FhirValueSet
 	const FHIRDEFINEDTYPE_QUESTIONNAIRE = 'Questionnaire';  // A structured set of questions and their answers. The Questionnaire may contain questions, answers or both. The questions are ordered and grouped into coherent subsets, corresponding to the structure of the grouping of the underlying questions.
 	const FHIRDEFINEDTYPE_RELATEDPERSON = 'RelatedPerson';  // Information about a person that is involved in the care for a patient, but who is not the target of healthcare, nor has a formal responsibility in the care process.
 	const FHIRDEFINEDTYPE_SECURITYEVENT = 'SecurityEvent';  // A record of an event made for purposes of maintaining a security log. Typical uses include detection of intrusion attempts and monitoring for inappropriate usage.
+	const FHIRDEFINEDTYPE_SLOT = 'Slot';  // (informative) A slot of time on a schedule that may be available for booking appointments.
 	const FHIRDEFINEDTYPE_SPECIMEN = 'Specimen';  // Sample for analysis.
 	const FHIRDEFINEDTYPE_SUBSTANCE = 'Substance';  // A homogeneous material with a definite composition.
 	const FHIRDEFINEDTYPE_SUPPLY = 'Supply';  // A supply - a  request for something, and provision of what is supplied.
@@ -542,6 +592,17 @@ class FhirValueSet
 	const RESOURCEPROFILESTATUS_DRAFT = 'draft';  // This profile is still under development.
 	const RESOURCEPROFILESTATUS_ACTIVE = 'active';  // This profile is ready for normal use.
 	const RESOURCEPROFILESTATUS_RETIRED = 'retired';  // This profile has been deprecated, withdrawn or superseded and should no longer be used.
+
+
+	// http://hl7.org/fhir/participantstatus
+	// The Participation status of an appointment
+
+	const PARTICIPANTSTATUS_ACCEPTED = 'accepted';  // The appointment participant has accepted that they can attend the appointment at the time specified in the AppointmentResponse.
+	const PARTICIPANTSTATUS_DECLINED = 'declined';  // The appointment participant has declined the appointment.
+	const PARTICIPANTSTATUS_TENTATIVE = 'tentative';  // The appointment participant has tentatively accepted the appointment.
+	const PARTICIPANTSTATUS_IN_PROCESS = 'in-process';  // The participant has in-process the appointment.
+	const PARTICIPANTSTATUS_COMPLETED = 'completed';  // The participant has completed the appointment.
+	const PARTICIPANTSTATUS_NEEDS_ACTION = 'needs-action';  // This is the intitial status of an appointment participant until a participant has replied. It implies that there is no commitment for the appointment.
 
 
 	// http://hl7.org/fhir/address-use
@@ -685,6 +746,9 @@ class FhirValueSet
 	const RESOURCETYPE_ADVERSEREACTION = 'AdverseReaction';  // Records an unexpected reaction suspected to be related to the exposure of the reaction subject to a substance.
 	const RESOURCETYPE_ALERT = 'Alert';  // Prospective warnings of potential issues when providing care to the patient.
 	const RESOURCETYPE_ALLERGYINTOLERANCE = 'AllergyIntolerance';  // Indicates the patient has a susceptibility to an adverse reaction upon exposure to a specified substance.
+	const RESOURCETYPE_APPOINTMENT = 'Appointment';  // (informative) A scheduled appointment for a patient and/or practitioner(s) where a service may take place.
+	const RESOURCETYPE_APPOINTMENTRESPONSE = 'AppointmentResponse';  // (informative) A response to a scheduled appointment for a patient and/or practitioner(s).
+	const RESOURCETYPE_AVAILABILITY = 'Availability';  // (informative) A container for slot(s) of time that may be available for booking appointments.
 	const RESOURCETYPE_CAREPLAN = 'CarePlan';  // Describes the intention of how one or more practitioners intend to deliver care for a particular patient for a period of time, possibly limited to care for a specific condition or set of conditions.
 	const RESOURCETYPE_COMPOSITION = 'Composition';  // A set of healthcare-related information that is assembled together into a single logical document that provides a single coherent statement of meaning, establishes its own context and that has clinical attestation with regard to who is making the statement.
 	const RESOURCETYPE_CONCEPTMAP = 'ConceptMap';  // A statement of relationships from one set of concepts to one or more other concept systems.
@@ -711,6 +775,7 @@ class FhirValueSet
 	const RESOURCETYPE_MEDICATIONPRESCRIPTION = 'MedicationPrescription';  // An order for both supply of the medication and the instructions for administration of the medicine to a patient.
 	const RESOURCETYPE_MEDICATIONSTATEMENT = 'MedicationStatement';  // A record of medication being taken by a patient, or that the medication has been given to a patient where the record is the result of a report from the patient or another clinician.
 	const RESOURCETYPE_MESSAGEHEADER = 'MessageHeader';  // The header for a message exchange that is either requesting or responding to an action.  The resource(s) that are the subject of the action as well as other Information related to the action are typically transmitted in a bundle in which the MessageHeader resource instance is the first resource in the bundle.
+	const RESOURCETYPE_NAMESPACE = 'Namespace';  // A curated namespace that issues unique symbols within that namespace for the identification of concepts, people, devices, etc.  Represents a "System" used within the Identifier and Coding data types.
 	const RESOURCETYPE_OBSERVATION = 'Observation';  // Measurements and simple assertions made about a patient, device or other subject.
 	const RESOURCETYPE_OPERATIONOUTCOME = 'OperationOutcome';  // A collection of error, warning or information messages that result from a system action.
 	const RESOURCETYPE_ORDER = 'Order';  // A request to perform an action.
@@ -726,6 +791,7 @@ class FhirValueSet
 	const RESOURCETYPE_QUESTIONNAIRE = 'Questionnaire';  // A structured set of questions and their answers. The Questionnaire may contain questions, answers or both. The questions are ordered and grouped into coherent subsets, corresponding to the structure of the grouping of the underlying questions.
 	const RESOURCETYPE_RELATEDPERSON = 'RelatedPerson';  // Information about a person that is involved in the care for a patient, but who is not the target of healthcare, nor has a formal responsibility in the care process.
 	const RESOURCETYPE_SECURITYEVENT = 'SecurityEvent';  // A record of an event made for purposes of maintaining a security log. Typical uses include detection of intrusion attempts and monitoring for inappropriate usage.
+	const RESOURCETYPE_SLOT = 'Slot';  // (informative) A slot of time on a schedule that may be available for booking appointments.
 	const RESOURCETYPE_SPECIMEN = 'Specimen';  // Sample for analysis.
 	const RESOURCETYPE_SUBSTANCE = 'Substance';  // A homogeneous material with a definite composition.
 	const RESOURCETYPE_SUPPLY = 'Supply';  // A supply - a  request for something, and provision of what is supplied.
@@ -781,6 +847,15 @@ class FhirValueSet
 	const QUANTITYCOMPARARATOR_GT = '>';  // The actual value is greater than the given value.
 
 
+	// http://hl7.org/fhir/slotstatus
+	// The free/busy status of an appointment
+
+	const SLOTSTATUS_BUSY = 'BUSY';  // Indicates that the time interval is busy because one  or more events have been scheduled for that interval.
+	const SLOTSTATUS_FREE = 'FREE';  // Indicates that the time interval is free for scheduling.
+	const SLOTSTATUS_BUSY_UNAVAILABLE = 'BUSY-UNAVAILABLE';  // Indicates that the time interval is busy and that the interval can not be scheduled.
+	const SLOTSTATUS_BUSY_TENTATIVE = 'BUSY-TENTATIVE';  // Indicates that the time interval is busy because one or more events have been tentatively scheduled for that interval.
+
+
 	// http://hl7.org/fhir/condition-relationship-type
 	// The type of relationship between a condition and its related item
 
@@ -824,6 +899,14 @@ class FhirValueSet
 	const SECURITYEVENTPARTICIPANTNETWORKTYPE_3 = '3';  // Telephone Number.
 	const SECURITYEVENTPARTICIPANTNETWORKTYPE_4 = '4';  // Email address.
 	const SECURITYEVENTPARTICIPANTNETWORKTYPE_5 = '5';  // URI (User directory, HTTP-PUT, ftp, etc.).
+
+
+	// http://hl7.org/fhir/namespace-type
+	// Identifies the purpose of the namespace
+
+	const NAMESPACETYPE_CODESYSTEM = 'codesystem';  // The namespace is used to define concepts and symbols to represent those concepts.  E.g. UCUM, LOINC, NDC code, local lab codes, etc.
+	const NAMESPACETYPE_IDENTIFIER = 'identifier';  // The namespace is used to manage identifiers (e.g. license numbers, order numbers, etc.).
+	const NAMESPACETYPE_ROOT = 'root';  // The namespace is used as the root for other identifiers and namespaces.
 
 
 	// http://hl7.org/fhir/object-lifecycle
