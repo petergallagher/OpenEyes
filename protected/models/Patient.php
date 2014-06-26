@@ -874,6 +874,59 @@ class Patient extends BaseActiveRecordVersioned
 		return SecondaryDiagnosis::model()->findAll($criteria);
 	}
 
+	/**
+	 * Returns an array of summarised patient Systemic diagnoses
+	 * @return array
+	 */
+	public function getSystemicDiagnosesSummary()
+	{
+		return array_map(function($diagnosis) {
+			return $diagnosis->systemicDescription;
+		}, $this->systemicDiagnoses);
+	}
+
+	/**
+	 * Returns an array of summarised patient Ophthalmic diagnoses
+	 * @return array
+	 */
+	public function getOphthalmicDiagnosesSummary()
+	{
+		return array_map(function($diagnosis) {
+			return $diagnosis->ophthalmicDescription;
+		}, $this->ophthalmicDiagnoses);
+	}
+
+	/**
+	 * Returns a summarised array of patient medications
+	 * @return array
+	 */
+	public function getMedicationsSummary()
+	{
+		return array_map(function($medication) {
+			$label = $medication->drug->label;
+			$option = $medication->option ? " ({$medication->option->name})" : "";
+			$frequency = $medication->frequency->name;
+			return $label.$option.' '.$frequency;
+		}, $this->medications);
+	}
+
+	/**
+	 * Returns a summarised array of patient allergy status
+	 * @return array An array containing a summarised allergy status or assigned allergy names
+	 */
+	public function getAllergiesSummary()
+	{
+		if (!$this->hasAllergyStatus()) {
+			return array('Patient allergy status is unknown');
+		}
+		if ($this->no_allergies_date) {
+			return array('Patient has no known allergies');
+		}
+		return array_map(function($allergy) {
+			return $allergy->name;
+		}, $this->allergies);
+	}
+
 	/*
 	 * returns the specialty codes that are relevant to the patient. Determined by looking at the diagnoses
 	 * related to the patient.
