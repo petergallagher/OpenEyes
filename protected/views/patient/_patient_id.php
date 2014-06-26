@@ -68,7 +68,10 @@
 					));
 				}
 			}?>
+
 			<!-- Warnings -->
+			<?php
+			/*
 			<?php if ($warnings) {
 				$msgs = array();
 				foreach ($warnings as $warn) {
@@ -79,8 +82,8 @@
 					<span class="messages"><?php echo implode(', ', $msgs); ?></span>
 				</span>
 			<?php } ?>
+			*/?>
 
-			<button id="toggle-patient-summary-popup" class="icon-alert-quicklook"></button>
 		</div>
 	</div>
 </div>
@@ -92,51 +95,60 @@ $cviStatus = $this->patient->getOPHInfo()->cvi_status->name;
 $medications = join(',<br/>', $this->patient->medicationsSummary);
 $allergies = join(',<br/>', $this->patient->allergiesSummary);
 ?>
-<div class="panel patient-popup" id="patient-summary-popup">
-	<?php if ($ophthalmicDiagnoses) {?>
+<div class="patient-popup-container">
+	<button
+		id="toggle-patient-summary-popup"
+		class="patient-summary-btn icon-alert-quicklook"
+		data-hide-icon="icon-alert-cross"
+		data-show-icon="icon-alert-quicklook">
+		Toggle patient summary
+	</button>
+	<div class="panel patient-popup" id="patient-summary-popup">
+		<?php if ($ophthalmicDiagnoses) {?>
+			<div class="row">
+				<div class="large-3 column label">
+					Ophthalmic Diagnoses
+				</div>
+				<div class="large-9 column data">
+					<?php echo $ophthalmicDiagnoses;?>
+				</div>
+			</div>
+		<?php }?>
+		<?php if ($systemicDiagnoses) {?>
+			<div class="row">
+				<div class="large-3 column label">
+					Systemic Diagnoses
+				</div>
+				<div class="large-9 column data">
+					<?php echo $systemicDiagnoses;?>
+				</div>
+			</div>
+		<?php }?>
 		<div class="row">
 			<div class="large-3 column label">
-				Ophthalmic Diagnoses
+				CVI Status
 			</div>
 			<div class="large-9 column data">
-				<?php echo $ophthalmicDiagnoses;?>
+				<?php echo $cviStatus;?>
 			</div>
 		</div>
-	<?php }?>
-	<?php if ($systemicDiagnoses) {?>
+		<?php if ($medications) {?>
+			<div class="row">
+				<div class="large-3 column label">
+					Medication
+				</div>
+				<div class="large-9 column data">
+					<?php echo $medications;?>
+				</div>
+			</div>
+		<?php }?>
 		<div class="row">
 			<div class="large-3 column label">
-				Systemic Diagnoses
+				Allergies
 			</div>
 			<div class="large-9 column data">
-				<?php echo $systemicDiagnoses;?>
+				<?php echo $allergies;?>
 			</div>
-		</div>
-	<?php }?>
-	<div class="row">
-		<div class="large-3 column label">
-			CVI Status
-		</div>
-		<div class="large-9 column data">
-			<?php echo $cviStatus;?>
-		</div>
-	</div>
-	<?php if ($medications) {?>
-		<div class="row">
-			<div class="large-3 column label">
-				Medication
-			</div>
-			<div class="large-9 column data">
-				<?php echo $medications;?>
-			</div>
-		</div>
-	<?php }?>
-	<div class="row">
-		<div class="large-3 column label">
-			Allergies
-		</div>
-		<div class="large-9 column data">
-			<?php echo $allergies;?>
 		</div>
 	</div>
 </div>

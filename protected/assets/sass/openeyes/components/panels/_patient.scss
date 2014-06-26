@@ -162,8 +162,30 @@
 }
 
 // PATIENT POPUP
+.patient-popup-container {
+	float: right;
+	width: 17px;
+	height: 17px;
+	margin-top: -26px;
+	margin-right: 12px;
+	position: relative;
+	.patient-summary-btn {
+	}
+}
 .panel {
 	&.patient-popup {
+		@include transition(
+			opacity .25s ease,
+			top .25s ease
+		);
+		&.clear-transition {
+			@include transition(none);
+		}
+		width: 400px;
+		left: -363px;
+		position: absolute;
+		z-index: 9999;
+		top: 40px;
 		background: #fce6b7;
 		border: {
 			color: #ffb212;
@@ -171,12 +193,8 @@
 			width: 2px;
 		};
 		display: none;
-		left: 6px;
-		margin-top: 2px;
+		opacity: 0;
 		padding: 5px;
-		position: absolute;
-		right: 6px;
-		z-index: 1;
 		// Triangle tip
 		&:after {
 			content: "";
@@ -188,7 +206,8 @@
 			border-bottom: 10px solid #ffb212;
 		}
 		&.show {
-			display: block;
+			opacity: 1;
+			top: 27px;
 		}
 		.row {
 			background: #fef5e3;

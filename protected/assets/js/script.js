@@ -158,18 +158,69 @@ $(document).ready(function(){
 	(function patientSummaryPopup() {
 
 		var button = $('#toggle-patient-summary-popup');
+		var container = $('.patient-popup-container');
 		var popup = $('#patient-summary-popup');
 
-		popup.on('show', function() {
-			popup.addClass('show');
+		var showIcon = button.data('show-icon');
+		var hideIcon = button.data('hide-icon');
+
+		var stuck = false;
+		var hideTimer = 0;
+		var hoverTimer = 0;
+
+		popup.on({
+			show: function() {
+				clearTimeout(hideTimer);
+
+				popup.show();
+
+				// We want to reset all existing transitions so that the popup
+				// will *always* animate in.
+
+				// Re-define the transitions on the popup to be none.
+				popup.addClass('clear-transition');
+				// Trigger a re-flow to reset the starting position of the transitions, now
+				// existing transitions will be removed.
+				popup[0].offsetWidth = popup[0].offsetWidth;
+				// Add the initial transition definitions back.
+				popup.removeClass('clear-transition');
+
+				// Yay, we can animate in from the initial starting point.
+				popup.addClass('show');
+			},
+			hide: function() {
+				clearTimeout(hideTimer);
+				popup.removeClass('show');
+				// We want the popup to animate out before being hidden.
+				hideTimer = setTimeout(popup.hide.bind(popup), 250);
+			}
 		});
 
-		popup.on('hide', function() {
-			popup.removeClass('show');
+		button.on({
+			click: function() {
+
+				stuck = !stuck;
+				popup.trigger(stuck ? 'show' : 'hide');
+
+				button
+					.removeClass(showIcon + ' ' + hideIcon)
+					.addClass(stuck ? hideIcon : showIcon);
+			}
 		});
 
-		button.on('click', function() {
-			popup.trigger(popup.hasClass('show') ? 'hide' : 'show');
+		// We add these mouse events on the container so that the popup does not
+		// hide when hovering over the popup contents.
+		container.on({
+			mouseenter: function() {
+				// We use a timer to prevent the popup from displaying unintentionally.
+				hoverTimer = setTimeout(popup.trigger.bind(popup, 'show'), 100);
+			},
+			mouseleave: function() {
+				clearTimeout(hoverTimer);
+				if (!stuck) {
+					popup.trigger('hide');
+				}
+			}
 		});
 	}());
 

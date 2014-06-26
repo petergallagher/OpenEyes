@@ -4061,21 +4061,43 @@ tfoot.pagination-container .pagination li {
   display: none;
 }
 
-/* line 166, ../sass/openeyes/components/panels/_patient.scss */
+/* line 165, ../sass/openeyes/components/panels/_patient.scss */
+.patient-popup-container {
+  float: right;
+  width: 17px;
+  height: 17px;
+  margin-top: -26px;
+  margin-right: 12px;
+  position: relative;
+}
+
+/* line 176, ../sass/openeyes/components/panels/_patient.scss */
 .panel.patient-popup {
+  -webkit-transition: opacity 0.25s ease, top 0.25s ease;
+  -moz-transition: opacity 0.25s ease, top 0.25s ease;
+  -o-transition: opacity 0.25s ease, top 0.25s ease;
+  transition: opacity 0.25s ease, top 0.25s ease;
+  width: 400px;
+  left: -363px;
+  position: absolute;
+  z-index: 9999;
+  top: 40px;
   background: #fce6b7;
   border-color: #ffb212;
   border-style: solid;
   border-width: 2px;
   display: none;
-  left: 6px;
-  margin-top: 2px;
+  opacity: 0;
   padding: 5px;
-  position: absolute;
-  right: 6px;
-  z-index: 1;
 }
 /* line 181, ../sass/openeyes/components/panels/_patient.scss */
+.panel.patient-popup.clear-transition {
+  -webkit-transition: none;
+  -moz-transition: none;
+  -o-transition: none;
+  transition: none;
+}
+/* line 199, ../sass/openeyes/components/panels/_patient.scss */
 .panel.patient-popup:after {
   content: "";
   position: absolute;
@@ -4085,25 +4107,26 @@ tfoot.pagination-container .pagination li {
   border-right: 7px solid transparent;
   border-bottom: 10px solid #ffb212;
 }
-/* line 190, ../sass/openeyes/components/panels/_patient.scss */
+/* line 208, ../sass/openeyes/components/panels/_patient.scss */
 .panel.patient-popup.show {
-  display: block;
+  opacity: 1;
+  top: 27px;
 }
-/* line 193, ../sass/openeyes/components/panels/_patient.scss */
+/* line 212, ../sass/openeyes/components/panels/_patient.scss */
 .panel.patient-popup .row {
   background: #fef5e3;
   margin: 0 0 3px 0;
 }
-/* line 196, ../sass/openeyes/components/panels/_patient.scss */
+/* line 215, ../sass/openeyes/components/panels/_patient.scss */
 .panel.patient-popup .row:last-child {
   margin-bottom: 0;
 }
-/* line 199, ../sass/openeyes/components/panels/_patient.scss */
+/* line 218, ../sass/openeyes/components/panels/_patient.scss */
 .panel.patient-popup .row .column {
   font-size: 11px;
   padding: 5px;
 }
-/* line 204, ../sass/openeyes/components/panels/_patient.scss */
+/* line 223, ../sass/openeyes/components/panels/_patient.scss */
 .panel.patient-popup .label {
   cursor: default;
   color: #b57e0d;
