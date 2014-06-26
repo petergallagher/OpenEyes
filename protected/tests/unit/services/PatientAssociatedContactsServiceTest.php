@@ -305,85 +305,100 @@ class PatientAssociatedContactsServiceTest extends \CDbTestCase
 		$this->assertEquals('Baker',$patient->contactAssignments[2]->contact->last_name);
 	}
 
-/*
 	public function getModifiedResource($id)
 	{
-		$resource = \Yii::app()->service->Patient($id)->fetch();
+		$resource = \Yii::app()->service->PatientAssociatedContacts($id)->fetch();
 
-		$resource->nhs_num = 'x0000';
-		$resource->hos_num = 'x0001';
-		$resource->title = 'x0002';
-		$resource->family_name = 'x0003';
-		$resource->given_name = 'x0004';
-		$resource->gender_ref = \Yii::app()->service->Gender(\Gender::model()->find('name=?',array('Female'))->id);
-		$resource->birth_date = '1988-04-04';
-		$resource->primary_phone = '0101010101';
-		$resource->gp_ref = \Yii::app()->service->Gp(1);
-		$resource->prac_ref = \Yii::app()->service->Practice(1);
-		$resource->addresses[0]->line1 = 'L1';
-		$resource->addresses[0]->line2 = 'L2';
-		$resource->addresses[0]->city = 'L3';
-		$resource->addresses[0]->state = 'L4';
-		$resource->addresses[0]->zip = 'L5';
-		$resource->addresses[0]->country = 'United Kingdom';
-		$resource->addresses[0]->correspond = 1;
-		$resource->addresses[0]->transport = 0;
+		$resource->contacts[0]->family_name = 'Bobson';
+		$resource->contacts[0]->site_ref = \Yii::app()->service->Site(1);
+
+		$resource->contacts[1]->title = 'Dr';
+		$resource->contacts[1]->site_ref = null;
+
+		$resource->contacts[2]->primary_phone = '1212121212';
+		$resource->contacts[2]->site_ref = \Yii::app()->service->Site(2);
+		$resource->contacts[2]->institution_ref = null;
 
 		return $resource;
 	}
 
-	public function testResourceToModel_Save_Update_ModelCountsCorrect()
+	public function testResourceToModel_Save_Update_Modified_ModelCountsCorrect()
 	{
-		$resource = $this->getModifiedResource(1);
+		$resource = $this->getModifiedResource(3);
 
 		$total_patients = count(\Patient::model()->findAll());
 		$total_contacts = count(\Contact::model()->findAll());
-		$total_addresses = count(\Address::model()->findAll());
-		$total_countries = count(\Country::model()->findAll());
-		$total_genders = count(\Gender::model()->findAll());
+		$total_pcas = count(\PatientContactAssignment::model()->findAll());
+		$total_sites = count(\Site::model()->findAll());
+		$total_institutions = count(\Institution::model()->findAll());
 
-		$ps = new PatientService;
-		$patient = $ps->resourceToModel($resource);
+		$ps = new PatientAssociatedContactsService;
+		$patient = $ps->resourceToModel($resource, $this->patients('patient3'));
+
+		$this->assertEquals($total_patients, count(\Patient::model()->findAll()));
+		$this->assertEquals($total_contacts+3, count(\Contact::model()->findAll()));
+		$this->assertEquals($total_pcas, count(\PatientContactAssignment::model()->findAll()));
+		$this->assertEquals($total_sites, count(\Site::model()->findAll()));
+		$this->assertEquals($total_institutions, count(\Institution::model()->findAll()));
+	}
+
+	public function testResourceToModel_Save_Update_NotModified_ModelCountsCorrect()
+	{
+		$resource = \Yii::app()->service->PatientAssociatedContacts(3)->fetch();
+
+		$total_patients = count(\Patient::model()->findAll());
+		$total_contacts = count(\Contact::model()->findAll());
+		$total_pcas = count(\PatientContactAssignment::model()->findAll());
+		$total_sites = count(\Site::model()->findAll());
+		$total_institutions = count(\Institution::model()->findAll());
+
+		$ps = new PatientAssociatedContactsService;
+		$patient = $ps->resourceToModel($resource, $this->patients('patient3'));
 
 		$this->assertEquals($total_patients, count(\Patient::model()->findAll()));
 		$this->assertEquals($total_contacts, count(\Contact::model()->findAll()));
-		$this->assertEquals($total_addresses, count(\Address::model()->findAll()));
-		$this->assertEquals($total_countries, count(\Country::model()->findAll()));
-		$this->assertEquals($total_genders, count(\Gender::model()->findAll()));
+		$this->assertEquals($total_pcas, count(\PatientContactAssignment::model()->findAll()));
+		$this->assertEquals($total_sites, count(\Site::model()->findAll()));
+		$this->assertEquals($total_institutions, count(\Institution::model()->findAll()));
 	}
 
 	public function testResourceToModel_Save_Update_DBIsCorrect()
 	{
-		$resource = $this->getModifiedResource(1);
+		$resource = $this->getModifiedResource(3);
 
-		$ps = new PatientService;
-		$patient = $ps->resourceToModel($resource);
+		$ps = new PatientAssociatedContactsService;
+		$patient = $ps->resourceToModel($resource, $this->patients('patient3'));
 		$patient = \Patient::model()->findByPk($patient->id);
 
-		$this->assertEquals('x0000',$patient->nhs_num);
-		$this->assertEquals('x0001',$patient->hos_num);
-		$this->assertEquals('x0002',$patient->title);
-		$this->assertEquals('x0003',$patient->last_name);
-		$this->assertEquals('x0004',$patient->first_name);
-		$this->assertInstanceOf('Gender', $patient->gender);
-		$this->assertEquals('Female',$patient->gender->name);
-		$this->assertEquals('1988-04-04',$patient->dob);
-		$this->assertEquals('0101010101',$patient->contact->primary_phone);
-		$this->assertEquals(1,$patient->gp_id);
-		$this->assertEquals(1,$patient->practice_id);
+		$this->assertInstanceOf('Patient',$patient);
+		$this->assertCount(3,$patient->contactAssignments);
 
-		$this->assertCount(1, $patient->contact->addresses);
-		$this->assertInstanceOf('Address', $patient->contact->addresses[0]);
-		$this->assertEquals('L1', $patient->contact->addresses[0]->address1);
-		$this->assertEquals('L2', $patient->contact->addresses[0]->address2);
-		$this->assertEquals('L3', $patient->contact->addresses[0]->city);
-		$this->assertEquals('L4', $patient->contact->addresses[0]->county);
-		$this->assertEquals('L5', $patient->contact->addresses[0]->postcode);
-		$this->assertInstanceOf('\Country', $patient->contact->addresses[0]->country);
-		$this->assertEquals('United Kingdom', $patient->contact->addresses[0]->country->name);
-		$this->assertEquals(\AddressType::CORRESPOND, $patient->contact->addresses[0]->address_type_id);
+		$this->assertNull($patient->contactAssignments[0]->contact);
+		$this->assertInstanceOf('ContactLocation',$patient->contactAssignments[0]->location);
+		$this->assertInstanceOf('Contact',$patient->contactAssignments[0]->location->contact);
+		$this->assertEquals('Dr',$patient->contactAssignments[0]->location->contact->title);
+		$this->assertEquals('Yuri',$patient->contactAssignments[0]->location->contact->first_name);
+		$this->assertEquals('Bobson',$patient->contactAssignments[0]->location->contact->last_name);
+		$this->assertEquals(1,$patient->contactAssignments[0]->location->site_id);
+		$this->assertNull($patient->contactAssignments[0]->location->institution_id);
+
+		$this->assertNull($patient->contactAssignments[1]->location);
+		$this->assertInstanceOf('Contact',$patient->contactAssignments[1]->contact);
+		$this->assertEquals('Dr',$patient->contactAssignments[1]->contact->title);
+		$this->assertEquals('Apple',$patient->contactAssignments[1]->contact->first_name);
+		$this->assertEquals('Inc',$patient->contactAssignments[1]->contact->last_name);
+
+		$this->assertNull($patient->contactAssignments[2]->contact);
+		$this->assertInstanceOf('ContactLocation',$patient->contactAssignments[0]->location);
+		$this->assertInstanceOf('Contact',$patient->contactAssignments[2]->location->contact);
+		$this->assertEquals('Ti',$patient->contactAssignments[2]->location->contact->title);
+		$this->assertEquals('Prac',$patient->contactAssignments[2]->location->contact->first_name);
+		$this->assertEquals('Tiss',$patient->contactAssignments[2]->location->contact->last_name);
+		$this->assertNull($patient->contactAssignments[2]->location->institution_id);
+		$this->assertEquals(2,$patient->contactAssignments[2]->location->site_id);
 	}
 
+/*
 	public function testJsonToResource()
 	{
 		$json = '{"nhs_num":"54321","hos_num":"12345","title":"Mr","family_name":"Aylward","given_name":"Jim","gender_ref":{"service":"Gender","id":1},"birth_date":"1970-01-01","date_of_death":null,"primary_phone":"07123 456789","addresses":[{"date_start":{"date":"2014-06-06 16:39:29","timezone_type":3,"timezone":"Europe\/London"},"date_end":{"date":"2014-06-06 16:39:29","timezone_type":3,"timezone":"Europe\/London"},"correspond":false,"transport":false,"use":null,"line1":"flat 1","line2":"bleakley creek","city":"flitchley","state":"london","zip":"ec1v 0dx","country":"United States"}],"care_providers":[],"gp_ref":{"service":"Gp","id":2},"prac_ref":{"service":"Practice","id":5},"cb_refs":[],"id":null,"last_modified":null}';
