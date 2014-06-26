@@ -496,10 +496,9 @@ class PatientAssociatedContactsServiceTest extends \CDbTestCase
 		$this->assertNull($patient->contactAssignments[2]->contact);
 	}
 
-/*
 	public function testJsonToModel_Save_Create_ModelCountsCorrect()
 	{
-		$json = '{"contacts":[{"title":"Dr","family_name":"Zhivago","given_name":"Yuri","primary_phone":"999","institution_ref":null,"site_ref":null,"id":null,"last_modified":null},{"title":"Mr","family_name":"Inc","given_name":"Apple","primary_phone":"01010101","institution_ref":null,"site_ref":{"service":"Site","id":"2"},"id":null,"last_modified":null},{"title":"Ti","family_name":"Tiss","given_name":"Prac","primary_phone":"0303032332","institution_ref":{"service":"Institution","id":"2"},"site_ref":null,"id":null,"last_modified":null}],"id":null,"last_modified":null,"patient_id":{"id":"3","last_modified":-2208988800}}';
+		$json = '{"contacts":[{"title":"Dr","family_name":"Zhivago2","given_name":"Yuri2","primary_phone":"999","institution_ref":null,"site_ref":null,"id":null,"last_modified":null},{"title":"Mr","family_name":"Inc","given_name":"Apple","primary_phone":"01010101","institution_ref":null,"site_ref":{"service":"Site","id":"2"},"id":null,"last_modified":null},{"title":"Ti","family_name":"Tiss","given_name":"Prac","primary_phone":"0303032332","institution_ref":{"service":"Institution","id":"1"},"site_ref":null,"id":null,"last_modified":null}],"id":null,"last_modified":null,"patient_id":{"id":"3","last_modified":-2208988800}}';
 
 		$total_patients = count(\Patient::model()->findAll());
 		$total_contacts = count(\Contact::model()->findAll());
@@ -508,11 +507,11 @@ class PatientAssociatedContactsServiceTest extends \CDbTestCase
 		$total_institutions = count(\Institution::model()->findAll());
 
 		$ps = new PatientAssociatedContactsService;
-		$patient = $ps->jsonToModel($json, new \Patient);
+		$patient = $ps->jsonToModel($json, $this->patients('patient4'));
 		$patient = \Patient::model()->findByPk($patient->id);
 
-		$this->assertEquals($total_patients+1, count(\Patient::model()->findAll()));
-		$this->assertEquals($total_contacts+1, count(\Contact::model()->findAll()));
+		$this->assertEquals($total_patients, count(\Patient::model()->findAll()));
+		$this->assertEquals($total_contacts+3, count(\Contact::model()->findAll()));
 		$this->assertEquals($total_pcas+3, count(\PatientContactAssignment::model()->findAll()));
 		$this->assertEquals($total_sites, count(\Site::model()->findAll()));
 		$this->assertEquals($total_institutions, count(\Institution::model()->findAll()));
@@ -520,101 +519,106 @@ class PatientAssociatedContactsServiceTest extends \CDbTestCase
 
 	public function testJsonToModel_Save_Create_DBIsCorrect()
 	{
-		$json = '{"nhs_num":"54321","hos_num":"12345","title":"Mr","family_name":"Aylward","given_name":"Jim","gender_ref":{"service":"Gender","id":1},"birth_date":"1970-01-01","date_of_death":null,"primary_phone":"07123 456789","addresses":[{"date_start":{"date":"2014-06-06 16:39:29","timezone_type":3,"timezone":"Europe\/London"},"date_end":{"date":"2014-06-06 16:39:29","timezone_type":3,"timezone":"Europe\/London"},"correspond":false,"transport":false,"use":null,"line1":"flat 1","line2":"bleakley creek","city":"flitchley","state":"london","zip":"ec1v 0dx","country":"United States"}],"care_providers":[],"gp_ref":{"service":"Gp","id":1},"prac_ref":{"service":"Practice","id":1},"cb_refs":[],"id":null,"last_modified":null}';
+		$json = '{"contacts":[{"title":"Dr","family_name":"Zhivago2","given_name":"Yuri2","primary_phone":"999","institution_ref":null,"site_ref":null,"id":null,"last_modified":null},{"title":"Mr","family_name":"Inc","given_name":"Apple","primary_phone":"01010101","institution_ref":null,"site_ref":{"service":"Site","id":"2"},"id":null,"last_modified":null},{"title":"Ti","family_name":"Tiss","given_name":"Prac","primary_phone":"0303032332","institution_ref":{"service":"Institution","id":"1"},"site_ref":null,"id":null,"last_modified":null}],"id":null,"last_modified":null,"patient_id":{"id":"3","last_modified":-2208988800}}';
 
-		$ps = new PatientService;
-		$patient = $ps->jsonToModel($json);
+		$ps = new PatientAssociatedContactsService;
+		$patient = $ps->jsonToModel($json, $this->patients('patient4'));
 		$patient = \Patient::model()->findByPk($patient->id);
 
-		$this->assertEquals('54321',$patient->nhs_num);
-		$this->assertEquals('12345',$patient->hos_num);
-		$this->assertEquals('Mr',$patient->title);
-		$this->assertEquals('Aylward',$patient->last_name);
-		$this->assertEquals('Jim',$patient->first_name);
-		$this->assertInstanceOf('Gender', $patient->gender);
-		$this->assertEquals('Male',$patient->gender->name);
-		$this->assertEquals('1970-01-01',$patient->dob);
-		$this->assertEquals('07123 456789',$patient->contact->primary_phone);
+		$this->assertInstanceOf('Patient',$patient);
+		$this->assertCount(3,$patient->contactAssignments);
 
-		$this->assertCount(1, $patient->contact->addresses);
-		$this->assertInstanceOf('Address', $patient->contact->addresses[0]);
-		$this->assertEquals('flat 1', $patient->contact->addresses[0]->address1);
-		$this->assertEquals('bleakley creek', $patient->contact->addresses[0]->address2);
-		$this->assertEquals('flitchley', $patient->contact->addresses[0]->city);
-		$this->assertEquals('london', $patient->contact->addresses[0]->county);
-		$this->assertEquals('ec1v 0dx', $patient->contact->addresses[0]->postcode);
-		$this->assertInstanceOf('\Country', $patient->contact->addresses[0]->country);
-		$this->assertEquals('United States', $patient->contact->addresses[0]->country->name);
+		$this->assertInstanceOf('PatientContactAssignment',$patient->contactAssignments[0]);
+		$this->assertInstanceOf('Contact',$patient->contactAssignments[0]->contact);
+		$this->assertEquals('Dr',$patient->contactAssignments[0]->contact->title);
+		$this->assertEquals('Zhivago2',$patient->contactAssignments[0]->contact->last_name);
+		$this->assertEquals('Yuri2',$patient->contactAssignments[0]->contact->first_name);
+		$this->assertEquals('999',$patient->contactAssignments[0]->contact->primary_phone);
+		$this->assertNull($patient->contactAssignments[0]->location);
 
-		$this->assertEquals(1, $patient->gp_id);
-		$this->assertEquals(1, $patient->practice_id);
+		$this->assertInstanceOf('PatientContactAssignment',$patient->contactAssignments[1]);
+		$this->assertInstanceOf('ContactLocation',$patient->contactAssignments[1]->location);
+		$this->assertInstanceOf('Contact',$patient->contactAssignments[1]->location->contact);
+		$this->assertEquals('Mr',$patient->contactAssignments[1]->location->contact->title);
+		$this->assertEquals('Inc',$patient->contactAssignments[1]->location->contact->last_name);
+		$this->assertEquals('Apple',$patient->contactAssignments[1]->location->contact->first_name);
+		$this->assertEquals('01010101',$patient->contactAssignments[1]->location->contact->primary_phone);
+		$this->assertEquals(2,$patient->contactAssignments[1]->location->site_id);
+		$this->assertNull($patient->contactAssignments[1]->location->institution_id);
+		$this->assertNull($patient->contactAssignments[1]->contact);
+
+		$this->assertInstanceOf('PatientContactAssignment',$patient->contactAssignments[2]);
+		$this->assertInstanceOf('ContactLocation',$patient->contactAssignments[2]->location);
+		$this->assertInstanceOf('Contact',$patient->contactAssignments[2]->location->contact);
+		$this->assertEquals('Ti',$patient->contactAssignments[2]->location->contact->title);
+		$this->assertEquals('Tiss',$patient->contactAssignments[2]->location->contact->last_name);
+		$this->assertEquals('Prac',$patient->contactAssignments[2]->location->contact->first_name);
+		$this->assertEquals('0303032332',$patient->contactAssignments[2]->location->contact->primary_phone);
+		$this->assertNull($patient->contactAssignments[2]->location->site_id);
+		$this->assertEquals(1,$patient->contactAssignments[2]->location->institution_id);
+		$this->assertNull($patient->contactAssignments[2]->contact);
 	}
 
 	public function testJsonToModel_Save_Update_ModelCountsCorrect()
 	{
-		$json = '{"nhs_num":"x0001","hos_num":"x0002","title":"x0003","family_name":"x0004","given_name":"x0005","gender_ref":{"service":"Gender","id":2},"birth_date":"1996-04-20","date_of_death":null,"primary_phone":"03333 343434","addresses":[{"date_start":{"date":"2014-06-06 16:39:29","timezone_type":3,"timezone":"Europe\/London"},"date_end":{"date":"2014-06-06 16:39:29","timezone_type":3,"timezone":"Europe\/London"},"correspond":false,"transport":true,"use":null,"line1":"flat 1","line2":"bleakley creek","city":"flitchley","state":"london","zip":"ec1v 0dx","country":"United States"}],"care_providers":[],"gp_ref":{"service":"Gp","id":1},"prac_ref":{"service":"Practice","id":1},"cb_refs":[],"id":1,"last_modified":null}';
+		$json = '{"contacts":[{"title":"Dr","family_name":"Zhivago","given_name":"Yuri","primary_phone":"999","institution_ref":null,"site_ref":null,"id":null,"last_modified":null},{"title":"Mr","family_name":"Inc","given_name":"Apple","primary_phone":"01010101","institution_ref":null,"site_ref":{"service":"Site","id":"2"},"id":null,"last_modified":null},{"title":"Ti","family_name":"Tiss","given_name":"Prac","primary_phone":"0303032332","institution_ref":{"service":"Institution","id":"1"},"site_ref":null,"id":null,"last_modified":null}],"id":null,"last_modified":null,"patient_id":{"id":"3","last_modified":-2208988800}}';
 
 		$total_patients = count(\Patient::model()->findAll());
 		$total_contacts = count(\Contact::model()->findAll());
-		$total_addresses = count(\Address::model()->findAll());
-		$total_countries = count(\Country::model()->findAll());
-		$total_genders = count(\Gender::model()->findAll());
+		$total_pcas = count(\PatientContactAssignment::model()->findAll());
+		$total_sites = count(\Site::model()->findAll());
+		$total_institutions = count(\Institution::model()->findAll());
 
-		$ps = new PatientService;
-		$patient = $ps->jsonToModel($json);
+		$ps = new PatientAssociatedContactsService;
+		$patient = $ps->jsonToModel($json, $this->patients('patient1'));
 		$patient = \Patient::model()->findByPk($patient->id);
 
 		$this->assertEquals($total_patients, count(\Patient::model()->findAll()));
-		$this->assertEquals($total_contacts, count(\Contact::model()->findAll()));
-		$this->assertEquals($total_addresses, count(\Address::model()->findAll()));
-		$this->assertEquals($total_countries, count(\Country::model()->findAll()));
-		$this->assertEquals($total_genders, count(\Gender::model()->findAll()));
+		$this->assertEquals($total_contacts+2, count(\Contact::model()->findAll()));
+		$this->assertEquals($total_pcas, count(\PatientContactAssignment::model()->findAll()));
+		$this->assertEquals($total_sites, count(\Site::model()->findAll()));
+		$this->assertEquals($total_institutions, count(\Institution::model()->findAll()));
 	}
 
 	public function testJsonToModel_Save_Update_DBIsCorrect()
 	{
-		$json = '{"nhs_num":"x0001","hos_num":"x0002","title":"x0003","family_name":"x0004","given_name":"x0005","gender_ref":{"service":"Gender","id":2},"birth_date":"1996-04-20","date_of_death":null,"primary_phone":"03333 343434","addresses":[{"date_start":{"date":"2014-06-06 16:39:29","timezone_type":3,"timezone":"Europe\/London"},"date_end":{"date":"2014-06-06 16:39:29","timezone_type":3,"timezone":"Europe\/London"},"correspond":false,"transport":true,"use":null,"line1":"L1","line2":"L2","city":"L3","state":"L4","zip":"L5","country":"United Kingdom"}],"care_providers":[],"gp_ref":{"service":"Gp","id":1},"prac_ref":{"service":"Practice","id":1},"cb_refs":[],"id":1,"last_modified":null}';
+		$json = '{"contacts":[{"title":"Dr","family_name":"Zhivago","given_name":"Yuri","primary_phone":"999","institution_ref":null,"site_ref":null,"id":null,"last_modified":null},{"title":"Mr","family_name":"Inc","given_name":"Apple","primary_phone":"01010101","institution_ref":null,"site_ref":{"service":"Site","id":"2"},"id":null,"last_modified":null},{"title":"Ti","family_name":"Tiss","given_name":"Prac","primary_phone":"0303032332","institution_ref":{"service":"Institution","id":"1"},"site_ref":null,"id":null,"last_modified":null}],"id":null,"last_modified":null,"patient_id":{"id":"3","last_modified":-2208988800}}';
 
-		$ps = new PatientService;
-		$patient = $ps->jsonToModel($json);
+		$ps = new PatientAssociatedContactsService;
+		$patient = $ps->jsonToModel($json, $this->patients('patient1'));
 		$patient = \Patient::model()->findByPk($patient->id);
 
-		$this->assertEquals('x0001',$patient->nhs_num);
-		$this->assertEquals('x0002',$patient->hos_num);
-		$this->assertEquals('x0003',$patient->title);
-		$this->assertEquals('x0004',$patient->last_name);
-		$this->assertEquals('x0005',$patient->first_name);
-		$this->assertInstanceOf('Gender', $patient->gender);
-		$this->assertEquals('Female',$patient->gender->name);
-		$this->assertEquals('1996-04-20',$patient->dob);
-		$this->assertEquals('03333 343434',$patient->contact->primary_phone);
+		$this->assertInstanceOf('Patient',$patient);
+		$this->assertCount(3,$patient->contactAssignments);
 
-		$this->assertCount(1, $patient->contact->addresses);
-		$this->assertInstanceOf('Address', $patient->contact->addresses[0]);
-		$this->assertEquals('L1', $patient->contact->addresses[0]->address1);
-		$this->assertEquals('L2', $patient->contact->addresses[0]->address2);
-		$this->assertEquals('L3', $patient->contact->addresses[0]->city);
-		$this->assertEquals('L4', $patient->contact->addresses[0]->county);
-		$this->assertEquals('L5', $patient->contact->addresses[0]->postcode);
-		$this->assertEquals(\AddressType::TRANSPORT, $patient->contact->addresses[0]->address_type_id);
-		$this->assertInstanceOf('\Country', $patient->contact->addresses[0]->country);
-		$this->assertEquals('United Kingdom', $patient->contact->addresses[0]->country->name);
+		$this->assertInstanceOf('PatientContactAssignment',$patient->contactAssignments[0]);
+		$this->assertInstanceOf('Contact',$patient->contactAssignments[0]->contact);
+		$this->assertEquals('Dr',$patient->contactAssignments[0]->contact->title);
+		$this->assertEquals('Zhivago',$patient->contactAssignments[0]->contact->last_name);
+		$this->assertEquals('Yuri',$patient->contactAssignments[0]->contact->first_name);
+		$this->assertEquals('999',$patient->contactAssignments[0]->contact->primary_phone);
+		$this->assertNull($patient->contactAssignments[0]->location);
 
-		$this->assertEquals(1, $patient->gp_id);
-		$this->assertEquals(1, $patient->practice_id);
+		$this->assertInstanceOf('PatientContactAssignment',$patient->contactAssignments[1]);
+		$this->assertInstanceOf('ContactLocation',$patient->contactAssignments[1]->location);
+		$this->assertInstanceOf('Contact',$patient->contactAssignments[1]->location->contact);
+		$this->assertEquals('Mr',$patient->contactAssignments[1]->location->contact->title);
+		$this->assertEquals('Inc',$patient->contactAssignments[1]->location->contact->last_name);
+		$this->assertEquals('Apple',$patient->contactAssignments[1]->location->contact->first_name);
+		$this->assertEquals('01010101',$patient->contactAssignments[1]->location->contact->primary_phone);
+		$this->assertEquals(2,$patient->contactAssignments[1]->location->site_id);
+		$this->assertNull($patient->contactAssignments[1]->location->institution_id);
+		$this->assertNull($patient->contactAssignments[1]->contact);
+
+		$this->assertInstanceOf('PatientContactAssignment',$patient->contactAssignments[2]);
+		$this->assertInstanceOf('ContactLocation',$patient->contactAssignments[2]->location);
+		$this->assertInstanceOf('Contact',$patient->contactAssignments[2]->location->contact);
+		$this->assertEquals('Ti',$patient->contactAssignments[2]->location->contact->title);
+		$this->assertEquals('Tiss',$patient->contactAssignments[2]->location->contact->last_name);
+		$this->assertEquals('Prac',$patient->contactAssignments[2]->location->contact->first_name);
+		$this->assertEquals('0303032332',$patient->contactAssignments[2]->location->contact->primary_phone);
+		$this->assertNull($patient->contactAssignments[2]->location->site_id);
+		$this->assertEquals(1,$patient->contactAssignments[2]->location->institution_id);
+		$this->assertNull($patient->contactAssignments[2]->contact);
 	}
-
-	public function testResourceToModel_Condition_Both_True_Exception()
-	{
-		$resource = $this->getResource();
-
-		$resource->addresses[0]->correspond = true;
-		$resource->addresses[0]->transport = true;
-
-		$this->setExpectedException('Exception', 'Unable to differentiate condition as more than one attribute is true.');
-
-		$ps = new PatientService;
-		$patient = $ps->resourceToModel($resource);
-	}
-	*/
 }

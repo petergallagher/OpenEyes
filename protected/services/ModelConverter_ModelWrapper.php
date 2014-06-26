@@ -116,7 +116,7 @@ class ModelConverter_ModelWrapper
 				foreach ($this->related_objects[$related_object_one][$related_object_two] as $i => $item) {
 					if (is_array($attribute)) {
 						foreach ($attribute as $key => $value) {
-							$this->related_objects[$related_object_one][$related_object_two][$i]->$key= $this->expandAttribute($value);
+							$this->related_objects[$related_object_one][$related_object_two][$i]->$key = $this->expandAttribute($value);
 						}
 					} else {
 						$this->related_objects[$related_object_one][$related_object_two][$i]->$attribute = $this->expandAttribute($attribute);
