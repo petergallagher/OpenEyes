@@ -301,9 +301,11 @@ class ModelConverter_ModelWrapperTest extends \CDbTestCase
 		$w->setRelatedObject('fast','M5',array(new \stdClass,new \stdClass,new \stdClass));
 		$w->relatedObjectCopyAttributeFromModel('fast','M5','address1');
 
-		$this->assertEquals('testing123', $w->getRelatedObject('fast','M5')[0]->address1);
-		$this->assertEquals('testing123', $w->getRelatedObject('fast','M5')[1]->address1);
-		$this->assertEquals('testing123', $w->getRelatedObject('fast','M5')[2]->address1);
+		$related_object = $w->getRelatedObject('fast','M5');
+
+		$this->assertEquals('testing123', $related_object[0]->address1);
+		$this->assertEquals('testing123', $related_object[1]->address1);
+		$this->assertEquals('testing123', $related_object[2]->address1);
 	}
 
 	public function testRelatedObjectCopyAttributeFromModel_Array_AttributeIsArray()
@@ -318,17 +320,19 @@ class ModelConverter_ModelWrapperTest extends \CDbTestCase
 		$w->setRelatedObject('fast','M5',array(new \stdClass,new \stdClass,new \stdClass));
 		$w->relatedObjectCopyAttributeFromModel('fast','M5',array('address1'=>'address1','address2'=>'address2','city'=>'city'));
 
-		$this->assertEquals('testing123', $w->getRelatedObject('fast','M5')[0]->address1);
-		$this->assertEquals('456test', $w->getRelatedObject('fast','M5')[0]->address2);
-		$this->assertEquals('testytesttest667', $w->getRelatedObject('fast','M5')[0]->city);
+		$related_object = $w->getRelatedObject('fast','M5');
 
-		$this->assertEquals('testing123', $w->getRelatedObject('fast','M5')[1]->address1);
-		$this->assertEquals('456test', $w->getRelatedObject('fast','M5')[1]->address2);
-		$this->assertEquals('testytesttest667', $w->getRelatedObject('fast','M5')[1]->city);
+		$this->assertEquals('testing123', $related_object[0]->address1);
+		$this->assertEquals('456test', $related_object[0]->address2);
+		$this->assertEquals('testytesttest667', $related_object[0]->city);
 
-		$this->assertEquals('testing123', $w->getRelatedObject('fast','M5')[2]->address1);
-		$this->assertEquals('456test', $w->getRelatedObject('fast','M5')[2]->address2);
-		$this->assertEquals('testytesttest667', $w->getRelatedObject('fast','M5')[2]->city);
+		$this->assertEquals('testing123', $related_object[1]->address1);
+		$this->assertEquals('456test', $related_object[1]->address2);
+		$this->assertEquals('testytesttest667', $related_object[1]->city);
+
+		$this->assertEquals('testing123', $related_object[2]->address1);
+		$this->assertEquals('456test', $related_object[2]->address2);
+		$this->assertEquals('testytesttest667', $related_object[2]->city);
 	}
 
 	public function testExpandAttribute()
