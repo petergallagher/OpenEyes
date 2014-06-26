@@ -155,7 +155,7 @@ class PatientAssociatedContactsServiceTest extends \CDbTestCase
 		$contact2->given_name = 'Hughie';
 		$contact2->family_name = 'Louie';
 		$contact2->primary_phone = '3024302149';
-		$contact2->institution_ref = \Yii::app()->service->Institution(1);
+		$contact2->institution_ref = \Yii::app()->service->Institution(2);
 
 		$contact3 = new PatientAssociatedContact;
 		$contact3->title = 'Dr';
@@ -208,7 +208,7 @@ class PatientAssociatedContactsServiceTest extends \CDbTestCase
 		$this->assertEquals('Hughie',$patient->contactAssignments[1]->location->contact->first_name);
 		$this->assertEquals('Louie',$patient->contactAssignments[1]->location->contact->last_name);
 		$this->assertInstanceOf('ContactLocation',$patient->contactAssignments[1]->location);
-		$this->assertEquals(1,$patient->contactAssignments[1]->location->institution_id);
+		$this->assertEquals(2,$patient->contactAssignments[1]->location->institution_id);
 		$this->assertNull($patient->contactAssignments[1]->location->site_id);
 
 		$this->assertNull($patient->contactAssignments[2]->location);
@@ -218,23 +218,21 @@ class PatientAssociatedContactsServiceTest extends \CDbTestCase
 		$this->assertEquals('Baker',$patient->contactAssignments[2]->contact->last_name);
 	}
 
+/*
 	public function testResourceToModel_Save_Create_ModelCountsCorrect()
 	{
 		$resource = $this->getResource();
-
-		\PatientContactAssignment::model()->deleteAll('patient_id=1');
 
 		$total_pcas = count(\PatientContactAssignment::model()->findAll());
 		$total_contacts = count(\Contact::model()->findAll());
 
 		$ps = new PatientAssociatedContactsService;
-		$patient = $ps->resourceToModel($resource,$this->patients('patient1'));
+		$patient = $ps->resourceToModel($resource);
 
-		$this->assertEquals($total_pcas+3, count(\PatientContactAssignment::model()->findAll()));
+		$this->assertEquals($total_pcas, count(\PatientContactAssignment::model()->findAll()));
 		$this->assertEquals($total_contacts+3, count(\Contact::model()->findAll()));
 	}
 
-/*
 	public function testResourceToModel_Save_ModelIsCorrect()
 	{
 		$resource = $this->getResource();

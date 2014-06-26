@@ -37,7 +37,7 @@ class PatientAssociatedContactsService extends DeclarativeModelService
 		'PatientAssociatedContact' => array(
 			'ar_class' => 'PatientContactAssignment',
 			'related_objects' => array(
-				'patient' => array('patient_id', 'Patient', 'save' => 'no'),
+				'patient' => array('patient_id', 'Patient'),
 				'location' => array('location_id', 'ContactLocation', 'rules' => array(
 					array(self::RULE_TYPE_NULLIFNULL, array('site_ref', 'institution_ref')),
 				)),
