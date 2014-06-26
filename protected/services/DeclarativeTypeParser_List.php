@@ -120,18 +120,20 @@ class DeclarativeTypeParser_List extends DeclarativeTypeParser
 
 	public function saveListItem($item)
 	{
-		foreach ($this->mc->map->getRelatedObjectsForClass(get_class($item)) as $relation => $def) {
-			if (@$def['save'] != 'no') {
-				if ($item->$relation) {
-					foreach ($this->mc->map->getRelatedObjectRelatedObjectsForClass(get_class($item), $relation) as $related_def) {
-						$this->mc->saveModel($item->$relation->{$related_def[1]});
-						$item->$relation->{$related_def[0]} = $item->$relation->{$related_def[1]}->primaryKey;
+		if ($related_objects = $this->mc->map->getRelatedObjectsForClass(get_class($item))) {
+			foreach ($related_objects as $relation => $def) {
+				if (@$def['save'] != 'no') {
+					if ($item->$relation) {
+						foreach ($this->mc->map->getRelatedObjectRelatedObjectsForClass(get_class($item), $relation) as $related_def) {
+							$this->mc->saveModel($item->$relation->{$related_def[1]});
+							$item->$relation->{$related_def[0]} = $item->$relation->{$related_def[1]}->primaryKey;
+						}
+
+						$this->mc->saveModel($item->$relation);
+
+						$parent_attribute = preg_replace('/^.*\./','',$def[0]);
+						$item->$parent_attribute = $item->$relation->primaryKey;
 					}
-
-					$this->mc->saveModel($item->$relation);
-
-					$parent_attribute = preg_replace('/^.*\./','',$def[0]);
-					$item->$parent_attribute = $item->$relation->primaryKey;
 				}
 			}
 		}

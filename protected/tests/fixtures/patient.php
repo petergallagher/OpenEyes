@@ -45,7 +45,8 @@ return array(
 		'nhs_num' => 65432,
 		'practice_id' => 2,
 		'address_id' => 2,
-		'contact_id' => 2
+		'contact_id' => 2,
+		'no_allergies_date' => '2012-01-01',
 	),
 	'patient3' => array(
 		'id' => 3,
