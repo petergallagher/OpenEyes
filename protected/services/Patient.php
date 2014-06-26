@@ -34,20 +34,22 @@ class Patient extends Resource
 		if (isset($values['birth_date'])) $values['birth_date'] = $values['birth_date']->toDate();
 		if (isset($values['date_of_death'])) $values['date_of_death'] = $values['date_of_death']->toDate();
 
-		foreach ($values['care_providers'] as $ref) {
-			switch ($ref->getServiceName()) {
-				case 'Gp':
-					$values['gp_ref'] = $ref;
-					break;
-				case 'Practice':
-					$values['prac_ref'] = $ref;
-					break;
-				case 'CommissioningBody':
-					$values['cb_refs'][] = $ref;
-					break;
+		if (isset($values['care_providers'])) {
+			foreach ($values['care_providers'] as $ref) {
+				switch ($ref->getServiceName()) {
+					case 'Gp':
+						$values['gp_ref'] = $ref;
+						break;
+					case 'Practice':
+						$values['prac_ref'] = $ref;
+						break;
+					case 'CommissioningBody':
+						$values['cb_refs'][] = $ref;
+						break;
+				}
 			}
+			unset($values['care_providers']);
 		}
-		unset($values['care_providers']);
 
 		return parent::fromFhirValues($values);
 	}

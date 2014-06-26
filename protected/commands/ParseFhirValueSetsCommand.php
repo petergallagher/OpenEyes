@@ -33,7 +33,7 @@ class ParseFhirValueSetsCommand extends CConsoleCommand
 
 		$value_sets = array();
 
-		foreach ($data->feed->entry as $entry) {
+		foreach ($data->entry as $entry) {
 			$content = $entry->content;
 			if (@$content->experimental ||
 				$content->status == 'retired' ||
