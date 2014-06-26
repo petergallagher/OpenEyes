@@ -80,93 +80,62 @@
 				</span>
 			<?php } ?>
 
-			<button type="button" class="icon-alert-help"></button>
+			<button id="toggle-patient-summary-popup" class="icon-alert-quicklook"></button>
 		</div>
-		<!-- <div class=" "> -->
-		<!-- </div> -->
 	</div>
 </div>
 
 <?php
-// Get Ophthalmic Diagnoses
-$ophthalmicDiagnoses = array_map(function($diagnosis) {
-	return $diagnosis->ophthalmicDescription;
-}, $this->patient->ophthalmicDiagnoses);
-$ophthalmicDiagnoses = join(',<br/>', $ophthalmicDiagnoses);
-
-// Get Systemic Diagnoses
-$systemicDiagnoses = array_map(function($diagnosis) {
-	return $diagnosis->systemicDescription;
-}, $this->patient->systemicDiagnoses);
-$systemicDiagnoses = join(',<br/>', $systemicDiagnoses);
-
-// Get CVI Status
+$ophthalmicDiagnoses = join(',<br/>', $this->patient->ophthalmicDiagnosesSummary);
+$systemicDiagnoses = join(',<br/>', $this->patient->systemicDiagnosesSummary);
 $cviStatus = $this->patient->getOPHInfo()->cvi_status->name;
-
-// Get medications
-$medications = array_map(function($medication) {
-	$label = $medication->drug->label;
-	$option = $medication->option ? " ({$medication->option->name})" : "";
-	$frequency = $medication->frequency->name;
-	return $label.$option.' '.$frequency;
-}, $this->patient->medications);
-$medications = join(',<br/>', $medications);
-
-// Get allergies
-$allergies = null;
-if (!$this->patient->hasAllergyStatus()) {
-	$allergies = 'Patient allergy status is unknown';
-} elseif ($this->patient->no_allergies_date) {
-	$allergies = 'Patient has no known allergies';
-} else {
-	$allergies = array_map(function($allergy) {
-		return $allergy->name;
-	}, $this->patient->allergies);
-	$allergies = join(',<br/>', $allergies);
-}
+$medications = join(',<br/>', $this->patient->medicationsSummary);
+$allergies = join(',<br/>', $this->patient->allergiesSummary);
 ?>
-<div class="panel patient-popup">
+<div class="panel patient-popup" id="patient-summary-popup">
 	<?php if ($ophthalmicDiagnoses) {?>
 		<div class="row">
-			<div class="large-4 column heading">
+			<div class="large-3 column label">
 				Ophthalmic Diagnoses
 			</div>
-			<div class="large-8 column data">
+			<div class="large-9 column data">
 				<?php echo $ophthalmicDiagnoses;?>
 			</div>
 		</div>
 	<?php }?>
 	<?php if ($systemicDiagnoses) {?>
 		<div class="row">
-			<div class="large-4 column heading">
+			<div class="large-3 column label">
 				Systemic Diagnoses
 			</div>
-			<div class="large-8 column data">
+			<div class="large-9 column data">
 				<?php echo $systemicDiagnoses;?>
 			</div>
 		</div>
 	<?php }?>
 	<div class="row">
-		<div class="large-4 column heading">
+		<div class="large-3 column label">
 			CVI Status
 		</div>
-		<div class="large-8 column data">
+		<div class="large-9 column data">
 			<?php echo $cviStatus;?>
 		</div>
 	</div>
-	<div class="row">
-		<div class="large-4 column heading">
-			Medication
+	<?php if ($medications) {?>
+		<div class="row">
+			<div class="large-3 column label">
+				Medication
+			</div>
+			<div class="large-9 column data">
+				<?php echo $medications;?>
+			</div>
 		</div>
-		<div class="large-8 column data">
-			<?php echo $medications;?>
-		</div>
-	</div>
+	<?php }?>
 	<div class="row">
-		<div class="large-4 column heading">
+		<div class="large-3 column label">
 			Allergies
 		</div>
-		<div class="large-8 column data">
+		<div class="large-9 column data">
 			<?php echo $allergies;?>
 		</div>
 	</div>

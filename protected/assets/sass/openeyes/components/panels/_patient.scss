@@ -164,14 +164,47 @@
 // PATIENT POPUP
 .panel {
 	&.patient-popup {
+		background: #fce6b7;
 		border: {
 			color: #ffb212;
 			style: solid;
 			width: 2px;
 		};
-		left: 0.75rem;
+		display: none;
+		left: 6px;
+		margin-top: 2px;
+		padding: 5px;
 		position: absolute;
-		right: 0.75rem;
+		right: 6px;
 		z-index: 1;
+		// Triangle tip
+		&:after {
+			content: "";
+			position: absolute;
+			top: -12px;
+			right: 18px;
+			border-left: 7px solid transparent;
+			border-right: 7px solid transparent;
+			border-bottom: 10px solid #ffb212;
+		}
+		&.show {
+			display: block;
+		}
+		.row {
+			background: #fef5e3;
+			margin: 0 0 3px 0;
+			&:last-child {
+				margin-bottom: 0;
+			}
+			.column {
+				font-size: 11px;
+				padding: 5px;
+			}
+		}
+		.label {
+			cursor: default;
+			color: #b57e0d;
+			margin: 0;
+		}
 	}
 }

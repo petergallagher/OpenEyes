@@ -155,6 +155,24 @@ $(document).ready(function(){
 		}, options));
 	}());
 
+	(function patientSummaryPopup() {
+
+		var button = $('#toggle-patient-summary-popup');
+		var popup = $('#patient-summary-popup');
+
+		popup.on('show', function() {
+			popup.addClass('show');
+		});
+
+		popup.on('hide', function() {
+			popup.removeClass('show');
+		});
+
+		button.on('click', function() {
+			popup.trigger(popup.hasClass('show') ? 'hide' : 'show');
+		});
+	}());
+
 	/**
 	 * Tab hover
 	 */
