@@ -218,8 +218,7 @@ class PatientAssociatedContactsServiceTest extends \CDbTestCase
 		$this->assertEquals('Baker',$patient->contactAssignments[2]->contact->last_name);
 	}
 
-/*
-	public function testResourceToModel_Save_Create_ModelCountsCorrect()
+	public function testResourceToModel_Save_Create_ModelCountsCorrect_83749837492()
 	{
 		$resource = $this->getResource();
 
@@ -227,12 +226,13 @@ class PatientAssociatedContactsServiceTest extends \CDbTestCase
 		$total_contacts = count(\Contact::model()->findAll());
 
 		$ps = new PatientAssociatedContactsService;
-		$patient = $ps->resourceToModel($resource);
+		$patient = $ps->resourceToModel($resource, $this->patients('patient1'));
 
 		$this->assertEquals($total_pcas, count(\PatientContactAssignment::model()->findAll()));
 		$this->assertEquals($total_contacts+3, count(\Contact::model()->findAll()));
 	}
 
+/*
 	public function testResourceToModel_Save_ModelIsCorrect()
 	{
 		$resource = $this->getResource();

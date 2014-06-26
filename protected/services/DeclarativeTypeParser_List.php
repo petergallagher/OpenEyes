@@ -92,12 +92,10 @@ class DeclarativeTypeParser_List extends DeclarativeTypeParser
 			}
 		}
 
-		if ($save) {
-			if ($object->$relation) {
-				foreach ($object->$relation as $current_item) {
-					if (!in_array($current_item->id,$matched_ids)) {
-						$this->mc->deleteModel($current_item);
-					}
+		if ($save && $data) {
+			foreach ($data as $current_item) {
+				if (!in_array($current_item->id,$matched_ids)) {
+					$this->mc->deleteModel($current_item);
 				}
 			}
 		}
