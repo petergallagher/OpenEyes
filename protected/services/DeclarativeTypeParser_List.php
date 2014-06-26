@@ -123,12 +123,15 @@ class DeclarativeTypeParser_List extends DeclarativeTypeParser
 		foreach ($this->mc->map->getRelatedObjectsForClass(get_class($item)) as $relation => $def) {
 			if (@$def['save'] != 'no') {
 				if ($item->$relation) {
-					if (!empty($def['related'])) {
-						$this->mc->saveModel($item->$relation->{$def['related'][1]});
-						$item->$relation->{$def['related'][0]} = $item->$relation->{$def['related'][1]}->primaryKey;
+					foreach ($this->mc->map->getRelatedObjectRelatedObjectsForClass(get_class($item), $relation) as $related_def) {
+						$this->mc->saveModel($item->$relation->{$related_def[1]});
+						$item->$relation->{$related_def[0]} = $item->$relation->{$related_def[1]}->primaryKey;
 					}
 
 					$this->mc->saveModel($item->$relation);
+
+					$parent_attribute = preg_replace('/^.*\./','',$def[0]);
+					$item->$parent_attribute = $item->$relation->primaryKey;
 				}
 			}
 		}

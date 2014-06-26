@@ -150,4 +150,33 @@ class ModelMap
 
 		return @$this->map[$class_name]['model_defaults'];
 	}
+
+	public function getRelatedObjectRelatedObjectsForClass($class_name, $relation_name)
+	{
+		if (!isset($this->map[$class_name]['related_objects'])) {
+			foreach ($this->map as $_class_name => $_def) {
+				if (@$_def['ar_class'] == $class_name) {
+					$related_objects = @$_def['related_objects'];
+				}
+			}
+		} else {
+			$related_objects = $this->map[$class_name]['related_objects'];
+		}
+
+		$related = array();
+
+		if (@$related_objects) {
+			foreach ($related_objects as $related_object_name => $def) {
+				if ($pos = strpos($def[0],'.')) {
+					list($_relation_name, $related_attribute) = explode('.',$def[0]);
+
+					if ($_relation_name == $relation_name) {
+						$related[] = array($related_attribute, $related_object_name);
+					}
+				}
+			}
+		}
+
+		return $related;
+	}
 }

@@ -122,7 +122,7 @@ class ModelConverter
 		}
 	}
 
-	protected function processRelatedObjectRules($related_object_def, $resource)
+	public function processRelatedObjectRules($related_object_def, $resource)
 	{
 		$attribute = $related_object_def[0];
 		$class_name = '\\'.$related_object_def[1];

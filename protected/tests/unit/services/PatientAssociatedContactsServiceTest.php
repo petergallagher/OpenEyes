@@ -268,39 +268,44 @@ class PatientAssociatedContactsServiceTest extends \CDbTestCase
 		$this->assertEquals('Baker',$patient->contactAssignments[2]->contact->last_name);
 	}
 
-/*
 	public function testResourceToModel_Save_Create_DBIsCorrect()
 	{
 		$resource = $this->getResource();
 
-		$ps = new PatientService;
-		$patient = $ps->resourceToModel($resource);
+		$ps = new PatientAssociatedContactsService;
+		$patient = $ps->resourceToModel($resource, $this->patients('patient1'));
 		$patient = \Patient::model()->findByPk($patient->id);
 
-		$this->assertEquals('1919',$patient->nhs_num);
-		$this->assertEquals('4545',$patient->hos_num);
-		$this->assertEquals('Mr',$patient->title);
-		$this->assertEquals('Krinkle',$patient->last_name);
-		$this->assertEquals('Henry',$patient->first_name);
-		$this->assertInstanceOf('Gender', $patient->gender);
-		$this->assertEquals('Male',$patient->gender->name);
-		$this->assertEquals('1994-04-23',$patient->dob);
-		$this->assertEquals('02332 3241959',$patient->contact->primary_phone);
+		$this->assertInstanceOf('Patient',$patient);
+		$this->assertCount(3,$patient->contactAssignments);
 
-		$this->assertCount(1, $patient->contact->addresses);
-		$this->assertInstanceOf('Address', $patient->contact->addresses[0]);
-		$this->assertEquals('1 some road',$patient->contact->addresses[0]->address1);
-		$this->assertEquals('some place',$patient->contact->addresses[0]->address2);
-		$this->assertEquals('somewhere',$patient->contact->addresses[0]->city);
-		$this->assertEquals('someton',$patient->contact->addresses[0]->county);
-		$this->assertEquals('som3 0ne',$patient->contact->addresses[0]->postcode);
-		$this->assertInstanceOf('Country', $patient->contact->addresses[0]->country);
-		$this->assertEquals('United Kingdom', $patient->contact->addresses[0]->country->name);
+		$this->assertNull($patient->contactAssignments[0]->contact);
+		$this->assertInstanceOf('ContactLocation',$patient->contactAssignments[0]->location);
+		$this->assertInstanceOf('Contact',$patient->contactAssignments[0]->location->contact);
+		$this->assertEquals('Dr',$patient->contactAssignments[0]->location->contact->title);
+		$this->assertEquals('Hunter',$patient->contactAssignments[0]->location->contact->first_name);
+		$this->assertEquals('Thompson',$patient->contactAssignments[0]->location->contact->last_name);
+		$this->assertEquals(1,$patient->contactAssignments[0]->location->site_id);
+		$this->assertNull($patient->contactAssignments[0]->location->institution_id);
 
-		$this->assertEquals(1, $patient->gp_id);
-		$this->assertEquals(1, $patient->practice_id);
+		$this->assertNull($patient->contactAssignments[1]->contact);
+		$this->assertInstanceOf('ContactLocation',$patient->contactAssignments[1]->location);
+		$this->assertInstanceOf('Contact',$patient->contactAssignments[1]->location->contact);
+		$this->assertEquals('Dr',$patient->contactAssignments[1]->location->contact->title);
+		$this->assertEquals('Hughie',$patient->contactAssignments[1]->location->contact->first_name);
+		$this->assertEquals('Louie',$patient->contactAssignments[1]->location->contact->last_name);
+		$this->assertInstanceOf('ContactLocation',$patient->contactAssignments[1]->location);
+		$this->assertEquals(1,$patient->contactAssignments[1]->location->institution_id);
+		$this->assertNull($patient->contactAssignments[1]->location->site_id);
+
+		$this->assertNull($patient->contactAssignments[2]->location);
+		$this->assertInstanceOf('Contact',$patient->contactAssignments[2]->contact);
+		$this->assertEquals('Dr',$patient->contactAssignments[2]->contact->title);
+		$this->assertEquals('Ted',$patient->contactAssignments[2]->contact->first_name);
+		$this->assertEquals('Baker',$patient->contactAssignments[2]->contact->last_name);
 	}
 
+/*
 	public function getModifiedResource($id)
 	{
 		$resource = \Yii::app()->service->Patient($id)->fetch();
