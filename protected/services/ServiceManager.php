@@ -90,35 +90,16 @@ class ServiceManager extends \CApplicationComponent
 	 * Find an internal service for the specified FHIR resource type, using tags to differentiate if necessary
 	 *
 	 * @param string[] $profiles
-	 * @return InternalService|null
+	 * @return InternalService|null Null if resource type is supported but no service matched the profile
 	 */
 	public function getFhirService($fhir_type, array $profiles)
 	{
-		$candidates = array_filter($this->service_config, function ($config) use ($fhir_type) { return $config['fhir_type'] == $fhir_type; });
+		$resource_class = \Yii::app()->fhirMap->getOeResourceTypeByProfile($fhir_type, $profiles);
+		if (!$resource_class) return null;
 
-		if (!$candidates) {
-			throw new NotFound("Unsupported resource type: '{$fhir_type}'");
+		foreach ($this->service_config as $name => $config) {
+			if ($config['resource_class'] == $resource_class) return $this->{$name};
 		}
-
-		// Unambiguous resource type
-		if (count($candidates) == 1) {
-			list ($name, $config) = each($candidates);
-			if (!$config['fhir_prefix']) return $this->{$name};
-		}
-
-		if (!$profiles) {
-			throw new ProcessingNotSupported("A profile must be specified for resources of type '{$fhir_type}'");
-		}
-
-		foreach ($candidates as $name => $config) {
-			$resource_class = $config['resource_class'];
-			if (in_array($resource_class::getOeFhirProfile(), $profiles)) {
-				return $this->{$name};
-			}
-		}
-
-		// Profile(s) supplied but no match, not necessarily an error
-		return null;
 	}
 
 	/**
@@ -126,20 +107,19 @@ class ServiceManager extends \CApplicationComponent
 	 *
 	 * @param string $fhir_type
 	 * @param string $fhir_id
-	 * @return InternalReference|null Null if no mapping found
+	 * @return InternalReference|null Null if resource type is supported but no mapping found
 	 */
 	public function fhirIdToReference($fhir_type, $fhir_id)
 	{
 		if (!preg_match('/^(?:(\w+)-)?(\d+)$/', $fhir_id, $m)) return null;
 		list (, $prefix, $id) = $m;
 
-		foreach ($this->service_config as $service_name => $config) {
-			if ($config['fhir_type'] == $fhir_type && $config['fhir_prefix'] == $prefix) {
-				return $this->{$service_name}($id);
-			}
-		}
+		$resource_class = \Yii::app()->fhirMap->getOeResourceTypeByPrefix($fhir_type, $prefix);
+		if (!$resource_class) return null;
 
-		return null;
+		foreach ($this->service_config as $name => $config) {
+			if ($config['resource_class'] == $resource_class) return $this->{$name}($id);
+		}
 	}
 
 	/**

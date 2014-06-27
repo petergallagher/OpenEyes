@@ -24,6 +24,7 @@ class ServiceManagerTest extends \PHPUnit_Framework_TestCase
 	}
 
 	private $manager;
+	private $fhir_map;
 
 	public function setUp()
 	{
@@ -34,6 +35,14 @@ class ServiceManagerTest extends \PHPUnit_Framework_TestCase
 			'services\ServiceManagerTest_NonFhirResourceService',
 		);
 		$this->manager->init();
+
+		$this->fhir_map = $this->getMockBuilder('services\FhirMap')->disableOriginalConstructor()->getMock();
+		\Yii::app()->setComponent('fhirMap', $this->fhir_map);
+	}
+
+	public function tearDown()
+	{
+		\Yii::app()->setComponent('fhirMap', null);
 	}
 
 	/**
@@ -60,44 +69,21 @@ class ServiceManagerTest extends \PHPUnit_Framework_TestCase
 		$this->assertInstanceOf('services\ServiceManagerTest_InternalResourceService', $this->manager->getService('ServiceManagerTest_InternalResource'));
 	}
 
-	/**
-	 * @expectedException services\NotFound
-	 * @expectedExceptionMessage Unsupported resource type: 'Caterpillar'
-	 */
 	public function testGetFhirService_NotFound()
 	{
-		$this->manager->getFhirService('Caterpillar', array());
+		$this->assertNull($this->manager->getFhirService('Caterpillar', array()));
 	}
 
-	public function testGetFhirService_Unambiguous()
+	public function testGetFhirService_Found()
 	{
+		$this->fhir_map->expects($this->any())->method('getOeResourceTypeByProfile')->will($this->returnValue('services\ServiceManagerTest_InternalResource'));
 		$this->assertInstanceOf('services\ServiceManagerTest_InternalResourceService', $this->manager->getFhirService('FhirResourceA', array()));
-	}
-
-	/**
-	 * @expectedException services\ProcessingNotSupported
-	 * @expectedExceptionMessage A profile must be specified for resources of type 'FhirResourceB'
-	 */
-	public function testGetFhirService_AmbiguousNoProfile()
-	{
-		$this->manager->getFhirService('FhirResourceB', array());
-	}
-
-	public function testGetFhirService_AmbiguousValidProfile()
-	{
-		$this->assertInstanceOf(
-			'services\ServiceManagerTest_InternalAmbiguousResourceService',
-			$this->manager->getFhirService('FhirResourceB', array('bar'))
-		);
-	}
-
-	public function testGetFhirService_AmbiguousInvalidProfile()
-	{
-		$this->assertNull($this->manager->getFhirService('FhirResourceB', array('baz')));
 	}
 
 	public function testFhirIdToReference_NoPrefix()
 	{
+		$this->fhir_map->expects($this->any())->method('getOeResourceTypeByPrefix')->with('FhirResourceA', '')->will($this->returnValue('services\ServiceManagerTest_InternalResource'));
+
 		$ref = $this->manager->fhirIdToReference('FhirResourceA', 42);
 		$this->assertEquals('ServiceManagerTest_InternalResource', $ref->getServiceName());
 		$this->assertEquals(42, $ref->getId());
@@ -105,6 +91,8 @@ class ServiceManagerTest extends \PHPUnit_Framework_TestCase
 
 	public function testFhirIdToReference_Prefix()
 	{
+		$this->fhir_map->expects($this->any())->method('getOeResourceTypeByPrefix')->with('FhirResourceB', 'foo')->will($this->returnValue('services\ServiceManagerTest_InternalAmbiguousResource'));
+
 		$ref = $this->manager->fhirIdToReference('FhirResourceB', 'foo-43');
 		$this->assertEquals('ServiceManagerTest_InternalAmbiguousResource', $ref->getServiceName());
 		$this->assertEquals(43, $ref->getId());
@@ -113,16 +101,6 @@ class ServiceManagerTest extends \PHPUnit_Framework_TestCase
 	public function testFhirIdToReference_UnknownFhirType()
 	{
 		$this->assertNull($this->manager->fhirIdToReference('Foo', 44));
-	}
-
-	public function testFhirIdToReference_MissingPrefix()
-	{
-		$this->assertNull($this->manager->fhirIdToReference('FhirResourceB', 45));
-	}
-
-	public function testFhirIdToReference_InvalidPrefix()
-	{
-		$this->assertNull($this->manager->fhirIdToReference('FhirResourceB', 'baz-46'));
 	}
 
 	/**
