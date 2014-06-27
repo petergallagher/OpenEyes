@@ -116,9 +116,13 @@ class ModelConverter
 			$object_relation = ($pos = strpos($attribute,'.')) ? substr($attribute,0,$pos).'.'.$relation_name : $relation_name;
 
 			if ($save && $related_object = $model->expandAttribute($object_relation)) {
+				if (isset($def[2])) {
+					$related_object->{$def[2]} = $model->getId();
+				}
+
 				$this->saveModel($related_object);
 
-				$model->setAttribute($attribute, $related_object->id);
+				$attribute && $model->setAttribute($attribute, $related_object->id);
 			} else {
 				$model->setAttribute($object_relation, $related_object_value, false);
 			}

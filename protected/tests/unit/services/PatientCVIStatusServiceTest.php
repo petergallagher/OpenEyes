@@ -71,27 +71,21 @@ class PatientCVIStatusServiceTest extends \CDbTestCase
 		$this->assertEquals('2012-01-04',$patient->cvi_status->cvi_status_date);
 	}
 
-/*
-	public function testResourceToModel_Save_Create_ModelCountsCorrect()
+	public function testResourceToModel_Save_ModelCountsCorrect()
 	{
 		$resource = $this->getResource();
 
 		$total_patients = count(\Patient::model()->findAll());
-		$total_contacts = count(\Contact::model()->findAll());
-		$total_addresses = count(\Address::model()->findAll());
-		$total_countries = count(\Country::model()->findAll());
-		$total_genders = count(\Gender::model()->findAll());
+		$total_cvi_status = count(\PatientOphInfo::model()->findAll());
 
-		$ps = new PatientService;
-		$patient = $ps->resourceToModel($resource, new \Patient);
+		$ps = new PatientCVIStatusService;
+		$patient = $ps->resourceToModel($resource, $this->patients('patient4'));
 
-		$this->assertEquals($total_patients+1, count(\Patient::model()->findAll()));
-		$this->assertEquals($total_contacts+1, count(\Contact::model()->findAll()));
-		$this->assertEquals($total_addresses+1, count(\Address::model()->findAll()));
-		$this->assertEquals($total_countries, count(\Country::model()->findAll()));
-		$this->assertEquals($total_genders, count(\Gender::model()->findAll()));
+		$this->assertEquals($total_patients, count(\Patient::model()->findAll()));
+		$this->assertEquals($total_cvi_status+1, count(\PatientOphInfo::model()->findAll()));
 	}
 
+/*
 	public function testResourceToModel_Save_Create_ModelIsCorrect()
 	{
 		$resource = $this->getResource();
