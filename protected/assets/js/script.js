@@ -120,6 +120,9 @@ $(document).ready(function(){
 		});
 	}());
 
+	/**
+	 * Init sticky (fixed) elements.
+	 */
 	(function stickyElements() {
 
 		var banner = new OpenEyes.UI.StickyElement('.admin.banner', {
@@ -155,28 +158,30 @@ $(document).ready(function(){
 		}, options));
 	}());
 
+	/**
+	 * Init patient summary popup.
+	 */
 	(function patientSummaryPopup() {
 
-		var button = $('#toggle-patient-summary-popup');
-		var container = $('.patient-popup-container');
+		var container = $('#patient-popup-container');
 		var popup = $('#patient-summary-popup');
-
-		var showIcon = button.data('show-icon');
-		var hideIcon = button.data('hide-icon');
+		var buttons = container.find('.toggle-patient-summary-popup');
+		var helpHint = popup.find('.help-hint');
 
 		var stuck = false;
+		var sticky = false;
 		var hideTimer = 0;
 		var hoverTimer = 0;
 
+		// Popup custom events.
 		popup.on({
+			update: function() {
+				popup.trigger(stuck ? 'show' : 'hide');
+			},
 			show: function() {
+				if (popup.hasClass('show')) return;
 				clearTimeout(hideTimer);
-
 				popup.show();
-
-				// We want to reset all existing transitions so that the popup
-				// will *always* animate in.
-
 				// Re-define the transitions on the popup to be none.
 				popup.addClass('clear-transition');
 				// Trigger a re-flow to reset the starting position of the transitions, now
@@ -184,8 +189,7 @@ $(document).ready(function(){
 				popup[0].offsetWidth = popup[0].offsetWidth;
 				// Add the initial transition definitions back.
 				popup.removeClass('clear-transition');
-
-				// Yay, we can animate in from the initial starting point.
+				// We can now animate in from the initial starting point.
 				popup.addClass('show');
 			},
 			hide: function() {
@@ -196,15 +200,31 @@ $(document).ready(function(){
 			}
 		});
 
-		button.on({
-			click: function() {
+		// Help hint custom events.
+		helpHint.on({
+			update: function() {
+				var text = helpHint.data('text')[ stuck ? 'close' : 'lock' ];
+				console.log(helpHint.data('text'));
+				helpHint.text(text[sticky ? 'short' : 'full']);
+			}
+		})
 
-				stuck = !stuck;
-				popup.trigger(stuck ? 'show' : 'hide');
-
-				button
+		// Button events.
+		buttons.on({
+			update: function() {
+				var button = $(this);
+				var showIcon = button.data('show-icon');
+				var hideIcon = button.data('hide-icon');
+				if (showIcon && hideIcon) {
+					button
 					.removeClass(showIcon + ' ' + hideIcon)
 					.addClass(stuck ? hideIcon : showIcon);
+				}
+			},
+			click: function() {
+				stuck = !stuck;
+				// Update all elements.
+				popup.add(buttons).add(helpHint).trigger('update');
 			}
 		});
 
@@ -212,8 +232,9 @@ $(document).ready(function(){
 		// hide when hovering over the popup contents.
 		container.on({
 			mouseenter: function() {
+				clearTimeout(hoverTimer);
 				// We use a timer to prevent the popup from displaying unintentionally.
-				hoverTimer = setTimeout(popup.trigger.bind(popup, 'show'), 100);
+				hoverTimer = setTimeout(popup.trigger.bind(popup, 'show'), 200);
 			},
 			mouseleave: function() {
 				clearTimeout(hoverTimer);

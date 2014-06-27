@@ -164,28 +164,26 @@
 // PATIENT POPUP
 .patient-popup-container {
 	float: right;
-	width: 17px;
-	height: 17px;
-	margin-top: -26px;
-	margin-right: 12px;
+	height: 68px;
+	margin-right: 8px;
+	margin-top: -70px;
 	position: relative;
-	.patient-summary-btn {
+	width: 30px;
+	text-align: right;
+	[class*=icon-patient] {
+		margin-bottom: 13px;
+	}
+	[class*=icon-alert] {
+		margin-right: 4px;
 	}
 }
+
 .panel {
 	&.patient-popup {
-		@include transition(
-			opacity .25s ease,
-			top .25s ease
-		);
+		@include transition(opacity 0.25s ease, top 0.25s ease);
 		&.clear-transition {
 			@include transition(none);
 		}
-		width: 400px;
-		left: -363px;
-		position: absolute;
-		z-index: 9999;
-		top: 40px;
 		background: #fce6b7;
 		border: {
 			color: #ffb212;
@@ -193,21 +191,27 @@
 			width: 2px;
 		};
 		display: none;
+		left: -355px;
 		opacity: 0;
 		padding: 5px;
-		// Triangle tip
-		&:after {
-			content: "";
-			position: absolute;
-			top: -12px;
-			right: 18px;
-			border-left: 7px solid transparent;
-			border-right: 7px solid transparent;
-			border-bottom: 10px solid #ffb212;
-		}
+		position: absolute;
+		top: 90px;
+		text-align: left;
+		width: 400px;
+		z-index: 9999;
 		&.show {
 			opacity: 1;
-			top: 27px;
+			top: 72px;
+		}
+		// Triangle tip
+		&:after {
+			border-bottom: 12px solid #ffb212;
+			border-left: 7px solid transparent;
+			border-right: 7px solid transparent;
+			content: "";
+			position: absolute;
+			right: 18px;
+			top: -14px;
 		}
 		.row {
 			background: #fef5e3;
@@ -221,9 +225,40 @@
 			}
 		}
 		.label {
-			cursor: default;
 			color: #b57e0d;
+			cursor: default;
 			margin: 0;
+		}
+		.alert-box {
+			display: table;
+			font-size: 11px;
+			min-height: 40px;
+			padding-bottom: 7px;
+			padding-top: 7px;
+			width: 100%;
+			span {
+				display: table-cell;
+				vertical-align: middle;
+			}
+		}
+		.help-hint {
+			@include border-radius(3px);
+			background: #fef8ec;
+			color: #999;
+			font-size: 11px;
+			padding: 4px;
+			position: absolute;
+			right: 45px;
+			top: -32px;
+			&:after {
+				border-bottom: 4px solid transparent;
+				border-left: 4px solid #fef8ec;
+				border-top: 4px solid transparent;
+				content: "";
+				position: absolute;
+				right: -4px;
+				top: 7px;
+			}
 		}
 	}
 }

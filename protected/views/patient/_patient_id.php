@@ -22,7 +22,7 @@
 	$warnings = $this->patient->getWarnings($clinical);
 ?>
 
-<div class="panel patient<?php if ($warnings) echo " warning" ?>" id="patientID">
+<div class="panel patient" id="patientID">
 	<div class="patient-details">
 		<!-- Name -->
 		<?php echo CHtml::link($this->patient->getDisplayName(),array('/patient/view/'.$this->patient->id)) ?>
@@ -95,15 +95,47 @@ $cviStatus = $this->patient->getOPHInfo()->cvi_status->name;
 $medications = join(',<br/>', $this->patient->medicationsSummary);
 $allergies = join(',<br/>', $this->patient->allergiesSummary);
 ?>
-<div class="patient-popup-container">
+<div id="patient-popup-container" class="patient-popup-container">
+
+	<!-- Patient icon -->
+	<button class="toggle-patient-summary-popup icon-patient-patient-id_small<?= $warnings ? '-warning' : '';?>">
+		Toggle patient summary
+	</button>
+	<!-- Quicklook icon -->
 	<button
-		id="toggle-patient-summary-popup"
-		class="patient-summary-btn icon-alert-quicklook"
+		class="toggle-patient-summary-popup icon-alert-quicklook"
 		data-hide-icon="icon-alert-cross"
 		data-show-icon="icon-alert-quicklook">
 		Toggle patient summary
 	</button>
+
 	<div class="panel patient-popup" id="patient-summary-popup">
+		<!-- Help hint -->
+		<span
+			class="help-hint"
+			data-text='{
+				"close": {
+					"full": "Click to close",
+					"short": "Close"
+				},
+				"lock": {
+					"full": "Click to lock",
+					"short": "Lock"
+				}
+			}'>
+			Click to lock
+		</span>
+		<!-- Warnings -->
+		<?php if ($warnings) {?>
+			<div class="alert-box patient with-icon">
+				<span>
+					<?php foreach ($warnings as $warn) {?>
+						<strong><?php echo $warn['long_msg']; ?></strong>
+						- <?php echo $warn['details'];
+					}?>
+				</span>
+			</div>
+		<?php }?>
 		<?php if ($ophthalmicDiagnoses) {?>
 			<div class="row">
 				<div class="large-3 column label">

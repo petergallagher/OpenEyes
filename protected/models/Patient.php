@@ -1378,6 +1378,11 @@ class Patient extends BaseActiveRecordVersioned
 							'details' => implode(', ', $terms)
 					);
 				}
+				$this->_clinical_warnings[] = array(
+						'short_msg' => 'Diabetes',
+						'long_msg' => 'Patient is Diabetic',
+						'details' => implode(', ', array('sugar','fat'))
+				);
 				if ($this->allergies) {
 					foreach ($this->allergies as $allergy) {
 						$allergies[] = $allergy->name;
