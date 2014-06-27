@@ -83,8 +83,11 @@ class ModelConverter
 
 	protected function mapResourceAttributeToModel(&$model, $resource_value, $attribute_def, $save)
 	{
-		if ((strpos($attribute_def,'.')) !== FALSE) {
-			list($relation_name, $related_object_attribute) = explode('.',$attribute_def);
+		if (substr_count($attribute_def,'.') >0) {
+			$ex = explode('.',$attribute_def);
+
+			$related_object_attribute = array_pop($ex);
+			$relation_name = implode('.',$ex);
 
 			if (!$model->isRelatedObject($relation_name)) {
 				return $this->mapResourceReferenceObjectToModel($model, $relation_name, $related_object_attribute, $resource_value, $save);

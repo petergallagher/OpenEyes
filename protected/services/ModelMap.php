@@ -97,17 +97,27 @@ class ModelMap
 		return @$this->map[$class_name]['related_objects'];
 	}
 
-	public function getReferenceObjectForClass($class_name, $relation_name)
+	public function getReferenceObjectForClass($class_name, $relation_names)
 	{
+		if (!is_array($relation_names)) {
+			$relation_names = explode('.',$relation_names);
+		}
+
+		$relation_name = array_shift($relation_names);
+
 		if (!@$this->map[$class_name]['reference_objects'][$relation_name]) {
 			foreach ($this->map as $_class_name => $_def) {
 				if (@$_def['ar_class'] == $class_name) {
-					return @$_def['reference_objects'][$relation_name];
+					return $this->getReferenceObjectForClass($_class_name, $relation_name.'.'.implode('.',$relation_names));
 				}
 			}
 		}
 
 		return @$this->map[$class_name]['reference_objects'][$relation_name];
+	}
+
+	private function recursivelyGetReferenceObjectForClass($reference_objects, $relation_names)
+	{
 	}
 
 	public function getRuleForOrClause($class_name, $attribute)

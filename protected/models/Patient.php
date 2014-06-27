@@ -151,6 +151,7 @@ class Patient extends BaseActiveRecordVersioned
 			'referrals' => array(self::HAS_MANY, 'Referral', 'patient_id'),
 			'lastReferral' => array(self::HAS_ONE, 'Referral', 'patient_id', 'order' => 'received_date desc'),
 			'gender' => array(self::BELONGS_TO, 'Gender', 'gender_id'),
+			'cvi_status' => array(self::HAS_ONE, 'PatientOphInfo', 'patient_id'),
 		);
 	}
 
