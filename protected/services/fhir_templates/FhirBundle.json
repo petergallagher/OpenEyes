@@ -8,7 +8,7 @@
 			"href": {":subst": "self_url"}
 		},
 		{
-			"rel": "base",
+			"rel": "fhir-base",
 			"href": {":subst": "base_url"}
 		}
 	],
