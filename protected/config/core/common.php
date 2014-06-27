@@ -182,6 +182,7 @@ return array(
 				'services\SiteService',
 				'services\PatientAssociatedContactsService',
 				'services\PatientAllergiesService',
+				'services\PatientCVIStatusService',
 			),
 		),
 		'session' => array(
