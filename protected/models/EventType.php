@@ -72,6 +72,8 @@ class EventType extends BaseActiveRecordVersioned
 		return array(
 			'events' => array(self::HAS_MANY, 'Event', 'event_type_id'),
 			'elementTypes' => array(self::HAS_MANY, 'ElementType', 'event_type_id'),
+			'parent' => array(self::BELONGS_TO, 'EventType', 'parent_id'),
+			'children' => array(self::HAS_MANY, 'EventType', 'parent_id'),
 		);
 	}
 
