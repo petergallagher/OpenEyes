@@ -69,6 +69,7 @@ class DataObjectTest extends \CDbTestCase
 		return array(
 			array(
 				(object)array(
+					'id' => 1,
 					'foo' => (object)array('baz' => 1),
 					'bar' => array(
 						(object)array('baz' => 2),
@@ -78,6 +79,7 @@ class DataObjectTest extends \CDbTestCase
 				),
 				new DataObjectTest_Obj1(
 					array(
+						'id' => 1,
 						'foo' => new DataObjectTest_Obj2(array('baz' => 1)),
 						'bar' => array(
 							new DataObjectTest_Obj2(array('baz' => 2)),

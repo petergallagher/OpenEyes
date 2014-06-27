@@ -60,7 +60,7 @@ abstract class DataObject implements FhirCompatible
 		$schema = \Yii::app()->fhirMarshal->getSchema($fhir_type);
 
 		foreach ($fhir_object as $name => &$value) {
-			if ($name == 'resourceType' || $name[0] == '_') continue;
+			if ($name == 'resourceType' || $name == 'id' || $name[0] == '_') continue;
 
 			$valueType = $schema[$name]['type'];
 			$class = static::getServiceClass($valueType);
