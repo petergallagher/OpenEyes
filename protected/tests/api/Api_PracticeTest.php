@@ -57,7 +57,7 @@ class Api_PracticeTest extends FhirTestCase
 	{
 		$this->get('Organization?identifier=F002&_profile=' . urlencode(services\Practice::getOeFhirProfile()));
 		$this->assertXPathEquals('feed', 'local-name()');
-		$this->assertXPathEquals($this->client->getBaseUrl(), 'string(./atom:link[@rel="base"]/@href)');
+		$this->assertXPathEquals($this->client->getBaseUrl(), 'string(./atom:link[@rel="fhir-base"]/@href)');
 		$this->assertUrlEquals(
 			$this->client->getBaseUrl() . '/Organization?identifier=F002&_profile=' . urlencode(services\Practice::getOeFhirProfile()),
 			$this->xPathEval('string(./atom:link[@rel="self"]/@href)')

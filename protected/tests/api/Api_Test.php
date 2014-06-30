@@ -316,7 +316,7 @@ class Api_Test extends FhirTestCase
 	{
 		$url = 'Practitioner?_profile=' . urlencode(services\Gp::getOeFhirProfile());
 		$this->get($url);
-		$this->assertXPathEquals($this->client->getBaseUrl(), 'string(./atom:link[@rel="base"]/@href)');
+		$this->assertXPathEquals($this->client->getBaseUrl(), 'string(./atom:link[@rel="fhir-base"]/@href)');
 		$this->assertXPathEquals("{$this->client->getBaseUrl()}/{$url}", 'string(./atom:link[@rel="self"]/@href)');
 		$this->assertXPathRegexp('|^' . preg_quote($this->client->getBaseUrl()) . '/Practitioner/gp-\d+$|', 'string(./atom:entry[1]/atom:id/text())');
 		$this->assertXPathRegexp('|^' . preg_quote($this->client->getBaseUrl()) . '/Practitioner/gp-\d+/_history/\d+$|', 'string(./atom:entry[1]/atom:link[@rel="self"]/@href)');
