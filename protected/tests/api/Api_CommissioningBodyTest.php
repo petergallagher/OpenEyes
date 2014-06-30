@@ -47,7 +47,7 @@ class Api_CommissioningBodyTest extends FhirTestCase
 	{
 		$this->get('Organization?identifier=CCG0001&_profile=' . urlencode(services\CommissioningBody::getOeFhirProfile()));
 		$this->assertXPathEquals('feed', 'local-name()');
-		$this->assertXPathEquals($this->client->getBaseUrl(), 'string(./atom:link[@rel="base"]/@href)');
+		$this->assertXPathEquals($this->client->getBaseUrl(), 'string(./atom:link[@rel="fhir-base"]/@href)');
 		$this->assertUrlEquals(
 			$this->client->getBaseUrl() . '/Organization?identifier=CCG0001&_profile=' . urlencode(services\CommissioningBody::getOeFhirProfile()),
 			$this->xPathEval('string(./atom:link[@rel="self"]/@href)')

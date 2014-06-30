@@ -106,7 +106,7 @@ class Api_PatientTest extends FhirTestCase
 	{
 		$this->get('Patient?_id=17885');
 		$this->assertXPathEquals('feed', 'local-name()');
-		$this->assertXPathEquals($this->client->getBaseUrl(), 'string(./atom:link[@rel="base"]/@href)');
+		$this->assertXPathEquals($this->client->getBaseUrl(), 'string(./atom:link[@rel="fhir-base"]/@href)');
 		$this->assertUrlEquals(
 			$this->client->getBaseUrl() . '/Patient?_id=17885',
 			$this->xPathEval('string(./atom:link[@rel="self"]/@href)')
@@ -120,7 +120,7 @@ class Api_PatientTest extends FhirTestCase
 	{
 		$this->get('Patient?identifier=1007913');
 		$this->assertXPathEquals('feed', 'local-name()');
-		$this->assertXPathEquals($this->client->getBaseUrl(), 'string(./atom:link[@rel="base"]/@href)');
+		$this->assertXPathEquals($this->client->getBaseUrl(), 'string(./atom:link[@rel="fhir-base"]/@href)');
 		$this->assertUrlEquals(
 			$this->client->getBaseUrl() . '/Patient?identifier=1007913',
 			$this->xPathEval('string(./atom:link[@rel="self"]/@href)')
@@ -134,7 +134,7 @@ class Api_PatientTest extends FhirTestCase
 	{
 		$this->get('Patient?identifier=1053991374');
 		$this->assertXPathEquals('feed', 'local-name()');
-		$this->assertXPathEquals($this->client->getBaseUrl(), 'string(./atom:link[@rel="base"]/@href)');
+		$this->assertXPathEquals($this->client->getBaseUrl(), 'string(./atom:link[@rel="fhir-base"]/@href)');
 		$this->assertUrlEquals(
 			$this->client->getBaseUrl() . '/Patient?identifier=1053991374',
 			$this->xPathEval('string(./atom:link[@rel="self"]/@href)')
@@ -147,7 +147,7 @@ class Api_PatientTest extends FhirTestCase
 	public function testSearchByFamilyName()
 	{
 		$this->get('Patient?family=Smith');
-		$this->assertXPathEquals($this->client->getBaseUrl(), 'string(./atom:link[@rel="base"]/@href)');
+		$this->assertXPathEquals($this->client->getBaseUrl(), 'string(./atom:link[@rel="fhir-base"]/@href)');
 		$this->assertUrlEquals(
 			$this->client->getBaseUrl() . '/Patient?family=Smith',
 			$this->xPathEval('string(./atom:link[@rel="self"]/@href)')
@@ -159,7 +159,7 @@ class Api_PatientTest extends FhirTestCase
 	public function testSearchByFullName()
 	{
 		$this->get('Patient?given=Patsy&family=Smith');
-		$this->assertXPathEquals($this->client->getBaseUrl(), 'string(./atom:link[@rel="base"]/@href)');
+		$this->assertXPathEquals($this->client->getBaseUrl(), 'string(./atom:link[@rel="fhir-base"]/@href)');
 		$this->assertUrlEquals(
 			$this->client->getBaseUrl() . '/Patient?given=Patsy&family=Smith',
 			$this->xPathEval('string(./atom:link[@rel="self"]/@href)')
