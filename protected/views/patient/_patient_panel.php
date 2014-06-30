@@ -61,6 +61,9 @@
 			<?php echo CHtml::link('Patient Summary',array('/patient/view/'.$this->patient->id)); ?>
 		</div>
 		<div class="large-6 column text-right">
+			<?php
+			// TODO: see OE-4349
+			?>
 			<?php if ($widgets = Yii::app()->params['patient_summary_id_widgets']) {
 				foreach ($widgets as $w) {
 					$this->widget($w['class'], array(
@@ -68,22 +71,6 @@
 					));
 				}
 			}?>
-
-			<!-- Warnings -->
-			<?php
-			/*
-			<?php if ($warnings) {
-				$msgs = array();
-				foreach ($warnings as $warn) {
-					$msgs[] = $warn['short_msg'];
-				}?>
-				<span class="warning">
-					<span class="icon icon-alert icon-alert-warning"></span>
-					<span class="messages"><?php echo implode(', ', $msgs); ?></span>
-				</span>
-			<?php } ?>
-			*/?>
-
 		</div>
 	</div>
 </div>

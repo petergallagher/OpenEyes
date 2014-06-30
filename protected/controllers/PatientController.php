@@ -1380,7 +1380,6 @@ class PatientController extends BaseController
 	 */
 	public function actionSummaryPopup($id)
 	{
-		Yii::app()->clientScript->registerPackage('mustache');
 		$this->widget('application.widgets.PatientSummaryPopup', array(
 			'patient' => $this->loadModel($id),
 			'accessLevel' => $this->checkAccess('OprnViewClinical')
