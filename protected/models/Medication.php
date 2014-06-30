@@ -58,6 +58,7 @@ class Medication extends BaseActiveRecordVersioned
 	public function relations()
 	{
 		return array(
+			'patient' => array(self::BELONGS_TO, 'Patient', 'patient_id'),
 			'drug' => array(self::BELONGS_TO, 'Drug', 'drug_id'),
 			'route' => array(self::BELONGS_TO, 'DrugRoute', 'route_id'),
 			'option' => array(self::BELONGS_TO, 'DrugRouteOption', 'option_id'),
