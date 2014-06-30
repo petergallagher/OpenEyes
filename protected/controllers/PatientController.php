@@ -41,7 +41,7 @@ class PatientController extends BaseController
 	{
 		return array(
 			array('allow',
-				'actions' => array('search', 'view'),
+				'actions' => array('search', 'view', 'summaryPopup'),
 				'users' => array('@')
 			),
 			array('allow',
@@ -1371,5 +1371,20 @@ class PatientController extends BaseController
 	{
 		$oprn = 'OprnCreate' . ($event_type->class_name == 'OphDrPrescription' ? 'Prescription' : 'Event');
 		return $this->checkAccess($oprn, $this->firm, $episode, $event_type);
+	}
+
+	/**
+	 * Render the patient panel popup view. This is used to refresh the popup contents
+	 * after changing patient details.
+	 * @param  integer $id The patient id.
+	 */
+	public function actionSummaryPopup($id)
+	{
+		Yii::app()->clientScript->registerPackage('mustache');
+		$this->widget('application.widgets.PatientSummaryPopup', array(
+			'patient' => $this->loadModel($id),
+			'accessLevel' => $this->checkAccess('OprnViewClinical')
+		));
+
 	}
 }

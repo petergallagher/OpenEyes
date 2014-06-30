@@ -69,9 +69,11 @@
 	 * @method
 	 */
 	StickyElement.prototype.wrapElement = function() {
-		this.element.wrap($('<div />', {
-			'class': this.options.wrapperClass
-		}));
+		if (!this.element.parent().hasClass(this.options.wrapperClass)) {
+			this.element.wrap($('<div />', {
+				'class': this.options.wrapperClass
+			}));
+		}
 		this.wrapper = this.element.parent();
 	};
 

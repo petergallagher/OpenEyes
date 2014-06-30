@@ -40,7 +40,7 @@
 	</div>
 	<div class="clearfix">
 		<span class="hospital-number">
-			<span class="screen-only">
+			<span class="screen-only abbr">
 				No.
 			</span>
 			<span class="print-only">

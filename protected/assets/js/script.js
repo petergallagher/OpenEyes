@@ -89,37 +89,6 @@ $(document).ready(function(){
 		}
 	}());
 
-	(function patientWarningTooltip() {
-
-		var warning = $('.panel.patient .warning');
-		if (!warning.length) {
-			return;
-		}
-		var messages = warning.find('.messages');
-		var box = $('<div class="quicklook warning"></div>');
-
-		box.hide();
-		box.html(messages.html());
-		box.appendTo('body');
-
-		warning.hover(function() {
-
-			var offsetPos = $(this).offset();
-			var top = offsetPos.top + $(this).height() + 6;
-			var middle = offsetPos.left + $(this).width()/2;
-			var left = middle - box.width()/2 - 8;
-
-			box.css({
-				position: 'absolute',
-				top: top,
-				left: left
-			});
-			box.fadeIn('fast');
-		}, function(e){
-			box.hide();
-		});
-	}());
-
 	/**
 	 * Init sticky (fixed) elements.
 	 */
@@ -156,93 +125,6 @@ $(document).ready(function(){
 				return instance.element.outerHeight(true);
 			}
 		}, options));
-	}());
-
-	/**
-	 * Init patient summary popup.
-	 */
-	(function patientSummaryPopup() {
-
-		var container = $('#patient-popup-container');
-		var popup = $('#patient-summary-popup');
-		var buttons = container.find('.toggle-patient-summary-popup');
-		var helpHint = popup.find('.help-hint');
-
-		var stuck = false;
-		var sticky = false;
-		var hideTimer = 0;
-		var hoverTimer = 0;
-
-		// Popup custom events.
-		popup.on({
-			update: function() {
-				popup.trigger(stuck ? 'show' : 'hide');
-			},
-			show: function() {
-				if (popup.hasClass('show')) return;
-				clearTimeout(hideTimer);
-				popup.show();
-				// Re-define the transitions on the popup to be none.
-				popup.addClass('clear-transition');
-				// Trigger a re-flow to reset the starting position of the transitions, now
-				// existing transitions will be removed.
-				popup[0].offsetWidth = popup[0].offsetWidth;
-				// Add the initial transition definitions back.
-				popup.removeClass('clear-transition');
-				// We can now animate in from the initial starting point.
-				popup.addClass('show');
-			},
-			hide: function() {
-				clearTimeout(hideTimer);
-				popup.removeClass('show');
-				// We want the popup to animate out before being hidden.
-				hideTimer = setTimeout(popup.hide.bind(popup), 250);
-			}
-		});
-
-		// Help hint custom events.
-		helpHint.on({
-			update: function() {
-				var text = helpHint.data('text')[ stuck ? 'close' : 'lock' ];
-				console.log(helpHint.data('text'));
-				helpHint.text(text[sticky ? 'short' : 'full']);
-			}
-		})
-
-		// Button events.
-		buttons.on({
-			update: function() {
-				var button = $(this);
-				var showIcon = button.data('show-icon');
-				var hideIcon = button.data('hide-icon');
-				if (showIcon && hideIcon) {
-					button
-					.removeClass(showIcon + ' ' + hideIcon)
-					.addClass(stuck ? hideIcon : showIcon);
-				}
-			},
-			click: function() {
-				stuck = !stuck;
-				// Update all elements.
-				popup.add(buttons).add(helpHint).trigger('update');
-			}
-		});
-
-		// We add these mouse events on the container so that the popup does not
-		// hide when hovering over the popup contents.
-		container.on({
-			mouseenter: function() {
-				clearTimeout(hoverTimer);
-				// We use a timer to prevent the popup from displaying unintentionally.
-				hoverTimer = setTimeout(popup.trigger.bind(popup, 'show'), 200);
-			},
-			mouseleave: function() {
-				clearTimeout(hoverTimer);
-				if (!stuck) {
-					popup.trigger('hide');
-				}
-			}
-		});
 	}());
 
 	/**

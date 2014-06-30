@@ -105,6 +105,12 @@ return array(
 					),
 					'basePath' => 'application.assets',
 					'depends' => array('jquery'),
+				),
+				'patientSummaryPopup' => array(
+					'js' => array(
+						'PatientSummaryPopup.js'
+					),
+					'basePath' => 'application.widgets.js'
 				)
 			),
 		),

@@ -198,7 +198,7 @@
 						row.remove();
 						$('#allergy_id').append('<option value="'+allergy_id+'">'+allergy_name+'</option>');
 						sort_selectbox($('#allergy_id'));
-
+						OpenEyes.UI.Widgets.PatientSummaryPopup.refresh(OE_patient_id);
 					} else {
 						new OpenEyes.UI.Dialog.Alert({
 							content: "Sorry, an internal error occurred and we were unable to remove the allergy.\n\nPlease contact support for assistance."

@@ -20,5 +20,8 @@
 
 <?php
 $this->renderPartial('//patient/_patient_panel');
-$this->renderPartial('//patient/_patient_panel_popup');
+$this->widget('application.widgets.PatientSummaryPopup', array(
+	'patient' => $this->patient,
+	'accessLevel' => $this->checkAccess('OprnViewClinical')
+));
 ?>

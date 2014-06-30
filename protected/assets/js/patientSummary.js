@@ -23,6 +23,7 @@ $(document).ready(function() {
 			'success': function(html) {
 				if (html == 'success') {
 					$('a.removeDiagnosis[rel="'+$('#diagnosis_id').val()+'"]').parent().parent().remove();
+					OpenEyes.UI.Widgets.PatientSummaryPopup.refresh(OE_patient_id);
 				} else {
 					new OpenEyes.UI.Dialog.Alert({
 						content: "Sorry, an internal error occurred and we were unable to remove the diagnosis.\n\nPlease contact support for assistance."

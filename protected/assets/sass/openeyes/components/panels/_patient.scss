@@ -55,17 +55,13 @@
 	&.patient {
 		@include panel($padding: 9px 10px);
 		@include border-radius($global-radius);
-		@include background(image-url("_elements/icons/patient/patient-id_small.png"), linear-gradient(top, #fff2d8 0%, #ffe6b3 100%));
+		@include background(linear-gradient(top, #fff2d8 0%, #ffe6b3 100%));
 		@media print {
 			padding: {
 				top: 2px;
 				bottom: 2px;
 			};
 		}
-		background: {
-			position: 98% 2px, top;
-			repeat: no-repeat, no-repeat;
-		};
 		border: {
 			color: #ffb212;
 			style: solid;
@@ -79,7 +75,7 @@
 			.stuck & {
 				border-bottom: 0;
 				margin: 0;
-				padding-bottom: 2px;
+				padding-bottom: 4px;
 				padding-top: 2px;
 				@include border-radius(0);
 			}
@@ -92,6 +88,7 @@
 			@media screen {
 				.stuck & {
 					font-size: 91%;
+					padding-bottom: 0;
 				}
 			}
 		}
@@ -119,10 +116,9 @@
 		}
 		.hospital-number {
 			margin-bottom: 3px;
-			@media screen {
-				.stuck & {
-					float: left;
-				}
+			padding-right: 5px;
+			.abbr {
+				opacity: .7;
 			}
 		}
 		.nhs-number {
@@ -151,7 +147,6 @@
 			}
 		}
 		&.warning {
-			@include background-image(image-url("_elements/icons/patient/patient-id_small-warning.png"), linear-gradient(top, #fff2d8 0%, #ffe6b3 100%));
 			.warning {
 				.messages {
 					display: none;
@@ -170,8 +165,27 @@
 	position: relative;
 	width: 30px;
 	text-align: right;
+	@media screen {
+		.stuck & {
+			height: 30px;
+			width: auto;
+			margin-top: -35px;
+			padding-top: 2px;
+		}
+	}
+	button {
+		&:active, &:focus {
+			outline: none;
+		}
+	}
 	[class*=icon-patient] {
 		margin-bottom: 13px;
+		@media screen {
+			.stuck & {
+				margin-bottom: 0;
+				margin-right: 4px;
+			}
+		}
 	}
 	[class*=icon-alert] {
 		margin-right: 4px;
@@ -199,9 +213,20 @@
 		text-align: left;
 		width: 400px;
 		z-index: 9999;
+		@media screen {
+			.stuck & {
+				left: -326px;
+				top: 50px;
+			}
+		}
 		&.show {
 			opacity: 1;
 			top: 72px;
+			@media screen {
+				.stuck & {
+					top: 38px;
+				}
+			}
 		}
 		// Triangle tip
 		&:after {
@@ -258,6 +283,11 @@
 				position: absolute;
 				right: -4px;
 				top: 7px;
+			}
+			@media screen {
+				.stuck & {
+					right: 76px;
+				}
 			}
 		}
 	}
