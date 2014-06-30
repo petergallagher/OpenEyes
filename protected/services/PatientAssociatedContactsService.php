@@ -39,14 +39,10 @@ class PatientAssociatedContactsService extends DeclarativeModelService
 			'related_objects' => array(
 				'patient' => array('patient_id', 'Patient', 'save' => 'no'),
 				'location' => array(
-					'location_id', 'ContactLocation', 'rules' => array(
-						array(self::RULE_TYPE_NULLIFNULL, array('site_ref', 'institution_ref')),
-					),
+					'location_id', 'ContactLocation',
 				),
 				'contact' => array(
-					'location.contact_id', 'Contact', 'rules' => array(
-						array(self::RULE_TYPE_ATTRIBUTE_IFNULL, array('site_ref', 'institution_ref'), 'contact_id'),
-					),
+					'location.contact_id', 'Contact',
 				),
 			),
 			'fields' => array(
@@ -70,5 +66,39 @@ class PatientAssociatedContactsService extends DeclarativeModelService
 
 	public function search(array $params)
 	{
+	}
+
+	/**
+	 * @param Array $related_object_def
+	 * @param Resource $resource
+	 *
+	 * Allows overriding the attribute for a specific relation in the service class
+	 */
+	public function getRelatedObjectAttribute($relation_name, $related_object_def, $resource)
+	{
+		if ($relation_name == 'contact') {
+			if (DeclarativeTypeParser::attributesAllNull($resource, array('site_ref', 'institution_ref'))) {
+				return 'contact_id';
+			}
+		}
+
+		return parent::getRelatedObjectAttribute($relation_name, $related_object_def, $resource);
+	}
+
+	/**
+	 * @param Array $related_object_def
+	 * @param Resource $resource
+	 *
+	 * Allows overriding the value for a specific relation in the service class (eg nulling it under certain conditions)
+	 */
+	public function getRelatedObjectValue($relation_name, $related_object_def, $resource)
+	{
+		if ($relation_name == 'location') {
+			if (DeclarativeTypeParser::attributesAllNull($resource, array('site_ref', 'institution_ref'))) {
+				return null;
+			}
+		}
+
+		return parent::getRelatedObjectValue($relation_name, $related_object_def, $resource);
 	}
 }

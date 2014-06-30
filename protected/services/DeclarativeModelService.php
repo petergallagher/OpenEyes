@@ -31,6 +31,13 @@ class DeclarativeModelService extends ModelService
 	const RULE_TYPE_NULLIFNULL = 1;
 	const RULE_TYPE_ATTRIBUTE_IFNULL = 2;
 
+	public $map;
+
+	public function __construct()
+	{
+		$this->map = new ModelMap($this::$model_map);
+	}
+
 	/**
 	 * @param BaseActiveRecord $model
 	 * @return Resource
@@ -39,7 +46,7 @@ class DeclarativeModelService extends ModelService
 	{
 		$resource = parent::modelToResource($model);
 
-		$mc = new ModelConverter($this::$model_map);
+		$mc = new ModelConverter($this);
 
 		return $mc->modelToResource($model, $resource);
 	}
@@ -52,7 +59,7 @@ class DeclarativeModelService extends ModelService
 	{
 		$resource = parent::jsonToResource($json);
 
-		$jc  = new JSONConverter($this::$model_map);
+		$jc  = new JSONConverter($this);
 
 		return $jc->jsonToResource($json, $this::$primary_model, $resource);
 	}
@@ -63,7 +70,7 @@ class DeclarativeModelService extends ModelService
 	 */
 	public function resourceToModel($resource, $model, $save=true)
 	{
-		$mc = new ModelConverter($this::$model_map);
+		$mc = new ModelConverter($this);
 
 		return $mc->resourceToModel($resource, $model, $save);
 	}
@@ -74,8 +81,33 @@ class DeclarativeModelService extends ModelService
 	 */
 	public function jsonToModel($json, $model, $save=true)
 	{
-		$jc  = new JSONConverter($this::$model_map);
+		$jc  = new JSONConverter($this);
 
 		return $jc->jsonToModel($json, $model, $save);
+	}
+
+	/**
+	 * @param string $relation_name
+	 * @param Array $related_object_def
+	 * @param Resource $resource
+	 *
+	 * Allows overriding the attribute for a specific relation in the service class
+	 */
+	public function getRelatedObjectAttribute($relation_name, $related_object_def, $resource)
+	{
+		return $related_object_def[0];
+	}
+
+	/**
+	 * @param string $relation_name
+	 * @param Array $related_object_def
+	 * @param Resource $resource
+	 *
+	 * Allows overriding the value for a specific relation in the service class (eg nulling it under certain conditions)
+	 */
+	public function getRelatedObjectValue($relation_name, $related_object_def, $resource)
+	{
+		$class_name = '\\'.$related_object_def[1];
+		return new $class_name;
 	}
 }

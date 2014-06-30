@@ -49,7 +49,10 @@ class ModelConverterTest extends \CDbTestCase
 			)
 		);
 
-		$op = new ModelConverter($map);
+		$ps = new PatientService;
+		$ps->map = new ModelMap($map);
+
+		$op = new ModelConverter($ps);
 
 		$resource = $op->modelToResource($patient, new Patient(array()));
 
@@ -85,7 +88,10 @@ class ModelConverterTest extends \CDbTestCase
 			)
 		);
 
-		$op = new ModelConverter($map);
+		$ps = new PatientService;
+		$ps->map = new ModelMap($map);
+
+		$op = new ModelConverter($ps);
 
 		$resource = $op->modelToResource($patient, new Patient(array()));
 
@@ -139,7 +145,10 @@ class ModelConverterTest extends \CDbTestCase
 			),
 		);
 
-		$op = new ModelConverter($map);
+		$ps = new PatientService;
+		$ps->map = new ModelMap($map);
+
+		$op = new ModelConverter($ps);
 
 		$resource = $op->modelToResource($patient, new Patient(array()));
 
@@ -170,7 +179,10 @@ class ModelConverterTest extends \CDbTestCase
 			)
 		);
 
-		$op = new ModelConverter($map);
+		$ps = new PatientService;
+		$ps->map = new ModelMap($map);
+
+		$op = new ModelConverter($ps);
 
 		$resource = $op->modelToResource($patient, new Patient(array()));
 
@@ -218,7 +230,10 @@ class ModelConverterTest extends \CDbTestCase
 			),
 		);
 
-		$op = new ModelConverter($map);
+		$ps = new PatientService;
+		$ps->map = new ModelMap($map);
+
+		$op = new ModelConverter($ps);
 
 		$resource = $op->modelToResource($patient, new Patient(array()));
 
@@ -260,8 +275,11 @@ class ModelConverterTest extends \CDbTestCase
 				),
 			),
 		);
-		
-		$op = new ModelConverter($map);
+
+		$ps = new PatientService;
+		$ps->map = new ModelMap($map);
+
+		$op = new ModelConverter($ps);
 
 		$resource = $op->modelToResource($patient, new Patient(array()));
 
@@ -298,7 +316,10 @@ class ModelConverterTest extends \CDbTestCase
 
 		$map = PatientService::getModelMap();
 
-		$op = new ModelConverter($map);
+		$ps = new PatientService;
+		$ps->map = new ModelMap($map);
+
+		$op = new ModelConverter($ps);
 
 		$resource = $op->modelToResource($patient, new Patient(array()));
 
@@ -374,7 +395,8 @@ class ModelConverterTest extends \CDbTestCase
 		$total_countries = count(\Country::model()->findAll());
 		$total_genders = count(\Gender::model()->findAll());
 
-		$mc = new ModelConverter(PatientService::getModelMap());
+		$mc = new ModelConverter(new PatientService);
+
 		$patient = $mc->resourceToModel($resource, new \Patient, false);
 
 		$this->assertEquals($total_patients, count(\Patient::model()->findAll()));
@@ -415,7 +437,7 @@ class ModelConverterTest extends \CDbTestCase
 		$resource->gp_ref = \Yii::app()->service->Gp(2);
 		$resource->prac_ref = \Yii::app()->service->Practice(1);
 
-		$mc = new ModelConverter(PatientService::getModelMap());
+		$mc = new ModelConverter(new PatientService);
 		$patient = $mc->resourceToModel($resource, new \Patient, false);
 
 		$this->assertEquals('54321',$patient->nhs_num);
@@ -485,7 +507,7 @@ class ModelConverterTest extends \CDbTestCase
 		$total_countries = count(\Country::model()->findAll());
 		$total_genders = count(\Gender::model()->findAll());
 
-		$mc = new ModelConverter(PatientService::getModelMap());
+		$mc = new ModelConverter(new PatientService);
 		$patient = $mc->resourceToModel($resource, new \Patient);
 
 		$this->assertEquals($total_patients+1, count(\Patient::model()->findAll()));
@@ -499,7 +521,7 @@ class ModelConverterTest extends \CDbTestCase
 	{
 		$resource = $this->getResource();
 
-		$mc = new ModelConverter(PatientService::getModelMap());
+		$mc = new ModelConverter(new PatientService);
 		$patient = $mc->resourceToModel($resource, new \Patient);
 
 		$this->assertInstanceOf('\Patient',$patient);
@@ -532,7 +554,7 @@ class ModelConverterTest extends \CDbTestCase
 	{
 		$resource = $this->getResource();
 
-		$mc = new ModelConverter(PatientService::getModelMap());
+		$mc = new ModelConverter(new PatientService);
 		$patient = $mc->resourceToModel($resource, new \Patient);
 		$patient = \Patient::model()->findByPk($patient->id);
 
@@ -562,7 +584,18 @@ class ModelConverterTest extends \CDbTestCase
 
 	public function testModelToResource_EmptyReference()
 	{
-		$c = new ModelConverter(array('Patient' => array('fields' => array('gp_ref' => array(DeclarativeModelService::TYPE_REF, 'gp_id', 'Gp')))));
+		$map = array(
+			'Patient' => array(
+				'fields' => array(
+					'gp_ref' => array(DeclarativeModelService::TYPE_REF, 'gp_id', 'Gp')
+				),
+			),
+		);
+
+		$ps = new PatientService;
+		$ps->map = new ModelMap($map);
+
+		$c = new ModelConverter($ps);
 
 		$res = $c->modelToResource(new \Patient, new Patient);
 

@@ -17,15 +17,11 @@ namespace services;
 
 class ModelConverter
 {
-	public $map;
+	public $service;
 
-	public function __construct($map)
+	public function __construct($service)
 	{
-		if ($map instanceof ModelMap) {
-			$this->map = $map;
-		} else {
-			$this->map = new ModelMap($map);
-		}
+		$this->service = $service;
 	}
 
 	public function modelToResource($object, &$resource)
@@ -35,7 +31,7 @@ class ModelConverter
 
 	public function modelToResourceParse($object, $object_class_name, &$resource)
 	{
-		foreach ($this->map->getFieldsForClass($object_class_name) as $res_attribute => $def) {
+		foreach ($this->service->map->getFieldsForClass($object_class_name) as $res_attribute => $def) {
 			if (is_array($def)) {
 				$class = 'services\\'.$def[0];
 				$parser = new $class($this);
@@ -50,11 +46,11 @@ class ModelConverter
 
 	public function resourceToModel($resource, $model, $save=true, $extra_fields=false)
 	{
-		$model = new ModelConverter_ModelWrapper($this->map, $model, $extra_fields);
+		$model = new ModelConverter_ModelWrapper($this->service->map, $model, $extra_fields);
 
 		$this->processRelatedObjects($model, $resource);
 
-		foreach ($this->map->getFieldsForClass($model->getClass()) as $res_attribute => $def) {
+		foreach ($this->service->map->getFieldsForClass($model->getClass()) as $res_attribute => $def) {
 			if (is_array($def)) {
 				$class = 'services\\'.$def[0];
 				$parser = new $class($this);
@@ -66,7 +62,7 @@ class ModelConverter
 
 		$save && $this->processRelatedObjects($model, $resource, true);
 
-		foreach ($this->map->getFieldsForClass($model->getClass()) as $res_attribute => $def) {
+		foreach ($this->service->map->getFieldsForClass($model->getClass()) as $res_attribute => $def) {
 			if (is_array($def)) {
 				$class = 'services\\'.$def[0];
 				$parser = new $class($this);
@@ -111,7 +107,8 @@ class ModelConverter
 	protected function processRelatedObjects(&$model, $resource, $save=false)
 	{
 		foreach ($model->getRelatedObjectDefinitions() as $relation_name => $def) {
-			list($attribute, $related_object_value) = $this->processRelatedObjectRules($def, $resource);
+			$attribute = $this->service->getRelatedObjectAttribute($relation_name, $def, $resource);
+			$related_object_value = $this->service->getRelatedObjectValue($relation_name, $def, $resource);
 
 			$object_relation = ($pos = strpos($attribute,'.')) ? substr($attribute,0,$pos).'.'.$relation_name : $relation_name;
 
@@ -127,34 +124,6 @@ class ModelConverter
 				$model->setAttribute($object_relation, $related_object_value, false);
 			}
 		}
-	}
-
-	public function processRelatedObjectRules($related_object_def, $resource)
-	{
-		$attribute = $related_object_def[0];
-		$class_name = '\\'.$related_object_def[1];
-		$related_object_value = new $class_name;
-
-		if (isset($related_object_def['rules'])) {
-			foreach ($related_object_def['rules'] as $rule) {
-				switch ($rule[0]) {
-					case DeclarativeModelService::RULE_TYPE_NULLIFNULL:
-						if (DeclarativeTypeParser::attributesAllNull($resource, $rule[1])) {
-							$related_object_value = null;
-						}
-						break;
-					case DeclarativeModelService::RULE_TYPE_ATTRIBUTE_IFNULL:
-						if (DeclarativeTypeParser::attributesAllNull($resource, $rule[1])) {
-							$attribute = $rule[2];
-						}
-						break;
-					default:
-						throw new \Exception("Unknown related object rule type: {$rule[0]}");
-				}
-			}
-		}
-
-		return array($attribute, $related_object_value);
 	}
 
 	/*
