@@ -67,6 +67,7 @@ class FamilyHistory extends BaseActiveRecordVersioned
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return array(
+			'patient' => array(self::BELONGS_TO, 'Patient', 'patient_id'),
 			'relative' => array(self::BELONGS_TO, 'FamilyHistoryRelative', 'relative_id'),
 			'side' => array(self::BELONGS_TO, 'FamilyHistorySide', 'side_id'),
 			'condition' => array(self::BELONGS_TO, 'FamilyHistoryCondition', 'condition_id'),

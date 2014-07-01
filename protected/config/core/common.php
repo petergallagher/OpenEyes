@@ -185,6 +185,7 @@ return array(
 				'services\PatientCVIStatusService',
 				'services\PatientMedicationsService',
 				'services\PatientPreviousOperationsService',
+				'services\PatientFamilyHistoryService',
 			),
 		),
 		'session' => array(
