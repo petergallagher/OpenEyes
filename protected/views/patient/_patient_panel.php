@@ -17,11 +17,6 @@
  * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
  */
 ?>
-<?php
-	$clinical = $this->checkAccess('OprnViewClinical');
-	$warnings = $this->patient->getWarnings($clinical);
-?>
-
 <div class="panel patient" id="patientID">
 	<div class="patient-details">
 		<!-- Name -->
@@ -38,6 +33,16 @@
 			<?php echo $this->patient->getGenderString() ?>
 		</span>
 	</div>
+	<!-- Widgets (extra icons, links etc) -->
+	<?php if ($widgets = Yii::app()->params['patient_summary_id_widgets']) {?>
+		<div class="patient-widgets">
+			<?php foreach ($widgets as $w) {
+				$this->widget($w['class'], array(
+					'patient' => $this->patient,
+				));
+			}?>
+		</div>
+	<?php }?>
 	<div class="clearfix">
 		<span class="hospital-number">
 			<span class="screen-only abbr">
@@ -56,21 +61,7 @@
 			<?php echo $this->patient->nhsnum?>
 		</span>
 	</div>
-	<div class="row">
-		<div class="large-6 column patient-summary-anchor">
-			<?php echo CHtml::link('Patient Summary',array('/patient/view/'.$this->patient->id)); ?>
-		</div>
-		<div class="large-6 column text-right">
-			<?php
-			// TODO: see OE-4349
-			?>
-			<?php if ($widgets = Yii::app()->params['patient_summary_id_widgets']) {
-				foreach ($widgets as $w) {
-					$this->widget($w['class'], array(
-						'patient' => $this->patient,
-					));
-				}
-			}?>
-		</div>
+	<div class="patient-summary-anchor">
+		<?php echo CHtml::link('Patient Summary',array('/patient/view/'.$this->patient->id)); ?>
 	</div>
 </div>

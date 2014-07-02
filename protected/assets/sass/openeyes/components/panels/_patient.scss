@@ -82,6 +82,7 @@
 		}
 		.patient-details {
 			padding-bottom: 4px;
+			display: inline-block;
 			a {
 				color: black;
 			}
@@ -113,6 +114,9 @@
 					display: none;
 				}
 			}
+		}
+		.patient-widgets {
+			display: inline-block;
 		}
 		.hospital-number {
 			margin-bottom: 3px;
