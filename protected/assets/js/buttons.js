@@ -51,16 +51,22 @@ function preventClickOnDisabledButton() {
 
 function disableButtons(selector) {
 
-	selector = $(selector || $('button,.button').not('.cancel'));
+	var buttons = $(selector || $('button,.button').not('.cancel'));
 
-	selector
+	// Filter out icon buttons
+	buttons = buttons.filter(function() {
+		console.log(this);
+		return !/icon-/.test(this.className);
+	});
+
+	buttons
 	.addClass('inactive')
 	.each(preventClickOnDisabledButton);
 
 	// Chrome will prevent the form from being submitted if the submit button is
 	// disabled in the same event loop, this fixes that issue.
 	setTimeout(function() {
-		selector.attr('disabled', true);
+		buttons.attr('disabled', true);
 	});
 
 	$('.loader').show();
