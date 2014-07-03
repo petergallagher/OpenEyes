@@ -97,27 +97,39 @@ class ModelMap
 		return @$this->map[$class_name]['related_objects'];
 	}
 
-	public function getReferenceObjectForClass($class_name, $relation_names)
+	public function getReferenceObjectForClass($class_name, $relation_name)
 	{
-		if (!is_array($relation_names)) {
-			$relation_names = explode('.',$relation_names);
+		if ($ref_object = $this->findReferenceObjectForClass($class_name, $relation_name)) {
+			return $ref_object;
 		}
 
-		$relation_name = array_shift($relation_names);
+		foreach ($this->map as $_class_name => $_def) {
+			if (@$_def['ar_class'] == $class_name) {
+				return $this->getReferenceObjectForClass($_class_name, $relation_name);
+			}
+		}
 
-		if (!@$this->map[$class_name]['reference_objects'][$relation_name]) {
-			foreach ($this->map as $_class_name => $_def) {
-				if (@$_def['ar_class'] == $class_name) {
-					return $this->getReferenceObjectForClass($_class_name, $relation_name.'.'.implode('.',$relation_names));
+		return null;
+	}
+
+	private function findReferenceObjectForClass($class_name, $relation_name)
+	{
+		if (!empty($this->map[$class_name]['reference_objects'])) {
+			foreach ($this->map[$class_name]['reference_objects'] as $_name => $_def) {
+				if ($pos = strpos($_def[0],'.')) {
+					$e = explode('.',$_def[0]);
+					array_pop($e);
+
+					$_name = implode('.',$e).'.'.$_name;
+				}
+
+				if ($_name == $relation_name) {
+					return $_def;
 				}
 			}
 		}
 
-		return @$this->map[$class_name]['reference_objects'][$relation_name];
-	}
-
-	private function recursivelyGetReferenceObjectForClass($reference_objects, $relation_names)
-	{
+		return false;
 	}
 
 	public function getRuleForOrClause($class_name, $attribute)

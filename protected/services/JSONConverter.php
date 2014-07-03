@@ -51,7 +51,7 @@ class JSONConverter
 	public function jsonToModel($json, $model_class_name, $save=true)
 	{
 		if (!$object = json_decode($json)) {
-			throw new Exception("Invalid JSON encountered: $json");
+			throw new \Exception("Invalid JSON encountered: $json");
 		}
 
 		$mc = new ModelConverter($this->service);

@@ -15,34 +15,16 @@
 
 namespace services;
 
-class PatientCVIStatusService extends DeclarativeModelService
+class PatientSocialHistory extends Resource
 {
-	static protected $operations = array(self::OP_READ, self::OP_UPDATE, self::OP_CREATE, self::OP_SEARCH);
-
-	static protected $search_params = array(
-		'id' => self::TYPE_TOKEN,
-	);
-
-	static protected $primary_model = 'Patient';
-
-	static protected $model_map = array(
-		'Patient' => array(
-			'related_objects' => array(
-				'cvi_status' => array(null, 'PatientOphInfo', 'patient_id', 'children' => array(
-					'cvi_status' => array('cvi_status_id', 'PatientOphInfoCviStatus'),
-				)),
-			),
-			'reference_objects' => array(
-				'cvi_status' => array('cvi_status.cvi_status_id', 'PatientOphInfoCviStatus', array('name')),
-			),
-			'fields' => array(
-				'cvi_status' => 'cvi_status.cvi_status.name',
-				'date' => array(self::TYPE_SIMPLEOBJECT, 'cvi_status.cvi_status_date', 'Date'),
-			),
-		),
-	);
-
-	public function search(array $params)
+	public function __construct($patient_id=null)
 	{
+		$params = array();
+
+		if ($patient_id) {
+			$params['patient_id'] = $patient_id;
+		}
+
+		parent::__construct($params);
 	}
 }
