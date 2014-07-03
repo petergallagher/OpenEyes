@@ -117,13 +117,6 @@ class ServiceManager extends \CApplicationComponent
 			}
 		}
 
-		// Then check for a universal service for this FHIR type
-		foreach ($this->service_config as $service_name => $config) {
-			if ($config['fhir_type'] == $fhir_type && !$config['fhir_prefix']) {
-				return $this->getService($service_name);
-			}
-		}
-
 		// Profile(s) supplied but no match, not necessarily an error
 		return null;
 	}
