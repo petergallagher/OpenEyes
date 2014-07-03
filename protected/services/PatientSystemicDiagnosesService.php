@@ -57,7 +57,7 @@ class PatientSystemicDiagnosesService extends DeclarativeModelService
 			foreach ($resource->diagnoses as $diagnosis) {
 				if ($disorder = \Disorder::model()->find('term=?',array($diagnosis->disorder))) {
 					if ($disorder->specialty_id) {
-						throw new \Exception('PatientSystemicDiagnoses passed a resource containing ophthalmic diagnoses');
+						throw new \Exception('PatientSystemicDiagnoses passed a resource containing non-systemic diagnoses');
 					}
 				}
 			}
@@ -76,7 +76,7 @@ class PatientSystemicDiagnosesService extends DeclarativeModelService
 			foreach ($object->diagnoses as $diagnosis) {
 				if ($disorder = \Disorder::model()->find('term=?',array($diagnosis->disorder))) {
 					if ($disorder->specialty_id) {
-						throw new \Exception('PatientSystemicDiagnoses passed a resource containing ophthalmic diagnoses');
+						throw new \Exception('PatientSystemicDiagnoses passed a resource containing non-systemic diagnoses');
 					}
 				}
 			}
