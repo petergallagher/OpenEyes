@@ -33,7 +33,7 @@ class PatientSocialHistoryServiceTest extends \CDbTestCase
 		$this->assertInstanceOf('services\PatientSocialHistory',$resource);
 
 		$this->assertEquals('Unemployed',$resource->occupation);
-		$this->assertEquals('HGV, Taxi, Train',$resource->driving_status);
+		$this->assertEquals('HGV',$resource->driving_status);
 		$this->assertEquals('Ex smoker',$resource->smoking_status);
 		$this->assertEquals('Lives in sheltered housing',$resource->accommodation);
 		$this->assertEquals('this is a comment',$resource->comments);
@@ -231,7 +231,7 @@ class PatientSocialHistoryServiceTest extends \CDbTestCase
 
 	public function testJsonToResource()
 	{
-		$json = '{"id":null,"last_modified":null,"patient_id":{"id":"1","last_modified":-2208988800},"occupation":"Unemployed","driving_status":"HGV, Taxi, Train","smoking_status":"Ex smoker","accommodation":"Lives in sheltered housing","comments":"this is a comment","type_of_job":"Forklifts","carer":"Yes","alcohol_intake":"100","substance_misuse":"Yes"}';
+		$json = '{"id":null,"last_modified":null,"patient_id":{"id":"1","last_modified":-2208988800},"occupation":"Unemployed","driving_status":"HGV","smoking_status":"Ex smoker","accommodation":"Lives in sheltered housing","comments":"this is a comment","type_of_job":"Forklifts","carer":"Yes","alcohol_intake":"100","substance_misuse":"Yes"}';
 
 		$ps = new PatientSocialHistoryService;
 		$resource = $ps->jsonToResource($json);
@@ -239,7 +239,7 @@ class PatientSocialHistoryServiceTest extends \CDbTestCase
 		$this->assertInstanceOf('services\PatientSocialHistory',$resource);
 
 		$this->assertEquals('Unemployed',$resource->occupation);
-		$this->assertEquals('HGV, Taxi, Train',$resource->driving_status);
+		$this->assertEquals('HGV',$resource->driving_status);
 		$this->assertEquals('Ex smoker',$resource->smoking_status);
 		$this->assertEquals('Lives in sheltered housing',$resource->accommodation);
 		$this->assertEquals('this is a comment',$resource->comments);
@@ -251,7 +251,7 @@ class PatientSocialHistoryServiceTest extends \CDbTestCase
 
 	public function jsonToModel_NoSave_NoNewRows()
 	{
-		$json = '{"id":null,"last_modified":null,"patient_id":{"id":"1","last_modified":-2208988800},"occupation":"Unemployed","driving_status":"HGV, Taxi, Train","smoking_status":"Ex smoker","accommodation":"Lives in sheltered housing","comments":"this is a comment","type_of_job":"Forklifts","carer":"Yes","alcohol_intake":"100","substance_misuse":"Yes"}';
+		$json = '{"id":null,"last_modified":null,"patient_id":{"id":"1","last_modified":-2208988800},"occupation":"Unemployed","driving_status":"HGV","smoking_status":"Ex smoker","accommodation":"Lives in sheltered housing","comments":"this is a comment","type_of_job":"Forklifts","carer":"Yes","alcohol_intake":"100","substance_misuse":"Yes"}';
 
 		$total_sh = count(\SocialHistory::model()->findAll());
 
@@ -263,7 +263,7 @@ class PatientSocialHistoryServiceTest extends \CDbTestCase
 
 	public function testJsonToModel_NoSave_ModelIsCorrect()
 	{
-		$json = '{"id":null,"last_modified":null,"patient_id":{"id":"1","last_modified":-2208988800},"occupation":"Unemployed","driving_status":"HGV, Taxi, Train","smoking_status":"Ex smoker","accommodation":"Lives in sheltered housing","comments":"this is a comment","type_of_job":"Forklifts","carer":"Yes","alcohol_intake":"100","substance_misuse":"Yes"}';
+		$json = '{"id":null,"last_modified":null,"patient_id":{"id":"1","last_modified":-2208988800},"occupation":"Unemployed","driving_status":"HGV","smoking_status":"Ex smoker","accommodation":"Lives in sheltered housing","comments":"this is a comment","type_of_job":"Forklifts","carer":"Yes","alcohol_intake":"100","substance_misuse":"Yes"}';
 
 		$ps = new PatientSocialHistoryService;
 		$patient = $ps->jsonToModel($json, $this->patients('patient3'), false);
@@ -276,7 +276,7 @@ class PatientSocialHistoryServiceTest extends \CDbTestCase
 		$this->assertInstanceOf('SocialHistoryCarer',$patient->socialHistory->carer);
 		$this->assertEquals('Yes',$patient->socialHistory->carer->name);
 		$this->assertInstanceOf('SocialHistoryDrivingStatus',$patient->socialHistory->driving_status);
-		$this->assertEquals('HGV, Taxi, Train',$patient->socialHistory->driving_status->name);
+		$this->assertEquals('HGV',$patient->socialHistory->driving_status->name);
 		$this->assertInstanceOf('SocialHistoryOccupation',$patient->socialHistory->occupation);
 		$this->assertEquals('this is a comment',$patient->socialHistory->comments);
 		$this->assertEquals('Forklifts',$patient->socialHistory->type_of_job);
@@ -287,7 +287,7 @@ class PatientSocialHistoryServiceTest extends \CDbTestCase
 
 	public function testJsonToModel_Save_Create_ModelCountsCorrect()
 	{
-		$json = '{"id":null,"last_modified":null,"patient_id":{"id":"1","last_modified":-2208988800},"occupation":"Unemployed","driving_status":"HGV, Taxi, Train","smoking_status":"Ex smoker","accommodation":"Lives in sheltered housing","comments":"this is a comment","type_of_job":"Forklifts","carer":"Yes","alcohol_intake":"100","substance_misuse":"Yes"}';
+		$json = '{"id":null,"last_modified":null,"patient_id":{"id":"1","last_modified":-2208988800},"occupation":"Unemployed","driving_status":"HGV","smoking_status":"Ex smoker","accommodation":"Lives in sheltered housing","comments":"this is a comment","type_of_job":"Forklifts","carer":"Yes","alcohol_intake":"100","substance_misuse":"Yes"}';
 
 		$total_sh = count(\SocialHistory::model()->findAll());
 
@@ -299,7 +299,7 @@ class PatientSocialHistoryServiceTest extends \CDbTestCase
 
 	public function testJsonToModel_Save_Create_ModelIsCorrect()
 	{
-		$json = '{"id":null,"last_modified":null,"patient_id":{"id":"1","last_modified":-2208988800},"occupation":"Unemployed","driving_status":"HGV, Taxi, Train","smoking_status":"Ex smoker","accommodation":"Lives in sheltered housing","comments":"this is a comment","type_of_job":"Forklifts","carer":"Yes","alcohol_intake":"100","substance_misuse":"Yes"}';
+		$json = '{"id":null,"last_modified":null,"patient_id":{"id":"1","last_modified":-2208988800},"occupation":"Unemployed","driving_status":"HGV","smoking_status":"Ex smoker","accommodation":"Lives in sheltered housing","comments":"this is a comment","type_of_job":"Forklifts","carer":"Yes","alcohol_intake":"100","substance_misuse":"Yes"}';
 
 		$ps = new PatientSocialHistoryService;
 		$patient = $ps->jsonToModel($json, $this->patients('patient3'));
@@ -312,7 +312,7 @@ class PatientSocialHistoryServiceTest extends \CDbTestCase
 		$this->assertInstanceOf('SocialHistoryCarer',$patient->socialHistory->carer);
 		$this->assertEquals('Yes',$patient->socialHistory->carer->name);
 		$this->assertInstanceOf('SocialHistoryDrivingStatus',$patient->socialHistory->driving_status);
-		$this->assertEquals('HGV, Taxi, Train',$patient->socialHistory->driving_status->name);
+		$this->assertEquals('HGV',$patient->socialHistory->driving_status->name);
 		$this->assertInstanceOf('SocialHistoryOccupation',$patient->socialHistory->occupation);
 		$this->assertEquals('this is a comment',$patient->socialHistory->comments);
 		$this->assertEquals('Forklifts',$patient->socialHistory->type_of_job);
@@ -323,7 +323,7 @@ class PatientSocialHistoryServiceTest extends \CDbTestCase
 
 	public function testJsonToModel_Save_Create_DBIsCorrect()
 	{
-		$json = '{"id":null,"last_modified":null,"patient_id":{"id":"1","last_modified":-2208988800},"occupation":"Unemployed","driving_status":"HGV, Taxi, Train","smoking_status":"Ex smoker","accommodation":"Lives in sheltered housing","comments":"this is a comment","type_of_job":"Forklifts","carer":"Yes","alcohol_intake":"100","substance_misuse":"Yes"}';
+		$json = '{"id":null,"last_modified":null,"patient_id":{"id":"1","last_modified":-2208988800},"occupation":"Unemployed","driving_status":"HGV","smoking_status":"Ex smoker","accommodation":"Lives in sheltered housing","comments":"this is a comment","type_of_job":"Forklifts","carer":"Yes","alcohol_intake":"100","substance_misuse":"Yes"}';
 
 		$ps = new PatientSocialHistoryService;
 		$patient = $ps->jsonToModel($json, $this->patients('patient3'));
@@ -337,7 +337,7 @@ class PatientSocialHistoryServiceTest extends \CDbTestCase
 		$this->assertInstanceOf('SocialHistoryCarer',$patient->socialHistory->carer);
 		$this->assertEquals('Yes',$patient->socialHistory->carer->name);
 		$this->assertInstanceOf('SocialHistoryDrivingStatus',$patient->socialHistory->driving_status);
-		$this->assertEquals('HGV, Taxi, Train',$patient->socialHistory->driving_status->name);
+		$this->assertEquals('HGV',$patient->socialHistory->driving_status->name);
 		$this->assertInstanceOf('SocialHistoryOccupation',$patient->socialHistory->occupation);
 		$this->assertEquals('this is a comment',$patient->socialHistory->comments);
 		$this->assertEquals('Forklifts',$patient->socialHistory->type_of_job);
@@ -348,7 +348,7 @@ class PatientSocialHistoryServiceTest extends \CDbTestCase
 
 	public function testJsonToModel_Save_Update_ModelCountsCorrect()
 	{
-		$json = '{"id":null,"last_modified":null,"patient_id":{"id":"1","last_modified":-2208988800},"occupation":"Unemployed","driving_status":"HGV, Taxi, Train","smoking_status":"Ex smoker","accommodation":"Lives in sheltered housing","comments":"this is a comment","type_of_job":"Forklifts","carer":"Yes","alcohol_intake":"100","substance_misuse":"Yes"}';
+		$json = '{"id":null,"last_modified":null,"patient_id":{"id":"1","last_modified":-2208988800},"occupation":"Unemployed","driving_status":"HGV","smoking_status":"Ex smoker","accommodation":"Lives in sheltered housing","comments":"this is a comment","type_of_job":"Forklifts","carer":"Yes","alcohol_intake":"100","substance_misuse":"Yes"}';
 
 		$total_sh = count(\SocialHistory::model()->findAll());
 
@@ -360,7 +360,7 @@ class PatientSocialHistoryServiceTest extends \CDbTestCase
 
 	public function testJsonToModel_Save_Update_ModelIsCorrect()
 	{
-		$json = '{"id":null,"last_modified":null,"patient_id":{"id":"1","last_modified":-2208988800},"occupation":"Unemployed","driving_status":"HGV, Taxi, Train","smoking_status":"Ex smoker","accommodation":"Lives in sheltered housing","comments":"this is a comment","type_of_job":"Forklifts","carer":"Yes","alcohol_intake":"100","substance_misuse":"Yes"}';
+		$json = '{"id":null,"last_modified":null,"patient_id":{"id":"1","last_modified":-2208988800},"occupation":"Unemployed","driving_status":"HGV","smoking_status":"Ex smoker","accommodation":"Lives in sheltered housing","comments":"this is a comment","type_of_job":"Forklifts","carer":"Yes","alcohol_intake":"100","substance_misuse":"Yes"}';
 
 		$ps = new PatientSocialHistoryService;
 		$patient = $ps->jsonToModel($json, $this->patients('patient2'));
@@ -373,7 +373,7 @@ class PatientSocialHistoryServiceTest extends \CDbTestCase
 		$this->assertInstanceOf('SocialHistoryCarer',$patient->socialHistory->carer);
 		$this->assertEquals('Yes',$patient->socialHistory->carer->name);
 		$this->assertInstanceOf('SocialHistoryDrivingStatus',$patient->socialHistory->driving_status);
-		$this->assertEquals('HGV, Taxi, Train',$patient->socialHistory->driving_status->name);
+		$this->assertEquals('HGV',$patient->socialHistory->driving_status->name);
 		$this->assertInstanceOf('SocialHistoryOccupation',$patient->socialHistory->occupation);
 		$this->assertEquals('this is a comment',$patient->socialHistory->comments);
 		$this->assertEquals('Forklifts',$patient->socialHistory->type_of_job);
@@ -384,7 +384,7 @@ class PatientSocialHistoryServiceTest extends \CDbTestCase
 
 	public function testJsonToModel_Save_Update_DBIsCorrect()
 	{
-		$json = '{"id":null,"last_modified":null,"patient_id":{"id":"1","last_modified":-2208988800},"occupation":"Unemployed","driving_status":"HGV, Taxi, Train","smoking_status":"Ex smoker","accommodation":"Lives in sheltered housing","comments":"this is a comment","type_of_job":"Forklifts","carer":"Yes","alcohol_intake":"100","substance_misuse":"Yes"}';
+		$json = '{"id":null,"last_modified":null,"patient_id":{"id":"1","last_modified":-2208988800},"occupation":"Unemployed","driving_status":"HGV","smoking_status":"Ex smoker","accommodation":"Lives in sheltered housing","comments":"this is a comment","type_of_job":"Forklifts","carer":"Yes","alcohol_intake":"100","substance_misuse":"Yes"}';
 
 		$ps = new PatientSocialHistoryService;
 		$patient = $ps->jsonToModel($json, $this->patients('patient2'));
@@ -398,7 +398,7 @@ class PatientSocialHistoryServiceTest extends \CDbTestCase
 		$this->assertInstanceOf('SocialHistoryCarer',$patient->socialHistory->carer);
 		$this->assertEquals('Yes',$patient->socialHistory->carer->name);
 		$this->assertInstanceOf('SocialHistoryDrivingStatus',$patient->socialHistory->driving_status);
-		$this->assertEquals('HGV, Taxi, Train',$patient->socialHistory->driving_status->name);
+		$this->assertEquals('HGV',$patient->socialHistory->driving_status->name);
 		$this->assertInstanceOf('SocialHistoryOccupation',$patient->socialHistory->occupation);
 		$this->assertEquals('this is a comment',$patient->socialHistory->comments);
 		$this->assertEquals('Forklifts',$patient->socialHistory->type_of_job);
