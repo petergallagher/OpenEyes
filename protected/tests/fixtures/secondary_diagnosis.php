@@ -27,6 +27,7 @@ return array(
 	array(
 		'disorder_id' => 6,
 		'patient_id' => 2,
+		'eye_id' => 1,
 		'date' => '2007',
 	),
 );

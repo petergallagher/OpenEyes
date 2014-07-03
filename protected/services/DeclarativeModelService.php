@@ -59,7 +59,7 @@ class DeclarativeModelService extends ModelService
 	{
 		$resource = parent::jsonToResource($json);
 
-		$jc  = new JSONConverter($this);
+		$jc = new JSONConverter($this);
 
 		return $jc->jsonToResource($json, $this::$primary_model, $resource);
 	}
@@ -81,7 +81,7 @@ class DeclarativeModelService extends ModelService
 	 */
 	public function jsonToModel($json, $model, $save=true)
 	{
-		$jc  = new JSONConverter($this);
+		$jc = new JSONConverter($this);
 
 		return $jc->jsonToModel($json, $model, $save);
 	}
