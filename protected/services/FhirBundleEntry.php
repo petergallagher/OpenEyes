@@ -17,6 +17,8 @@ namespace services;
 
 class FhirBundleEntry extends DataObject
 {
+	static protected $fhir_type = 'Bundle.Entry';
+
 	/**
 	 * @param string url
 	 * @param Resource $resource

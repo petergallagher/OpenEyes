@@ -18,9 +18,9 @@ namespace services;
 abstract class DataObject implements FhirCompatible
 {
 	/**
-	 * The FHIR type that this class corresponds to, if left unset the unqualified name of the class is assumed
+	 * The FHIR type that this class corresponds to, if any
 	 */
-	static protected $fhir_type;
+	static protected $fhir_type = null;
 
 	/**
 	 * Get the FHIR type that this class corresponds to
@@ -29,12 +29,7 @@ abstract class DataObject implements FhirCompatible
 	 */
 	static public function getFhirType()
 	{
-		if (isset(static::$fhir_type)) {
-			return static::$fhir_type;
-		} else {
-			$class = new \ReflectionClass(get_called_class());
-			return $class->getShortName();
-		}
+		return static::$fhir_type;
 	}
 
 	/**
@@ -54,10 +49,12 @@ abstract class DataObject implements FhirCompatible
 	 */
 	static public function fromFhir($fhir_object)
 	{
-		$fhir_object = clone($fhir_object);
-
 		$fhir_type = static::getFhirType();
+		if (!$fhir_type) throw new \Exception("Class '" . get_called_class() . "' does not have a FHIR equivalent");
+
 		$schema = \Yii::app()->fhirMarshal->getSchema($fhir_type);
+
+		$fhir_object = clone($fhir_object);
 
 		foreach ($fhir_object as $name => &$value) {
 			if ($name == 'resourceType' || $name == 'id' || $name[0] == '_') continue;
@@ -157,6 +154,8 @@ abstract class DataObject implements FhirCompatible
 	 */
 	public function toFhir()
 	{
+		if (!static::getFhirType()) throw new \Exception("Class '" . get_class($this) . "' does not have a FHIR equivalent");
+
 		$values = $this->toFhirValues();
 		$this->subObjectsToFhir($values);
 
