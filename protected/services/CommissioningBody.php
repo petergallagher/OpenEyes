@@ -30,4 +30,11 @@ class CommissioningBody extends Resource
 	public $code;
 	public $name;
 	public $address = null;
+
+	public function toFhirValues()
+	{
+		$values = parent::toFhirValues();
+		unset($values['type_ref']);
+		return $values;
+	}
 }

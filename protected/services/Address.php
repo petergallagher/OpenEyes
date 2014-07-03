@@ -17,6 +17,8 @@ namespace services;
 
 class Address extends DataObject
 {
+	static protected $fhir_type = 'Address';
+
 	public $use = null;
 	public $line1;
 	public $line2 = null;

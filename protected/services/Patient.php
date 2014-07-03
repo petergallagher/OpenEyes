@@ -17,6 +17,8 @@ namespace services;
 
 class Patient extends Resource
 {
+	static protected $fhir_type = 'Patient';
+
 	static public function fromFhirValues(array $values)
 	{
 		switch (@$values['gender']) {

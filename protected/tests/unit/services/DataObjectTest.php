@@ -101,11 +101,30 @@ class DataObjectTest extends \CDbTestCase
 	}
 
 	/**
+	 * @expectedException Exception
+	 * @expectedExceptionMessage Class 'services\DataObjectTest_NonFhirObj' does not have a FHIR equivalent
+	 */
+	public function testFromFhir_NonFhir()
+	{
+		DataObjectTest_NonFhirObj::fromFhir(new \StdClass);
+	}
+
+	/**
 	 * @dataProvider fhirObjectDataProvider
 	 */
 	public function testToFhir($fhir_object, $object)
 	{
 		$this->assertEquals($fhir_object, $object->toFhir());
+	}
+
+	/**
+	 * @expectedException Exception
+	 * @expectedExceptionMessage Class 'services\DataObjectTest_NonFhirObj' does not have a FHIR equivalent
+	 */
+	public function testToFhir_NonFhir()
+	{
+		$obj = new DataObjectTest_NonFhirObj;
+		$obj->toFhir();
 	}
 
 	public function testSerialise()
@@ -153,6 +172,8 @@ abstract class DataObjectTest_BaseObj extends DataObject
 
 class DataObjectTest_Obj1 extends DataObjectTest_BaseObj
 {
+	static protected $fhir_type = 'DataObjectTest_Obj1';
+
 	static public function getServiceClass($fhir_type)
 	{
 		if ($fhir_type == 'FhirType2') {
@@ -171,4 +192,8 @@ class DataObjectTest_Obj2 extends DataObjectTest_BaseObj
 	static protected $fhir_type = 'FhirType2';
 
 	public $baz;
+}
+
+class DataObjectTest_NonFhirObj extends DataObject
+{
 }

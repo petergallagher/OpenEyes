@@ -17,6 +17,8 @@ namespace services;
 
 class FhirOutcomeIssue extends DataObject
 {
+	static protected $fhir_type = 'OperationOutcome.issue';
+
 	public $severity;
 	public $type;
 	public $details;
