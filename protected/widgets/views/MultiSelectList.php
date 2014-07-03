@@ -76,15 +76,15 @@ $widgetOptionsJson = json_encode(array(
 						foreach ($attributes as $att => $att_val) {
 							echo " " . $att . "=\"" . $att_val . "\"";
 						}
-						echo ">" . $option . "</option>";
+						echo ">" . strip_tags($option) . "</option>";
 					}?>
 				</select>
 				<?php if ($showRemoveAllLink) {?>
 					<a href="#" class="remove-all<?php echo !$found ? ' hide': '';?>">Remove all</a>
 				<?php }?>
 			</div>
-			<?php if (!$found && $noSelectionsMessage) {?>
-				<div class="no-selections-msg pill"><?php echo $noSelectionsMessage;?></div>
+			<?php if ($noSelectionsMessage) {?>
+				<div class="no-selections-msg pill<?php if ($found) {?> hide<?php }?>"><?php echo $noSelectionsMessage;?></div>
 			<?php }?>
 			<ul class="MultiSelectList multi-select-selections<?php if (!$found && (!empty($selected_ids) || !$showNonePlaceholder)) echo ' hide';?>">
 				<li class="MultiSelectNone"<?php if (!empty($selected_ids) || !$showNonePlaceholder) {?> style="display: none"<?php }?>><?php echo is_bool($showNonePlaceholder) ? 'None' : $showNonePlaceholder?></li>
@@ -92,7 +92,7 @@ $widgetOptionsJson = json_encode(array(
 					if (isset($options[$id])) {?>
 						<li>
 							<span class="text">
-								<?php echo $options[$id] ?>
+								<?php echo CHtml::encode($options[$id])?>
 							</span>
 							<a href="#" data-name="<?php echo CHtml::modelName($element)?>[<?php echo $field?>][]" data-text="<?php echo $options[$id] ?>" class="MultiSelectRemove remove-one<?php if (isset($htmlOptions['class'])) {?> <?php echo $htmlOptions['class']?><?php }?>"<?php if (isset($htmlOptions['data-linked-fields'])) {?> data-linked-fields="<?php echo $htmlOptions['data-linked-fields']?>"<?php }?><?php if (isset($htmlOptions['data-linked-values'])) {?> data-linked-values="<?php echo $htmlOptions['data-linked-values']?>"<?php }?>>Remove</a>
 							<input type="hidden" name="<?php echo CHtml::modelName($element)?>[<?php echo $field?>][]" value="<?php echo $id?>"

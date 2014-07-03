@@ -80,8 +80,6 @@ class BaseEventTypeController extends BaseModuleController
 	 */
 	static protected $action_types = array();
 
-	/* @var Firm */
-	public $firm;
 	/* @var Patient */
 	public $patient;
 	/* @var Site */
@@ -167,21 +165,6 @@ class BaseEventTypeController extends BaseModuleController
 			throw new Exception("Action '{$action}' has no type associated with it");
 		}
 		return $this->action_type_map[strtolower($action)];
-	}
-
-	/**
-	 * Sets the firm property on the controller from the session
-	 *
-	 * @throws HttpException
-	 */
-	protected function setFirmFromSession()
-	{
-		if (!$firm_id = Yii::app()->session->get('selected_firm_id')) {
-			throw new HttpException('Firm not selected');
-		}
-		if (!$this->firm || $this->firm->id != $firm_id) {
-			$this->firm = Firm::model()->findByPk($firm_id);
-		}
 	}
 
 	/**
@@ -1108,6 +1091,20 @@ class BaseEventTypeController extends BaseModuleController
 			}
 		}
 
+		//event date
+		if(isset($data['Event']['event_date']))
+		{
+			$event = $this->event;
+			$event->event_date = $data['Event']['event_date'];
+			if (!$event->validate()) {
+				foreach ($event->getErrors() as $errormsgs) {
+					foreach ($errormsgs as $error) {
+						$errors['Event'][] = $error;
+					}
+				}
+			}
+		}
+
 		return $errors;
 	}
 
@@ -1345,12 +1342,7 @@ class BaseEventTypeController extends BaseModuleController
 	public function renderOpenElements($action, $form=null, $data=null)
 	{
 		if($form && (($action == strtolower (self::ACTION_TYPE_CREATE) ) || $this->checkAdminAccess()) ){
-			echo $form->datePicker($this->event, 'event_date', array(), array(
-				'style' => 'margin-left:8px',
-			), array(
-				'label' => 2,
-				'field' => 2
-			));
+			$this->renderPartial('//patient/event_date', array('form'=>$form));
 		}
 
 		foreach ($this->getElements() as $element) {

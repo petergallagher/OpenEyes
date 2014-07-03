@@ -78,7 +78,9 @@ class Prescription extends OpenEyesPage
 
     public function removeThirdTaper ()
     {
-        $this->getElement('removeThirdTaper')->click();
+        $element = $this->getElement('removeThirdTaper');
+        $this->scrollWindowToElement($element);
+        $element->click();
     }
 
     public function noPreservativeCheckbox ()
@@ -89,7 +91,7 @@ class Prescription extends OpenEyesPage
     public function prescriptionDropdown ($drug)
     {
         $this->getElement('prescriptionCommonDrug')->selectOption($drug);
-        $this->getSession()->wait(1000);
+        $this->getSession()->wait(3000);
     }
 
     public function standardSet ($set)

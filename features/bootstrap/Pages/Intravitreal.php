@@ -127,9 +127,13 @@ class Intravitreal extends OpenEyesPage
          {
              if ($this->isRightSideOpen())
              {
-             $this->getElement('addRightSide')->click();
+             $element = $this->getElement('addRightSide');
+             $this->scrollWindowToElement($element);
+             $element->click();
              $this->getSession()->wait(5000, 'window.$ && $.active == 0');
              }
+
+             $this->getSession()->wait(2000);
          }
 
         protected function isLeftSideOpen()
@@ -169,12 +173,16 @@ class Intravitreal extends OpenEyesPage
 
          public function rightTypeTopical ()
          {
-             $this->getElement('rightAnaestheticTopical')->click();
+             $element = $this->getElement('rightAnaestheticTopical');
+             $this->scrollWindowToElement($element);
+             $element->click();
          }
 
          public function rightTypeLA ()
          {
-             $this->getElement('rightAnaestheticLA')->click();
+             $element = $this->getElement('rightAnaestheticLA');
+             $this->scrollWindowToElement($element);
+             $element->click();
          }
 
          public function rightDeliveryRetrobulbar ()
@@ -220,12 +228,16 @@ class Intravitreal extends OpenEyesPage
         //Left
         public function leftTypeTopical ()
         {
-            $this->getElement('leftAnaestheticTopical')->click();
+            $element = $this->getElement('leftAnaestheticTopical');
+            $this->scrollWindowToElement($element);
+            $element->click();
         }
 
         public function leftTypeLA ()
         {
-            $this->getElement('leftAnaestheticLA')->click();
+            $element = $this->getElement('leftAnaestheticLA');
+            $this->scrollWindowToElement($element);
+            $element->click();
         }
 
         public function leftDeliveryRetrobulbar ()

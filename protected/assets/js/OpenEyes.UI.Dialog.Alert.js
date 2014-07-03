@@ -38,7 +38,6 @@
 	function AlertDialog(options) {
 
 		options = $.extend(true, {}, AlertDialog._defaultOptions, options);
-		options.content = this.getContent(options);
 
 		Dialog.call(this, options);
 	}
@@ -103,6 +102,12 @@
 	 */
 	AlertDialog.prototype.onButtonClick = function() {
 		this.close();
+		/**
+		 * Emitted after the use has clicked on the 'OK' button.
+		 *
+		 * @event OpenEyes.UI.Dialog.Alert#ok
+		 */
+		this.emit('ok');
 	};
 
 	exports.Alert = AlertDialog;

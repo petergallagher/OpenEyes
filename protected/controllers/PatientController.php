@@ -309,7 +309,7 @@ class PatientController extends BaseController
 			if (!empty($legacyepisodes)) {
 				$criteria = new CDbCriteria;
 				$criteria->compare('episode_id',$legacyepisodes[0]->id);
-				$criteria->order = 'created_date desc';
+				$criteria->order = 'event_date desc, created_date desc';
 
 				foreach (Event::model()->findAll($criteria) as $event) {
 					if (in_array($event->eventType->class_name,Yii::app()->modules) && (!$event->eventType->disabled)) {
@@ -321,7 +321,7 @@ class PatientController extends BaseController
 		} elseif ($current_episode->end_date == null) {
 			$criteria = new CDbCriteria;
 			$criteria->compare('episode_id',$current_episode->id);
-			$criteria->order = 'created_date desc';
+			$criteria->order = 'event_date desc, created_date desc';
 
 			if ($event = Event::model()->find($criteria)) {
 				$this->redirect(array($event->eventType->class_name.'/default/view/'.$event->id));
@@ -417,6 +417,7 @@ class PatientController extends BaseController
 		}
 
 		$this->patient = $this->episode->patient;
+		$this->layout = '//layouts/events_and_episodes';
 
 		$episodes = $this->patient->episodes;
 		// TODO: verify if ordered_episodes complete supercedes need for unordered $episodes
@@ -721,23 +722,9 @@ class PatientController extends BaseController
 		Yii::app()->session['episode_hide_status'] = $status;
 	}
 
-	private function processDiagnosisDate()
+	private function processFuzzyDate()
 	{
-		$date = $_POST['fuzzy_year'];
-
-		if ($_POST['fuzzy_month']) {
-			$date .= '-'.str_pad($_POST['fuzzy_month'],2,'0',STR_PAD_LEFT);
-		} else {
-			$date .= '-00';
-		}
-
-		if ($_POST['fuzzy_day']) {
-			$date .= '-'.str_pad($_POST['fuzzy_day'],2,'0',STR_PAD_LEFT);
-		} else {
-			$date .= '-00';
-		}
-
-		return $date;
+		return Helper::padFuzzyDate(@$_POST['fuzzy_year'],@$_POST['fuzzy_month'],@$_POST['fuzzy_day']);
 	}
 
 	public function actionAdddiagnosis()
@@ -756,7 +743,7 @@ class PatientController extends BaseController
 			throw new Exception('Unable to find patient: '.@$_POST['patient_id']);
 		}
 
-		$date = $this->processDiagnosisDate();
+		$date = $this->processFuzzyDate();
 
 		if (!$_POST['diagnosis_eye']) {
 			if (!SecondaryDiagnosis::model()->find('patient_id=? and disorder_id=? and date=?',array($patient->id,$disorder->id,$date))) {
@@ -785,7 +772,7 @@ class PatientController extends BaseController
 
 		$sd = new SecondaryDiagnosis;
 		$sd->patient_id = $patient->id;
-		$sd->date = @$_POST['fuzzy_year'].'-'.str_pad(@$_POST['fuzzy_month'],2,'0',STR_PAD_LEFT).'-'.str_pad(@$_POST['fuzzy_day'],2,'0',STR_PAD_LEFT);
+		$sd->date = $this->processFuzzyDate();
 		$sd->disorder_id = @$disorder_id;
 		$sd->eye_id = @$_POST['diagnosis_eye'];
 
@@ -845,7 +832,7 @@ class PatientController extends BaseController
 			throw new Exception('Unable to find patient: '.@$_POST['patient_id']);
 		}
 
-		$cvi_status_date = $this->processDiagnosisDate();
+		$cvi_status_date = $this->processFuzzyDate();
 
 		$result = $patient->editOphInfo($cvi_status, $cvi_status_date);
 
@@ -980,7 +967,11 @@ class PatientController extends BaseController
 		$po->patient_id = $patient->id;
 		$po->side_id = @$_POST['previous_operation_side'] ? @$_POST['previous_operation_side'] : null;
 		$po->operation = @$_POST['previous_operation'];
-		$po->date = str_pad(@$_POST['fuzzy_year'],4,'0',STR_PAD_LEFT).'-'.str_pad(@$_POST['fuzzy_month'],2,'0',STR_PAD_LEFT).'-'.str_pad(@$_POST['fuzzy_day'],2,'0',STR_PAD_LEFT);
+		$po->date = $this->processFuzzyDate();
+
+		if($po->date == '0000-00-00'){
+			$po->date = null;
+		}
 
 		if (!$po->save()) {
 			echo json_encode($po->getErrors());

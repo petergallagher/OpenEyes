@@ -29,6 +29,8 @@ class OperationBooking extends OpenEyesPage
         'operationComments' => array('xpath' => "//*[@id='Element_OphTrOperationbooking_Operation_comments']"),
         'scheduleLater' => array('xpath' => "//*[@id='et_schedulelater']"),
         'scheduleNow' => array('xpath' => "//*[@id='et_save_and_schedule']"),
+        'duplicateProcedureOk' => array('xpath' => "//*[@class='secondary small confirm ok']"),
+        'duplicateProcedureCancel' => array('xpath' => "//*[@class='warning small confirm cancel']"),
         'availableTheatreSlotDate' => array('xpath' => "//*[@class='available']"),
         'availableTheatreSlotDateOutsideRTT' => array('xpath' => "//*[@class='available outside_rtt']"),
         'availableThreeWeeksTime' => array ('xpath' => "//*[@id='calendar']//*[contains(text(),'27')]"),
@@ -63,7 +65,9 @@ class OperationBooking extends OpenEyesPage
 
     public function diagnosis ($diagnosis)
     {
-        $this->getElement('operationDiagnosis')->setValue($diagnosis);
+        $element =$this->getElement('operationDiagnosis');
+        $this->scrollWindowToElement($element);
+        $element->setValue($diagnosis);
     }
 
     public function operationEyes ($opEyes)
@@ -81,11 +85,15 @@ class OperationBooking extends OpenEyesPage
     public function procedure ($procedure)
     {
         $this->getElement('operationProcedure')->setValue($procedure);
+        $this->getSession()->wait(2000);
+
     }
 
     public function consultantYes ()
     {
-        $this->getElement('consultantYes')->click();
+        $element = $this->getElement('consultantYes');
+        $this->scrollWindowToElement($element);
+        $element->click();
     }
 
     public function consultantNo ()
@@ -95,26 +103,27 @@ class OperationBooking extends OpenEyesPage
 
     public function selectAnaesthetic ($type)
     {
-		$el = null;
+		$element = null;
 		if ($type==='Topical') {
-            $el = $this->getElement('anaestheticTopical');
+            $element = $this->getElement('anaestheticTopical');
         }
         if ($type==='LA') {
-			$el = $this->getElement('anaestheticLa');
+			$element = $this->getElement('anaestheticLa');
         }
         if ($type==='LAC') {
-			$el = $this->getElement('anaestheticLac');
+			$element = $this->getElement('anaestheticLac');
         }
         if ($type==='LAS') {
-			$el = $this->getElement('anaestheticLas');
+			$element = $this->getElement('anaestheticLas');
         }
         if ($type==='GA') {
-			$el = $this->getElement('anaestheticGa');
+			$element = $this->getElement('anaestheticGa');
         }
-		$el->focus();
-        $this->scrollWindowToElement($el);
-		$el->click();
-		$this->getSession()->wait(3000, "window.$ && $(\"#Element_OphTrOperationbooking_Operation_anaesthetic_type_id [name='Element_OphTrOperationbooking_Operation[anaesthetic_type_id]']:checked\").val() == " .   $el->getValue());
+//		$element->focus();
+        $this->scrollWindowToElement($element);
+        $this->getSession()->wait(2000);
+		$element->click();
+		$this->getSession()->wait(3000);
     }
 
     public function postOpStayYes ()
@@ -170,6 +179,18 @@ class OperationBooking extends OpenEyesPage
         $this->getSession()->wait(15000,"window.$ && $('.event-title').html() == 'Schedule Operation' ");
     }
 
+    public function duplicateProcedureOk ()
+    {
+        if ($this->isDuplicateProcedurePopUpShown()) {
+        $this->getElement('duplicateProcedureOk')->click();
+        }
+    }
+
+    public function isDuplicateProcedurePopUpShown ()
+    {
+        return (bool) $this->find('xpath', $this->getElement('duplicateProcedureOk')->getXpath());
+    }
+
     public function EmergencyList ()
     {
         $this->getElement('EmergencyList')->selectOption("EMG");
@@ -188,7 +209,8 @@ class OperationBooking extends OpenEyesPage
     public function availableSlotExactDay ($day)
     {
 		$slot = $this->find('xpath' , "//*[@id='calendar']//*[number()='" . $day ."']");
-		$slot->click();
+		$this->scrollWindowToElement($slot);
+        $slot->click();
 		$this->getSession()->wait(15000, "window.$ && $('#calendar td.available.selected_date').html().trim() == '" . $day . "' ");
     }
 

@@ -115,9 +115,9 @@ Feature: Open Eyes Login and Patient Diagnosis Screen Template
     Then I Add a Comorbiditiy of "10"
     Then I Add a Comorbiditiy of "11"
     Then I Add a Comorbiditiy of "12"
-    Then I Add a Comorbiditiy of "13"
-    Then I Add a Comorbiditiy of "14"
-    Then I Add a Comorbiditiy of "15"
+#    Then I Add a Comorbiditiy of "13"
+#    Then I Add a Comorbiditiy of "14"
+#    Then I Add a Comorbiditiy of "15"
 
     Then I remove all comorbidities
 
@@ -137,6 +137,8 @@ Feature: Open Eyes Login and Patient Diagnosis Screen Template
     Then I enter right Axis degrees of "38"
     Then I enter right Axis degrees of "38"
     And I enter a right type of "3"
+
+    Then I choose to expand the Visual Function section
 
     Then I choose to expand the Visual Acuity section
     And I select a Visual Acuity of "2"
@@ -179,7 +181,7 @@ Feature: Open Eyes Login and Patient Diagnosis Screen Template
     And I select Clinic Date "7"
 
     Then I choose an Introduction of "site21"
-    And I add Findings of "examination2"
+    And I add Findings of "examination1"
     And I choose a Diagnosis of "site541"
     Then I choose a Management of "site181"
     And I choose Drugs "site301"

@@ -184,7 +184,7 @@ $(document).ready(function(){
 		});
 	}
 
-	$(window).bind('beforeunload', function (e) {
+	$(window).on('beforeunload', function (e) {
 		if (formHasChanged && !submitted) {
 			var message = "You have not saved your changes.", e = e || window.event;
 			if (e) {
@@ -194,7 +194,7 @@ $(document).ready(function(){
 		}
 	});
 
-	$("form").submit(function() {
+	$(this).on('submit', 'form', function() {
 		submitted = true;
 	});
 
@@ -297,6 +297,10 @@ $(document).ready(function(){
 				}
 			}
 		}
+	});
+
+	$(this).on('click', '.alert-box .close' , function(e) {
+		$(e.srcElement).closest('.alert-box').fadeOut(500);
 	});
 });
 
