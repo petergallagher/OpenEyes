@@ -169,7 +169,7 @@ class PatientSystemicDiagnosesServiceTest extends \CDbTestCase
 
 		$resource->diagnoses[0]->disorder = 'Myopia';
 
-		$this->setExpectedException('Exception','PatientSystemicDiagnoses passed a resource containing ophthalmic diagnoses');
+		$this->setExpectedException('Exception','PatientSystemicDiagnoses passed a resource containing non-systemic diagnoses');
 
 		$ps = new PatientSystemicDiagnosesService;
 		$patient = $ps->resourceToModel($resource, $this->patients('patient3'));
@@ -258,7 +258,7 @@ class PatientSystemicDiagnosesServiceTest extends \CDbTestCase
 
 		$resource->diagnoses[0]->disorder = 'Myopia';
 
-		$this->setExpectedException('Exception','PatientSystemicDiagnoses passed a resource containing ophthalmic diagnoses');
+		$this->setExpectedException('Exception','PatientSystemicDiagnoses passed a resource containing non-systemic diagnoses');
 
 		$ps = new PatientSystemicDiagnosesService;
 		$patient = $ps->resourceToModel($resource, $this->patients('patient2'));
@@ -390,7 +390,7 @@ class PatientSystemicDiagnosesServiceTest extends \CDbTestCase
 	{
 		$json = '{"diagnoses":[{"disorder":"Myopia","side":"Left","id":null,"last_modified":null},{"disorder":"Essential hypertension","side":false,"id":null,"last_modified":null}],"id":null,"last_modified":null,"patient_id":{"id":"2","last_modified":-2208988800}}';
 
-		$this->setExpectedException('Exception','PatientSystemicDiagnoses passed a resource containing ophthalmic diagnoses');
+		$this->setExpectedException('Exception','PatientSystemicDiagnoses passed a resource containing non-systemic diagnoses');
 
 		$ps = new PatientSystemicDiagnosesService;
 		$patient = $ps->jsonToModel($json, $this->patients('patient3'));
@@ -463,7 +463,7 @@ class PatientSystemicDiagnosesServiceTest extends \CDbTestCase
 	{
 		$json = '{"diagnoses":[{"disorder":"Myopia","side":"Left","id":null,"last_modified":null},{"disorder":"Essential hypertension","side":false,"id":null,"last_modified":null}],"id":null,"last_modified":null,"patient_id":{"id":"2","last_modified":-2208988800}}';
 
-		$this->setExpectedException('Exception','PatientSystemicDiagnoses passed a resource containing ophthalmic diagnoses');
+		$this->setExpectedException('Exception','PatientSystemicDiagnoses passed a resource containing non-systemic diagnoses');
 
 		$ps = new PatientSystemicDiagnosesService;
 		$patient = $ps->jsonToModel($json, $this->patients('patient2'));
