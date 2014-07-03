@@ -190,6 +190,7 @@ return array(
 				'services\PatientFamilyHistoryService',
 				'services\PatientSocialHistoryService',
 				'services\PatientSystemicDiagnosesService',
+				'services\PatientOphthalmicDiagnosesService',
 			),
 		),
 		'session' => array(
