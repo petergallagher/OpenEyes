@@ -154,6 +154,14 @@ class Patient extends BaseActiveRecordVersioned
 			'cvi_status' => array(self::HAS_ONE, 'PatientOphInfo', 'patient_id'),
 			'socialHistory' => array(self::HAS_ONE, 'SocialHistory', 'patient_id'),
 			'adherence' => array(self::HAS_ONE, 'MedicationAdherence', 'patient_id'),
+			'systemicDiagnoses' => array(self::HAS_MANY, 'SecondaryDiagnosis', 'patient_id',
+				'join' => 'join `disorder` `systemicDiagnosesDisorder` on `systemicDiagnoses`.`disorder_id` = `systemicDiagnosesDisorder`.`id` and `systemicDiagnosesDisorder`.`specialty_id` is null',
+				'order' => 'date asc'
+			),
+			'ophthalmicDiagnoses' => array(self::HAS_MANY, 'SecondaryDiagnosis', 'patient_id',
+				'join' => 'join `disorder` `ophthalmicDiagnosesDisorder` on `ophthalmicDiagnoses`.`disorder_id` = `ophthalmicDiagnosesDisorder`.`id` join `specialty` '.
+					'`ophthalmicDiagnosesDisorderSpecialty` on `ophthalmicDiagnosesDisorder`.`specialty_id` = `ophthalmicDiagnosesDisorderSpecialty`.`id` and '.
+					'`ophthalmicDiagnosesDisorderSpecialty`.`code` = \'130\'', 'order' => 'date asc'),
 		);
 	}
 
@@ -921,29 +929,6 @@ class Patient extends BaseActiveRecordVersioned
 		return $res;
 	}
 
-	public function getSystemicDiagnoses()
-	{
-		$criteria = new CDbCriteria;
-		$criteria->compare('patient_id', $this->id);
-		$criteria->join = 'join disorder on t.disorder_id = disorder.id and specialty_id is null';
-		$criteria->order = 'date asc';
-
-		return SecondaryDiagnosis::model()->findAll($criteria);
-	}
-
-	public function getOphthalmicDiagnoses()
-	{
-		$criteria = new CDbCriteria;
-		$criteria->compare('patient_id', $this->id);
-
-		$criteria->join = 'join disorder on t.disorder_id = disorder.id join specialty on disorder.specialty_id = specialty.id';
-		$criteria->compare('specialty.code', 130);
-
-		$criteria->order = 'date asc';
-
-		return SecondaryDiagnosis::model()->findAll($criteria);
-	}
-
 	/*
 	 * returns the specialty codes that are relevant to the patient. Determined by looking at the diagnoses
 	 * related to the patient.
@@ -1152,7 +1137,7 @@ class Patient extends BaseActiveRecordVersioned
 	 */
 	public function getSyd()
 	{
-		return strtolower(Helper::formatList(Helper::extractValues($this->getSystemicDiagnoses(), 'disorder.term')));
+		return strtolower(Helper::formatList(Helper::extractValues($this->systemicDiagnoses, 'disorder.term')));
 	}
 
 	public function addPreviousOperation($operation, $side_id, $date)
