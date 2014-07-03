@@ -29,6 +29,8 @@ class ContactLocationTest extends CDbTestCase
 		'Institution',
 		'Site',
 		'contactlocations' => 'ContactLocation',
+		'PatientContactAssignment',
+		'patients' => 'Patient',
 	);
 
 	public $expectedLetterAddress;
@@ -160,9 +162,8 @@ class ContactLocationTest extends CDbTestCase
 	{
 		$this->model->setAttribute('contact_id', 1);
 		$result = $this->contactlocations('contactlocation1')->GetPatients();
-		$expected = $this->model->getPatients();
+		$expected = array($this->patients('patient2'));
 
 		$this->assertEquals($expected, $result);
 	}
-
 }
