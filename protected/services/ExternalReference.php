@@ -27,9 +27,24 @@ class ExternalReference extends ResourceReference
 		$this->url = $url;
 	}
 
-	public function resolve()
+	public function fetch()
 	{
-		throw new Exception("Not implemented");
+		throw new \Exception("Not implemented");
+	}
+
+	public function getLastModified()
+	{
+		throw new \Exception("Not implemented");
+	}
+
+	public function update(Resource $resource)
+	{
+		throw new \Exception("Not implemented");
+	}
+
+	public function delete()
+	{
+		throw new \Exception("Not implemented");
 	}
 
 	public function toFhir()
