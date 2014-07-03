@@ -280,7 +280,7 @@ class PatientAllergiesServiceTest extends \CDbTestCase
 		$this->assertEquals('allergy 2',$resource->allergies[1]->name);
 	}
 
-	public function jsonToModel_NoSave_NoNewRows()
+	public function testJsonToModel_NoSave_NoNewRows()
 	{
 		$json = '{"allergies":[{"name":"allergy 1","id":null,"last_modified":null},{"name":"allergy 2","id":null,"last_modified":null}],"no_allergies_date":null,"id":null,"last_modified":null,"patient_id":{"id":"1","last_modified":-2208988800}}';
 
@@ -289,7 +289,7 @@ class PatientAllergiesServiceTest extends \CDbTestCase
 		$total_alas = count(\PatientAllergyAssignment::model()->findAll());
 
 		$ps = new PatientAllergiesService;
-		$patient = $ps->jsonToModel($json, false);
+		$patient = $ps->jsonToModel($json, new \Patient, false);
 
 		$this->assertEquals($total_patients, count(\Patient::model()->findAll()));
 		$this->assertEquals($total_allergies, count(\Allergy::model()->findAll()));

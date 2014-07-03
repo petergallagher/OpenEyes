@@ -236,7 +236,7 @@ class PatientCVIStatusServiceTest extends \CDbTestCase
 		$this->assertInstanceOf('services\Date',$resource->date);
 	}
 
-	public function jsonToModel_NoSave_NoNewRows()
+	public function testJsonToModel_NoSave_NoNewRows()
 	{
 		$json = '{"id":null,"last_modified":null,"patient_id":{"id":"2","last_modified":-2208988800},"cvi_status":"Not Certified","date":{"date":"2014-06-27 14:41:04","timezone_type":3,"timezone":"Europe\/London"}}';
 

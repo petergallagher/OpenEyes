@@ -435,7 +435,7 @@ class PatientAssociatedContactsServiceTest extends \CDbTestCase
 		$this->assertEquals(2,$resource->contacts[2]->institution_ref->getId());
 	}
 
-	public function jsonToModel_NoSave_NoNewRows()
+	public function testJsonToModel_NoSave_NoNewRows()
 	{
 		$json = '{"contacts":[{"title":"Dr","family_name":"Zhivago","given_name":"Yuri","primary_phone":"999","institution_ref":null,"site_ref":null,"id":null,"last_modified":null},{"title":"Mr","family_name":"Inc","given_name":"Apple","primary_phone":"01010101","institution_ref":null,"site_ref":{"service":"Site","id":"2"},"id":null,"last_modified":null},{"title":"Ti","family_name":"Tiss","given_name":"Prac","primary_phone":"0303032332","institution_ref":{"service":"Institution","id":"2"},"site_ref":null,"id":null,"last_modified":null}],"id":null,"last_modified":null,"patient_id":{"id":"3","last_modified":-2208988800}}';
 
@@ -446,7 +446,7 @@ class PatientAssociatedContactsServiceTest extends \CDbTestCase
 		$total_institutions = count(\Institution::model()->findAll());
 
 		$ps = new PatientAssociatedContactsService;
-		$patient = $ps->jsonToModel($json, false);
+		$patient = $ps->jsonToModel($json, new \Patient, false);
 
 		$this->assertEquals($total_patients, count(\Patient::model()->findAll()));
 		$this->assertEquals($total_contacts, count(\Contact::model()->findAll()));

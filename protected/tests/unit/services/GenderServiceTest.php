@@ -161,7 +161,7 @@ class GenderServiceTest extends \CDbTestCase
 		$this->assertEquals('Male',$resource->name);
 	}
 
-	public function jsonToModel_NoSave_NoNewRows()
+	public function testJsonToModel_NoSave_NoNewRows()
 	{
 		$json = '{"name":"Male"}';
 

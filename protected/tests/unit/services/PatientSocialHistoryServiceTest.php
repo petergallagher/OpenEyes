@@ -249,7 +249,7 @@ class PatientSocialHistoryServiceTest extends \CDbTestCase
 		$this->assertEquals('Yes',$resource->substance_misuse);
 	}
 
-	public function jsonToModel_NoSave_NoNewRows()
+	public function testJsonToModel_NoSave_NoNewRows()
 	{
 		$json = '{"id":null,"last_modified":null,"patient_id":{"id":"1","last_modified":-2208988800},"occupation":"Unemployed","driving_status":"HGV","smoking_status":"Ex smoker","accommodation":"Lives in sheltered housing","comments":"this is a comment","type_of_job":"Forklifts","carer":"Yes","alcohol_intake":"100","substance_misuse":"Yes"}';
 

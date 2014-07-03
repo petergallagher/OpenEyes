@@ -297,7 +297,7 @@ class GpServiceTest extends \CDbTestCase
 		$this->assertEquals('United States',$resource->address->country);
 	}
 
-	public function jsonToModel_NoSave_NoNewRows()
+	public function testJsonToModel_NoSave_NoNewRows()
 	{
 		$json = '{"gnc":"AII2E2F","obj_prof":"AA1134","title":"Dr","family_name":"Zhivago","given_name":"Yuri","primary_phone":"999","address":{"use":null,"line1":"Staplegun","line2":"Staplegun Creek","city":"Stapleton","state":"staple","zip":"st44 pl3","country":"United States"}}';
 

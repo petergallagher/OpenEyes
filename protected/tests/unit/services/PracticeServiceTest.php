@@ -243,7 +243,7 @@ class PracticeServiceTest extends \CDbTestCase
 		$this->assertEquals('United Kingdom', $resource->address->country);
 	}
 
-	public function jsonToModel_NoSave_NoNewRows()
+	public function testJsonToModel_NoSave_NoNewRows()
 	{
 		$json = '{"code":"x0001","primary_phone":"x0002","address":{"use":null,"line1":"x0003","line2":"x0004","city":"x0005","state":"x0006","zip":"x0007","country":"United Kingdom"}}';
 

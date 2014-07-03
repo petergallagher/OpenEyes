@@ -274,7 +274,7 @@ class CommissioningBodyServiceTest extends \CDbTestCase
 		$this->assertEquals('United States',$resource->address->country);
 	}
 
-	public function jsonToModel_NoSave_NoNewRows()
+	public function testJsonToModel_NoSave_NoNewRows()
 	{
 		$json = '{"code":"AAPL","name":"Apple","address":{"use":null,"line1":"1 Infinite Loop","line2":"","city":"Cupertino","state":"California","zip":"1AA PL3","country":"United States"},"type_ref":{"service":"CommissioningBodyType","id":"1"}}';
 
@@ -282,8 +282,8 @@ class CommissioningBodyServiceTest extends \CDbTestCase
 		$total_contacts = count(\Contact::model()->findAll());
 		$total_addresses = count(\Address::model()->findAll());
 
-		$cs = new GpService;
-		$cb = $cs->jsonToModel($json, false);
+		$cs = new CommissioningBodyService;
+		$cb = $cs->jsonToModel($json, new \CommissioningBody, false);
 
 		$this->assertEquals($total_cbs, count(\CommissioningBody::model()->findAll()));
 		$this->assertEquals($total_contacts, count(\Contact::model()->findAll()));

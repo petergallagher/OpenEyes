@@ -412,14 +412,14 @@ class PatientMedicationsServiceTest extends \CDbTestCase
 		$this->assertInstanceOf('services\Date',$resource->previous_medications[0]->end_date);
 	}
 
-	public function jsonToModel_NoSave_NoNewRows()
+	public function testJsonToModel_NoSave_NoNewRows()
 	{
 		$json = '{"medications":[{"drug":"Abidec drops","route":"IM","option":"Left","frequency":"bd","start_date":{"date":"2012-01-01 00:00:00","timezone_type":3,"timezone":"Europe\/London"},"end_date":null,"dose":"loads","stop_reason":false,"id":null,"last_modified":null}],"previous_medications":[{"drug":"Acetazolamide 250mg tablets","route":"Eye","option":"Right","frequency":"2 hourly","start_date":{"date":"2013-03-03 00:00:00","timezone_type":3,"timezone":"Europe\/London"},"end_date":{"date":"2013-06-06 00:00:00","timezone_type":3,"timezone":"Europe\/London"},"dose":"much","stop_reason":"Started seeing halos and auras","id":null,"last_modified":null}],"id":null,"last_modified":null,"patient_id":{"id":"1","last_modified":-2208988800}}';
 
 		$total_medications = count(\Medication::model()->findAll());
 
 		$ps = new PatientMedicationsService;
-		$patient = $ps->jsonToModel($json, false);
+		$patient = $ps->jsonToModel($json, new \Patient, false);
 
 		$this->assertEquals($total_medications, count(\Medication::model()->findAll()));
 	}

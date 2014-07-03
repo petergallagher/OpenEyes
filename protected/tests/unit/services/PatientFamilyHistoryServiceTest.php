@@ -321,7 +321,7 @@ class PatientFamilyHistoryServiceTest extends \CDbTestCase
 		$this->assertEquals('i am writing more tests',$resource->history[1]->comments);
 	}
 
-	public function jsonToModel_NoSave_NoNewRows()
+	public function testJsonToModel_NoSave_NoNewRows()
 	{
 		$json = '{"history":[{"relative":"Cousin","side":"Maternal","condition":"Other","comments":"i am writing tests","id":null,"last_modified":null},{"relative":"Grandmother","side":"Unknown","condition":"Cataract","comments":"i am writing more tests","id":null,"last_modified":null}],"id":null,"last_modified":null}';
 
