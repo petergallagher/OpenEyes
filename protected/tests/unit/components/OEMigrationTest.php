@@ -44,6 +44,14 @@ class OEMigrationTest extends CDbTestCase
 	{
 		$eventTypeResultSet = EventType::model()->findAll('id >= 1000');
 
+		if (Yii::app()->db->getSchema()->getTable('et_ophtroperationbooking_diagnosis')) {
+			Yii::app()->db->createCommand("delete from et_ophtroperationbooking_diagnosis")->query();
+			Yii::app()->db->createCommand("delete from ophtroperationbooking_operation_procedures_procedures")->query();
+			Yii::app()->db->createCommand("delete from ophtroperationbooking_operation_booking")->query();
+			Yii::app()->db->createCommand("delete from et_ophtroperationbooking_operation")->query();
+			Yii::app()->db->createCommand("delete from et_ophtroperationbooking_scheduleope")->query();
+		}
+
 		Yii::app()->db->createCommand("delete from episode_summary")->query();
 		Yii::app()->db->createCommand("delete from episode_summary_item")->query();
 		Yii::app()->db->createCommand("delete from event where event_type_id >= 1000")->query();
@@ -77,6 +85,7 @@ class OEMigrationTest extends CDbTestCase
 		ob_end_clean();
 		$this->compareFixtureWithResultSet($this->event_type, $eventTypeResultSet);
 
+		Event::model()->deleteAll('event_type_id >= 1000');
 		EventType::model()->deleteAll('id >= 1000');
 		$this->assertGreaterThan(0, $this->oeMigration->getCsvFiles());
 
