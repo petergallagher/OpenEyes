@@ -55,7 +55,7 @@ class EpisodeServiceTest extends \CDbTestCase
 	{
 		$episode = new Episode;
 
-		$episode->patient_ref = \Yii::app()->service->Patient(1);
+		$episode->patient_ref = \Yii::app()->service->Patient(4);
 		$episode->firm = 'Aylward Firm';
 		$episode->subspecialty = 'Subspecialty 2';
 		$episode->status = 'Post-op';
@@ -87,8 +87,8 @@ class EpisodeServiceTest extends \CDbTestCase
 
 		$this->assertInstanceOf('Episode',$episode);
 		$this->assertInstanceOf('Patient',$episode->patient);
-		$this->assertEquals(1,$episode->patient->id);
-		$this->assertEquals(1,$episode->patient_id);
+		$this->assertEquals(4,$episode->patient->id);
+		$this->assertEquals(4,$episode->patient_id);
 		$this->assertInstanceOf('Firm',$episode->firm);
 		$this->assertEquals('Aylward Firm',$episode->firm->name);
 		$this->assertEquals(\Firm::model()->find('name=? and service_subspecialty_assignment_id=?',array('Aylward Firm',2))->id,$episode->firm_id);
@@ -108,380 +108,501 @@ class EpisodeServiceTest extends \CDbTestCase
 		$this->assertEquals(\Disorder::model()->find('term=?',array('Myopia'))->id,$episode->disorder_id);
 	}
 
-/*
 	public function testResourceToModel_Save_Create_ModelCountsCorrect()
 	{
 		$resource = $this->getResource();
 
-		$total_sd = count(\SecondaryDiagnosis::model()->findAll());
+		$total_e = count(\Episode::model()->findAll());
 
-		$ps = new PatientOphthalmicDiagnosesService;
-		$patient = $ps->resourceToModel($resource, $this->patients('patient3'));
+		$ps = new EpisodeService;
+		$episode = $ps->resourceToModel($resource, new \Episode);
 
-		$this->assertEquals($total_sd+2, count(\SecondaryDiagnosis::model()->findAll()));
+		$this->assertEquals($total_e+1, count(\Episode::model()->findAll()));
 	}
 
-	public function testResourceToModel_Save_ModelIsCorrect()
+	public function testResourceToModel_Save_Create_ModelIsCorrect()
 	{
 		$resource = $this->getResource();
 
-		$ps = new PatientOphthalmicDiagnosesService;
-		$patient = $ps->resourceToModel($resource, $this->patients('patient3'));
+		$ps = new EpisodeService;
+		$episode = $ps->resourceToModel($resource, new \Episode);
 
-		$this->assertInstanceOf('Patient',$patient);
-		$this->assertCount(2,$patient->ophthalmicDiagnoses);
-
-		$this->assertInstanceOf('SecondaryDiagnosis',$patient->ophthalmicDiagnoses[0]);
-		$this->assertInstanceOf('Disorder',$patient->ophthalmicDiagnoses[0]->disorder);
-		$this->assertEquals('Myopia',$patient->ophthalmicDiagnoses[0]->disorder->term);
-		$this->assertEquals(\Disorder::model()->find('term=?',array('Myopia'))->id,$patient->ophthalmicDiagnoses[0]->disorder_id);
-		$this->assertInstanceOf('Eye',$patient->ophthalmicDiagnoses[0]->eye);
-		$this->assertEquals('Both',$patient->ophthalmicDiagnoses[0]->eye->name);
-		$this->assertEquals(\Eye::model()->find('name=?',array('Both'))->id,$patient->ophthalmicDiagnoses[0]->eye_id);
-
-		$this->assertInstanceOf('SecondaryDiagnosis',$patient->ophthalmicDiagnoses[1]);
-		$this->assertInstanceOf('Disorder',$patient->ophthalmicDiagnoses[1]->disorder);
-		$this->assertEquals('Retinal lattice degeneration',$patient->ophthalmicDiagnoses[1]->disorder->term);
-		$this->assertEquals(\Disorder::model()->find('term=?',array('Retinal lattice degeneration'))->id,$patient->ophthalmicDiagnoses[1]->disorder_id);
-		$this->assertInstanceOf('Eye',$patient->ophthalmicDiagnoses[1]->eye);
-		$this->assertEquals('Right',$patient->ophthalmicDiagnoses[1]->eye->name);
-		$this->assertEquals(\Eye::model()->find('name=?',array('Right'))->id,$patient->ophthalmicDiagnoses[1]->eye_id);
+		$this->assertInstanceOf('Episode',$episode);
+		$this->assertInstanceOf('Patient',$episode->patient);
+		$this->assertEquals(4,$episode->patient->id);
+		$this->assertEquals(4,$episode->patient_id);
+		$this->assertInstanceOf('Firm',$episode->firm);
+		$this->assertEquals('Aylward Firm',$episode->firm->name);
+		$this->assertEquals(\Firm::model()->find('name=? and service_subspecialty_assignment_id=?',array('Aylward Firm',2))->id,$episode->firm_id);
+		$this->assertInstanceOf('ServiceSubspecialtyAssignment',$episode->firm->serviceSubspecialtyAssignment);
+		$this->assertInstanceOf('Subspecialty',$episode->firm->serviceSubspecialtyAssignment->subspecialty);
+		$this->assertEquals('Subspecialty 2',$episode->firm->serviceSubspecialtyAssignment->subspecialty->name);
+		$this->assertInstanceOf('EpisodeStatus',$episode->status);
+		$this->assertEquals('Post-op',$episode->status->name);
+		$this->assertEquals(\EpisodeStatus::model()->find('name=?',array('Post-op'))->id,$episode->episode_status_id);
+		$this->assertEquals('2013-05-04',$episode->start_date);
+		$this->assertNull($episode->end_date);
+		$this->assertInstanceOf('Eye',$episode->eye);
+		$this->assertEquals('Right',$episode->eye->name);
+		$this->assertEquals(\Eye::model()->find('name=?',array('Right'))->id,$episode->eye_id);
+		$this->assertInstanceOf('Disorder',$episode->diagnosis);
+		$this->assertEquals('Myopia',$episode->diagnosis->term);
+		$this->assertEquals(\Disorder::model()->find('term=?',array('Myopia'))->id,$episode->disorder_id);
 	}
 
 	public function testResourceToModel_Save_Create_DBIsCorrect()
 	{
 		$resource = $this->getResource();
 
-		$ps = new PatientOphthalmicDiagnosesService;
-		$patient = $ps->resourceToModel($resource, $this->patients('patient3'));
-		$patient = \Patient::model()->findByPk($patient->id);
+		$ps = new EpisodeService;
+		$episode = $ps->resourceToModel($resource, new \Episode);
 
-		$this->assertInstanceOf('Patient',$patient);
-		$this->assertCount(2,$patient->ophthalmicDiagnoses);
-
-		$this->assertInstanceOf('SecondaryDiagnosis',$patient->ophthalmicDiagnoses[0]);
-		$this->assertInstanceOf('Disorder',$patient->ophthalmicDiagnoses[0]->disorder);
-		$this->assertEquals('Myopia',$patient->ophthalmicDiagnoses[0]->disorder->term);
-		$this->assertEquals(\Disorder::model()->find('term=?',array('Myopia'))->id,$patient->ophthalmicDiagnoses[0]->disorder_id);
-		$this->assertInstanceOf('Eye',$patient->ophthalmicDiagnoses[0]->eye);
-		$this->assertEquals('Both',$patient->ophthalmicDiagnoses[0]->eye->name);
-		$this->assertEquals(\Eye::model()->find('name=?',array('Both'))->id,$patient->ophthalmicDiagnoses[0]->eye_id);
-
-		$this->assertInstanceOf('SecondaryDiagnosis',$patient->ophthalmicDiagnoses[1]);
-		$this->assertInstanceOf('Disorder',$patient->ophthalmicDiagnoses[1]->disorder);
-		$this->assertEquals('Retinal lattice degeneration',$patient->ophthalmicDiagnoses[1]->disorder->term);
-		$this->assertEquals(\Disorder::model()->find('term=?',array('Retinal lattice degeneration'))->id,$patient->ophthalmicDiagnoses[1]->disorder_id);
-		$this->assertInstanceOf('Eye',$patient->ophthalmicDiagnoses[1]->eye);
-		$this->assertEquals('Right',$patient->ophthalmicDiagnoses[1]->eye->name);
-		$this->assertEquals(\Eye::model()->find('name=?',array('Right'))->id,$patient->ophthalmicDiagnoses[1]->eye_id);
+		$this->assertInstanceOf('Episode',$episode);
+		$this->assertInstanceOf('Patient',$episode->patient);
+		$this->assertEquals(4,$episode->patient->id);
+		$this->assertEquals(4,$episode->patient_id);
+		$this->assertInstanceOf('Firm',$episode->firm);
+		$this->assertEquals('Aylward Firm',$episode->firm->name);
+		$this->assertEquals(\Firm::model()->find('name=? and service_subspecialty_assignment_id=?',array('Aylward Firm',2))->id,$episode->firm_id);
+		$this->assertInstanceOf('ServiceSubspecialtyAssignment',$episode->firm->serviceSubspecialtyAssignment);
+		$this->assertInstanceOf('Subspecialty',$episode->firm->serviceSubspecialtyAssignment->subspecialty);
+		$this->assertEquals('Subspecialty 2',$episode->firm->serviceSubspecialtyAssignment->subspecialty->name);
+		$this->assertInstanceOf('EpisodeStatus',$episode->status);
+		$this->assertEquals('Post-op',$episode->status->name);
+		$this->assertEquals(\EpisodeStatus::model()->find('name=?',array('Post-op'))->id,$episode->episode_status_id);
+		$this->assertEquals('2013-05-04',$episode->start_date);
+		$this->assertNull($episode->end_date);
+		$this->assertInstanceOf('Eye',$episode->eye);
+		$this->assertEquals('Right',$episode->eye->name);
+		$this->assertEquals(\Eye::model()->find('name=?',array('Right'))->id,$episode->eye_id);
+		$this->assertInstanceOf('Disorder',$episode->diagnosis);
+		$this->assertEquals('Myopia',$episode->diagnosis->term);
+		$this->assertEquals(\Disorder::model()->find('term=?',array('Myopia'))->id,$episode->disorder_id);
 	}
 
-	public function testResourceToModel_Save_Create_NonOphthalmic_Exception()
+	public function testResourceToModel_Save_Create_CantCreateEpisodeInSameSubspecialty()
 	{
 		$resource = $this->getResource();
+		$resource->patient_ref = \Yii::app()->service->Patient(1);
 
-		$resource->diagnoses[0]->disorder = 'Diabetes mellitus type 1';
+		$this->setExpectedException('Exception','There is already an open Subspecialty 2 episode for this patient.');
 
-		$this->setExpectedException('Exception','PatientOphthalmicDiagnoses passed a resource containing non-ophthalmic diagnoses');
+		$ps = new EpisodeService;
+		$episode = $ps->resourceToModel($resource, new \Episode);
+	}
 
-		$ps = new PatientOphthalmicDiagnosesService;
-		$patient = $ps->resourceToModel($resource, $this->patients('patient3'));
+	public function testResourceToModel_Save_Create_CantCreateLegacyEpisodeIfOneAlreadyExists()
+	{
+		$resource = $this->getResource();
+		$resource->firm = null;
+		$resource->subspecialty = null;
+		$resource->legacy = 1;
+		$resource->patient_ref = \Yii::app()->service->Patient(3);
+
+		$this->setExpectedException('Exception','There is already a legacy episode for this patient.');
+
+		$ps = new EpisodeService;
+		$episode = $ps->resourceToModel($resource, new \Episode);
+	}
+
+	public function testResourceToModel_Save_Create_CantCreateSupportServicesEpisodeIfOneAlreadyExists()
+	{
+		$resource = $this->getResource();
+		$resource->firm = null;
+		$resource->subspecialty = null;
+		$resource->support_services = 1;
+		$resource->patient_ref = \Yii::app()->service->Patient(3);
+
+		$this->setExpectedException('Exception','There is already a support services episode for this patient.');
+
+		$ps = new EpisodeService;
+		$episode = $ps->resourceToModel($resource, new \Episode);
+	}
+
+	public function testResourceToModel_Save_Create_CantNoSubspecialtyFirmIfAlreadyExists()
+	{
+		$resource = $this->getResource();
+		$resource->firm = $this->firms('firm6')->name;
+		$resource->subspecialty = null;
+		$resource->patient_ref = \Yii::app()->service->Patient(3);
+
+		$this->setExpectedException('Exception','There is already an open No subspecialty firm episode for this patient.');
+
+		$ps = new EpisodeService;
+		$episode = $ps->resourceToModel($resource, new \Episode);
 	}
 
 	public function testResourceToModel_Save_Update_Modified_ModelCountsCorrect()
 	{
 		$resource = $this->getResource();
 
-		$total_sd = count(\SecondaryDiagnosis::model()->findAll());
+		$total_e	= count(\Episode::model()->findAll());
 
-		$ps = new PatientOphthalmicDiagnosesService;
-		$patient = $ps->resourceToModel($resource, $this->patients('patient2'));
+		$ps = new EpisodeService;
+		$episode = $ps->resourceToModel($resource, $this->episodes('episode6'));
 
-		$this->assertEquals($total_sd-1, count(\SecondaryDiagnosis::model()->findAll()));
+		$this->assertEquals($total_e, count(\Episode::model()->findAll()));
 	}
 
 	public function testResourceToModel_Save_Update_NotModified_ModelCountsCorrect()
 	{
-		$resource = \Yii::app()->service->PatientOphthalmicDiagnoses(2)->fetch();
+		$resource = \Yii::app()->service->Episode(2)->fetch();
 
-		$total_sd = count(\SecondaryDiagnosis::model()->findAll());
+		$total_e	= count(\Episode::model()->findAll());
 
-		$ps = new PatientOphthalmicDiagnosesService;
-		$patient = $ps->resourceToModel($resource, $this->patients('patient2'));
+		$ps = new EpisodeService;
+		$episode = $ps->resourceToModel($resource, $this->episodes('episode2'));
 
-		$this->assertEquals($total_sd, count(\SecondaryDiagnosis::model()->findAll()));
+		$this->assertEquals($total_e, count(\Episode::model()->findAll()));
 	}
 
 	public function testResourceToModel_Save_Update_ModelIsCorrect()
 	{
 		$resource = $this->getResource();
 
-		$ps = new PatientOphthalmicDiagnosesService;
-		$patient = $ps->resourceToModel($resource, $this->patients('patient2'));
+		$ps = new EpisodeService;
+		$episode = $ps->resourceToModel($resource, $this->episodes('episode2'));
 
-		$this->assertInstanceOf('Patient',$patient);
-		$this->assertCount(2,$patient->ophthalmicDiagnoses);
-
-		$this->assertInstanceOf('SecondaryDiagnosis',$patient->ophthalmicDiagnoses[0]);
-		$this->assertInstanceOf('Disorder',$patient->ophthalmicDiagnoses[0]->disorder);
-		$this->assertEquals('Myopia',$patient->ophthalmicDiagnoses[0]->disorder->term);
-		$this->assertEquals(\Disorder::model()->find('term=?',array('Myopia'))->id,$patient->ophthalmicDiagnoses[0]->disorder_id);
-		$this->assertInstanceOf('Eye',$patient->ophthalmicDiagnoses[0]->eye);
-		$this->assertEquals('Both',$patient->ophthalmicDiagnoses[0]->eye->name);
-		$this->assertEquals(\Eye::model()->find('name=?',array('Both'))->id,$patient->ophthalmicDiagnoses[0]->eye_id);
-
-		$this->assertInstanceOf('SecondaryDiagnosis',$patient->ophthalmicDiagnoses[1]);
-		$this->assertInstanceOf('Disorder',$patient->ophthalmicDiagnoses[1]->disorder);
-		$this->assertEquals('Retinal lattice degeneration',$patient->ophthalmicDiagnoses[1]->disorder->term);
-		$this->assertEquals(\Disorder::model()->find('term=?',array('Retinal lattice degeneration'))->id,$patient->ophthalmicDiagnoses[1]->disorder_id);
-		$this->assertInstanceOf('Eye',$patient->ophthalmicDiagnoses[1]->eye);
-		$this->assertEquals('Right',$patient->ophthalmicDiagnoses[1]->eye->name);
-		$this->assertEquals(\Eye::model()->find('name=?',array('Right'))->id,$patient->ophthalmicDiagnoses[1]->eye_id);
+		$this->assertInstanceOf('Episode',$episode);
+		$this->assertInstanceOf('Patient',$episode->patient);
+		$this->assertEquals(4,$episode->patient->id);
+		$this->assertEquals(4,$episode->patient_id);
+		$this->assertInstanceOf('Firm',$episode->firm);
+		$this->assertEquals('Aylward Firm',$episode->firm->name);
+		$this->assertEquals(\Firm::model()->find('name=? and service_subspecialty_assignment_id=?',array('Aylward Firm',2))->id,$episode->firm_id);
+		$this->assertInstanceOf('ServiceSubspecialtyAssignment',$episode->firm->serviceSubspecialtyAssignment);
+		$this->assertInstanceOf('Subspecialty',$episode->firm->serviceSubspecialtyAssignment->subspecialty);
+		$this->assertEquals('Subspecialty 2',$episode->firm->serviceSubspecialtyAssignment->subspecialty->name);
+		$this->assertInstanceOf('EpisodeStatus',$episode->status);
+		$this->assertEquals('Post-op',$episode->status->name);
+		$this->assertEquals(\EpisodeStatus::model()->find('name=?',array('Post-op'))->id,$episode->episode_status_id);
+		$this->assertEquals('2013-05-04',$episode->start_date);
+		$this->assertNull($episode->end_date);
+		$this->assertInstanceOf('Eye',$episode->eye);
+		$this->assertEquals('Right',$episode->eye->name);
+		$this->assertEquals(\Eye::model()->find('name=?',array('Right'))->id,$episode->eye_id);
+		$this->assertInstanceOf('Disorder',$episode->diagnosis);
+		$this->assertEquals('Myopia',$episode->diagnosis->term);
+		$this->assertEquals(\Disorder::model()->find('term=?',array('Myopia'))->id,$episode->disorder_id);
 	}
 
 	public function testResourceToModel_Save_Update_DBIsCorrect()
 	{
 		$resource = $this->getResource();
 
-		$ps = new PatientOphthalmicDiagnosesService;
-		$patient = $ps->resourceToModel($resource, $this->patients('patient2'));
-		$patient = \Patient::model()->findByPk($patient->id);
+		$ps = new EpisodeService;
+		$episode = $ps->resourceToModel($resource, $this->episodes('episode2'));
+		$episode = \Episode::model()->findByPk($episode->id);
 
-		$this->assertInstanceOf('Patient',$patient);
-		$this->assertCount(2,$patient->ophthalmicDiagnoses);
-
-		$this->assertInstanceOf('SecondaryDiagnosis',$patient->ophthalmicDiagnoses[0]);
-		$this->assertInstanceOf('Disorder',$patient->ophthalmicDiagnoses[0]->disorder);
-		$this->assertEquals('Myopia',$patient->ophthalmicDiagnoses[0]->disorder->term);
-		$this->assertEquals(\Disorder::model()->find('term=?',array('Myopia'))->id,$patient->ophthalmicDiagnoses[0]->disorder_id);
-		$this->assertInstanceOf('Eye',$patient->ophthalmicDiagnoses[0]->eye);
-		$this->assertEquals('Both',$patient->ophthalmicDiagnoses[0]->eye->name);
-		$this->assertEquals(\Eye::model()->find('name=?',array('Both'))->id,$patient->ophthalmicDiagnoses[0]->eye_id);
-
-		$this->assertInstanceOf('SecondaryDiagnosis',$patient->ophthalmicDiagnoses[1]);
-		$this->assertInstanceOf('Disorder',$patient->ophthalmicDiagnoses[1]->disorder);
-		$this->assertEquals('Retinal lattice degeneration',$patient->ophthalmicDiagnoses[1]->disorder->term);
-		$this->assertEquals(\Disorder::model()->find('term=?',array('Retinal lattice degeneration'))->id,$patient->ophthalmicDiagnoses[1]->disorder_id);
-		$this->assertInstanceOf('Eye',$patient->ophthalmicDiagnoses[1]->eye);
-		$this->assertEquals('Right',$patient->ophthalmicDiagnoses[1]->eye->name);
-		$this->assertEquals(\Eye::model()->find('name=?',array('Right'))->id,$patient->ophthalmicDiagnoses[1]->eye_id);
-	}
-
-	public function testResourceToModel_Save_Update_NotOphthalmic_Exception()
-	{
-		$resource = $this->getResource();
-
-		$resource->diagnoses[0]->disorder = 'Diabetes mellitus type 1';
-
-		$this->setExpectedException('Exception','PatientOphthalmicDiagnoses passed a resource containing non-ophthalmic diagnoses');
-
-		$ps = new PatientOphthalmicDiagnosesService;
-		$patient = $ps->resourceToModel($resource, $this->patients('patient2'));
+		$this->assertInstanceOf('Episode',$episode);
+		$this->assertInstanceOf('Patient',$episode->patient);
+		$this->assertEquals(4,$episode->patient->id);
+		$this->assertEquals(4,$episode->patient_id);
+		$this->assertInstanceOf('Firm',$episode->firm);
+		$this->assertEquals('Aylward Firm',$episode->firm->name);
+		$this->assertEquals(\Firm::model()->find('name=? and service_subspecialty_assignment_id=?',array('Aylward Firm',2))->id,$episode->firm_id);
+		$this->assertInstanceOf('ServiceSubspecialtyAssignment',$episode->firm->serviceSubspecialtyAssignment);
+		$this->assertInstanceOf('Subspecialty',$episode->firm->serviceSubspecialtyAssignment->subspecialty);
+		$this->assertEquals('Subspecialty 2',$episode->firm->serviceSubspecialtyAssignment->subspecialty->name);
+		$this->assertInstanceOf('EpisodeStatus',$episode->status);
+		$this->assertEquals('Post-op',$episode->status->name);
+		$this->assertEquals(\EpisodeStatus::model()->find('name=?',array('Post-op'))->id,$episode->episode_status_id);
+		$this->assertEquals('2013-05-04 00:00:00',$episode->start_date);
+		$this->assertNull($episode->end_date);
+		$this->assertInstanceOf('Eye',$episode->eye);
+		$this->assertEquals('Right',$episode->eye->name);
+		$this->assertEquals(\Eye::model()->find('name=?',array('Right'))->id,$episode->eye_id);
+		$this->assertInstanceOf('Disorder',$episode->diagnosis);
+		$this->assertEquals('Myopia',$episode->diagnosis->term);
+		$this->assertEquals(\Disorder::model()->find('term=?',array('Myopia'))->id,$episode->disorder_id);
 	}
 
 	public function testJsonToResource()
 	{
-		$json = '{"diagnoses":[{"disorder":"Myopia","side":"Left","id":null,"last_modified":null},{"disorder":"Retinal lattice degeneration","side":false,"id":null,"last_modified":null}],"id":null,"last_modified":null,"patient_id":{"id":"2","last_modified":-2208988800}}';
+		$json = \Yii::app()->service->Episode(5)->fetch()->serialise();
 
-		$ps = new PatientOphthalmicDiagnosesService;
+		$ps = new EpisodeService;
 		$resource = $ps->jsonToResource($json);
 
-		$this->assertInstanceOf('services\PatientOphthalmicDiagnoses',$resource);
-		$this->assertCount(2,$resource->diagnoses);
+		$this->assertInstanceOf('services\Episode',$resource);
 
-		$this->assertInstanceOf('services\PatientDiagnosis',$resource->diagnoses[0]);
-		$this->assertEquals('Myopia',$resource->diagnoses[0]->disorder);
-		$this->assertEquals('Left',$resource->diagnoses[0]->side);
-
-		$this->assertInstanceOf('services\PatientDiagnosis',$resource->diagnoses[1]);
-		$this->assertEquals('Retinal lattice degeneration',$resource->diagnoses[1]->disorder);
-		$this->assertFalse($resource->diagnoses[1]->side);
+		$this->assertInstanceOf('services\PatientReference',$resource->patient_ref);
+		$this->assertEquals(1,$resource->patient_ref->getId());
+		$this->assertEquals('Aylward Firm',$resource->firm);
+		$this->assertEquals('Subspecialty 1',$resource->subspecialty);
+		$this->assertInstanceOf('services\Date',$resource->start_date);
+		$this->assertNull($resource->end_date);
+		$this->assertEquals('New',$resource->status);
+		$this->assertEquals(0,$resource->legacy);
+		$this->assertEquals(0,$resource->deleted);
+		$this->assertEquals('Left',$resource->eye);
+		$this->assertEquals('Posterior vitreous detachment',$resource->disorder);
+		$this->assertEquals(0,$resource->support_services);
 	}
 
 	public function testJsonToModel_NoSave_NoNewRows()
 	{
-		$json = '{"diagnoses":[{"disorder":"Myopia","side":"Left","id":null,"last_modified":null},{"disorder":"Retinal lattice degeneration","side":false,"id":null,"last_modified":null}],"id":null,"last_modified":null,"patient_id":{"id":"2","last_modified":-2208988800}}';
+		$json = \Yii::app()->service->Episode(5)->fetch()->serialise();
 
-		$total_sd = count(\SecondaryDiagnosis::model()->findAll());
+		$total_e = count(\Episode::model()->findAll());
 
-		$ps = new PatientOphthalmicDiagnosesService;
-		$patient = $ps->jsonToModel($json, $this->patients('patient3'), false);
+		$ps = new EpisodeService;
+		$episode = $ps->jsonToModel($json, new \Episode, false);
 
-		$this->assertEquals($total_sd, count(\SecondaryDiagnosis::model()->findAll()));
+		$this->assertEquals($total_e, count(\Episode::model()->findAll()));
 	}
 
 	public function testJsonToModel_NoSave_ModelIsCorrect()
 	{
-		$json = '{"diagnoses":[{"disorder":"Myopia","side":"Left","id":null,"last_modified":null},{"disorder":"Retinal lattice degeneration","side":false,"id":null,"last_modified":null}],"id":null,"last_modified":null,"patient_id":{"id":"2","last_modified":-2208988800}}';
+		$json = \Yii::app()->service->Episode(5)->fetch()->serialise();
 
-		$ps = new PatientOphthalmicDiagnosesService;
-		$patient = $ps->jsonToModel($json, new \Patient, false);
+		$ps = new EpisodeService;
+		$episode = $ps->jsonToModel($json, new \Episode, false);
 
-		$this->assertInstanceOf('Patient',$patient);
-		$this->assertCount(2,$patient->ophthalmicDiagnoses);
-
-		$this->assertInstanceOf('SecondaryDiagnosis',$patient->ophthalmicDiagnoses[0]);
-		$this->assertInstanceOf('Disorder',$patient->ophthalmicDiagnoses[0]->disorder);
-		$this->assertEquals('Myopia',$patient->ophthalmicDiagnoses[0]->disorder->term);
-		$this->assertEquals(\Disorder::model()->find('term=?',array('Myopia'))->id,$patient->ophthalmicDiagnoses[0]->disorder_id);
-		$this->assertInstanceOf('Eye',$patient->ophthalmicDiagnoses[0]->eye);
-		$this->assertEquals('Left',$patient->ophthalmicDiagnoses[0]->eye->name);
-		$this->assertEquals(\Eye::model()->find('name=?',array('Left'))->id,$patient->ophthalmicDiagnoses[0]->eye_id);
-
-		$this->assertInstanceOf('SecondaryDiagnosis',$patient->ophthalmicDiagnoses[1]);
-		$this->assertInstanceOf('Disorder',$patient->ophthalmicDiagnoses[1]->disorder);
-		$this->assertEquals('Retinal lattice degeneration',$patient->ophthalmicDiagnoses[1]->disorder->term);
-		$this->assertEquals(\Disorder::model()->find('term=?',array('Retinal lattice degeneration'))->id,$patient->ophthalmicDiagnoses[1]->disorder_id);
-		$this->assertNull($patient->ophthalmicDiagnoses[1]->eye);
-		$this->assertNull($patient->ophthalmicDiagnoses[1]->eye_id);
+		$this->assertInstanceOf('Episode',$episode);
+		$this->assertInstanceOf('Patient',$episode->patient);
+		$this->assertEquals(1,$episode->patient->id);
+		$this->assertEquals(1,$episode->patient_id);
+		$this->assertInstanceOf('Firm',$episode->firm);
+		$this->assertEquals('Aylward Firm',$episode->firm->name);
+		$this->assertEquals(\Firm::model()->find('name=? and service_subspecialty_assignment_id=?',array('Aylward Firm',1))->id,$episode->firm_id);
+		$this->assertInstanceOf('ServiceSubspecialtyAssignment',$episode->firm->serviceSubspecialtyAssignment);
+		$this->assertInstanceOf('Subspecialty',$episode->firm->serviceSubspecialtyAssignment->subspecialty);
+		$this->assertEquals('Subspecialty 1',$episode->firm->serviceSubspecialtyAssignment->subspecialty->name);
+		$this->assertInstanceOf('EpisodeStatus',$episode->status);
+		$this->assertEquals('New',$episode->status->name);
+		$this->assertEquals(\EpisodeStatus::model()->find('name=?',array('New'))->id,$episode->episode_status_id);
+		$this->assertEquals('2014-06-04',$episode->start_date);
+		$this->assertNull($episode->end_date);
+		$this->assertInstanceOf('Eye',$episode->eye);
+		$this->assertEquals('Left',$episode->eye->name);
+		$this->assertEquals(\Eye::model()->find('name=?',array('Left'))->id,$episode->eye_id);
+		$this->assertInstanceOf('Disorder',$episode->diagnosis);
+		$this->assertEquals('Posterior vitreous detachment',$episode->diagnosis->term);
+		$this->assertEquals(\Disorder::model()->find('term=?',array('Posterior vitreous detachment'))->id,$episode->disorder_id);
 	}
 
 	public function testJsonToModel_Save_Create_ModelCountsCorrect()
 	{
-		$json = '{"diagnoses":[{"disorder":"Myopia","side":"Left","id":null,"last_modified":null},{"disorder":"Retinal lattice degeneration","side":false,"id":null,"last_modified":null}],"id":null,"last_modified":null,"patient_id":{"id":"2","last_modified":-2208988800}}';
+		$resource = \Yii::app()->service->Episode(5)->fetch();
+		$resource->patient_ref = \Yii::app()->service->Patient(2);
 
-		$total_sd = count(\SecondaryDiagnosis::model()->findAll());
+		$json = $resource->serialise();
 
-		$ps = new PatientOphthalmicDiagnosesService;
-		$patient = $ps->jsonToModel($json, $this->patients('patient4'));
+		$total_e = count(\Episode::model()->findAll());
 
-		$this->assertEquals($total_sd+2, count(\SecondaryDiagnosis::model()->findAll()));
+		$ps = new EpisodeService;
+		$episode = $ps->jsonToModel($json, new \Episode);
+
+		$this->assertEquals($total_e+1, count(\Episode::model()->findAll()));
 	}
 
 	public function testJsonToModel_Save_Create_ModelIsCorrect()
 	{
-		$json = '{"diagnoses":[{"disorder":"Myopia","side":"Left","id":null,"last_modified":null},{"disorder":"Retinal lattice degeneration","side":false,"id":null,"last_modified":null}],"id":null,"last_modified":null,"patient_id":{"id":"2","last_modified":-2208988800}}';
+		$resource = \Yii::app()->service->Episode(5)->fetch();
+		$resource->patient_ref = \Yii::app()->service->Patient(2);
 
-		$ps = new PatientOphthalmicDiagnosesService;
-		$patient = $ps->jsonToModel($json, $this->patients('patient4'));
+		$json = $resource->serialise();
 
-		$this->assertInstanceOf('Patient',$patient);
-		$this->assertCount(2,$patient->ophthalmicDiagnoses);
+		$ps = new EpisodeService;
+		$episode = $ps->jsonToModel($json, new \Episode);
 
-		$this->assertInstanceOf('SecondaryDiagnosis',$patient->ophthalmicDiagnoses[0]);
-		$this->assertInstanceOf('Disorder',$patient->ophthalmicDiagnoses[0]->disorder);
-		$this->assertEquals('Myopia',$patient->ophthalmicDiagnoses[0]->disorder->term);
-		$this->assertEquals(\Disorder::model()->find('term=?',array('Myopia'))->id,$patient->ophthalmicDiagnoses[0]->disorder_id);
-		$this->assertInstanceOf('Eye',$patient->ophthalmicDiagnoses[0]->eye);
-		$this->assertEquals('Left',$patient->ophthalmicDiagnoses[0]->eye->name);
-		$this->assertEquals(\Eye::model()->find('name=?',array('Left'))->id,$patient->ophthalmicDiagnoses[0]->eye_id);
-
-		$this->assertInstanceOf('SecondaryDiagnosis',$patient->ophthalmicDiagnoses[1]);
-		$this->assertInstanceOf('Disorder',$patient->ophthalmicDiagnoses[1]->disorder);
-		$this->assertEquals('Retinal lattice degeneration',$patient->ophthalmicDiagnoses[1]->disorder->term);
-		$this->assertEquals(\Disorder::model()->find('term=?',array('Retinal lattice degeneration'))->id,$patient->ophthalmicDiagnoses[1]->disorder_id);
-		$this->assertNull($patient->ophthalmicDiagnoses[1]->eye);
-		$this->assertNull($patient->ophthalmicDiagnoses[1]->eye_id);
+		$this->assertInstanceOf('Episode',$episode);
+		$this->assertInstanceOf('Patient',$episode->patient);
+		$this->assertEquals(2,$episode->patient->id);
+		$this->assertEquals(2,$episode->patient_id);
+		$this->assertInstanceOf('Firm',$episode->firm);
+		$this->assertEquals('Aylward Firm',$episode->firm->name);
+		$this->assertEquals(\Firm::model()->find('name=? and service_subspecialty_assignment_id=?',array('Aylward Firm',1))->id,$episode->firm_id);
+		$this->assertInstanceOf('ServiceSubspecialtyAssignment',$episode->firm->serviceSubspecialtyAssignment);
+		$this->assertInstanceOf('Subspecialty',$episode->firm->serviceSubspecialtyAssignment->subspecialty);
+		$this->assertEquals('Subspecialty 1',$episode->firm->serviceSubspecialtyAssignment->subspecialty->name);
+		$this->assertInstanceOf('EpisodeStatus',$episode->status);
+		$this->assertEquals('New',$episode->status->name);
+		$this->assertEquals(\EpisodeStatus::model()->find('name=?',array('New'))->id,$episode->episode_status_id);
+		$this->assertEquals('2014-06-04',$episode->start_date);
+		$this->assertNull($episode->end_date);
+		$this->assertInstanceOf('Eye',$episode->eye);
+		$this->assertEquals('Left',$episode->eye->name);
+		$this->assertEquals(\Eye::model()->find('name=?',array('Left'))->id,$episode->eye_id);
+		$this->assertInstanceOf('Disorder',$episode->diagnosis);
+		$this->assertEquals('Posterior vitreous detachment',$episode->diagnosis->term);
+		$this->assertEquals(\Disorder::model()->find('term=?',array('Posterior vitreous detachment'))->id,$episode->disorder_id);
 	}
 
 	public function testJsonToModel_Save_Create_DBIsCorrect()
 	{
-		$json = '{"diagnoses":[{"disorder":"Myopia","side":"Left","id":null,"last_modified":null},{"disorder":"Retinal lattice degeneration","side":false,"id":null,"last_modified":null}],"id":null,"last_modified":null,"patient_id":{"id":"2","last_modified":-2208988800}}';
+		$resource = \Yii::app()->service->Episode(5)->fetch();
+		$resource->patient_ref = \Yii::app()->service->Patient(2);
 
-		$ps = new PatientOphthalmicDiagnosesService;
-		$patient = $ps->jsonToModel($json, $this->patients('patient4'));
-		$patient = \Patient::model()->findByPk($patient->id);
+		$json = $resource->serialise();
 
-		$this->assertInstanceOf('Patient',$patient);
-		$this->assertCount(2,$patient->ophthalmicDiagnoses);
+		$ps = new EpisodeService;
+		$episode = $ps->jsonToModel($json, new \Episode);
+		$episode = \Episode::model()->findByPk($episode->id);
 
-		$this->assertInstanceOf('SecondaryDiagnosis',$patient->ophthalmicDiagnoses[0]);
-		$this->assertInstanceOf('Disorder',$patient->ophthalmicDiagnoses[0]->disorder);
-		$this->assertEquals('Myopia',$patient->ophthalmicDiagnoses[0]->disorder->term);
-		$this->assertEquals(\Disorder::model()->find('term=?',array('Myopia'))->id,$patient->ophthalmicDiagnoses[0]->disorder_id);
-		$this->assertInstanceOf('Eye',$patient->ophthalmicDiagnoses[0]->eye);
-		$this->assertEquals('Left',$patient->ophthalmicDiagnoses[0]->eye->name);
-		$this->assertEquals(\Eye::model()->find('name=?',array('Left'))->id,$patient->ophthalmicDiagnoses[0]->eye_id);
-
-		$this->assertInstanceOf('SecondaryDiagnosis',$patient->ophthalmicDiagnoses[1]);
-		$this->assertInstanceOf('Disorder',$patient->ophthalmicDiagnoses[1]->disorder);
-		$this->assertEquals('Retinal lattice degeneration',$patient->ophthalmicDiagnoses[1]->disorder->term);
-		$this->assertEquals(\Disorder::model()->find('term=?',array('Retinal lattice degeneration'))->id,$patient->ophthalmicDiagnoses[1]->disorder_id);
-		$this->assertNull($patient->ophthalmicDiagnoses[1]->eye);
-		$this->assertNull($patient->ophthalmicDiagnoses[1]->eye_id);
+		$this->assertInstanceOf('Episode',$episode);
+		$this->assertInstanceOf('Patient',$episode->patient);
+		$this->assertEquals(2,$episode->patient->id);
+		$this->assertEquals(2,$episode->patient_id);
+		$this->assertInstanceOf('Firm',$episode->firm);
+		$this->assertEquals('Aylward Firm',$episode->firm->name);
+		$this->assertEquals(\Firm::model()->find('name=? and service_subspecialty_assignment_id=?',array('Aylward Firm',1))->id,$episode->firm_id);
+		$this->assertInstanceOf('ServiceSubspecialtyAssignment',$episode->firm->serviceSubspecialtyAssignment);
+		$this->assertInstanceOf('Subspecialty',$episode->firm->serviceSubspecialtyAssignment->subspecialty);
+		$this->assertEquals('Subspecialty 1',$episode->firm->serviceSubspecialtyAssignment->subspecialty->name);
+		$this->assertInstanceOf('EpisodeStatus',$episode->status);
+		$this->assertEquals('New',$episode->status->name);
+		$this->assertEquals(\EpisodeStatus::model()->find('name=?',array('New'))->id,$episode->episode_status_id);
+		$this->assertEquals('2014-06-04 00:00:00',$episode->start_date);
+		$this->assertNull($episode->end_date);
+		$this->assertInstanceOf('Eye',$episode->eye);
+		$this->assertEquals('Left',$episode->eye->name);
+		$this->assertEquals(\Eye::model()->find('name=?',array('Left'))->id,$episode->eye_id);
+		$this->assertInstanceOf('Disorder',$episode->diagnosis);
+		$this->assertEquals('Posterior vitreous detachment',$episode->diagnosis->term);
+		$this->assertEquals(\Disorder::model()->find('term=?',array('Posterior vitreous detachment'))->id,$episode->disorder_id);
 	}
 
-	public function testJsonToModel_Save_Create_NonOphthalmic_Exception()
+	public function testJsonToModel_Save_Create_CantCreateEpisodeInSameSubspecialty()
 	{
-		$json = '{"diagnoses":[{"disorder":"Diabetes mellitus type 1","side":"Left","id":null,"last_modified":null},{"disorder":"Essential hypertension","side":false,"id":null,"last_modified":null}],"id":null,"last_modified":null,"patient_id":{"id":"2","last_modified":-2208988800}}';
+		$resource = $this->getResource();
+		$resource->patient_ref = \Yii::app()->service->Patient(1);
 
-		$this->setExpectedException('Exception','PatientOphthalmicDiagnoses passed a resource containing non-ophthalmic diagnoses');
+		$json = $resource->serialise();
 
-		$ps = new PatientOphthalmicDiagnosesService;
-		$patient = $ps->jsonToModel($json, $this->patients('patient3'));
+		$this->setExpectedException('Exception','There is already an open Subspecialty 2 episode for this patient.');
+
+		$ps = new EpisodeService;
+		$episode = $ps->jsonToModel($json, new \Episode);
+	}
+
+	public function testJsonToModel_Save_Create_CantCreateLegacyEpisodeIfOneAlreadyExists()
+	{
+		$resource = $this->getResource();
+		$resource->firm = null;
+		$resource->subspecialty = null;
+		$resource->legacy = 1;
+		$resource->patient_ref = \Yii::app()->service->Patient(3);
+
+		$json = $resource->serialise();
+
+		$this->setExpectedException('Exception','There is already a legacy episode for this patient.');
+
+		$ps = new EpisodeService;
+		$episode = $ps->jsonToModel($json, new \Episode);
+	}
+
+	public function testJsonToModel_Save_Create_CantCreateSupportServicesEpisodeIfOneAlreadyExists()
+	{
+		$resource = $this->getResource();
+		$resource->firm = null;
+		$resource->subspecialty = null;
+		$resource->support_services = 1;
+		$resource->patient_ref = \Yii::app()->service->Patient(3);
+
+		$json = $resource->serialise();
+
+		$this->setExpectedException('Exception','There is already a support services episode for this patient.');
+
+		$ps = new EpisodeService;
+		$episode = $ps->jsonToModel($json, new \Episode);
+	}
+
+	public function testJsonToModel_Save_Create_CantNoSubspecialtyFirmIfAlreadyExists()
+	{
+		$resource = $this->getResource();
+		$resource->firm = $this->firms('firm6')->name;
+		$resource->subspecialty = null;
+		$resource->patient_ref = \Yii::app()->service->Patient(3);
+
+		$json = $resource->serialise();
+
+		$this->setExpectedException('Exception','There is already an open No subspecialty firm episode for this patient.');
+
+		$ps = new EpisodeService;
+		$episode = $ps->jsonToModel($json, new \Episode);
 	}
 
 	public function testJsonToModel_Save_Update_ModelCountsCorrect()
 	{
-		$json = '{"diagnoses":[{"disorder":"Myopia","side":"Left","id":null,"last_modified":null},{"disorder":"Retinal lattice degeneration","side":false,"id":null,"last_modified":null}],"id":null,"last_modified":null,"patient_id":{"id":"2","last_modified":-2208988800}}';
+		$resource = $this->getResource();
+		$resource->patient_ref = \Yii::app()->service->Patient(3);
 
-		$total_sd = count(\SecondaryDiagnosis::model()->findAll());
+		$json = $resource->serialise();
 
-		$ps = new PatientOphthalmicDiagnosesService;
-		$patient = $ps->jsonToModel($json, $this->patients('patient2'));
+		$total_e = count(\Episode::model()->findAll());
 
-		$this->assertEquals($total_sd-1, count(\SecondaryDiagnosis::model()->findAll()));
+		$ps = new EpisodeService;
+		$episode = $ps->jsonToModel($json, $this->episodes('episode3'));
+
+		$this->assertEquals($total_e, count(\Episode::model()->findAll()));
 	}
 
 	public function testJsonToModel_Save_Update_ModelIsCorrect()
 	{
-		$json = '{"diagnoses":[{"disorder":"Myopia","side":"Left","id":null,"last_modified":null},{"disorder":"Retinal lattice degeneration","side":false,"id":null,"last_modified":null}],"id":null,"last_modified":null,"patient_id":{"id":"2","last_modified":-2208988800}}';
+		$resource = $this->getResource();
+		$resource->patient_ref = \Yii::app()->service->Patient(3);
 
-		$ps = new PatientOphthalmicDiagnosesService;
-		$patient = $ps->jsonToModel($json, $this->patients('patient4'));
+		$json = $resource->serialise();
 
-		$this->assertInstanceOf('Patient',$patient);
-		$this->assertCount(2,$patient->ophthalmicDiagnoses);
+		$ps = new EpisodeService;
+		$episode = $ps->jsonToModel($json, $this->episodes('episode3'));
 
-		$this->assertInstanceOf('SecondaryDiagnosis',$patient->ophthalmicDiagnoses[0]);
-		$this->assertInstanceOf('Disorder',$patient->ophthalmicDiagnoses[0]->disorder);
-		$this->assertEquals('Myopia',$patient->ophthalmicDiagnoses[0]->disorder->term);
-		$this->assertEquals(\Disorder::model()->find('term=?',array('Myopia'))->id,$patient->ophthalmicDiagnoses[0]->disorder_id);
-		$this->assertInstanceOf('Eye',$patient->ophthalmicDiagnoses[0]->eye);
-		$this->assertEquals('Left',$patient->ophthalmicDiagnoses[0]->eye->name);
-		$this->assertEquals(\Eye::model()->find('name=?',array('Left'))->id,$patient->ophthalmicDiagnoses[0]->eye_id);
-
-		$this->assertInstanceOf('SecondaryDiagnosis',$patient->ophthalmicDiagnoses[1]);
-		$this->assertInstanceOf('Disorder',$patient->ophthalmicDiagnoses[1]->disorder);
-		$this->assertEquals('Retinal lattice degeneration',$patient->ophthalmicDiagnoses[1]->disorder->term);
-		$this->assertEquals(\Disorder::model()->find('term=?',array('Retinal lattice degeneration'))->id,$patient->ophthalmicDiagnoses[1]->disorder_id);
-		$this->assertNull($patient->ophthalmicDiagnoses[1]->eye);
-		$this->assertNull($patient->ophthalmicDiagnoses[1]->eye_id);
+		$this->assertInstanceOf('Episode',$episode);
+		$this->assertInstanceOf('Patient',$episode->patient);
+		$this->assertEquals(3,$episode->patient->id);
+		$this->assertEquals(3,$episode->patient_id);
+		$this->assertInstanceOf('Firm',$episode->firm);
+		$this->assertEquals('Aylward Firm',$episode->firm->name);
+		$this->assertEquals(\Firm::model()->find('name=? and service_subspecialty_assignment_id=?',array('Aylward Firm',2))->id,$episode->firm_id);
+		$this->assertInstanceOf('ServiceSubspecialtyAssignment',$episode->firm->serviceSubspecialtyAssignment);
+		$this->assertInstanceOf('Subspecialty',$episode->firm->serviceSubspecialtyAssignment->subspecialty);
+		$this->assertEquals('Subspecialty 2',$episode->firm->serviceSubspecialtyAssignment->subspecialty->name);
+		$this->assertInstanceOf('EpisodeStatus',$episode->status);
+		$this->assertEquals('Post-op',$episode->status->name);
+		$this->assertEquals(\EpisodeStatus::model()->find('name=?',array('Post-op'))->id,$episode->episode_status_id);
+		$this->assertEquals('2013-05-04',$episode->start_date);
+		$this->assertNull($episode->end_date);
+		$this->assertInstanceOf('Eye',$episode->eye);
+		$this->assertEquals('Right',$episode->eye->name);
+		$this->assertEquals(\Eye::model()->find('name=?',array('Right'))->id,$episode->eye_id);
+		$this->assertInstanceOf('Disorder',$episode->diagnosis);
+		$this->assertEquals('Myopia',$episode->diagnosis->term);
+		$this->assertEquals(\Disorder::model()->find('term=?',array('Myopia'))->id,$episode->disorder_id);
 	}
 
 	public function testJsonToModel_Save_Update_DBIsCorrect()
 	{
-		$json = '{"diagnoses":[{"disorder":"Myopia","side":"Left","id":null,"last_modified":null},{"disorder":"Retinal lattice degeneration","side":false,"id":null,"last_modified":null}],"id":null,"last_modified":null,"patient_id":{"id":"2","last_modified":-2208988800}}';
+		$resource = $this->getResource();
+		$resource->patient_ref = \Yii::app()->service->Patient(3);
 
-		$ps = new PatientOphthalmicDiagnosesService;
-		$patient = $ps->jsonToModel($json, $this->patients('patient4'));
-		$patient = \Patient::model()->findByPk($patient->id);
+		$json = $resource->serialise();
 
-		$this->assertInstanceOf('Patient',$patient);
-		$this->assertCount(2,$patient->ophthalmicDiagnoses);
+		$ps = new EpisodeService;
+		$episode = $ps->jsonToModel($json, $this->episodes('episode3'));
+		$episode = \Episode::model()->findByPk($episode->id);
 
-		$this->assertInstanceOf('SecondaryDiagnosis',$patient->ophthalmicDiagnoses[0]);
-		$this->assertInstanceOf('Disorder',$patient->ophthalmicDiagnoses[0]->disorder);
-		$this->assertEquals('Myopia',$patient->ophthalmicDiagnoses[0]->disorder->term);
-		$this->assertEquals(\Disorder::model()->find('term=?',array('Myopia'))->id,$patient->ophthalmicDiagnoses[0]->disorder_id);
-		$this->assertInstanceOf('Eye',$patient->ophthalmicDiagnoses[0]->eye);
-		$this->assertEquals('Left',$patient->ophthalmicDiagnoses[0]->eye->name);		$this->assertEquals(\Eye::model()->find('name=?',array('Left'))->id,$patient->ophthalmicDiagnoses[0]->eye_id);
-		$this->assertInstanceOf('SecondaryDiagnosis',$patient->ophthalmicDiagnoses[1]);
-		$this->assertInstanceOf('Disorder',$patient->ophthalmicDiagnoses[1]->disorder);
-		$this->assertEquals('Retinal lattice degeneration',$patient->ophthalmicDiagnoses[1]->disorder->term);
-		$this->assertEquals(\Disorder::model()->find('term=?',array('Retinal lattice degeneration'))->id,$patient->ophthalmicDiagnoses[1]->disorder_id);
-		$this->assertNull($patient->ophthalmicDiagnoses[1]->eye);
-		$this->assertNull($patient->ophthalmicDiagnoses[1]->eye_id);
+		$this->assertInstanceOf('Episode',$episode);
+		$this->assertInstanceOf('Patient',$episode->patient);
+		$this->assertEquals(3,$episode->patient->id);
+		$this->assertEquals(3,$episode->patient_id);
+		$this->assertInstanceOf('Firm',$episode->firm);
+		$this->assertEquals('Aylward Firm',$episode->firm->name);
+		$this->assertEquals(\Firm::model()->find('name=? and service_subspecialty_assignment_id=?',array('Aylward Firm',2))->id,$episode->firm_id);
+		$this->assertInstanceOf('ServiceSubspecialtyAssignment',$episode->firm->serviceSubspecialtyAssignment);
+		$this->assertInstanceOf('Subspecialty',$episode->firm->serviceSubspecialtyAssignment->subspecialty);
+		$this->assertEquals('Subspecialty 2',$episode->firm->serviceSubspecialtyAssignment->subspecialty->name);
+		$this->assertInstanceOf('EpisodeStatus',$episode->status);
+		$this->assertEquals('Post-op',$episode->status->name);
+		$this->assertEquals(\EpisodeStatus::model()->find('name=?',array('Post-op'))->id,$episode->episode_status_id);
+		$this->assertEquals('2013-05-04 00:00:00',$episode->start_date);
+		$this->assertNull($episode->end_date);
+		$this->assertInstanceOf('Eye',$episode->eye);
+		$this->assertEquals('Right',$episode->eye->name);
+		$this->assertEquals(\Eye::model()->find('name=?',array('Right'))->id,$episode->eye_id);
+		$this->assertInstanceOf('Disorder',$episode->diagnosis);
+		$this->assertEquals('Myopia',$episode->diagnosis->term);
+		$this->assertEquals(\Disorder::model()->find('term=?',array('Myopia'))->id,$episode->disorder_id);
 	}
-
-	public function testJsonToModel_Save_Update_NonOphthalmic_Exception()
-	{
-		$json = '{"diagnoses":[{"disorder":"Diabetes mellitus type 1","side":"Left","id":null,"last_modified":null},{"disorder":"Retinal lattice degeneration","side":false,"id":null,"last_modified":null}],"id":null,"last_modified":null,"patient_id":{"id":"2","last_modified":-2208988800}}';
-
-		$this->setExpectedException('Exception','PatientOphthalmicDiagnoses passed a resource containing non-ophthalmic diagnoses');
-
-		$ps = new PatientOphthalmicDiagnosesService;
-		$patient = $ps->jsonToModel($json, $this->patients('patient2'));
-	}
-	*/
 }

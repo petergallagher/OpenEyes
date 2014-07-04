@@ -436,4 +436,29 @@ class Episode extends BaseActiveRecordVersioned
 		$properties['patient_id'] = $this->patient_id;
 		parent::audit($target, $action, $data, $log, $properties);
 	}
+
+	public function afterValidate()
+	{
+		// Enforce only one open episode per subspecialty
+		if ($this->getIsNewRecord()) {
+			if ($this->support_services && Episode::model()->find('patient_id=? and support_services=?',array($this->patient_id,1))) {
+				throw new Exception("There is already a support services episode for this patient.");
+			}
+			if ($this->legacy && Episode::model()->find('patient_id=? and legacy=?',array($this->patient_id,1))) {
+				throw new Exception("There is already a legacy episode for this patient.");
+			}
+
+			if ($this->firm && $this->firm->serviceSubspecialtyAssignment) {
+				if (Episode::model()->with(array('firm' => array('with' => 'serviceSubspecialtyAssignment')))->find('patient_id=? and serviceSubspecialtyAssignment.subspecialty_id = ? and end_date is null',array($this->patient_id,$this->firm->serviceSubspecialtyAssignment->subspecialty_id))) {
+					throw new Exception("There is already an open {$this->firm->serviceSubspecialtyAssignment->subspecialty->name} episode for this patient.");
+				}
+			} else if ($this->firm) {
+				if (Episode::model()->find('patient_id=? and firm_id=? and end_date is null',array($this->patient_id,$this->firm->id))) {
+					throw new Exception("There is already an open {$this->firm->name} episode for this patient.");
+				}
+			}
+		}
+
+		return parent::afterValidate();
+	}
 }

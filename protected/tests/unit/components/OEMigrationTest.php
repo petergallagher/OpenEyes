@@ -175,11 +175,11 @@ class OEMigrationTest extends CDbTestCase
 		ob_end_clean();
 		$episode_id = $this->oeMigration->getInsertReferentialObjectValue('episode', 1);
 		$this->assertGreaterThan(0, (int) $episode_id);
-		$this->assertequals(5, (int) $episode_id);
+		$this->assertequals(9, (int) $episode_id);
 		//lets try with strings
 		$episode_id2 = $this->oeMigration->getInsertReferentialObjectValue('episode', '1');
 		$this->assertGreaterThan(0, (int) $episode_id2);
-		$this->assertequals(5, (int) $episode_id2);
+		$this->assertequals(9, (int) $episode_id2);
 
 		$newOeMigration = new OEMigration();
 		$newOeMigration->setTestData(true);
@@ -189,9 +189,9 @@ class OEMigrationTest extends CDbTestCase
 		$newEpisodeId = $newOeMigration->getInsertReferentialObjectValue('episode', 1);
 		$newEpisodeId2 = $newOeMigration->getInsertReferentialObjectValue('episode', 2);
 		$this->assertGreaterThan(0, (int) $newEpisodeId );
-		$this->assertequals(6, (int) $newEpisodeId );
+		$this->assertequals(10, (int) $newEpisodeId );
 		$this->assertGreaterThan(0, (int) $newEpisodeId2 );
-		$this->assertequals(7, (int) $newEpisodeId2 );
+		$this->assertequals(11, (int) $newEpisodeId2 );
 	}
 
 	/**

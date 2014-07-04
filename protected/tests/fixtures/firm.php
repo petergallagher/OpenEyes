@@ -48,4 +48,9 @@ return array(
 		'service_subspecialty_assignment_id' => 2,
 		'name' => 'Aylward Firm'
 	),
+	'firm6' => array(
+		'id' => 6,
+		'service_subspecialty_assignment_id' => null,
+		'name' => 'No subspecialty firm',
+	),
 );
