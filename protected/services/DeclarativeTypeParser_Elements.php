@@ -15,24 +15,34 @@
 
 namespace services;
 
-class DeclarativeTypeParser_List extends DeclarativeTypeParser
+class DeclarativeTypeParser_Elements extends DeclarativeTypeParser
 {
 	public function modelToResourceParse($object, $attribute, $data_class, $param=null)
 	{
-		$data_list = DeclarativeTypeParser::expandObjectAttribute($object, $attribute);
-		$_data_class = $data_class[0] == '\\' ? $data_class : 'services\\'.$data_class;
+		$element_list = DeclarativeTypeParser::expandObjectAttribute($object, $attribute);
 
-		$data_items = array();
+		$resource_items = array();
 
-		foreach ($data_list as $data_item) {
-			$data_items[] = $this->mc->modelToResourceParse($data_item, $data_class, new $_data_class);
+		foreach ($element_list as $element) {
+			$data_class = 'OEModule\\'.$element->event->eventType->class_name.'\\services\\'.\CHtml::modelName($element);
+			$service_class = '\\'.$data_class.'Service';
+
+			$service = new $service_class;
+			$converter = new ModelConverter($service);
+
+			$data_items[] = $converter->modelToResourceParse($element, \CHtml::modelName($element), new $data_class);
 		}
 
 		return $data_items;
 	}
 
+	public function setElementRelatedObjects(&$resource_item, $element)
+	{
+	}
+
 	public function resourceToModelParse(&$model, $resource, $model_attribute, $res_attribute, $param1, $model_class, $save)
 	{
+		/*
 		if ((strpos($model_attribute,'.')) !== FALSE) {
 			list($related_object_name, $related_object_attribute) = explode('.',$model_attribute);
 		} else {
@@ -46,10 +56,12 @@ class DeclarativeTypeParser_List extends DeclarativeTypeParser
 				$model->addToRelatedObjectArray($related_object_name,$related_object_attribute,$this->mc->resourceToModel($item, new $model_class, false));
 			}
 		}
+		*/
 	}
 
 	public function resourceToModel_RelatedObjects(&$model, $model_attribute, $copy_attribute, $save)
 	{
+		/*
 		"resourceToModel_RelatedObjects for ".get_class($model)."\n";
 
 		if ((strpos($model_attribute,'.')) !== FALSE) {
@@ -63,52 +75,12 @@ class DeclarativeTypeParser_List extends DeclarativeTypeParser
 		$attribute = $related_object_attribute ? $related_object_name.'.'.$related_object_attribute : $related_object_name;
 
 		$model->setAttribute($attribute, $this->filterListItems($model->expandAttribute($related_object_name), $related_object_attribute, $model->getRelatedObject($related_object_name,$related_object_attribute), $save));
-	}
-
-	protected function filterListItems($object, $relation, $items, $save)
-	{
-		$items_to_keep = array();
-		$matched_ids = array();
-
-		$data = $relation ? $object->$relation : $object;
-
-		foreach ($items as $item) {
-			$found = false;
-
-			if ($data) {
-				foreach ($data as $current_item) {
-					$class_name = 'services\\'.get_class($current_item);
-					$current_item_res = $this->mc->modelToResource($current_item, new $class_name);
-					$new_item_res = $this->mc->modelToResource($item, new $class_name);
-
-					if ($current_item_res->isEqual($new_item_res)) {
-						$found = true;
-						$items_to_keep[] = $current_item;
-						$matched_ids[] = $current_item->id;
-					}
-				}
-			}
-
-			if (!$found) {
-				$items_to_keep[] = $item;
-
-				$save && $this->saveListItem($item);
-			}
-		}
-
-		if ($save && $data) {
-			foreach ($data as $current_item) {
-				if (!in_array($current_item->id,$matched_ids)) {
-					$this->mc->deleteModel($current_item);
-				}
-			}
-		}
-
-		return $items_to_keep;
+		*/
 	}
 
 	public function jsonToResourceParse($object, $attribute, $data_class, $model_class)
 	{
+		/*
 		$data_class = 'services\\'.$data_class;
 
 		$data_items = array();
@@ -118,8 +90,10 @@ class DeclarativeTypeParser_List extends DeclarativeTypeParser
 		}
 
 		return $data_items;
+		*/
 	}
 
+/*
 	public function saveListItem($item)
 	{
 		if ($related_objects = $this->mc->service->map->getRelatedObjectsForClass(get_class($item))) {
@@ -142,4 +116,5 @@ class DeclarativeTypeParser_List extends DeclarativeTypeParser
 
 		$this->mc->saveModel($item);
 	}
+	*/
 }
