@@ -194,6 +194,9 @@ return array(
 				'services\EpisodeService',
 				'services\EventTypeService',
 				'services\EventService',
+				'services\UserService',
+				'services\ReferralService',
+				'services\RTTService',
 			),
 		),
 		'session' => array(
