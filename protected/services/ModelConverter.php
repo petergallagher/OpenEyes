@@ -100,9 +100,7 @@ class ModelConverter
 		$model->addReferenceObjectAttribute($relation_name, $related_object_attribute, $resource_value);
 
 		if ($model->haveAllKeysForReferenceObject($relation_name)) {
-			if ($related_object = $model->associateReferenceObjectWithModel($relation_name)) {
-				$save && $this->saveModel($related_object);
-			}
+			$model->associateReferenceObjectWithModel($relation_name);
 		}
 	}
 
