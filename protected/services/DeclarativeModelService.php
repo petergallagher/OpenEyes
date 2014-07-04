@@ -110,4 +110,16 @@ class DeclarativeModelService extends ModelService
 		$class_name = '\\'.$related_object_def[1];
 		return new $class_name;
 	}
+
+	/**
+	 * @param ActiveRecord $model
+	 * @param Resource $resource
+	 *
+	 * Allows overriding the setting of reference objects where they're a bit too complicated for simple representation with
+	 * the declarative DSL. Currently this is used for obtaining the firm for an episode, which is based on the firm name
+	 * and subspecialty assignment
+	 */
+	public function getComplexReferenceObjects(&$model, $resource)
+	{
+	}
 }

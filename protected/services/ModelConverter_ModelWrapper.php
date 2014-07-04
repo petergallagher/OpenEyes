@@ -133,9 +133,9 @@ class ModelConverter_ModelWrapper
 		return DeclarativeTypeParser::expandObjectAttribute($this->model, $attributes);
 	}
 
-	public function setAttribute($attributes, $value, $force=true)
+	public function setAttribute($attribute, $value, $force=true)
 	{
-		return DeclarativeTypeParser::setObjectAttribute($this->model, $attributes, $value, $force);
+		return DeclarativeTypeParser::setObjectAttribute($this->model, $attribute, $value, $force);
 	}
 
 	public function setAttributes($attributes)

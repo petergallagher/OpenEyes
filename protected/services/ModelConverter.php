@@ -48,6 +48,8 @@ class ModelConverter
 	{
 		$model = new ModelConverter_ModelWrapper($this->service->map, $model, $extra_fields);
 
+		$this->service->getComplexReferenceObjects($model, $resource);
+
 		$this->processRelatedObjects($model, $resource);
 
 		foreach ($this->service->map->getFieldsForClass($model->getClass()) as $res_attribute => $def) {
