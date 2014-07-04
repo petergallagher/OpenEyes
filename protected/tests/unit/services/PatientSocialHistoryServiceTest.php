@@ -47,10 +47,10 @@ class PatientSocialHistoryServiceTest extends \CDbTestCase
 	{
 		$resource = new PatientSocialHistory;
 
-		$resource->occupation = 'Model train driver';
-		$resource->driving_status = 'Awesome';
+		$resource->occupation = 'Sickness';
+		$resource->driving_status = 'Motor vehicle';
 		$resource->smoking_status = 'Tons';
-		$resource->accommodation = 'Travelodge';
+		$resource->accommodation = 'Lives alone - coping';
 		$resource->comments = 'this is a really unnecessarily long comment';
 		$resource->type_of_job = 'shady';
 		$resource->carer = 'No';
@@ -83,12 +83,13 @@ class PatientSocialHistoryServiceTest extends \CDbTestCase
 
 		$this->assertInstanceOf('SocialHistory',$patient->socialHistory);
 		$this->assertInstanceOf('SocialHistoryAccommodation',$patient->socialHistory->accommodation);
-		$this->assertEquals('Travelodge',$patient->socialHistory->accommodation->name);
+		$this->assertEquals('Lives alone - coping',$patient->socialHistory->accommodation->name);
 		$this->assertInstanceOf('SocialHistoryCarer',$patient->socialHistory->carer);
 		$this->assertEquals('No',$patient->socialHistory->carer->name);
 		$this->assertInstanceOf('SocialHistoryDrivingStatus',$patient->socialHistory->driving_status);
-		$this->assertEquals('Awesome',$patient->socialHistory->driving_status->name);
+		$this->assertEquals('Motor vehicle',$patient->socialHistory->driving_status->name);
 		$this->assertInstanceOf('SocialHistoryOccupation',$patient->socialHistory->occupation);
+		$this->assertEquals('Sickness',$patient->socialHistory->occupation->name);
 		$this->assertEquals('this is a really unnecessarily long comment',$patient->socialHistory->comments);
 		$this->assertEquals('shady',$patient->socialHistory->type_of_job);
 		$this->assertEquals('99999999',$patient->socialHistory->alcohol_intake);
@@ -119,12 +120,13 @@ class PatientSocialHistoryServiceTest extends \CDbTestCase
 
 		$this->assertInstanceOf('SocialHistory',$patient->socialHistory);
 		$this->assertInstanceOf('SocialHistoryAccommodation',$patient->socialHistory->accommodation);
-		$this->assertEquals('Travelodge',$patient->socialHistory->accommodation->name);
+		$this->assertEquals('Lives alone - coping',$patient->socialHistory->accommodation->name);
 		$this->assertInstanceOf('SocialHistoryCarer',$patient->socialHistory->carer);
 		$this->assertEquals('No',$patient->socialHistory->carer->name);
 		$this->assertInstanceOf('SocialHistoryDrivingStatus',$patient->socialHistory->driving_status);
-		$this->assertEquals('Awesome',$patient->socialHistory->driving_status->name);
+		$this->assertEquals('Motor vehicle',$patient->socialHistory->driving_status->name);
 		$this->assertInstanceOf('SocialHistoryOccupation',$patient->socialHistory->occupation);
+		$this->assertEquals('Sickness',$patient->socialHistory->occupation->name);
 		$this->assertEquals('this is a really unnecessarily long comment',$patient->socialHistory->comments);
 		$this->assertEquals('shady',$patient->socialHistory->type_of_job);
 		$this->assertEquals('99999999',$patient->socialHistory->alcohol_intake);
@@ -144,12 +146,13 @@ class PatientSocialHistoryServiceTest extends \CDbTestCase
 
 		$this->assertInstanceOf('SocialHistory',$patient->socialHistory);
 		$this->assertInstanceOf('SocialHistoryAccommodation',$patient->socialHistory->accommodation);
-		$this->assertEquals('Travelodge',$patient->socialHistory->accommodation->name);
+		$this->assertEquals('Lives alone - coping',$patient->socialHistory->accommodation->name);
 		$this->assertInstanceOf('SocialHistoryCarer',$patient->socialHistory->carer);
 		$this->assertEquals('No',$patient->socialHistory->carer->name);
 		$this->assertInstanceOf('SocialHistoryDrivingStatus',$patient->socialHistory->driving_status);
-		$this->assertEquals('Awesome',$patient->socialHistory->driving_status->name);
+		$this->assertEquals('Motor vehicle',$patient->socialHistory->driving_status->name);
 		$this->assertInstanceOf('SocialHistoryOccupation',$patient->socialHistory->occupation);
+		$this->assertEquals('Sickness',$patient->socialHistory->occupation->name);
 		$this->assertEquals('this is a really unnecessarily long comment',$patient->socialHistory->comments);
 		$this->assertEquals('shady',$patient->socialHistory->type_of_job);
 		$this->assertEquals('99999999',$patient->socialHistory->alcohol_intake);
@@ -192,12 +195,13 @@ class PatientSocialHistoryServiceTest extends \CDbTestCase
 
 		$this->assertInstanceOf('SocialHistory',$patient->socialHistory);
 		$this->assertInstanceOf('SocialHistoryAccommodation',$patient->socialHistory->accommodation);
-		$this->assertEquals('Travelodge',$patient->socialHistory->accommodation->name);
+		$this->assertEquals('Lives alone - coping',$patient->socialHistory->accommodation->name);
 		$this->assertInstanceOf('SocialHistoryCarer',$patient->socialHistory->carer);
 		$this->assertEquals('No',$patient->socialHistory->carer->name);
 		$this->assertInstanceOf('SocialHistoryDrivingStatus',$patient->socialHistory->driving_status);
-		$this->assertEquals('Awesome',$patient->socialHistory->driving_status->name);
+		$this->assertEquals('Motor vehicle',$patient->socialHistory->driving_status->name);
 		$this->assertInstanceOf('SocialHistoryOccupation',$patient->socialHistory->occupation);
+		$this->assertEquals('Sickness',$patient->socialHistory->occupation->name);
 		$this->assertEquals('this is a really unnecessarily long comment',$patient->socialHistory->comments);
 		$this->assertEquals('shady',$patient->socialHistory->type_of_job);
 		$this->assertEquals('99999999',$patient->socialHistory->alcohol_intake);
@@ -216,12 +220,13 @@ class PatientSocialHistoryServiceTest extends \CDbTestCase
 
 		$this->assertInstanceOf('SocialHistory',$patient->socialHistory);
 		$this->assertInstanceOf('SocialHistoryAccommodation',$patient->socialHistory->accommodation);
-		$this->assertEquals('Travelodge',$patient->socialHistory->accommodation->name);
+		$this->assertEquals('Lives alone - coping',$patient->socialHistory->accommodation->name);
 		$this->assertInstanceOf('SocialHistoryCarer',$patient->socialHistory->carer);
 		$this->assertEquals('No',$patient->socialHistory->carer->name);
 		$this->assertInstanceOf('SocialHistoryDrivingStatus',$patient->socialHistory->driving_status);
-		$this->assertEquals('Awesome',$patient->socialHistory->driving_status->name);
+		$this->assertEquals('Motor vehicle',$patient->socialHistory->driving_status->name);
 		$this->assertInstanceOf('SocialHistoryOccupation',$patient->socialHistory->occupation);
+		$this->assertEquals('Sickness',$patient->socialHistory->occupation->name);
 		$this->assertEquals('this is a really unnecessarily long comment',$patient->socialHistory->comments);
 		$this->assertEquals('shady',$patient->socialHistory->type_of_job);
 		$this->assertEquals('99999999',$patient->socialHistory->alcohol_intake);
@@ -278,6 +283,7 @@ class PatientSocialHistoryServiceTest extends \CDbTestCase
 		$this->assertInstanceOf('SocialHistoryDrivingStatus',$patient->socialHistory->driving_status);
 		$this->assertEquals('HGV',$patient->socialHistory->driving_status->name);
 		$this->assertInstanceOf('SocialHistoryOccupation',$patient->socialHistory->occupation);
+		$this->assertEquals('Unemployed',$patient->socialHistory->occupation->name);
 		$this->assertEquals('this is a comment',$patient->socialHistory->comments);
 		$this->assertEquals('Forklifts',$patient->socialHistory->type_of_job);
 		$this->assertEquals(100,$patient->socialHistory->alcohol_intake);
@@ -314,6 +320,7 @@ class PatientSocialHistoryServiceTest extends \CDbTestCase
 		$this->assertInstanceOf('SocialHistoryDrivingStatus',$patient->socialHistory->driving_status);
 		$this->assertEquals('HGV',$patient->socialHistory->driving_status->name);
 		$this->assertInstanceOf('SocialHistoryOccupation',$patient->socialHistory->occupation);
+		$this->assertEquals('Unemployed',$patient->socialHistory->occupation->name);
 		$this->assertEquals('this is a comment',$patient->socialHistory->comments);
 		$this->assertEquals('Forklifts',$patient->socialHistory->type_of_job);
 		$this->assertEquals(100,$patient->socialHistory->alcohol_intake);
@@ -339,6 +346,7 @@ class PatientSocialHistoryServiceTest extends \CDbTestCase
 		$this->assertInstanceOf('SocialHistoryDrivingStatus',$patient->socialHistory->driving_status);
 		$this->assertEquals('HGV',$patient->socialHistory->driving_status->name);
 		$this->assertInstanceOf('SocialHistoryOccupation',$patient->socialHistory->occupation);
+		$this->assertEquals('Unemployed',$patient->socialHistory->occupation->name);
 		$this->assertEquals('this is a comment',$patient->socialHistory->comments);
 		$this->assertEquals('Forklifts',$patient->socialHistory->type_of_job);
 		$this->assertEquals(100,$patient->socialHistory->alcohol_intake);
@@ -375,6 +383,7 @@ class PatientSocialHistoryServiceTest extends \CDbTestCase
 		$this->assertInstanceOf('SocialHistoryDrivingStatus',$patient->socialHistory->driving_status);
 		$this->assertEquals('HGV',$patient->socialHistory->driving_status->name);
 		$this->assertInstanceOf('SocialHistoryOccupation',$patient->socialHistory->occupation);
+		$this->assertEquals('Unemployed',$patient->socialHistory->occupation->name);
 		$this->assertEquals('this is a comment',$patient->socialHistory->comments);
 		$this->assertEquals('Forklifts',$patient->socialHistory->type_of_job);
 		$this->assertEquals(100,$patient->socialHistory->alcohol_intake);
@@ -400,6 +409,7 @@ class PatientSocialHistoryServiceTest extends \CDbTestCase
 		$this->assertInstanceOf('SocialHistoryDrivingStatus',$patient->socialHistory->driving_status);
 		$this->assertEquals('HGV',$patient->socialHistory->driving_status->name);
 		$this->assertInstanceOf('SocialHistoryOccupation',$patient->socialHistory->occupation);
+		$this->assertEquals('Unemployed',$patient->socialHistory->occupation->name);
 		$this->assertEquals('this is a comment',$patient->socialHistory->comments);
 		$this->assertEquals('Forklifts',$patient->socialHistory->type_of_job);
 		$this->assertEquals(100,$patient->socialHistory->alcohol_intake);
