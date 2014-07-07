@@ -37,6 +37,7 @@ class DeclarativeTypeParser_Elements extends DeclarativeTypeParser
 			$relations = $element->relations();
 
 			$_element = new $data_class;
+			$_element->_class_name = \CHtml::modelName($element);
 
 			foreach ($_element->fields() as $field) {
 				if (preg_match('/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/',$element->$field)) {
@@ -48,7 +49,12 @@ class DeclarativeTypeParser_Elements extends DeclarativeTypeParser
 				}
 			}
 
-			foreach ($_element->relations() as $relation) {
+			foreach ($_element->relations() as $index => $relation) {
+				if (!is_int($index)) {
+					$other_relation = $relation;
+					$relation = $index;
+				}
+
 				if (!isset($relations[$relation])) {
 					throw new \Exception("relation $relation is not defined on element class ".\CHtml::modelName($element));
 				}
@@ -78,40 +84,89 @@ class DeclarativeTypeParser_Elements extends DeclarativeTypeParser
 
 	public function resourceToModelParse(&$model, $resource, $model_attribute, $res_attribute, $param1, $model_class, $save)
 	{
-		/*
-		if ((strpos($model_attribute,'.')) !== FALSE) {
-			list($related_object_name, $related_object_attribute) = explode('.',$model_attribute);
-		} else {
-			list($related_object_name, $related_object_attribute) = array($model_attribute,null);
-		}
+		$elements = array();
 
-		$model->setRelatedObject($related_object_name, $related_object_attribute, array());
+		foreach ($resource->$res_attribute as $_element) {
+			$data_class = $_element->_class_name;
 
-		if ($resource->$res_attribute) {
-			foreach ($resource->$res_attribute as $item) {
-				$model->addToRelatedObjectArray($related_object_name,$related_object_attribute,$this->mc->resourceToModel($item, new $model_class, false));
+			$element = new $data_class;
+
+			$relations = $element->relations();
+
+			foreach ($_element->fields() as $field) {
+				if ($_element->$field instanceof Date) {
+					$element->$field = $_element->$field->format('Y-m-d');
+				} else if ($_element->$field instanceof DateTime) {
+					$element->$field = $_element->$field->format('Y-m-d H:i:s');
+				} else {
+					$element->$field = $_element->$field;
+				}
 			}
+
+			foreach ($_element->relations() as $relation) {
+				if (!isset($relations[$relation])) {
+					throw new \Exception("relation $relation is not defined on element class ".\CHtml::modelName($element));
+				}
+
+				switch ($relations[$relation][0]) {
+					case 'CBelongsToRelation':
+						$related_class = $relations[$relation][1];
+						$attribute = isset($relations[$relation]['order']) ? $relations[$relation]['order'] : 'name';
+						$element->$relation = $_element->$relation ? $related_class::model()->find($attribute.'=?',array($_element->$relation)) : null;
+						$element->{$relations[$relation][2]} = $element->$relation ? $element->$relation->primaryKey : null;
+						break;
+					case 'CHasManyRelation':
+						$element->$relation = $resource->$res_attribute ? $this->resourceToModelParse($model, $_element, null, $relation, null, null, null) : null;
+						break;
+					default:
+						throw new \Exception("Unhandled relation type: ".$relations[$relation][0]);
+				}
+			}
+
+			foreach ($_element->references() as $field) {
+				$reference_class = $relations[$field][1];
+
+				$element->$field = $_element->{$field."_ref"} ? $reference_class::model()->findByPk($_element->{$field."_ref"}->getId()) : null;
+				$element->{$field."_id"} = $element->$field ? $element->$field->primaryKey : null;
+			}
+
+			$elements[] = $element;
 		}
-		*/
+
+		if (\CHtml::modelName($model) == 'services_ModelConverter_ModelWrapper') {
+			$model->setAttribute('_elements',$elements);
+		}
+
+		return $elements;
 	}
 
-	public function resourceToModel_RelatedObjects(&$model, $model_attribute, $copy_attribute, $save)
+	public function resourceToModel_AfterSave($model)
 	{
-		/*
-		"resourceToModel_RelatedObjects for ".get_class($model)."\n";
+		$elements = $model->expandAttribute('_elements');
 
-		if ((strpos($model_attribute,'.')) !== FALSE) {
-			list($related_object_name, $related_object_attribute) = explode('.',$model_attribute);
-		} else {
-			list($related_object_name, $related_object_attribute) = array($model_attribute,null);
+		foreach ($elements as $element) {
+			$element->event_id = $model->getId();
+
+			$this->mc->saveModel($element);
+
+			$data_class = '\\OEModule\\'.$element->event->eventType->class_name.'\\services\\'.\CHtml::modelName($element);
+			$data_obj = new $data_class;
+
+			$relations = $element->relations();
+
+			foreach ($data_obj->relations() as $relation) {
+				if (!isset($relations[$relation])) {
+					throw new \Exception("relation $relation is not defined on element class ".\CHtml::modelName($element));
+				}
+
+				if ($relations[$relation][0] == 'CHasManyRelation') {
+					foreach ($element->$relation as $item) {
+						$item->element_id = $element->id;
+						$this->mc->saveModel($item);
+					}
+				}
+			}
 		}
-
-		$copy_attribute && $model->relatedObjectCopyAttributeFromModel($related_object_name,$related_object_attribute,$copy_attribute);
-
-		$attribute = $related_object_attribute ? $related_object_name.'.'.$related_object_attribute : $related_object_name;
-
-		$model->setAttribute($attribute, $this->filterListItems($model->expandAttribute($related_object_name), $related_object_attribute, $model->getRelatedObject($related_object_name,$related_object_attribute), $save));
-		*/
 	}
 
 	public function jsonToResourceParse($object, $attribute, $data_class, $model_class)

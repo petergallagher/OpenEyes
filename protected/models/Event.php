@@ -35,6 +35,8 @@ class Event extends BaseActiveRecordVersioned
 {
 	private $defaultScopeDisabled = false;
 
+	public $_elements;
+
 	/**
 	 * Returns the static model of the specified AR class.
 	 * @param string $className
@@ -407,6 +409,10 @@ class Event extends BaseActiveRecordVersioned
 	 */
 	public function getElements()
 	{
+		if (!empty($this->_elements)) {
+			return $this->_elements;
+		}
+
 		$elements = array();
 		if ($this->id) {
 			foreach ($this->eventType->getAllElementTypes() as $element_type) {

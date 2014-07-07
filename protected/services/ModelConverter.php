@@ -83,7 +83,19 @@ class ModelConverter
 			}
 		}
 
-		$save && $model->save();
+		if ($save) {
+			$model->save();
+
+			foreach ($this->map->getFieldsForClass($model->getClass()) as $res_attribute => $def) {
+				if (is_array($def)) {
+					$class = 'services\\'.$def[0];
+					$parser = new $class($this);
+					if (method_exists($parser,'resourceToModel_AfterSave')) {
+						$parser->resourceToModel_AfterSave($model);
+					}
+				}
+			}
+		}
 
 		return $model->getModel();
 	}

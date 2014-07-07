@@ -17,6 +17,8 @@ namespace services;
 
 class ElementDataObject extends DataObject
 {
+	public $_class_name;
+
 	public function fields()
 	{
 		return array();
