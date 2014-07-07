@@ -23,7 +23,7 @@ class EventService extends DeclarativeModelService
 		'id' => self::TYPE_TOKEN,
 	);
 
-	static protected $primary_model = 'Patient';
+	static protected $primary_model = 'Event';
 
 	static protected $model_map = array(
 		'Event' => array(
