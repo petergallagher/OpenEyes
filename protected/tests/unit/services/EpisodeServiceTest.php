@@ -372,7 +372,7 @@ class EpisodeServiceTest extends \CDbTestCase
 		$this->assertInstanceOf('EpisodeStatus',$episode->status);
 		$this->assertEquals('New',$episode->status->name);
 		$this->assertEquals(\EpisodeStatus::model()->find('name=?',array('New'))->id,$episode->episode_status_id);
-		$this->assertEquals('2014-06-04',$episode->start_date);
+		$this->assertEquals(substr($this->episodes('episode5')->start_date,0,10),$episode->start_date);
 		$this->assertNull($episode->end_date);
 		$this->assertInstanceOf('Eye',$episode->eye);
 		$this->assertEquals('Left',$episode->eye->name);
@@ -420,7 +420,7 @@ class EpisodeServiceTest extends \CDbTestCase
 		$this->assertInstanceOf('EpisodeStatus',$episode->status);
 		$this->assertEquals('New',$episode->status->name);
 		$this->assertEquals(\EpisodeStatus::model()->find('name=?',array('New'))->id,$episode->episode_status_id);
-		$this->assertEquals('2014-06-04',$episode->start_date);
+		$this->assertEquals(substr($this->episodes('episode5')->start_date,0,10),$episode->start_date);
 		$this->assertNull($episode->end_date);
 		$this->assertInstanceOf('Eye',$episode->eye);
 		$this->assertEquals('Left',$episode->eye->name);
@@ -454,7 +454,7 @@ class EpisodeServiceTest extends \CDbTestCase
 		$this->assertInstanceOf('EpisodeStatus',$episode->status);
 		$this->assertEquals('New',$episode->status->name);
 		$this->assertEquals(\EpisodeStatus::model()->find('name=?',array('New'))->id,$episode->episode_status_id);
-		$this->assertEquals('2014-06-04 00:00:00',$episode->start_date);
+		$this->assertEquals(substr($this->episodes('episode5')->start_date,0,10).' 00:00:00',$episode->start_date);
 		$this->assertNull($episode->end_date);
 		$this->assertInstanceOf('Eye',$episode->eye);
 		$this->assertEquals('Left',$episode->eye->name);
