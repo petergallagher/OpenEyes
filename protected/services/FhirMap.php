@@ -57,6 +57,75 @@ class FhirMap extends \CApplicationComponent
 		return null;
 	}
 
+	/**
+	 * List FHIR 'supported' profiles for the system
+	 *
+	 * http://hl7.org/implement/standards/fhir/conformance-definitions.html#Conformance.profile
+	 * From our point of view, this means profiles specific to each
+	 * internal resource type.
+	 *
+	 * @return ResourceReference[]
+	 */
+	public function listFhirSupportedProfiles()
+	{
+		$refs = array();
+		foreach ($this->resources as $class) {
+			if (!\Yii::app()->fhirMarshal->isStandardType($class::getFhirType())) continue;
+			$refs[] = new ExternalReference($class::getOeFhirProfile());
+		}
+		return $refs;
+	}
+
+	/**
+	 * Describe FHIR REST server resources supported by the system
+	 *
+	 * http://hl7.org/implement/standards/fhir/conformance-definitions.html#Conformance.rest.resource
+	 *
+	 * @return array
+	 */
+	public function describeFhirServerResources()
+	{
+		$types = array();
+		foreach ($this->resources as $resource_class) {
+			$type = $resource_class::getFhirType();
+			if (!\Yii::app()->fhirMarshal->isStandardType($type)) continue;
+
+			$service_class = \Yii::app()->serviceManager->getInternalServiceClassForResource($resource_class);
+
+			if (!isset($types[$type])) {
+				$types[$type] = array('ops' => array(), 'sps' => array());
+			}
+
+			$types[$type]['ops'] = array_unique(array_merge($types[$type]['ops'], $service_class::getSupportedOperations()));
+			$types[$type]['sps'] += $service_class::getSupportedSearchParams();
+		}
+
+		$resources = array();
+		foreach ($types as $type => $data) {
+			$res = (object)array(
+				'type' => $type,
+				'operation' => array(),
+				'readHistory' => false,
+				'updateCreate' => false,
+				'searchParam' => array(),
+			);
+
+			if (in_array(InternalService::OP_READ, $data['ops'])) $data['ops'][] = 'vread';
+			foreach ($data['ops'] as $op) {
+				$res->operation[] = (object)array('code' => $op);
+			}
+
+			foreach ($data['sps'] as $sp_name => $sp_type) {
+				if ($sp_name == 'id') $sp_name == '_id';
+				$res->searchParam[] = (object)array("name" => $sp_name, "type" => $sp_type);
+			}
+
+			$resources[] = $res;
+		}
+
+		return $resources;
+	}
+
 	private function getOeResourceTypeCandidates($fhir_type)
 	{
 		$candidates = array_filter(

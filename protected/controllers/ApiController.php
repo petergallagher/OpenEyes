@@ -325,7 +325,7 @@ class ApiController extends CController
 
 		$indexed_resources = array();
 		foreach ($resources as $resource) {
-			$url = $base_url . '/' . Yii::app()->service->serviceAndIdToFhirUrl($service->getServiceName(), $resource->getId());
+			$url = $base_url . '/' . Yii::app()->service->serviceAndIdToFhirUrl($service, $resource->getId());
 			$indexed_resources[$url] = $resource;
 		}
 
@@ -377,8 +377,8 @@ class ApiController extends CController
 				'url' => $this->createAbsoluteUrl('api/'),
 				'fhir_version' => self::FHIR_VERSION,
 				'accept_unknown' => true,
-				'profiles' => Yii::app()->service->listFhirSupportedProfiles(),
-				'server_resources' => Yii::app()->service->describeFhirServerResources(),
+				'profiles' => Yii::app()->fhirMap->listFhirSupportedProfiles(),
+				'server_resources' => Yii::app()->fhirMap->describeFhirServerResources(),
 			)
 		);
 		$this->sendResource($statement);

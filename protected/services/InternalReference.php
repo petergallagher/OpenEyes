@@ -34,6 +34,14 @@ abstract class InternalReference extends ResourceReference
 	}
 
 	/**
+	 * @return InternalService
+	 */
+	public function getService()
+	{
+		return $this->service;
+	}
+
+	/**
 	 * @return string
 	 */
 	public function getServiceName()

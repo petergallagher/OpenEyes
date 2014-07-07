@@ -19,24 +19,7 @@ class ServiceManager extends \CApplicationComponent
 {
 	public $internal_services = array();
 
-	private $service_config = array();
 	private $services = array();
-
-	public function init()
-	{
-		foreach ($this->internal_services as $service_class) {
-			$resource_class = $service_class::getResourceClass();
-
-			$this->service_config[$service_class::getServiceName()] = array(
-				'service_class' => $service_class,
-				'resource_class' => $resource_class,
-				'fhir_type' => $resource_class::getFhirType(),
-				'fhir_prefix' => $resource_class::getFhirPrefix(),
-			);
-		}
-
-		parent::init();
-	}
 
 	/**
 	 * @param string $name
@@ -63,16 +46,18 @@ class ServiceManager extends \CApplicationComponent
 	public function getService($name)
 	{
 		if (!array_key_exists($name, $this->services)) {
-			if (isset($this->service_config[$name])) {
-				$class_name = $this->service_config[$name]['service_class'];
-				$service = $class_name::load();
-				if (!$service instanceof Service) {
-					throw new \Exception("Invalid service class: '{$class_name}'");
+			foreach ($this->internal_services as $service_class) {
+				if ($service_class::getServiceName() == $name) {
+					$service = $service_class::load();
+					if (!$service instanceof InternalService) {
+						throw new \Exception("Invalid internal service class: '{$service_class}'");
+					}
+
+					$this->services[$name] = $service;
+					break;
 				}
-				$this->services[$name] = $service;
-			} else {
-				$this->services[$name] = null;
 			}
+			if (!isset($this->services[$name])) $this->services[$name] = null;
 		}
 		return $this->services[$name];
 	}
@@ -87,6 +72,34 @@ class ServiceManager extends \CApplicationComponent
 	}
 
 	/**
+	 * @param string $resource_class
+	 * @return InternalService
+	 */
+	public function getInternalServiceForResource($resource_class)
+	{
+		foreach ($this->internal_services as $service_class) {
+			if ($service_class::getResourceClass() == $resource_class) {
+				return $this->getService($service_class::getServiceName());
+			}
+		}
+
+		throw new \Exception("No internal service found for resource class '{$resource_class}'");
+	}
+
+	/**
+	 * @param string $resource_class
+	 * @return string
+	 */
+	public function getInternalServiceClassForResource($resource_class)
+	{
+		foreach ($this->internal_services as $service_class) {
+			if ($service_class::getResourceClass() == $resource_class) return $service_class;
+		}
+
+		throw new \Exception("No internal service found for resource class '{$resource_class}'");
+	}
+
+	/**
 	 * Find an internal service for the specified FHIR resource type, using tags to differentiate if necessary
 	 *
 	 * @param string[] $profiles
@@ -97,9 +110,7 @@ class ServiceManager extends \CApplicationComponent
 		$resource_class = \Yii::app()->fhirMap->getOeResourceTypeByProfile($fhir_type, $profiles);
 		if (!$resource_class) return null;
 
-		foreach ($this->service_config as $name => $config) {
-			if ($config['resource_class'] == $resource_class) return $this->{$name};
-		}
+		return $this->getInternalServiceForResource($resource_class);
 	}
 
 	/**
@@ -117,32 +128,27 @@ class ServiceManager extends \CApplicationComponent
 		$resource_class = \Yii::app()->fhirMap->getOeResourceTypeByPrefix($fhir_type, $prefix);
 		if (!$resource_class) return null;
 
-		foreach ($this->service_config as $name => $config) {
-			if ($config['resource_class'] == $resource_class) return $this->{$name}($id);
-		}
+		return $this->getInternalServiceForResource($resource_class)->getReference($id);
 	}
 
 	/**
 	 * Convert an internal service name and ID to a FHIR relative URL
 	 *
-	 * @param string $service_name
+	 * @param InternalService $service
 	 * @param int $id
 	 * @return string
 	 */
-	public function serviceAndIdToFhirUrl($service_name, $id)
+	public function serviceAndIdToFhirUrl(InternalService $service, $id)
 	{
-		if (!isset($this->service_config[$service_name])) {
-			throw new \Exception("Unknown service: '{$service_name}'");
+		$resource_class = $service::getResourceClass();
+
+		if (!($fhir_type = $resource_class::getFhirType())) {
+			throw new \Exception("No FHIR resource type configured for service '{$service::getServiceName()}'");
 		}
 
-		if (!isset($this->service_config[$service_name]['fhir_type'])) {
-			throw new \Exception("No FHIR resource type configured for service '{$service_name}'");
-		}
+		$prefix = $resource_class::getFhirPrefix() ? ($resource_class::getFhirPrefix() . '-') : '';
 
-		$prefix = $this->service_config[$service_name]['fhir_prefix'] ?
-			$this->service_config[$service_name]['fhir_prefix'] . '-' : '';
-
-		return "{$this->service_config[$service_name]['fhir_type']}/{$prefix}{$id}";
+		return "{$fhir_type}/{$prefix}{$id}";
 	}
 
 	/**
@@ -153,77 +159,6 @@ class ServiceManager extends \CApplicationComponent
 	 */
 	public function referenceToFhirUrl(InternalReference $ref)
 	{
-		return $this->serviceAndIdToFhirUrl($ref->getServiceName(), $ref->getId());
-	}
-
-	/**
-	 * List FHIR 'supported' profiles for the system
-	 *
-	 * http://hl7.org/implement/standards/fhir/conformance-definitions.html#Conformance.profile
-	 * From our point of view, this means profiles specific to each
-	 * internal resource type.
-	 *
-	 * @return ResourceReference[]
-	 */
-	public function listFhirSupportedProfiles()
-	{
-		$refs = array();
-		foreach ($this->service_config as $name => $config) {
-			if (!isset($config['fhir_type']) || !\Yii::app()->fhirMarshal->isStandardType($config['fhir_type'])) continue;
-
-			$class = $config['resource_class'];
-			$refs[] = new ExternalReference($class::getOeFhirProfile());
-		}
-		return $refs;
-	}
-
-	/**
-	 * Describe FHIR REST server resources supported by the system
-	 *
-	 * http://hl7.org/implement/standards/fhir/conformance-definitions.html#Conformance.rest.resource
-	 *
-	 * @return array
-	 */
-	public function describeFhirServerResources()
-	{
-		$types = array();
-		foreach ($this->service_config as $name => $config) {
-			if (!isset($config['fhir_type']) || !\Yii::app()->fhirMarshal->isStandardType($config['fhir_type'])) continue;
-
-			$class = $config['service_class'];
-			$type = $config['fhir_type'];
-
-			if (!isset($types[$type])) {
-				$types[$type] = array('ops' => array(), 'sps' => array());
-			}
-
-			$types[$type]['ops'] = array_unique(array_merge($types[$type]['ops'], $class::getSupportedOperations()));
-			$types[$type]['sps'] += $class::getSupportedSearchParams();
-		}
-
-		$resources = array();
-		foreach ($types as $type => $data) {
-			$res = (object)array(
-				'type' => $type,
-				'operation' => array(),
-				'readHistory' => false,
-				'updateCreate' => false,
-				'searchParam' => array(),
-			);
-
-			if (in_array(InternalService::OP_READ, $data['ops'])) $data['ops'][] = 'vread';
-			foreach ($data['ops'] as $op) {
-				$res->operation[] = (object)array('code' => $op);
-			}
-
-			foreach ($data['sps'] as $sp_name => $sp_type) {
-				if ($sp_name == 'id') $sp_name == '_id';
-				$res->searchParam[] = (object)array("name" => $sp_name, "type" => $sp_type);
-			}
-
-			$resources[] = $res;
-		}
-
-		return $resources;
+		return $this->serviceAndIdToFhirUrl($ref->getService(), $ref->getId());
 	}
 }
