@@ -61,9 +61,7 @@ class DeclarativeTypeParser_Elements extends DeclarativeTypeParser
 						$_element->$relation = $this->modelToResourceParse($element, $relation, $module_class);
 						break;
 					default:
-						echo "Unknown relation type: ";
-						var_dump($relations[$relation][0]);
-						exit;
+						throw new \Exception("Unhandled relation type: ".$relations[$relation][0]);
 				}
 			}
 
