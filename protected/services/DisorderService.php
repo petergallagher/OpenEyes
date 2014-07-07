@@ -26,7 +26,7 @@ class DisorderService extends DeclarativeModelService
 
 	static protected $primary_model = 'Disorder';
 
-	static protected $model_map = array(
+	static public $model_map = array(
 		'Disorder' => array(
 			'reference_objects' => array(
 				'specialty' => array('specialty_id', 'Specialty', array('name')),

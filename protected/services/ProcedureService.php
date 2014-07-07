@@ -26,7 +26,7 @@ class ProcedureService extends DeclarativeModelService
 
 	static protected $primary_model = 'Procedure';
 
-	static protected $model_map = array(
+	static public $model_map = array(
 		'Procedure' => array(
 			'fields' => array(
 				'term' => 'term',

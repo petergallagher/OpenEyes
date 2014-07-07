@@ -26,7 +26,7 @@ class GpService extends DeclarativeModelService
 
 	static protected $primary_model = 'Gp';
 
-	static protected $model_map = array(
+	static public $model_map = array(
 		'Gp' => array(
 			'related_objects' => array(
 				'contact' => array('contact_id', 'Contact'),

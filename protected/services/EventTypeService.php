@@ -25,7 +25,7 @@ class EventTypeService extends DeclarativeModelService
 
 	static protected $primary_model = 'EventType';
 
-	static protected $model_map = array(
+	static public $model_map = array(
 		'EventType' => array(
 			'reference_objects' => array(
 				'event_group' => array('event_group_id', 'EventGroup', array('name')),

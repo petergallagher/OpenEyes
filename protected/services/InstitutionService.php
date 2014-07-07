@@ -26,7 +26,7 @@ class InstitutionService extends DeclarativeModelService
 
 	static protected $primary_model = 'Institution';
 
-	static protected $model_map = array(
+	static public $model_map = array(
 	);
 
 	public function search(array $params)

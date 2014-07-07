@@ -49,10 +49,7 @@ class ModelConverterTest extends \CDbTestCase
 			)
 		);
 
-		$ps = new PatientService;
-		$ps->map = new ModelMap($map);
-
-		$op = new ModelConverter($ps);
+		$op = new ModelConverter(new PatientService, $map);
 
 		$resource = $op->modelToResource($patient, new Patient(array()));
 
@@ -88,10 +85,7 @@ class ModelConverterTest extends \CDbTestCase
 			)
 		);
 
-		$ps = new PatientService;
-		$ps->map = new ModelMap($map);
-
-		$op = new ModelConverter($ps);
+		$op = new ModelConverter(new PatientService, $map);
 
 		$resource = $op->modelToResource($patient, new Patient(array()));
 
@@ -145,10 +139,7 @@ class ModelConverterTest extends \CDbTestCase
 			),
 		);
 
-		$ps = new PatientService;
-		$ps->map = new ModelMap($map);
-
-		$op = new ModelConverter($ps);
+		$op = new ModelConverter(new PatientService, $map);
 
 		$resource = $op->modelToResource($patient, new Patient(array()));
 
@@ -179,10 +170,7 @@ class ModelConverterTest extends \CDbTestCase
 			)
 		);
 
-		$ps = new PatientService;
-		$ps->map = new ModelMap($map);
-
-		$op = new ModelConverter($ps);
+		$op = new ModelConverter(new PatientService, $map);
 
 		$resource = $op->modelToResource($patient, new Patient(array()));
 
@@ -230,10 +218,7 @@ class ModelConverterTest extends \CDbTestCase
 			),
 		);
 
-		$ps = new PatientService;
-		$ps->map = new ModelMap($map);
-
-		$op = new ModelConverter($ps);
+		$op = new ModelConverter(new PatientService, $map);
 
 		$resource = $op->modelToResource($patient, new Patient(array()));
 
@@ -276,10 +261,7 @@ class ModelConverterTest extends \CDbTestCase
 			),
 		);
 
-		$ps = new PatientService;
-		$ps->map = new ModelMap($map);
-
-		$op = new ModelConverter($ps);
+		$op = new ModelConverter(new PatientService, $map);
 
 		$resource = $op->modelToResource($patient, new Patient(array()));
 
@@ -314,12 +296,7 @@ class ModelConverterTest extends \CDbTestCase
 		$patient->gp_id = 2;
 		$patient->practice_id = 5;
 
-		$map = PatientService::getModelMap();
-
-		$ps = new PatientService;
-		$ps->map = new ModelMap($map);
-
-		$op = new ModelConverter($ps);
+		$op = new ModelConverter(new PatientService);
 
 		$resource = $op->modelToResource($patient, new Patient(array()));
 
@@ -592,10 +569,7 @@ class ModelConverterTest extends \CDbTestCase
 			),
 		);
 
-		$ps = new PatientService;
-		$ps->map = new ModelMap($map);
-
-		$c = new ModelConverter($ps);
+		$c = new ModelConverter(new PatientService, $map);
 
 		$res = $c->modelToResource(new \Patient, new Patient);
 

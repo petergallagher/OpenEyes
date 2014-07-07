@@ -26,7 +26,7 @@ class RTTService extends DeclarativeModelService
 
 	static protected $primary_model = 'RTT';
 
-	static protected $model_map = array(
+	static public $model_map = array(
 		'RTT' => array(
 			'reference_objects' => array(
 				'referral_type' => array('referral_type_id', 'ReferralType', array('name')),

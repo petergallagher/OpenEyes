@@ -32,13 +32,6 @@ class DeclarativeModelService extends ModelService
 	const RULE_TYPE_NULLIFNULL = 1;
 	const RULE_TYPE_ATTRIBUTE_IFNULL = 2;
 
-	public $map;
-
-	public function __construct()
-	{
-		$this->map = new ModelMap($this::$model_map);
-	}
-
 	/**
 	 * @param BaseActiveRecord $model
 	 * @return Resource

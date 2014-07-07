@@ -26,7 +26,7 @@ class ReferralService extends DeclarativeModelService
 
 	static protected $primary_model = 'Referral';
 
-	static protected $model_map = array(
+	static public $model_map = array(
 		'Referral' => array(
 			'reference_objects' => array(
 				'referral_type' => array('referral_type_id', 'ReferralType', array('name')),

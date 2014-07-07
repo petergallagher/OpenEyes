@@ -18,10 +18,19 @@ namespace services;
 class ModelConverter
 {
 	public $service;
+	public $map;
 
-	public function __construct($service)
+	public function __construct($service, $map=null)
 	{
 		$this->service = $service;
+
+		if ($map === null) {
+			$this->map = new ModelMap($service::$model_map);
+		} else if ($map instanceof ModelMap) {
+			$this->map = $map;
+		} else {
+			$this->map = new ModelMap($map);
+		}
 	}
 
 	public function modelToResource($object, &$resource)
@@ -31,7 +40,7 @@ class ModelConverter
 
 	public function modelToResourceParse($object, $object_class_name, &$resource)
 	{
-		foreach ($this->service->map->getFieldsForClass($object_class_name) as $res_attribute => $def) {
+		foreach ($this->map->getFieldsForClass($object_class_name) as $res_attribute => $def) {
 			if (is_array($def)) {
 				$class = 'services\\'.$def[0];
 				$parser = new $class($this);
@@ -46,13 +55,13 @@ class ModelConverter
 
 	public function resourceToModel($resource, $model, $save=true, $extra_fields=false)
 	{
-		$model = new ModelConverter_ModelWrapper($this->service->map, $model, $extra_fields);
+		$model = new ModelConverter_ModelWrapper($this->map, $model, $extra_fields);
 
 		$this->service->getComplexReferenceObjects($model, $resource);
 
 		$this->processRelatedObjects($model, $resource);
 
-		foreach ($this->service->map->getFieldsForClass($model->getClass()) as $res_attribute => $def) {
+		foreach ($this->map->getFieldsForClass($model->getClass()) as $res_attribute => $def) {
 			if (is_array($def)) {
 				$class = 'services\\'.$def[0];
 				$parser = new $class($this);
@@ -64,7 +73,7 @@ class ModelConverter
 
 		$save && $this->processRelatedObjects($model, $resource, true);
 
-		foreach ($this->service->map->getFieldsForClass($model->getClass()) as $res_attribute => $def) {
+		foreach ($this->map->getFieldsForClass($model->getClass()) as $res_attribute => $def) {
 			if (is_array($def)) {
 				$class = 'services\\'.$def[0];
 				$parser = new $class($this);

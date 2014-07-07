@@ -28,7 +28,7 @@ class PatientPreviousOperationsService extends DeclarativeModelService
 
 	static protected $primary_model = 'Patient';
 
-	static protected $model_map = array(
+	static public $model_map = array(
 		'Patient' => array(
 			'fields' => array(
 				'operations' => array(self::TYPE_LIST, 'previousOperations', 'PatientPreviousOperation', 'PreviousOperation', array('patient_id' => 'primaryKey')),

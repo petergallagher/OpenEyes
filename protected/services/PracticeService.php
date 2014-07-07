@@ -26,7 +26,7 @@ class PracticeService extends DeclarativeModelService
 
 	static protected $primary_model = 'Practice';
 
-	static protected $model_map = array(
+	static public $model_map = array(
 		'Practice' => array(
 			'related_objects' => array(
 				'contact' => array('contact_id', 'Contact'),

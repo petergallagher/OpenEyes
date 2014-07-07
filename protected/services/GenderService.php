@@ -26,7 +26,7 @@ class GenderService extends DeclarativeModelService
 
 	static protected $primary_model = 'Gender';
 
-	static protected $model_map = array(
+	static public $model_map = array(
 		'Gender' => array(
 			'fields' => array(
 				'name' => 'name',

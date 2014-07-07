@@ -18,10 +18,19 @@ namespace services;
 class JSONConverter
 {
 	protected $service;
+	public $map;
 
-	public function __construct($service)
+	public function __construct($service, $map=null)
 	{
 		$this->service = $service;
+
+		if ($map === null) {
+			$this->map = new ModelMap($service::$model_map);
+		} else if ($map instanceof ModelMap) {
+			$this->map = $map;
+		} else {
+			$this->map = new ModelMap($map);
+		}
 	}
 
 	public function jsonToResource($json, $object_class_name, &$resource)
@@ -35,7 +44,7 @@ class JSONConverter
 
 	public function jsonToResourceParse($object, $object_class_name, &$resource)
 	{
-		foreach ($this->service->map->getFieldsForClass($object_class_name) as $res_attribute => $def) {
+		foreach ($this->map->getFieldsForClass($object_class_name) as $res_attribute => $def) {
 			if (is_array($def)) {
 				$class = 'services\\'.$def[0];
 				$parser = new $class($this);
@@ -54,7 +63,7 @@ class JSONConverter
 			throw new \Exception("Invalid JSON encountered: $json");
 		}
 
-		$mc = new ModelConverter($this->service);
+		$mc = new ModelConverter($this->service, $this->map);
 
 		return $mc->resourceToModel($object, $model_class_name, $save);
 	}

@@ -21,7 +21,7 @@ class CommissioningBodyTypeService extends DeclarativeModelService
 
 	static protected $primary_model = 'CommissioningBodyType';
 
-	static protected $model_map = array(
+	static public $model_map = array(
 		'CommissioningBodyType' => array(
 			'fields' => array(
 				'name' => 'name',

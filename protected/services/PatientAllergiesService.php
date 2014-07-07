@@ -28,7 +28,7 @@ class PatientAllergiesService extends DeclarativeModelService
 
 	static protected $primary_model = 'Patient';
 
-	static protected $model_map = array(
+	static public $model_map = array(
 		'Patient' => array(
 			'fields' => array(
 				'allergies' => array(self::TYPE_LIST, 'allergyAssignments', 'PatientAllergy', 'PatientAllergyAssignment', array('patient_id' => 'primaryKey')),

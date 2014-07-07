@@ -25,7 +25,7 @@ class PatientFamilyHistoryService extends DeclarativeModelService
 
 	static protected $primary_model = 'Patient';
 
-	static protected $model_map = array(
+	static public $model_map = array(
 		'Patient' => array(
 			'fields' => array(
 				'history' => array(self::TYPE_LIST, 'familyHistory', 'PatientFamilyHistoryItem', 'FamilyHistory', array('patient_id' => 'primaryKey')),

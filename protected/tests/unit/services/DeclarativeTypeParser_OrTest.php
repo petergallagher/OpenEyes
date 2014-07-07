@@ -78,10 +78,7 @@ class DeclarativeTypeParser_OrTest extends \CDbTestCase
 			->method('getClass')
 			->will($this->returnValue('Address'));
 
-		$ps = new PatientService;
-		$ps->map = $map;
-
-		$mc = new ModelConverter($ps);
+		$mc = new ModelConverter(new PatientService, $map);
 
 		$p = new DeclarativeTypeParser_Or($mc);
 
@@ -126,10 +123,7 @@ class DeclarativeTypeParser_OrTest extends \CDbTestCase
 			->method('getClass')
 			->will($this->returnValue('Address'));
 
-		$ps = new PatientService;
-		$ps->map = $map;
-
-		$mc = new ModelConverter($ps);
+		$mc = new ModelConverter(new PatientService, $map);
 
 		$p = new DeclarativeTypeParser_Or($mc);
 
@@ -170,10 +164,7 @@ class DeclarativeTypeParser_OrTest extends \CDbTestCase
 			->method('getClass')
 			->will($this->returnValue('Address'));
 
-		$ps = new PatientService;
-		$ps->map = $map;
-
-		$mc = new ModelConverter($ps);
+		$mc = new ModelConverter(new PatientService, $map);
 
 		$p = new DeclarativeTypeParser_Or($mc);
 

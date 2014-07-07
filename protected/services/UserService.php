@@ -26,7 +26,7 @@ class UserService extends DeclarativeModelService
 
 	static protected $primary_model = 'User';
 
-	static protected $model_map = array(
+	static public $model_map = array(
 		'User' => array(
 			'related_objects' => array(
 				'contact' => array('contact_id', 'Contact'),

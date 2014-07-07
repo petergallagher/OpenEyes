@@ -25,7 +25,7 @@ class PatientSocialHistoryService extends DeclarativeModelService
 
 	static protected $primary_model = 'Patient';
 
-	static protected $model_map = array(
+	static public $model_map = array(
 		'Patient' => array(
 			'related_objects' => array(
 				'socialHistory' => array(null, 'SocialHistory', 'patient_id', 'children' => array(

@@ -28,7 +28,7 @@ class DeclarativeTypeParser_Or extends DeclarativeTypeParser
 
 	public function resourceToModelParse(&$model, $resource, $model_attribute, $res_attribute, $model_class, $param1, $save)
 	{
-		$rule = $this->mc->service->map->getRuleForOrClause($model->getClass(), $res_attribute);
+		$rule = $this->mc->map->getRuleForOrClause($model->getClass(), $res_attribute);
 
 		switch ($rule[0]) {
 			case DeclarativeModelService::RULE_TYPE_ALLNULL:

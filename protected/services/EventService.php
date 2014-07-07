@@ -25,7 +25,7 @@ class EventService extends DeclarativeModelService
 
 	static protected $primary_model = 'Event';
 
-	static protected $model_map = array(
+	static public $model_map = array(
 		'Event' => array(
 			'fields' => array(
 				'episode_ref' => array(self::TYPE_REF, 'episode_id', 'Episode'),

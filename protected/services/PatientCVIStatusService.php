@@ -25,7 +25,7 @@ class PatientCVIStatusService extends DeclarativeModelService
 
 	static protected $primary_model = 'Patient';
 
-	static protected $model_map = array(
+	static public $model_map = array(
 		'Patient' => array(
 			'related_objects' => array(
 				'cvi_status' => array(null, 'PatientOphInfo', 'patient_id', 'children' => array(

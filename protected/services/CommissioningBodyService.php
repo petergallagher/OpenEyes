@@ -29,7 +29,7 @@ class CommissioningBodyService extends DeclarativeModelService
 
 	static protected $primary_model = 'CommissioningBody';
 
-	static protected $model_map = array(
+	static public $model_map = array(
 		'CommissioningBody' => array(
 			'related_objects' => array(
 				'contact' => array('contact_id', 'Contact'),

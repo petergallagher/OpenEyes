@@ -15,36 +15,20 @@
 
 namespace services;
 
-class SiteService extends DeclarativeModelService
+class ElementDataObject extends DataObject
 {
-	static protected $operations = array(self::OP_READ, self::OP_UPDATE, self::OP_DELETE, self::OP_CREATE, self::OP_SEARCH);
-
-	static protected $search_params = array(
-		'id' => self::TYPE_TOKEN,
-		'identifier' => self::TYPE_TOKEN,
-	);
-
-	static protected $primary_model = 'Site';
-
-	static public $model_map = array(
-	);
-
-	public function search(array $params)
+	public function fields()
 	{
-		$model = $this->getSearchModel();
-		if (isset($params['id'])) $model->id = $params['id'];
-		if (isset($params['identifier'])) $model->nat_id = $params['identifier'];
-
-		return $this->getResourcesFromDataProvider($model->search());
+		return array();
 	}
 
-	/**
-	 * @param string $name
-	 * @return InternalReference|null
-	 */
-	public function getReferenceByName($name)
+	public function relations()
 	{
-		$id = \Yii::app()->db->createCommand()->select('id')->from('site')->where('name = ?', array($name))->queryScalar();
-		return $id ? $this->getReference($id) : null;
+		return array();
+	}
+
+	public function references()
+	{
+		return array();
 	}
 }

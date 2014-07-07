@@ -38,44 +38,38 @@ class DeclarativeTypeParser_Elements extends DeclarativeTypeParser
 
 			$_element = new $data_class;
 
-			if (!empty($_element->fields)) {
-				foreach ($_element->fields as $field) {
-					if (preg_match('/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/',$element->$field)) {
-						$_element->$field = new Date($element->$field);
-					} else if (preg_match('/^[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}$/',$element->$field)) {
-						$_element->$field = new DateTime($element->$field);
-					} else {
-						$_element->$field = $element->$field;
-					}
+			foreach ($_element->fields() as $field) {
+				if (preg_match('/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/',$element->$field)) {
+					$_element->$field = new Date($element->$field);
+				} else if (preg_match('/^[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}$/',$element->$field)) {
+					$_element->$field = new DateTime($element->$field);
+				} else {
+					$_element->$field = $element->$field;
 				}
 			}
 
-			if (!empty($_element->relations)) {
-				foreach ($_element->relations as $relation) {
-					if (!isset($relations[$relation])) {
-						throw new \Exception("relation $relation is not defined on element class ".\CHtml::modelName($element));
-					}
+			foreach ($_element->relations() as $relation) {
+				if (!isset($relations[$relation])) {
+					throw new \Exception("relation $relation is not defined on element class ".\CHtml::modelName($element));
+				}
 
-					switch ($relations[$relation][0]) {
-						case 'CBelongsToRelation':
-							$_element->$relation = $element->$relation ? $element->$relation->name : null;
-							break;
-						case 'CHasManyRelation':
-							$_element->$relation = $this->modelToResourceParse($element, $relation, $module_class);
-							break;
-						default:
-							echo "Unknown relation type: ";
-							var_dump($relations[$relation][0]);
-							exit;
-					}
+				switch ($relations[$relation][0]) {
+					case 'CBelongsToRelation':
+						$_element->$relation = $element->$relation ? $element->$relation->name : null;
+						break;
+					case 'CHasManyRelation':
+						$_element->$relation = $this->modelToResourceParse($element, $relation, $module_class);
+						break;
+					default:
+						echo "Unknown relation type: ";
+						var_dump($relations[$relation][0]);
+						exit;
 				}
 			}
 
-			if (!empty($_element->references)) {
-				foreach ($_element->references as $field) {
-					$reference_class = $relations[$field][1];
-					$_element->{$field."_ref"} = \Yii::app()->service->$reference_class($element->{$field."_id"});
-				}
+			foreach ($_element->references() as $field) {
+				$reference_class = $relations[$field][1];
+				$_element->{$field."_ref"} = \Yii::app()->service->$reference_class($element->{$field."_id"});
 			}
 
 			$data_items[] = $_element;

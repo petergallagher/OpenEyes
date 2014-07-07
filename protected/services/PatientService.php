@@ -28,7 +28,7 @@ class PatientService extends DeclarativeModelService
 
 	static protected $primary_model = 'Patient';
 
-	static protected $model_map = array(
+	static public $model_map = array(
 		'Patient' => array(
 			'related_objects' => array(
 				'contact' => array('contact_id', 'Contact'),
@@ -84,11 +84,6 @@ class PatientService extends DeclarativeModelService
 			),
 		),
 	);
-
-	public static function getModelMap()
-	{
-		return self::$model_map;
-	}
 
 	public function search(array $params)
 	{

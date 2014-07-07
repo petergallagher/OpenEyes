@@ -25,7 +25,7 @@ class EpisodeService extends DeclarativeModelService
 
 	static protected $primary_model = 'Episode';
 
-	static protected $model_map = array(
+	static public $model_map = array(
 		'Episode' => array(
 			'reference_objects' => array(
 				'firm' => array('firm_id', 'Firm', array('name','service_subspecialty_assignment_id')),
