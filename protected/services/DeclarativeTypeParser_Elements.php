@@ -17,27 +17,71 @@ namespace services;
 
 class DeclarativeTypeParser_Elements extends DeclarativeTypeParser
 {
-	public function modelToResourceParse($object, $attribute, $data_class, $param=null)
+	public function modelToResourceParse($object, $attribute, $module_class, $param=null)
 	{
 		$element_list = DeclarativeTypeParser::expandObjectAttribute($object, $attribute);
 
 		$resource_items = array();
 
 		foreach ($element_list as $element) {
-			$data_class = 'OEModule\\'.$element->event->eventType->class_name.'\\services\\'.\CHtml::modelName($element);
-			$service_class = '\\'.$data_class.'Service';
+			if (!$module_class) {
+				$module_class = $element->event->eventType->class_name;
+			}
 
-			$service = new $service_class;
-			$converter = new ModelConverter($service);
+			if (strstr(\CHtml::modelName($element),$module_class)) {
+				$data_class = 'OEModule\\'.$module_class.'\\services\\'.\CHtml::modelName($element);
+			} else {
+				$data_class = '\\services\\'.\CHtml::modelName($element);
+			}
 
-			$data_items[] = $converter->modelToResourceParse($element, \CHtml::modelName($element), new $data_class);
+			$relations = $element->relations();
+
+			$_element = new $data_class;
+
+			if (!empty($_element->fields)) {
+				foreach ($_element->fields as $field) {
+					if (preg_match('/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/',$element->$field)) {
+						$_element->$field = new Date($element->$field);
+					} else if (preg_match('/^[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}$/',$element->$field)) {
+						$_element->$field = new DateTime($element->$field);
+					} else {
+						$_element->$field = $element->$field;
+					}
+				}
+			}
+
+			if (!empty($_element->relations)) {
+				foreach ($_element->relations as $relation) {
+					if (!isset($relations[$relation])) {
+						throw new \Exception("relation $relation is not defined on element class ".\CHtml::modelName($element));
+					}
+
+					switch ($relations[$relation][0]) {
+						case 'CBelongsToRelation':
+							$_element->$relation = $element->$relation ? $element->$relation->name : null;
+							break;
+						case 'CHasManyRelation':
+							$_element->$relation = $this->modelToResourceParse($element, $relation, $module_class);
+							break;
+						default:
+							echo "Unknown relation type: ";
+							var_dump($relations[$relation][0]);
+							exit;
+					}
+				}
+			}
+
+			if (!empty($_element->references)) {
+				foreach ($_element->references as $field) {
+					$reference_class = $relations[$field][1];
+					$_element->{$field."_ref"} = \Yii::app()->service->$reference_class($element->{$field."_id"});
+				}
+			}
+
+			$data_items[] = $_element;
 		}
 
 		return $data_items;
-	}
-
-	public function setElementRelatedObjects(&$resource_item, $element)
-	{
 	}
 
 	public function resourceToModelParse(&$model, $resource, $model_attribute, $res_attribute, $param1, $model_class, $save)
