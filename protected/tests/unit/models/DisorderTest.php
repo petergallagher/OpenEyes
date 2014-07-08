@@ -32,7 +32,7 @@ class DisorderTest extends CDbTestCase
 	public function dataProvider_Search()
 	{
 		return array(
-			array(array('term' => 'Myopia'), 1, array('disorder1')),
+			array(array('term' => 'Myopia'), 1, array('myopia')),
 			array(array('term' => 'foobar'), 0, array()),
 		);
 	}
@@ -69,8 +69,8 @@ class DisorderTest extends CDbTestCase
 	 */
 	public function testRules()
 	{
-		$this->assertTrue($this->disorders('disorder1')->validate());
-		$this->assertEmpty($this->disorders('disorder1')->errors);
+		$this->assertTrue($this->disorders('myopia')->validate());
+		$this->assertEmpty($this->disorders('myopia')->errors);
 	}
 
 	/**
@@ -81,7 +81,7 @@ class DisorderTest extends CDbTestCase
 	{
 		$expected = array('Myopia');
 
-		$result = $this->disorders('disorder1')->GetDisorderOptions('Myopia');
+		$result = $this->disorders('myopia')->GetDisorderOptions('Myopia');
 
 		$this->assertEquals($expected, $result);
 	}
