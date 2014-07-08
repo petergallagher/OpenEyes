@@ -106,10 +106,18 @@ abstract class InternalReference extends ResourceReference
 	}
 
 	/**
+	 * @return string
+	 */
+	public function toFhirUrl()
+	{
+		return \Yii::app()->service->serviceAndIdToFhirUrl($this->service, $this->id);
+	}
+
+	/**
 	 * @return StdClass
 	 */
 	public function toFhir()
 	{
-		return (object)array("reference" => \Yii::app()->service->referenceToFhirUrl($this));
+		return (object)array("reference" => $this->toFhirUrl());
 	}
 }

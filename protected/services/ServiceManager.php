@@ -150,15 +150,4 @@ class ServiceManager extends \CApplicationComponent
 
 		return "{$fhir_type}/{$prefix}{$id}";
 	}
-
-	/**
-	 * Convert an internal reference to a FHIR relative URL
-	 *
-	 * @param InternalReference $ref
-	 * @return string
-	 */
-	public function referenceToFhirUrl(InternalReference $ref)
-	{
-		return $this->serviceAndIdToFhirUrl($ref->getService(), $ref->getId());
-	}
 }

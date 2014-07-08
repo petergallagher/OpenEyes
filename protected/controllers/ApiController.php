@@ -160,7 +160,7 @@ class ApiController extends CController
 			$this->sendResponse(304);
 		}
 
-		header('Content-Location: ' . $this->createAbsoluteUrl('api/') . '/' . Yii::app()->service->referenceToFhirUrl($ref) . "/_history/{$vid}");
+		header('Content-Location: ' . $this->createAbsoluteUrl('api/') . '/' . $ref->toFhirUrl() . "/_history/{$vid}");
 		$this->sendLastModified($ref);
 		$this->sendEtag($ref);
 		$this->sendResource($ref->fetch());
@@ -200,7 +200,7 @@ class ApiController extends CController
 			$ref = $this->getRef($resource_type, $id);
 
 			$vid = $ref->getVersionId();
-			$vurl = $this->createAbsoluteUrl('api/') . '/' . Yii::app()->service->referenceToFhirUrl($ref) . "/_history/{$vid}";
+			$vurl = $this->createAbsoluteUrl('api/') . '/' . $ref->toFhirUrl() . "/_history/{$vid}";
 
 			if (isset($_SERVER['HTTP_CONTENT_LOCATION']) && $_SERVER['HTTP_CONTENT_LOCATION'] != $vurl) {
 				$this->sendResponse(409);
@@ -281,7 +281,7 @@ class ApiController extends CController
 		$ref = $service->fhirCreate($fhirObject);
 		$tx->commit();
 
-		$url = Yii::app()->service->referenceToFhirUrl($ref);
+		$url = $ref->toFhirUrl();
 
 		header('Location: ' . $this->createAbsoluteUrl('api/') . "/{$url}/_history/{$ref->getVersionId()}");
 		$this->sendEtag($ref);

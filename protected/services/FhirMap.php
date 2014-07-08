@@ -90,7 +90,7 @@ class FhirMap extends \CApplicationComponent
 			$type = $resource_class::getFhirType();
 			if (!\Yii::app()->fhirMarshal->isStandardType($type)) continue;
 
-			$service_class = \Yii::app()->serviceManager->getInternalServiceClassForResource($resource_class);
+			$service_class = \Yii::app()->service->getInternalServiceClassForResource($resource_class);
 
 			if (!isset($types[$type])) {
 				$types[$type] = array('ops' => array(), 'sps' => array());
