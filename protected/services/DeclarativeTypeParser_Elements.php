@@ -103,7 +103,14 @@ class DeclarativeTypeParser_Elements extends DeclarativeTypeParser
 				}
 			}
 
-			foreach ($_element->relations() as $relation) {
+			foreach ($_element->relations() as $index => $relation) {
+				if (!is_int($index)) {
+					list($other_relation,$other_relation_item) = $relation;
+					$relation = $index;
+				} else {
+					$other_relation = false;
+				}
+
 				if (!isset($relations[$relation])) {
 					throw new \Exception("relation $relation is not defined on element class ".\CHtml::modelName($element));
 				}
@@ -117,6 +124,10 @@ class DeclarativeTypeParser_Elements extends DeclarativeTypeParser
 						break;
 					case 'CHasManyRelation':
 						$element->$relation = $resource->$res_attribute ? $this->resourceToModelParse($model, $_element, null, $relation, null, null, null) : null;
+
+						if ($other_relation) {
+							$element->$other_relation = $this->getRelatedItemsFromRelation($element->$relation,$other_relation_item);
+						}
 						break;
 					default:
 						throw new \Exception("Unhandled relation type: ".$relations[$relation][0]);
@@ -140,6 +151,17 @@ class DeclarativeTypeParser_Elements extends DeclarativeTypeParser
 		return $elements;
 	}
 
+	private function getRelatedItemsFromRelation($data, $item_name)
+	{
+		$items = array();
+
+		foreach ($data as $item) {
+			$items[] = $item->$item_name;
+		}
+
+		return $items;
+	}
+
 	public function resourceToModel_AfterSave($model)
 	{
 		$elements = $model->expandAttribute('_elements');
@@ -154,7 +176,14 @@ class DeclarativeTypeParser_Elements extends DeclarativeTypeParser
 
 			$relations = $element->relations();
 
-			foreach ($data_obj->relations() as $relation) {
+			foreach ($data_obj->relations() as $index => $relation) {
+				if (!is_int($index)) {
+					list($other_relation,$other_relation_item) = $relation;
+					$relation = $index;
+				} else {
+					$other_relation = false;
+				}
+
 				if (!isset($relations[$relation])) {
 					throw new \Exception("relation $relation is not defined on element class ".\CHtml::modelName($element));
 				}
