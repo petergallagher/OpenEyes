@@ -42,13 +42,21 @@ return array(
 			'received_date' => date('Y-m-d', strtotime('-5 days')),
 			'referrer' => 'TEST'
 	),
-		'referral4' => array(
-				'id' => 4,
-				'refno' => 634,
-				'patient_id' => 1,
-				'referral_type_id' => 1,
-				'received_date' => date('Y-m-d', strtotime('-25 days')),
-				'closed_date' => date('Y-m-d', strtotime('-13 days')),
-				'referrer' => 'TEST'
-		),
+	'referral4' => array(
+		'id' => 4,
+		'refno' => 634,
+		'patient_id' => 1,
+		'referral_type_id' => 1,
+		'received_date' => date('Y-m-d', strtotime('-25 days')),
+		'closed_date' => date('Y-m-d', strtotime('-13 days')),
+		'referrer' => 'TEST'
+	),
+	'referral5' => array(
+		'id' => 5,
+		'refno' => 1337,
+		'patient_id' => 3,
+		'referral_type_id' => 1,
+		'received_date' => date('Y-m-d', strtotime('-20 days')),
+		'referrer' => 'testing'
+	),
 );

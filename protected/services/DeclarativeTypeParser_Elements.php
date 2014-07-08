@@ -80,8 +80,6 @@ class DeclarativeTypeParser_Elements extends DeclarativeTypeParser
 								}
 							}
 
-							//if ($recur) break;
-
 							$item_class = \CHtml::modelName($item);
 							$list[] = \Yii::app()->service->$item_class($item->primaryKey);
 						}
@@ -121,47 +119,21 @@ class DeclarativeTypeParser_Elements extends DeclarativeTypeParser
 
 			$data_class = $_element->_class_name;
 
-			$element = new $data_class;
-
-			$relations = $element->relations();
-
-			foreach ($_element->fields() as $field) {
-				if ($_element->$field instanceof Date) {
-					$element->$field = $_element->$field->format('Y-m-d');
-				} else if ($_element->$field instanceof DateTime) {
-					$element->$field = $_element->$field->format('Y-m-d H:i:s');
-				} else {
-					$element->$field = $_element->$field;
+			if (\CHtml::modelName($model) == 'services_ModelConverter_ModelWrapper' && $model->getId()) {
+				if (!$element = $data_class::model()->find('event_id=?',array($model->getId()))) {
+					$element = new $data_class;
 				}
-			}
-
-			foreach ($_element->relations() as $index => $relation) {
-				if (!isset($relations[$relation])) {
-					throw new \Exception("relation $relation is not defined on element class ".\CHtml::modelName($element));
+			} else {
+				if ($data_class === null) {
+					throw new \Exception("data_class cannot be null");
 				}
 
-				switch ($relations[$relation][0]) {
-					case 'CBelongsToRelation':
-						$related_class = $relations[$relation][1];
-						$attribute = isset($relations[$relation]['order']) ? $relations[$relation]['order'] : 'name';
-						$element->$relation = $_element->$relation ? $related_class::model()->find($attribute.'=?',array($_element->$relation)) : null;
-						$element->{$relations[$relation][2]} = $element->$relation ? $element->$relation->primaryKey : null;
-						break;
-					case 'CHasManyRelation':
-						$a = 1;
-						$element->$relation = $resource->$res_attribute ? $this->resourceToModelParse($a, $_element, null, $relation, null, null, null) : null;
-						break;
-					default:
-						throw new \Exception("Unhandled relation type: ".$relations[$relation][0]);
-				}
+				$element = new $data_class;
 			}
 
-			foreach ($_element->references() as $field) {
-				$reference_class = $relations[$field][1];
-
-				$element->$field = $_element->{$field."_ref"} ? $reference_class::model()->findByPk($_element->{$field."_ref"}->getId()) : null;
-				$element->{$field."_id"} = $element->$field ? $element->$field->primaryKey : null;
-			}
+			$this->resourceToModelParse_Fields($element, $_element);
+			$this->resourceToModelParse_Relations($element, $_element, $resource, $res_attribute);
+			$this->resourceToModelParse_References($element, $_element);
 
 			$elements[] = $element;
 		}
@@ -171,6 +143,57 @@ class DeclarativeTypeParser_Elements extends DeclarativeTypeParser
 		}
 
 		return $elements;
+	}
+
+	public function resourceToModelParse_Fields(&$model, &$element)
+	{
+		foreach ($element->fields() as $field) {
+			if ($element->$field instanceof Date) {
+				$model->$field = $element->$field->format('Y-m-d');
+			} else if ($element->$field instanceof DateTime) {
+				$model->$field = $element->$field->format('Y-m-d H:i:s');
+			} else {
+				$model->$field = $element->$field;
+			}
+		}
+	}
+
+	public function resourceToModelParse_Relations(&$model, &$element, $resource, $res_attribute)
+	{
+		$relations = $model->relations();
+
+		foreach ($element->relations() as $index => $relation) {
+			if (!isset($relations[$relation])) {
+				throw new \Exception("relation $relation is not defined on element class ".\CHtml::modelName($model));
+			}
+
+			switch ($relations[$relation][0]) {
+				case 'CBelongsToRelation':
+					$related_class = $relations[$relation][1];
+					$attribute = isset($relations[$relation]['order']) ? $relations[$relation]['order'] : 'name';
+					$model->$relation = $element->$relation ? $related_class::model()->find($attribute.'=?',array($element->$relation)) : null;
+					$model->{$relations[$relation][2]} = $model->$relation ? $model->$relation->primaryKey : null;
+					break;
+				case 'CHasManyRelation':
+					$a = 1;
+					$model->$relation = $resource->$res_attribute ? $this->resourceToModelParse($a, $element, null, $relation, null, null, null) : null;
+					break;
+				default:
+					throw new \Exception("Unhandled relation type: ".$relations[$relation][0]);
+			}
+		}
+	}
+
+	public function resourceToModelParse_References(&$model, &$element)
+	{
+		$relations = $model->relations();
+
+		foreach ($element->references() as $field) {
+			$reference_class = $relations[$field][1];
+
+			$model->$field = $element->{$field."_ref"} ? $reference_class::model()->findByPk($element->{$field."_ref"}->getId()) : null;
+			$model->{$field."_id"} = $model->$field ? $model->$field->primaryKey : null;
+		}
 	}
 
 	public function resourceToModel_AfterSave($model)
