@@ -71,4 +71,12 @@ class ModelReference extends InternalReference
 
 		return $model;
 	}
+
+	/**
+	 * @return string
+	 */
+	public function getModelClass()
+	{
+		return \CHtml::modelName($this->model);
+	}
 }

@@ -49,12 +49,7 @@ class DeclarativeTypeParser_Elements extends DeclarativeTypeParser
 				}
 			}
 
-			foreach ($_element->relations() as $index => $relation) {
-				if (!is_int($index)) {
-					$other_relation = $relation;
-					$relation = $index;
-				}
-
+			foreach ($_element->relations() as $relation) {
 				if (!isset($relations[$relation])) {
 					throw new \Exception("relation $relation is not defined on element class ".\CHtml::modelName($element));
 				}
@@ -64,7 +59,38 @@ class DeclarativeTypeParser_Elements extends DeclarativeTypeParser
 						$_element->$relation = $element->$relation ? $element->$relation->name : null;
 						break;
 					case 'CHasManyRelation':
-						$_element->$relation = $this->modelToResourceParse($element, $relation, $module_class);
+						$list = array();
+
+						$recur = false;
+						$data_class = null;
+
+						foreach ($element->$relation as $item) {
+							if (!$data_class) {
+								if (strstr(\CHtml::modelName($item),$module_class)) {
+									$data_class = 'OEModule\\'.$module_class.'\\services\\'.\CHtml::modelName($item);
+								} else {
+									$data_class = '\\services\\'.\CHtml::modelName($item);
+								}
+
+								$data_item = new $data_class;
+
+								if ($data_item instanceof ElementDataObject) {
+									$recur = true;
+									break;
+								}
+							}
+
+							//if ($recur) break;
+
+							$item_class = \CHtml::modelName($item);
+							$list[] = \Yii::app()->service->$item_class($item->primaryKey);
+						}
+
+						if ($recur) {
+							$_element->$relation = $this->modelToResourceParse($element, $relation, $module_class);
+						} else {
+							$_element->$relation = $list;
+						}
 						break;
 					default:
 						throw new \Exception("Unhandled relation type: ".$relations[$relation][0]);
@@ -87,6 +113,12 @@ class DeclarativeTypeParser_Elements extends DeclarativeTypeParser
 		$elements = array();
 
 		foreach ($resource->$res_attribute as $_element) {
+			if ($_element instanceof ModelReference) {
+				$model_class = $_element->getModelClass();
+				$elements[] = $model_class::model()->findByPk($_element->getId());
+				continue;
+			}
+
 			$data_class = $_element->_class_name;
 
 			$element = new $data_class;
@@ -104,13 +136,6 @@ class DeclarativeTypeParser_Elements extends DeclarativeTypeParser
 			}
 
 			foreach ($_element->relations() as $index => $relation) {
-				if (!is_int($index)) {
-					list($other_relation,$other_relation_item) = $relation;
-					$relation = $index;
-				} else {
-					$other_relation = false;
-				}
-
 				if (!isset($relations[$relation])) {
 					throw new \Exception("relation $relation is not defined on element class ".\CHtml::modelName($element));
 				}
@@ -123,11 +148,8 @@ class DeclarativeTypeParser_Elements extends DeclarativeTypeParser
 						$element->{$relations[$relation][2]} = $element->$relation ? $element->$relation->primaryKey : null;
 						break;
 					case 'CHasManyRelation':
-						$element->$relation = $resource->$res_attribute ? $this->resourceToModelParse($model, $_element, null, $relation, null, null, null) : null;
-
-						if ($other_relation) {
-							$element->$other_relation = $this->getRelatedItemsFromRelation($element->$relation,$other_relation_item);
-						}
+						$a = 1;
+						$element->$relation = $resource->$res_attribute ? $this->resourceToModelParse($a, $_element, null, $relation, null, null, null) : null;
 						break;
 					default:
 						throw new \Exception("Unhandled relation type: ".$relations[$relation][0]);
@@ -151,17 +173,6 @@ class DeclarativeTypeParser_Elements extends DeclarativeTypeParser
 		return $elements;
 	}
 
-	private function getRelatedItemsFromRelation($data, $item_name)
-	{
-		$items = array();
-
-		foreach ($data as $item) {
-			$items[] = $item->$item_name;
-		}
-
-		return $items;
-	}
-
 	public function resourceToModel_AfterSave($model)
 	{
 		$elements = $model->expandAttribute('_elements');
@@ -170,31 +181,6 @@ class DeclarativeTypeParser_Elements extends DeclarativeTypeParser
 			$element->event_id = $model->getId();
 
 			$this->mc->saveModel($element);
-
-			$data_class = '\\OEModule\\'.$element->event->eventType->class_name.'\\services\\'.\CHtml::modelName($element);
-			$data_obj = new $data_class;
-
-			$relations = $element->relations();
-
-			foreach ($data_obj->relations() as $index => $relation) {
-				if (!is_int($index)) {
-					list($other_relation,$other_relation_item) = $relation;
-					$relation = $index;
-				} else {
-					$other_relation = false;
-				}
-
-				if (!isset($relations[$relation])) {
-					throw new \Exception("relation $relation is not defined on element class ".\CHtml::modelName($element));
-				}
-
-				if ($relations[$relation][0] == 'CHasManyRelation') {
-					foreach ($element->$relation as $item) {
-						$item->element_id = $element->id;
-						$this->mc->saveModel($item);
-					}
-				}
-			}
 		}
 	}
 

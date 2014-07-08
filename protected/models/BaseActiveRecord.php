@@ -343,9 +343,12 @@ class BaseActiveRecord extends CActiveRecord
 				if (in_array($name, $thru_rels) || !in_array($name, $safe_attributes)) {
 					continue;
 				}
+
 				$rel = $record_relations[$name];
 				$new_objs = $this->$name;
-				$orig_objs = $this->getRelated($name, true);
+				// Cloning is necessary so we can save an object that has had the relation set but no data posted (service layer)
+				$clone = clone $this;
+				$orig_objs = $clone->getRelated($name, true);
 
 				if (get_class($rel) == self::MANY_MANY) {
 					foreach ($orig_objs as $obj) {
