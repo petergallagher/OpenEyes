@@ -246,21 +246,21 @@ class PatientOphthalmicDiagnosesServiceTest extends \CDbTestCase
 		$this->assertInstanceOf('Patient',$patient);
 		$this->assertCount(2,$patient->ophthalmicDiagnoses);
 
-		$this->assertInstanceOf('SecondaryDiagnosis',$patient->ophthalmicDiagnoses[0]);
-		$this->assertInstanceOf('Disorder',$patient->ophthalmicDiagnoses[0]->disorder);
-		$this->assertEquals('Myopia',$patient->ophthalmicDiagnoses[0]->disorder->term);
-		$this->assertEquals(\Disorder::model()->find('term=?',array('Myopia'))->id,$patient->ophthalmicDiagnoses[0]->disorder_id);
-		$this->assertInstanceOf('Eye',$patient->ophthalmicDiagnoses[0]->eye);
-		$this->assertEquals('Both',$patient->ophthalmicDiagnoses[0]->eye->name);
-		$this->assertEquals(\Eye::model()->find('name=?',array('Both'))->id,$patient->ophthalmicDiagnoses[0]->eye_id);
-
-		$this->assertInstanceOf('SecondaryDiagnosis',$patient->ophthalmicDiagnoses[1]);
-		$this->assertInstanceOf('Disorder',$patient->ophthalmicDiagnoses[1]->disorder);
-		$this->assertEquals('Retinal lattice degeneration',$patient->ophthalmicDiagnoses[1]->disorder->term);
-		$this->assertEquals(\Disorder::model()->find('term=?',array('Retinal lattice degeneration'))->id,$patient->ophthalmicDiagnoses[1]->disorder_id);
-		$this->assertInstanceOf('Eye',$patient->ophthalmicDiagnoses[1]->eye);
-		$this->assertEquals('Right',$patient->ophthalmicDiagnoses[1]->eye->name);
-		$this->assertEquals(\Eye::model()->find('name=?',array('Right'))->id,$patient->ophthalmicDiagnoses[1]->eye_id);
+		foreach ($patient->ophthalmicDiagnoses as $diagnosis) {
+			$this->assertInstanceOf('SecondaryDiagnosis',$diagnosis);
+			switch ($diagnosis->disorder->term) {
+				case 'Myopia':
+					$this->assertEquals($this->disorder('myopia'), $diagnosis->disorder);
+					$this->assertEquals($this->eye('eyeBoth'), $diagnosis->eye);
+					break;
+				case 'Retinal lattice degeneration':
+					$this->assertEquals($this->disorder('rld'), $diagnosis->disorder);
+					$this->assertEquals($this->eye('eyeRight'), $diagnosis->eye);
+					break;
+				default:
+					$this->fail("Unexpected diagnosis: {$dianosis->disorder->term}");
+			}
+		}
 	}
 
 	public function testResourceToModel_Save_Update_NotOphthalmic_Exception()
@@ -381,20 +381,22 @@ class PatientOphthalmicDiagnosesServiceTest extends \CDbTestCase
 		$this->assertInstanceOf('Patient',$patient);
 		$this->assertCount(2,$patient->ophthalmicDiagnoses);
 
-		$this->assertInstanceOf('SecondaryDiagnosis',$patient->ophthalmicDiagnoses[0]);
-		$this->assertInstanceOf('Disorder',$patient->ophthalmicDiagnoses[0]->disorder);
-		$this->assertEquals('Myopia',$patient->ophthalmicDiagnoses[0]->disorder->term);
-		$this->assertEquals(\Disorder::model()->find('term=?',array('Myopia'))->id,$patient->ophthalmicDiagnoses[0]->disorder_id);
-		$this->assertInstanceOf('Eye',$patient->ophthalmicDiagnoses[0]->eye);
-		$this->assertEquals('Left',$patient->ophthalmicDiagnoses[0]->eye->name);
-		$this->assertEquals(\Eye::model()->find('name=?',array('Left'))->id,$patient->ophthalmicDiagnoses[0]->eye_id);
 
-		$this->assertInstanceOf('SecondaryDiagnosis',$patient->ophthalmicDiagnoses[1]);
-		$this->assertInstanceOf('Disorder',$patient->ophthalmicDiagnoses[1]->disorder);
-		$this->assertEquals('Retinal lattice degeneration',$patient->ophthalmicDiagnoses[1]->disorder->term);
-		$this->assertEquals(\Disorder::model()->find('term=?',array('Retinal lattice degeneration'))->id,$patient->ophthalmicDiagnoses[1]->disorder_id);
-		$this->assertNull($patient->ophthalmicDiagnoses[1]->eye);
-		$this->assertNull($patient->ophthalmicDiagnoses[1]->eye_id);
+		foreach ($patient->ophthalmicDiagnoses as $diagnosis) {
+			$this->assertInstanceOf('SecondaryDiagnosis',$diagnosis);
+			switch ($diagnosis->disorder->term) {
+				case 'Myopia':
+					$this->assertEquals($this->disorder('myopia'), $diagnosis->disorder);
+					$this->assertEquals($this->eye('eyeLeft'), $diagnosis->eye);
+					break;
+				case 'Retinal lattice degeneration':
+					$this->assertEquals($this->disorder('rld'), $diagnosis->disorder);
+					$this->assertNull($diagnosis->eye);
+					break;
+				default:
+					$this->fail("Unexpected diagnosis: {$dianosis->disorder->term}");
+			}
+		}
 	}
 
 	public function testJsonToModel_Save_Create_NonOphthalmic_Exception()
@@ -456,18 +458,22 @@ class PatientOphthalmicDiagnosesServiceTest extends \CDbTestCase
 		$this->assertInstanceOf('Patient',$patient);
 		$this->assertCount(2,$patient->ophthalmicDiagnoses);
 
-		$this->assertInstanceOf('SecondaryDiagnosis',$patient->ophthalmicDiagnoses[0]);
-		$this->assertInstanceOf('Disorder',$patient->ophthalmicDiagnoses[0]->disorder);
-		$this->assertEquals('Myopia',$patient->ophthalmicDiagnoses[0]->disorder->term);
-		$this->assertEquals(\Disorder::model()->find('term=?',array('Myopia'))->id,$patient->ophthalmicDiagnoses[0]->disorder_id);
-		$this->assertInstanceOf('Eye',$patient->ophthalmicDiagnoses[0]->eye);
-		$this->assertEquals('Left',$patient->ophthalmicDiagnoses[0]->eye->name);		$this->assertEquals(\Eye::model()->find('name=?',array('Left'))->id,$patient->ophthalmicDiagnoses[0]->eye_id);
-		$this->assertInstanceOf('SecondaryDiagnosis',$patient->ophthalmicDiagnoses[1]);
-		$this->assertInstanceOf('Disorder',$patient->ophthalmicDiagnoses[1]->disorder);
-		$this->assertEquals('Retinal lattice degeneration',$patient->ophthalmicDiagnoses[1]->disorder->term);
-		$this->assertEquals(\Disorder::model()->find('term=?',array('Retinal lattice degeneration'))->id,$patient->ophthalmicDiagnoses[1]->disorder_id);
-		$this->assertNull($patient->ophthalmicDiagnoses[1]->eye);
-		$this->assertNull($patient->ophthalmicDiagnoses[1]->eye_id);
+
+		foreach ($patient->ophthalmicDiagnoses as $diagnosis) {
+			$this->assertInstanceOf('SecondaryDiagnosis',$diagnosis);
+			switch ($diagnosis->disorder->term) {
+				case 'Myopia':
+					$this->assertEquals($this->disorder('myopia'), $diagnosis->disorder);
+					$this->assertEquals($this->eye('eyeLeft'), $diagnosis->eye);
+					break;
+				case 'Retinal lattice degeneration':
+					$this->assertEquals($this->disorder('rld'), $diagnosis->disorder);
+					$this->assertNull($diagnosis->eye);
+					break;
+				default:
+					$this->fail("Unexpected diagnosis: {$dianosis->disorder->term}");
+			}
+		}
 	}
 
 	public function testJsonToModel_Save_Update_NonOphthalmic_Exception()
