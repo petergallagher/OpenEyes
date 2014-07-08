@@ -160,7 +160,7 @@ class ApiController extends CController
 			$this->sendResponse(304);
 		}
 
-		header('Content-Location: ' . $this->createAbsoluteUrl('api/') . '/' . Yii::app()->service->referenceToFhirUrl($ref) . "/_history/{$vid}");
+		header('Content-Location: ' . $this->createAbsoluteUrl('api/') . '/' . $ref->toFhirUrl() . "/_history/{$vid}");
 		$this->sendLastModified($ref);
 		$this->sendEtag($ref);
 		$this->sendResource($ref->fetch());
@@ -200,7 +200,7 @@ class ApiController extends CController
 			$ref = $this->getRef($resource_type, $id);
 
 			$vid = $ref->getVersionId();
-			$vurl = $this->createAbsoluteUrl('api/') . '/' . Yii::app()->service->referenceToFhirUrl($ref) . "/_history/{$vid}";
+			$vurl = $this->createAbsoluteUrl('api/') . '/' . $ref->toFhirUrl() . "/_history/{$vid}";
 
 			if (isset($_SERVER['HTTP_CONTENT_LOCATION']) && $_SERVER['HTTP_CONTENT_LOCATION'] != $vurl) {
 				$this->sendResponse(409);
@@ -281,7 +281,7 @@ class ApiController extends CController
 		$ref = $service->fhirCreate($fhirObject);
 		$tx->commit();
 
-		$url = Yii::app()->service->referenceToFhirUrl($ref);
+		$url = $ref->toFhirUrl();
 
 		header('Location: ' . $this->createAbsoluteUrl('api/') . "/{$url}/_history/{$ref->getVersionId()}");
 		$this->sendEtag($ref);
@@ -325,7 +325,7 @@ class ApiController extends CController
 
 		$indexed_resources = array();
 		foreach ($resources as $resource) {
-			$url = $base_url . '/' . Yii::app()->service->serviceAndIdToFhirUrl($service->getServiceName(), $resource->getId());
+			$url = $base_url . '/' . Yii::app()->service->serviceAndIdToFhirUrl($service, $resource->getId());
 			$indexed_resources[$url] = $resource;
 		}
 
@@ -338,14 +338,16 @@ class ApiController extends CController
 	{
 		$profiles = isset($params['_profile']) ? array($params['_profile']) : array();
 		$service = Yii::app()->service->getFhirService($resource_type, $profiles);
-		if (!$service) return null;
 
 		// If a profile was supplied it must match
 		if (isset($params['_profile'])) {
-			$resource_class = $service->getResourceClass();
-			if ($resource_class::getOeFhirProfile() != $params['_profile']) {
-				return null;
+			if ($service) {
+				$resource_class = $service->getResourceClass();
+				if ($resource_class::getOeFhirProfile() != $params['_profile']) $service = null;
 			}
+			if (!$service) return null;
+		} else {
+			if (!$service) throw new services\ProcessingNotSupported("A profile must be specified for resources of type '{$resource_type}'");
 		}
 
 		// Special case for when there's a resource ID as part of the search (which doesn't seem very useful...)
@@ -375,8 +377,8 @@ class ApiController extends CController
 				'url' => $this->createAbsoluteUrl('api/'),
 				'fhir_version' => self::FHIR_VERSION,
 				'accept_unknown' => true,
-				'profiles' => Yii::app()->service->listFhirSupportedProfiles(),
-				'server_resources' => Yii::app()->service->describeFhirServerResources(),
+				'profiles' => Yii::app()->fhirMap->listFhirSupportedProfiles(),
+				'server_resources' => Yii::app()->fhirMap->describeFhirServerResources(),
 			)
 		);
 		$this->sendResource($statement);

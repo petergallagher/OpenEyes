@@ -126,6 +126,15 @@ return array(
 			'observers' => array(),
 		),
 		'fhirClient' => array('class' => 'FhirClient'),
+		'fhirMap' => array(
+			'class' => '\services\FhirMap',
+			'resources' => array(
+				'services\CommissioningBody',
+				'services\Gp',
+				'services\Patient',
+				'services\Practice',
+			),
+		),
 		'fhirMarshal' => array('class' => 'FhirMarshal'),
 		'log' => array(
 			'class' => 'FlushableLogRouter',
