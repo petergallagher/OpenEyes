@@ -123,4 +123,19 @@ class PatientAssociatedContactsService extends DeclarativeModelService
 
 		$this->saveModel($pca);
 	}
+
+	public function setUpListItem($item, $model_class)
+	{
+		$model_item = parent::setUpListItem($item, $model_class);
+
+		if (!$item->location_id) {
+			$model_item->location = null;
+			$model_item->location_id = null;
+		} else if (!$item->contact_id) {
+			$model_item->contact = null;
+			$model_item->contact_id = null;
+		}
+
+		return $model_item;
+	}
 }

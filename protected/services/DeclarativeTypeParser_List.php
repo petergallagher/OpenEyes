@@ -43,7 +43,9 @@ class DeclarativeTypeParser_List extends DeclarativeTypeParser
 
 		if ($resource->$res_attribute) {
 			foreach ($resource->$res_attribute as $item) {
-				$model->addToRelatedObjectArray($related_object_name,$related_object_attribute,$this->mc->resourceToModel($item, new $model_class, false));
+				$model_item = $this->mc->service->setUpListItem($item, $model_class);
+
+				$model->addToRelatedObjectArray($related_object_name,$related_object_attribute,$this->mc->resourceToModel($item, $model_item, false));
 			}
 		}
 	}

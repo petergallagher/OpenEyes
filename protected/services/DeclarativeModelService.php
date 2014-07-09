@@ -147,4 +147,13 @@ class DeclarativeModelService extends ModelService
 			$model->setAttribute($object_relation, $related_object_value, false);
 		}
 	}
+
+	public function setUpListItem($item, $model_class)
+	{
+		if ($id = method_exists($item,'getId') ? $item->getId() : @$item->id) {
+			return $model_class::model()->findByPk($id);
+		} else {
+			return new $model_class;
+		}
+	}
 }
