@@ -252,15 +252,15 @@ class PatientAllergiesServiceTest extends \CDbTestCase
 
 		$this->assertInstanceOf('PatientAllergyAssignment',$patient->allergyAssignments[0]);
 		$this->assertInstanceOf('Allergy',$patient->allergyAssignments[0]->allergy);
-		$this->assertEquals('allergy 1',$patient->allergyAssignments[0]->allergy->name);
+		$this->assertEquals('allergy 3',$patient->allergyAssignments[0]->allergy->name);
 
 		$this->assertInstanceOf('PatientAllergyAssignment',$patient->allergyAssignments[1]);
 		$this->assertInstanceOf('Allergy',$patient->allergyAssignments[1]->allergy);
-		$this->assertEquals('allergy 2',$patient->allergyAssignments[1]->allergy->name);
+		$this->assertEquals('allergy 1',$patient->allergyAssignments[1]->allergy->name);
 
 		$this->assertInstanceOf('PatientAllergyAssignment',$patient->allergyAssignments[2]);
 		$this->assertInstanceOf('Allergy',$patient->allergyAssignments[2]->allergy);
-		$this->assertEquals('allergy 3',$patient->allergyAssignments[2]->allergy->name);
+		$this->assertEquals('allergy 2',$patient->allergyAssignments[2]->allergy->name);
 	}
 
 	public function testJsonToResource()
