@@ -321,9 +321,11 @@ class PatientServiceTest extends \CDbTestCase
 		$this->assertEquals('0101010101',$patient->contact->primary_phone);
 		$this->assertEquals(1,$patient->gp_id);
 		$this->assertEquals(1,$patient->practice_id);
+		$this->assertEquals($resource->contact_id, $patient->contact_id);
 
 		$this->assertCount(1, $patient->contact->addresses);
 		$this->assertInstanceOf('Address', $patient->contact->addresses[0]);
+		$this->assertEquals($patient->contact->addresses[0]->contact_id, $resource->contact_id);
 		$this->assertEquals('L1', $patient->contact->addresses[0]->address1);
 		$this->assertEquals('L2', $patient->contact->addresses[0]->address2);
 		$this->assertEquals('L3', $patient->contact->addresses[0]->city);
@@ -510,6 +512,7 @@ class PatientServiceTest extends \CDbTestCase
 		$patient = $ps->jsonToModel($json, $model);
 		$patient = \Patient::model()->findByPk($patient->id);
 
+		$this->assertEquals(1,$patient->contact_id);
 		$this->assertEquals('x0001',$patient->nhs_num);
 		$this->assertEquals('x0002',$patient->hos_num);
 		$this->assertEquals('x0003',$patient->title);
@@ -522,6 +525,7 @@ class PatientServiceTest extends \CDbTestCase
 
 		$this->assertCount(1, $patient->contact->addresses);
 		$this->assertInstanceOf('Address', $patient->contact->addresses[0]);
+		$this->assertEquals(1, $patient->contact->addresses[0]->contact_id);
 		$this->assertEquals('L1', $patient->contact->addresses[0]->address1);
 		$this->assertEquals('L2', $patient->contact->addresses[0]->address2);
 		$this->assertEquals('L3', $patient->contact->addresses[0]->city);
