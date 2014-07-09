@@ -53,6 +53,11 @@ class DeclarativeTypeParser_ListTest extends \CDbTestCase
 			->setMethods(array('resourceToModel'))
 			->getMock();
 
+		$service = $this->getMockBuilder('services\DeclarativeModelService')
+			->disableOriginalConstructor()
+			->setMethods(array('setUpListItem'))
+			->getMock();
+
 		$model = $this->getMockBuilder('services\ModelConverter_ModelWrapper')
 			->disableOriginalConstructor()
 			->setMethods(array('addToRelatedObjectArray'))
@@ -66,6 +71,11 @@ class DeclarativeTypeParser_ListTest extends \CDbTestCase
 		);
 
 		foreach ($data as $i => $item) {
+			$service->expects($this->at($i))
+				->method('setUpListItem')
+				->with($item, "Address")
+				->will($this->returnValue(new \Address));
+
 			$mc->expects($this->at($i))
 				->method('resourceToModel')
 				->with($item, new \Address, false)
@@ -75,6 +85,8 @@ class DeclarativeTypeParser_ListTest extends \CDbTestCase
 				->method('addToRelatedObjectArray')
 				->with('testing','iscool',$item);
 		}
+
+		$mc->service = $service;
 
 		$resource = (object)array(
 			'data' => $data
@@ -86,6 +98,11 @@ class DeclarativeTypeParser_ListTest extends \CDbTestCase
 
 	public function testResourceToModelParse_WithoutDot()
 	{
+		$service = $this->getMockBuilder('services\DeclarativeModelService')
+			->disableOriginalConstructor()
+			->setMethods(array('setUpListItem'))
+			->getMock();
+
 		$mc = $this->getMockBuilder('services\ModelConverter')
 			->disableOriginalConstructor()
 			->setMethods(array('resourceToModel'))
@@ -104,6 +121,11 @@ class DeclarativeTypeParser_ListTest extends \CDbTestCase
 		); 
 		
 		foreach ($data as $i => $item) {
+			$service->expects($this->at($i))
+				->method('setUpListItem')
+				->with($item, "Address")
+				->will($this->returnValue(new \Address));
+
 			$mc->expects($this->at($i))
 				->method('resourceToModel')
 				->with($item, new \Address, false)
@@ -114,6 +136,8 @@ class DeclarativeTypeParser_ListTest extends \CDbTestCase
 				->with('testing',null,$item);
 		}
 		
+		$mc->service = $service;
+
 		$resource = (object)array(
 			'data' => $data
 		);
