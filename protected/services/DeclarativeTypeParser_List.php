@@ -50,8 +50,6 @@ class DeclarativeTypeParser_List extends DeclarativeTypeParser
 
 	public function resourceToModel_RelatedObjects(&$model, $model_attribute, $copy_attribute, $save)
 	{
-		"resourceToModel_RelatedObjects for ".get_class($model)."\n";
-
 		if ((strpos($model_attribute,'.')) !== FALSE) {
 			list($related_object_name, $related_object_attribute) = explode('.',$model_attribute);
 		} else {
@@ -62,7 +60,11 @@ class DeclarativeTypeParser_List extends DeclarativeTypeParser
 
 		$attribute = $related_object_attribute ? $related_object_name.'.'.$related_object_attribute : $related_object_name;
 
-		$model->setAttribute($attribute, $this->filterListItems($model->expandAttribute($related_object_name), $related_object_attribute, $model->getRelatedObject($related_object_name,$related_object_attribute), $save));
+		$related_object = $model->getRelatedObject($related_object_name,$related_object_attribute);
+
+		$object = $model->expandAttribute($related_object_name);
+
+		$model->setAttribute($attribute, $this->filterListItems($object, $related_object_attribute, $related_object, $save));
 	}
 
 	protected function filterListItems($object, $relation, $items, $save)
@@ -73,26 +75,17 @@ class DeclarativeTypeParser_List extends DeclarativeTypeParser
 		$data = $relation ? $object->$relation : $object;
 
 		foreach ($items as $item) {
-			$found = false;
-
-			if ($data) {
-				foreach ($data as $current_item) {
-					$class_name = 'services\\'.get_class($current_item);
-					$current_item_res = $this->mc->modelToResource($current_item, new $class_name);
-					$new_item_res = $this->mc->modelToResource($item, new $class_name);
-
-					if ($current_item_res->isEqual($new_item_res)) {
-						$found = true;
-						$items_to_keep[] = $current_item;
-						$matched_ids[] = $current_item->id;
-					}
+			if ($save) {
+				$save_method = "saveListitem_".\CHtml::modelName($item);
+				if (method_exists($this->mc->service,$save_method)) {
+					$this->mc->service->$save_method($item);
+				} else {
+					$this->saveListItem($item);
 				}
 			}
 
-			if (!$found) {
-				$items_to_keep[] = $item;
-
-				$save && $this->saveListItem($item);
+			if ($item->id) {
+				$matched_ids[] = $item->id;
 			}
 		}
 
@@ -104,7 +97,7 @@ class DeclarativeTypeParser_List extends DeclarativeTypeParser
 			}
 		}
 
-		return $items_to_keep;
+		return $items;
 	}
 
 	public function jsonToResourceParse($object, $attribute, $data_class, $model_class)

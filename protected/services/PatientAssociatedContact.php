@@ -23,4 +23,6 @@ class PatientAssociatedContact extends Resource
 	public $primary_phone;
 	public $institution_ref;
 	public $site_ref;
+	public $contact_id;
+	public $location_id;
 }

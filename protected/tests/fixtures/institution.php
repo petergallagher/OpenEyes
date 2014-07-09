@@ -26,4 +26,12 @@ return array(
 		'remote_id' => 'foo',
 		'contact_id' => 1,
 	),
+	'buckpalace' => array(
+		'id' => 2,
+		'name' => 'Buckingham Palace',
+		'short_name' => 'BuckPalace',
+		'source_id' => 1,
+		'remote_id' => 'fee',
+		'contact_id' => 1,
+	),
 );

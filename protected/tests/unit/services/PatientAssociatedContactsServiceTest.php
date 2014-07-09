@@ -38,6 +38,9 @@ class PatientAssociatedContactsServiceTest extends \CDbTestCase
 		$this->assertCount(3,$resource->contacts);
 
 		$this->assertInstanceOf('services\PatientAssociatedContact',$resource->contacts[0]);
+		$this->assertEquals(1,$resource->contacts[0]->getId());
+		$this->assertEquals($patient->contactAssignments[0]->contact_id,$resource->contacts[0]->contact_id);
+		$this->assertFalse($resource->contacts[0]->location_id);
 		$this->assertEquals('Dr',$resource->contacts[0]->title);
 		$this->assertEquals('Zhivago',$resource->contacts[0]->family_name);
 		$this->assertEquals('Yuri',$resource->contacts[0]->given_name);
@@ -46,6 +49,9 @@ class PatientAssociatedContactsServiceTest extends \CDbTestCase
 		$this->assertNull($resource->contacts[0]->institution_ref);
 
 		$this->assertInstanceOf('services\PatientAssociatedContact',$resource->contacts[1]);
+		$this->assertEquals(2,$resource->contacts[1]->getId());
+		$this->assertEquals($patient->contactAssignments[1]->contact_id,$resource->contacts[1]->contact_id);
+		$this->assertFalse($resource->contacts[1]->location_id);
 		$this->assertEquals('Mr',$resource->contacts[1]->title);
 		$this->assertEquals('Inc',$resource->contacts[1]->family_name);
 		$this->assertEquals('Apple',$resource->contacts[1]->given_name);
@@ -54,6 +60,9 @@ class PatientAssociatedContactsServiceTest extends \CDbTestCase
 		$this->assertNull($resource->contacts[1]->institution_ref);
 
 		$this->assertInstanceOf('services\PatientAssociatedContact',$resource->contacts[2]);
+		$this->assertEquals(3,$resource->contacts[2]->getId());
+		$this->assertEquals($patient->contactAssignments[2]->contact_id,$resource->contacts[2]->contact_id);
+		$this->assertFalse($resource->contacts[2]->location_id);
 		$this->assertEquals('Ti',$resource->contacts[2]->title);
 		$this->assertEquals('Tiss',$resource->contacts[2]->family_name);
 		$this->assertEquals('Prac',$resource->contacts[2]->given_name);
@@ -74,6 +83,9 @@ class PatientAssociatedContactsServiceTest extends \CDbTestCase
 		$this->assertCount(3,$resource->contacts);
 
 		$this->assertInstanceOf('services\PatientAssociatedContact',$resource->contacts[0]);
+		$this->assertEquals($patient->contactAssignments[0]->id,$resource->contacts[0]->getId());
+		$this->assertEquals($patient->contactAssignments[0]->location->contact_id,$resource->contacts[0]->contact_id);
+		$this->assertEquals($patient->contactAssignments[0]->location->id,$resource->contacts[0]->location_id);
 		$this->assertEquals('Dr',$resource->contacts[0]->title);
 		$this->assertEquals('Zhivago',$resource->contacts[0]->family_name);
 		$this->assertEquals('Yuri',$resource->contacts[0]->given_name);
@@ -83,6 +95,9 @@ class PatientAssociatedContactsServiceTest extends \CDbTestCase
 		$this->assertNull($resource->contacts[0]->institution_ref);
 
 		$this->assertInstanceOf('services\PatientAssociatedContact',$resource->contacts[1]);
+		$this->assertEquals($patient->contactAssignments[1]->id,$resource->contacts[1]->getId());
+		$this->assertEquals($patient->contactAssignments[1]->location->contact_id,$resource->contacts[1]->contact_id);
+		$this->assertEquals($patient->contactAssignments[1]->location->id,$resource->contacts[1]->location_id);
 		$this->assertEquals('Mr',$resource->contacts[1]->title);
 		$this->assertEquals('Inc',$resource->contacts[1]->family_name);
 		$this->assertEquals('Apple',$resource->contacts[1]->given_name);
@@ -92,6 +107,9 @@ class PatientAssociatedContactsServiceTest extends \CDbTestCase
 		$this->assertNull($resource->contacts[1]->institution_ref);
 
 		$this->assertInstanceOf('services\PatientAssociatedContact',$resource->contacts[2]);
+		$this->assertEquals($patient->contactAssignments[2]->id,$resource->contacts[2]->getId());
+		$this->assertEquals($patient->contactAssignments[2]->location->contact_id,$resource->contacts[2]->contact_id);
+		$this->assertEquals($patient->contactAssignments[2]->location->id,$resource->contacts[2]->location_id);
 		$this->assertEquals('Ti',$resource->contacts[2]->title);
 		$this->assertEquals('Tiss',$resource->contacts[2]->family_name);
 		$this->assertEquals('Prac',$resource->contacts[2]->given_name);
@@ -311,9 +329,11 @@ class PatientAssociatedContactsServiceTest extends \CDbTestCase
 
 		$resource->contacts[0]->family_name = 'Bobson';
 		$resource->contacts[0]->site_ref = \Yii::app()->service->Site(1);
+		$resource->contacts[0]->contact_id = null;
 
 		$resource->contacts[1]->title = 'Dr';
 		$resource->contacts[1]->site_ref = null;
+		$resource->contacts[1]->location_id = null;
 
 		$resource->contacts[2]->primary_phone = '1212121212';
 		$resource->contacts[2]->site_ref = \Yii::app()->service->Site(2);
@@ -336,7 +356,7 @@ class PatientAssociatedContactsServiceTest extends \CDbTestCase
 		$patient = $ps->resourceToModel($resource, $this->patients('patient3'));
 
 		$this->assertEquals($total_patients, count(\Patient::model()->findAll()));
-		$this->assertEquals($total_contacts+3, count(\Contact::model()->findAll()));
+		$this->assertEquals($total_contacts+1, count(\Contact::model()->findAll()));
 		$this->assertEquals($total_pcas, count(\PatientContactAssignment::model()->findAll()));
 		$this->assertEquals($total_sites, count(\Site::model()->findAll()));
 		$this->assertEquals($total_institutions, count(\Institution::model()->findAll()));
@@ -360,6 +380,41 @@ class PatientAssociatedContactsServiceTest extends \CDbTestCase
 		$this->assertEquals($total_pcas, count(\PatientContactAssignment::model()->findAll()));
 		$this->assertEquals($total_sites, count(\Site::model()->findAll()));
 		$this->assertEquals($total_institutions, count(\Institution::model()->findAll()));
+	}
+
+	public function testResourceToModel_Save_Update_ModelIsCorrect()
+	{
+		$resource = $this->getModifiedResource(3);
+
+		$ps = new PatientAssociatedContactsService;
+		$patient = $ps->resourceToModel($resource, $this->patients('patient3'));
+
+		$this->assertInstanceOf('Patient',$patient);
+		$this->assertCount(3,$patient->contactAssignments);
+
+		$this->assertNull($patient->contactAssignments[0]->contact);
+		$this->assertInstanceOf('ContactLocation',$patient->contactAssignments[0]->location);
+		$this->assertInstanceOf('Contact',$patient->contactAssignments[0]->location->contact);
+		$this->assertEquals('Dr',$patient->contactAssignments[0]->location->contact->title);
+		$this->assertEquals('Yuri',$patient->contactAssignments[0]->location->contact->first_name);
+		$this->assertEquals('Bobson',$patient->contactAssignments[0]->location->contact->last_name);
+		$this->assertEquals(1,$patient->contactAssignments[0]->location->site_id);
+		$this->assertNull($patient->contactAssignments[0]->location->institution_id);
+
+		$this->assertNull($patient->contactAssignments[1]->location);
+		$this->assertInstanceOf('Contact',$patient->contactAssignments[1]->contact);
+		$this->assertEquals('Dr',$patient->contactAssignments[1]->contact->title);
+		$this->assertEquals('Apple',$patient->contactAssignments[1]->contact->first_name);
+		$this->assertEquals('Inc',$patient->contactAssignments[1]->contact->last_name);
+
+		$this->assertNull($patient->contactAssignments[2]->contact);
+		$this->assertInstanceOf('ContactLocation',$patient->contactAssignments[0]->location);
+		$this->assertInstanceOf('Contact',$patient->contactAssignments[2]->location->contact);
+		$this->assertEquals('Ti',$patient->contactAssignments[2]->location->contact->title);
+		$this->assertEquals('Prac',$patient->contactAssignments[2]->location->contact->first_name);
+		$this->assertEquals('Tiss',$patient->contactAssignments[2]->location->contact->last_name);
+		$this->assertNull($patient->contactAssignments[2]->location->institution_id);
+		$this->assertEquals(2,$patient->contactAssignments[2]->location->site_id);
 	}
 
 	public function testResourceToModel_Save_Update_DBIsCorrect()
@@ -400,7 +455,7 @@ class PatientAssociatedContactsServiceTest extends \CDbTestCase
 
 	public function testJsonToResource()
 	{
-		$json = '{"contacts":[{"title":"Dr","family_name":"Zhivago","given_name":"Yuri","primary_phone":"999","institution_ref":null,"site_ref":null,"id":null,"last_modified":null},{"title":"Mr","family_name":"Inc","given_name":"Apple","primary_phone":"01010101","institution_ref":null,"site_ref":{"service":"Site","id":"2"},"id":null,"last_modified":null},{"title":"Ti","family_name":"Tiss","given_name":"Prac","primary_phone":"0303032332","institution_ref":{"service":"Institution","id":"2"},"site_ref":null,"id":null,"last_modified":null}],"id":null,"last_modified":null,"patient_id":{"id":"3","last_modified":-2208988800}}';
+		$json = '{"contacts":[{"title":"Dr","family_name":"Zhivago","given_name":"Yuri","primary_phone":"999","institution_ref":null,"site_ref":null,"contact_id":"7","location_id":false,"id":"1","last_modified":null},{"title":"Mr","family_name":"Inc","given_name":"Apple","primary_phone":"01010101","institution_ref":null,"site_ref":{"service":"Site","id":"2"},"contact_id":"8","location_id":false,"id":"2","last_modified":null},{"title":"Ti","family_name":"Tiss","given_name":"Prac","primary_phone":"0303032332","institution_ref":{"service":"Institution","id":"2"},"site_ref":null,"contact_id":"9","location_id":false,"id":"3","last_modified":null}],"id":null,"last_modified":null,"patient_id":{"id":"1","last_modified":-2208988800}}';
 
 		$ps = new PatientAssociatedContactsService;
 		$resource = $ps->jsonToResource($json);
@@ -437,7 +492,7 @@ class PatientAssociatedContactsServiceTest extends \CDbTestCase
 
 	public function testJsonToModel_NoSave_NoNewRows()
 	{
-		$json = '{"contacts":[{"title":"Dr","family_name":"Zhivago","given_name":"Yuri","primary_phone":"999","institution_ref":null,"site_ref":null,"id":null,"last_modified":null},{"title":"Mr","family_name":"Inc","given_name":"Apple","primary_phone":"01010101","institution_ref":null,"site_ref":{"service":"Site","id":"2"},"id":null,"last_modified":null},{"title":"Ti","family_name":"Tiss","given_name":"Prac","primary_phone":"0303032332","institution_ref":{"service":"Institution","id":"2"},"site_ref":null,"id":null,"last_modified":null}],"id":null,"last_modified":null,"patient_id":{"id":"3","last_modified":-2208988800}}';
+		$json = '{"contacts":[{"title":"Dr","family_name":"Zhivago","given_name":"Yuri","primary_phone":"999","institution_ref":null,"site_ref":null,"contact_id":"7","location_id":false,"id":"1","last_modified":null},{"title":"Mr","family_name":"Inc","given_name":"Apple","primary_phone":"01010101","institution_ref":null,"site_ref":{"service":"Site","id":"2"},"contact_id":"8","location_id":false,"id":"2","last_modified":null},{"title":"Ti","family_name":"Tiss","given_name":"Prac","primary_phone":"0303032332","institution_ref":{"service":"Institution","id":"2"},"site_ref":null,"contact_id":"9","location_id":false,"id":"3","last_modified":null}],"id":null,"last_modified":null,"patient_id":{"id":"1","last_modified":-2208988800}}';
 
 		$total_patients = count(\Patient::model()->findAll());
 		$total_contacts = count(\Contact::model()->findAll());
@@ -457,7 +512,7 @@ class PatientAssociatedContactsServiceTest extends \CDbTestCase
 
 	public function testJsonToModel_NoSave_ModelIsCorrect()
 	{
-		$json = '{"contacts":[{"title":"Dr","family_name":"Zhivago","given_name":"Yuri","primary_phone":"999","institution_ref":null,"site_ref":null,"id":null,"last_modified":null},{"title":"Mr","family_name":"Inc","given_name":"Apple","primary_phone":"01010101","institution_ref":null,"site_ref":{"service":"Site","id":"2"},"id":null,"last_modified":null},{"title":"Ti","family_name":"Tiss","given_name":"Prac","primary_phone":"0303032332","institution_ref":{"service":"Institution","id":"2"},"site_ref":null,"id":null,"last_modified":null}],"id":null,"last_modified":null,"patient_id":{"id":"3","last_modified":-2208988800}}';
+		$json = '{"contacts":[{"title":"Dr","family_name":"Zhivago","given_name":"Yuri","primary_phone":"999","institution_ref":null,"site_ref":null,"contact_id":"7","location_id":false,"id":"1","last_modified":null},{"title":"Mr","family_name":"Inc","given_name":"Apple","primary_phone":"01010101","institution_ref":null,"site_ref":{"service":"Site","id":"2"},"contact_id":"8","location_id":false,"id":"2","last_modified":null},{"title":"Ti","family_name":"Tiss","given_name":"Prac","primary_phone":"0303032332","institution_ref":{"service":"Institution","id":"2"},"site_ref":null,"contact_id":"9","location_id":false,"id":"3","last_modified":null}],"id":null,"last_modified":null,"patient_id":{"id":"1","last_modified":-2208988800}}';
 
 		$ps = new PatientAssociatedContactsService;
 		$patient = $ps->jsonToModel($json, new \Patient, false);
@@ -498,7 +553,7 @@ class PatientAssociatedContactsServiceTest extends \CDbTestCase
 
 	public function testJsonToModel_Save_Create_ModelCountsCorrect()
 	{
-		$json = '{"contacts":[{"title":"Dr","family_name":"Zhivago2","given_name":"Yuri2","primary_phone":"999","institution_ref":null,"site_ref":null,"id":null,"last_modified":null},{"title":"Mr","family_name":"Inc","given_name":"Apple","primary_phone":"01010101","institution_ref":null,"site_ref":{"service":"Site","id":"2"},"id":null,"last_modified":null},{"title":"Ti","family_name":"Tiss","given_name":"Prac","primary_phone":"0303032332","institution_ref":{"service":"Institution","id":"1"},"site_ref":null,"id":null,"last_modified":null}],"id":null,"last_modified":null,"patient_id":{"id":"3","last_modified":-2208988800}}';
+		$json = '{"contacts":[{"title":"Dr","family_name":"Zhivago","given_name":"Yuri","primary_phone":"999","institution_ref":null,"site_ref":null,"contact_id":null,"location_id":false,"id":"1","last_modified":null},{"title":"Mr","family_name":"Inc","given_name":"Apple","primary_phone":"01010101","institution_ref":null,"site_ref":{"service":"Site","id":"2"},"contact_id":null,"location_id":false,"id":"2","last_modified":null},{"title":"Ti","family_name":"Tiss","given_name":"Prac","primary_phone":"0303032332","institution_ref":{"service":"Institution","id":"2"},"site_ref":null,"contact_id":null,"location_id":false,"id":"3","last_modified":null}],"id":null,"last_modified":null,"patient_id":{"id":"1","last_modified":-2208988800}}';
 
 		$total_patients = count(\Patient::model()->findAll());
 		$total_contacts = count(\Contact::model()->findAll());
@@ -519,7 +574,7 @@ class PatientAssociatedContactsServiceTest extends \CDbTestCase
 
 	public function testJsonToModel_Save_Create_DBIsCorrect()
 	{
-		$json = '{"contacts":[{"title":"Dr","family_name":"Zhivago2","given_name":"Yuri2","primary_phone":"999","institution_ref":null,"site_ref":null,"id":null,"last_modified":null},{"title":"Mr","family_name":"Inc","given_name":"Apple","primary_phone":"01010101","institution_ref":null,"site_ref":{"service":"Site","id":"2"},"id":null,"last_modified":null},{"title":"Ti","family_name":"Tiss","given_name":"Prac","primary_phone":"0303032332","institution_ref":{"service":"Institution","id":"1"},"site_ref":null,"id":null,"last_modified":null}],"id":null,"last_modified":null,"patient_id":{"id":"3","last_modified":-2208988800}}';
+		$json = '{"contacts":[{"title":"Dr","family_name":"Zhivago2","given_name":"Yuri2","primary_phone":"999","institution_ref":null,"site_ref":null,"contact_id":null,"location_id":false,"id":"1","last_modified":null},{"title":"Mr","family_name":"Inc","given_name":"Apple","primary_phone":"01010101","institution_ref":null,"site_ref":{"service":"Site","id":"2"},"contact_id":null,"location_id":false,"id":"2","last_modified":null},{"title":"Ti","family_name":"Tiss","given_name":"Prac","primary_phone":"0303032332","institution_ref":{"service":"Institution","id":"1"},"site_ref":null,"contact_id":null,"location_id":false,"id":"3","last_modified":null}],"id":null,"last_modified":null,"patient_id":{"id":"1","last_modified":-2208988800}}';
 
 		$ps = new PatientAssociatedContactsService;
 		$patient = $ps->jsonToModel($json, $this->patients('patient4'));
@@ -561,7 +616,7 @@ class PatientAssociatedContactsServiceTest extends \CDbTestCase
 
 	public function testJsonToModel_Save_Update_ModelCountsCorrect()
 	{
-		$json = '{"contacts":[{"title":"Dr","family_name":"Zhivago","given_name":"Yuri","primary_phone":"999","institution_ref":null,"site_ref":null,"id":null,"last_modified":null},{"title":"Mr","family_name":"Inc","given_name":"Apple","primary_phone":"01010101","institution_ref":null,"site_ref":{"service":"Site","id":"2"},"id":null,"last_modified":null},{"title":"Ti","family_name":"Tiss","given_name":"Prac","primary_phone":"0303032332","institution_ref":{"service":"Institution","id":"1"},"site_ref":null,"id":null,"last_modified":null}],"id":null,"last_modified":null,"patient_id":{"id":"3","last_modified":-2208988800}}';
+		$json = '{"contacts":[{"title":"Dr","family_name":"Zhivago","given_name":"Yuri","primary_phone":"999","institution_ref":null,"site_ref":null,"contact_id":null,"location_id":false,"id":"1","last_modified":null},{"title":"Mr","family_name":"Inc","given_name":"Apple","primary_phone":"01010101","institution_ref":null,"site_ref":{"service":"Site","id":"2"},"contact_id":null,"location_id":false,"id":"2","last_modified":null},{"title":"Ti","family_name":"Tiss","given_name":"Prac","primary_phone":"0303032332","institution_ref":{"service":"Institution","id":"2"},"site_ref":null,"contact_id":"9","location_id":false,"id":"3","last_modified":null}],"id":null,"last_modified":null,"patient_id":{"id":"1","last_modified":-2208988800}}';
 
 		$total_patients = count(\Patient::model()->findAll());
 		$total_contacts = count(\Contact::model()->findAll());
@@ -582,7 +637,7 @@ class PatientAssociatedContactsServiceTest extends \CDbTestCase
 
 	public function testJsonToModel_Save_Update_DBIsCorrect()
 	{
-		$json = '{"contacts":[{"title":"Dr","family_name":"Zhivago","given_name":"Yuri","primary_phone":"999","institution_ref":null,"site_ref":null,"id":null,"last_modified":null},{"title":"Mr","family_name":"Inc","given_name":"Apple","primary_phone":"01010101","institution_ref":null,"site_ref":{"service":"Site","id":"2"},"id":null,"last_modified":null},{"title":"Ti","family_name":"Tiss","given_name":"Prac","primary_phone":"0303032332","institution_ref":{"service":"Institution","id":"1"},"site_ref":null,"id":null,"last_modified":null}],"id":null,"last_modified":null,"patient_id":{"id":"3","last_modified":-2208988800}}';
+		$json = '{"contacts":[{"title":"Dr","family_name":"Zhivago","given_name":"Yuri","primary_phone":"999","institution_ref":null,"site_ref":null,"contact_id":"7","location_id":false,"id":"1","last_modified":null},{"title":"Mr","family_name":"Inc","given_name":"Apple","primary_phone":"01010101","institution_ref":null,"site_ref":{"service":"Site","id":"2"},"contact_id":"8","location_id":false,"id":"2","last_modified":null},{"title":"Ti","family_name":"Tiss","given_name":"Prac","primary_phone":"0303032332","institution_ref":{"service":"Institution","id":"1"},"site_ref":null,"contact_id":"9","location_id":false,"id":"3","last_modified":null}],"id":null,"last_modified":null,"patient_id":{"id":"1","last_modified":-2208988800}}';
 
 		$ps = new PatientAssociatedContactsService;
 		$patient = $ps->jsonToModel($json, $this->patients('patient1'));

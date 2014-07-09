@@ -158,7 +158,7 @@ abstract class ModelService extends InternalService
 	 *
 	 * @param BaseActiveRecord $model
 	 */
-	protected function saveModel(\BaseActiveRecord $model)
+	protected function saveModel(\BaseActiveRecord &$model)
 	{
 		if (!$model->save()) {
 			throw new ValidationFailure("Validation failure on " . get_class($model), $model->errors);

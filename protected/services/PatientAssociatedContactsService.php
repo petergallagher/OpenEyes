@@ -42,24 +42,18 @@ class PatientAssociatedContactsService extends DeclarativeModelService
 					'location_id', 'ContactLocation',
 				),
 				'contact' => array(
-					'location.contact_id', 'Contact',
+					'contact_id', 'Contact',
 				),
 			),
 			'fields' => array(
-				'title' => array(self::TYPE_OR, 'title', array('location.contact','contact')),
-				'given_name' => array(self::TYPE_OR, 'first_name', array('location.contact', 'contact')),
-				'family_name' => array(self::TYPE_OR, 'last_name', array('location.contact', 'contact')),
-				'primary_phone' => array(self::TYPE_OR, 'primary_phone', array('location.contact', 'contact')),
+				'title' => 'contact.title',
+				'given_name' => 'contact.first_name',
+				'family_name' => 'contact.last_name',
+				'primary_phone' => 'contact.primary_phone',
 				'site_ref' => array(self::TYPE_REF, 'location.site_id', 'Site'),
 				'institution_ref' => array(self::TYPE_REF, 'location.institution_id', 'Institution'),
-			),
-			'rules' => array(
-				'fields' => array(
-					'title' => array(self::RULE_TYPE_ALLNULL, array('site_ref', 'institution_ref'), 'then' => 'contact', 'else' => 'location.contact'),
-					'given_name' => array(self::RULE_TYPE_ALLNULL, array('site_ref', 'institution_ref'), 'then' => 'contact', 'else' => 'location.contact'),
-					'family_name' => array(self::RULE_TYPE_ALLNULL, array('site_ref', 'institution_ref'), 'then' => 'contact', 'else' => 'location.contact'),
-					'primary_phone' => array(self::RULE_TYPE_ALLNULL, array('site_ref', 'institution_ref'), 'then' => 'contact', 'else' => 'location.contact'),
-				),
+				'contact_id' => 'contact.id',
+				'location_id' => 'location.id',
 			),
 		),
 	);
@@ -68,37 +62,65 @@ class PatientAssociatedContactsService extends DeclarativeModelService
 	{
 	}
 
-	/**
-	 * @param Array $related_object_def
-	 * @param Resource $resource
-	 *
-	 * Allows overriding the attribute for a specific relation in the service class
-	 */
-	public function getRelatedObjectAttribute($relation_name, $related_object_def, $resource)
+	public function expandModelAttribute($model, $attribute)
 	{
-		if ($relation_name == 'contact') {
-			if (DeclarativeTypeParser::attributesAllNull($resource, array('site_ref', 'institution_ref'))) {
-				return 'contact_id';
-			}
+		if (preg_match('/^contact\./',$attribute)) {
+			return DeclarativeTypeParser::expandObjectAttribute($model, $model->location ? "location.$attribute" : $attribute);
+		} else {
+			return parent::expandModelAttribute($model, $attribute);
 		}
-
-		return parent::getRelatedObjectAttribute($relation_name, $related_object_def, $resource);
 	}
 
-	/**
-	 * @param Array $related_object_def
-	 * @param Resource $resource
-	 *
-	 * Allows overriding the value for a specific relation in the service class (eg nulling it under certain conditions)
-	 */
-	public function getRelatedObjectValue($relation_name, $related_object_def, $resource)
+	public function setModelAttributeFromResource(&$model, $attribute, $resource_value)
 	{
-		if ($relation_name == 'location') {
-			if (DeclarativeTypeParser::attributesAllNull($resource, array('site_ref', 'institution_ref'))) {
-				return null;
-			}
+		if (preg_match('/^contact\./',$attribute) && $model->expandAttribute('location')) {
+			$attribute = "location.$attribute";
 		}
 
-		return parent::getRelatedObjectValue($relation_name, $related_object_def, $resource);
+		// blank pks on new records break Yii
+		if (preg_match('/\.id$/',$attribute) && !$resource_value) return;
+
+		return parent::setModelAttributeFromResource($model, $attribute, $resource_value);
+	}
+
+	public function setUpRelatedObjects(&$model, $resource)
+	{
+		foreach ($model->getRelatedObjectDefinitions() as $relation_name => $def) {
+			$attribute = $this->getRelatedObjectAttribute($relation_name, $def, $resource);
+			$related_object_value = $this->getRelatedObjectValue($model, $relation_name, $def, $resource);
+
+			$object_relation = ($pos = strpos($attribute,'.')) ? substr($attribute,0,$pos).'.'.$relation_name : $relation_name;
+
+			if ($object_relation == 'location' && (DeclarativeTypeParser::attributesAllNull($resource, array('site_ref','institution_ref')))) {
+				$related_object_value = null;
+			}
+
+			if ($object_relation == 'contact' && (!DeclarativeTypeParser::attributesAllNull($resource, array('site_ref','institution_ref')))) {
+				$object_relation = "location.contact";
+			}
+
+			$model->setAttribute($object_relation, $related_object_value, false);
+		}
+	}
+
+	public function saveListitem_PatientContactAssignment($pca)
+	{
+		if ($pca->location) {
+			$this->saveModel($pca->location->contact);
+
+			$pca->location->contact_id = $pca->location->contact->id;
+
+			$this->saveModel($pca->location);
+
+			$pca->location_id = $pca->location->id;
+			$pca->contact_id = null;
+		} else {
+			$this->saveModel($pca->contact);
+
+			$pca->contact_id = $pca->contact->id;
+			$pca->location_id = null;
+		}
+
+		$this->saveModel($pca);
 	}
 }

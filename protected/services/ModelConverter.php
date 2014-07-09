@@ -46,7 +46,7 @@ class ModelConverter
 				$parser = new $class($this);
 				$resource->$res_attribute = $parser->modelToResourceParse($object, $def[1], $def[2], @$def[3]);
 			} else {
-				$resource->$res_attribute = DeclarativeTypeParser::expandObjectAttribute($object, $def);
+				$resource->$res_attribute = $this->service->expandModelAttribute($object, $def);
 			}
 		}
 
@@ -59,7 +59,7 @@ class ModelConverter
 
 		$this->service->getComplexReferenceObjects($model, $resource);
 
-		$this->processRelatedObjects($model, $resource);
+		$this->service->setUpRelatedObjects($model, $resource);
 
 		foreach ($this->map->getFieldsForClass($model->getClass()) as $res_attribute => $def) {
 			if (is_array($def)) {
@@ -67,11 +67,15 @@ class ModelConverter
 				$parser = new $class($this);
 				$parser->resourceToModelParse($model, $resource, $def[1], $res_attribute, $def[2], @$def[3], $save);
 			} else {
-				$this->mapResourceAttributeToModel($model, $resource->$res_attribute, $def, $save);
+				if ($this->isReferenceObjectAttribute($model, $def)) {
+					$this->mapResourceReferenceObjectToModel($model, $def, $resource->$res_attribute);
+				} else {
+					$this->service->setModelAttributeFromResource($model, $def, $resource->$res_attribute);
+				}
 			}
 		}
 
-		$save && $this->processRelatedObjects($model, $resource, true);
+		$save && $this->saveRelatedObjects($model, $resource);
 
 		foreach ($this->map->getFieldsForClass($model->getClass()) as $res_attribute => $def) {
 			if (is_array($def)) {
@@ -100,7 +104,7 @@ class ModelConverter
 		return $model->getModel();
 	}
 
-	protected function mapResourceAttributeToModel(&$model, $resource_value, $attribute_def, $save)
+	protected function isReferenceObjectAttribute($model, $attribute_def)
 	{
 		if (substr_count($attribute_def,'.') >0) {
 			$ex = explode('.',$attribute_def);
@@ -108,16 +112,18 @@ class ModelConverter
 			$related_object_attribute = array_pop($ex);
 			$relation_name = implode('.',$ex);
 
-			if (!$model->isRelatedObject($relation_name)) {
-				return $this->mapResourceReferenceObjectToModel($model, $relation_name, $related_object_attribute, $resource_value, $save);
-			}
+			return !$model->isRelatedObject($relation_name);
 		}
 
-		$model->setAttribute($attribute_def, $resource_value);
+		return false;
 	}
 
-	protected function mapResourceReferenceObjectToModel(&$model, $relation_name, $related_object_attribute, $resource_value, $save)
+	protected function mapResourceReferenceObjectToModel(&$model, $attribute_def, $resource_value)
 	{
+		$ex = explode('.',$attribute_def);
+		$related_object_attribute = array_pop($ex);
+		$relation_name = implode('.',$ex);
+
 		$model->addReferenceObjectAttribute($relation_name, $related_object_attribute, $resource_value);
 
 		if ($model->haveAllKeysForReferenceObject($relation_name)) {
@@ -125,15 +131,15 @@ class ModelConverter
 		}
 	}
 
-	protected function processRelatedObjects(&$model, $resource, $save=false)
+	protected function saveRelatedObjects(&$model, $resource)
 	{
 		foreach ($model->getRelatedObjectDefinitions() as $relation_name => $def) {
 			$attribute = $this->service->getRelatedObjectAttribute($relation_name, $def, $resource);
-			$related_object_value = $this->service->getRelatedObjectValue($relation_name, $def, $resource);
+			$related_object_value = $this->service->getRelatedObjectValue($model, $relation_name, $def, $resource);
 
 			$object_relation = ($pos = strpos($attribute,'.')) ? substr($attribute,0,$pos).'.'.$relation_name : $relation_name;
 
-			if ($save && $related_object = $model->expandAttribute($object_relation)) {
+			if ($related_object = $model->expandAttribute($object_relation)) {
 				if (isset($def[2])) {
 					$related_object->{$def[2]} = $model->getId();
 				}
@@ -141,8 +147,6 @@ class ModelConverter
 				$this->saveModel($related_object);
 
 				$attribute && $model->setAttribute($attribute, $related_object->id);
-			} else {
-				$model->setAttribute($object_relation, $related_object_value, false);
 			}
 		}
 	}

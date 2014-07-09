@@ -132,34 +132,6 @@ class ModelMap
 		return false;
 	}
 
-	public function getRuleForOrClause($class_name, $attribute)
-	{
-		if (!isset($this->map[$class_name]['rules']['fields'][$attribute])) {
-			foreach ($this->map as $_class_name => $_def) {
-				if (@$_def['ar_class'] == $class_name) {
-					return $this->getRuleForOrClause($_class_name, $attribute);
-				}
-			}
-
-			throw new \Exception("Missing 'or' rule for $class_name.$attribute");
-		}
-
-		return $this->map[$class_name]['rules']['fields'][$attribute];
-	}
-
-	public function getRulesForRelatedObject($class_name, $relation_name)
-	{
-		if (!isset($this->map[$class_name])) {
-			foreach ($this->map as $_class_name => $_def) {
-				if (@$_def['ar_class'] == $class_name) {
-					return $this->getRulesForRelatedObject($_class_name, $relation_name);
-				}
-			}
-		}
-
-		return @$this->map[$class_name]['rules']['related_objects'][$relation_name];
-	}
-
 	public function getModelDefaultsForClass($class_name)
 	{
 		if (!isset($this->map[$class_name]['model_defaults'])) {

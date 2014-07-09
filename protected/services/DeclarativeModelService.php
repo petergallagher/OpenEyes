@@ -99,9 +99,18 @@ class DeclarativeModelService extends ModelService
 	 *
 	 * Allows overriding the value for a specific relation in the service class (eg nulling it under certain conditions)
 	 */
-	public function getRelatedObjectValue($relation_name, $related_object_def, $resource)
+	public function getRelatedObjectValue($model, $relation_name, $related_object_def, $resource)
 	{
 		$class_name = '\\'.$related_object_def[1];
+
+		if (isset($resource->{$related_object_def[0]})) {
+			$id = $resource->{$related_object_def[0]};
+
+			if ($value = $class_name::model()->findByPk($id)) {
+				return $value;
+			}
+		}
+
 		return new $class_name;
 	}
 
@@ -115,5 +124,27 @@ class DeclarativeModelService extends ModelService
 	 */
 	public function getComplexReferenceObjects(&$model, $resource)
 	{
+	}
+
+	public function expandModelAttribute($model, $attribute)
+	{
+		return DeclarativeTypeParser::expandObjectAttribute($model, $attribute);
+	}
+
+	public function setModelAttributeFromResource(&$model, $attribute, $resource_value)
+	{
+		$model->setAttribute($attribute, $resource_value);
+	}
+
+	public function setUpRelatedObjects(&$model, $resource)
+	{
+		foreach ($model->getRelatedObjectDefinitions() as $relation_name => $def) {
+			$attribute = $this->getRelatedObjectAttribute($relation_name, $def, $resource);
+			$related_object_value = $this->getRelatedObjectValue($model, $relation_name, $def, $resource);
+
+			$object_relation = ($pos = strpos($attribute,'.')) ? substr($attribute,0,$pos).'.'.$relation_name : $relation_name;
+
+			$model->setAttribute($object_relation, $related_object_value, false);
+		}
 	}
 }
