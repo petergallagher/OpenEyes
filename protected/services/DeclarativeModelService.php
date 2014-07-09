@@ -25,12 +25,7 @@ class DeclarativeModelService extends ModelService
 	const TYPE_CONDITION = 'DeclarativeTypeParser_Condition';
 	const TYPE_RESOURCE = 'DeclarativeTypeParser_Resource';
 	const TYPE_REF_LIST = 'DeclarativeTypeParser_RefList';
-	const TYPE_OR = 'DeclarativeTypeParser_Or';
 	const TYPE_ELEMENTS = 'DeclarativeTypeParser_Elements';
-
-	const RULE_TYPE_ALLNULL = 0;
-	const RULE_TYPE_NULLIFNULL = 1;
-	const RULE_TYPE_ATTRIBUTE_IFNULL = 2;
 
 	/**
 	 * @param BaseActiveRecord $model
