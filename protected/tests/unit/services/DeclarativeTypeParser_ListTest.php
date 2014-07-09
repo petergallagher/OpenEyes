@@ -59,10 +59,10 @@ class DeclarativeTypeParser_ListTest extends \CDbTestCase
 			->getMock();
 
 		$data = array(
-			(object)array('one'),
-			(object)array('two'),
-			(object)array('three'),
-			(object)array('four')
+			(object)array('one','id'=>null),
+			(object)array('two','id'=>null),
+			(object)array('three','id'=>null),
+			(object)array('four','id'=>null)
 		);
 
 		foreach ($data as $i => $item) {
@@ -97,10 +97,10 @@ class DeclarativeTypeParser_ListTest extends \CDbTestCase
 			->getMock();
 
 		$data = array(
-			(object)array('one'),
-			(object)array('two'),
-			(object)array('three'),
-			(object)array('four')
+			(object)array('one','id'=>null),
+			(object)array('two','id'=>null),
+			(object)array('three','id'=>null),
+			(object)array('four','id'=>null)
 		); 
 		
 		foreach ($data as $i => $item) {

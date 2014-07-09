@@ -101,6 +101,8 @@ abstract class DataObject implements FhirCompatible
 		return \DataTemplate::fromJsonFile($path);
 	}
 
+	protected $id = null;
+
 	/**
 	 * @param array $values
 	 */
@@ -109,6 +111,14 @@ abstract class DataObject implements FhirCompatible
 		foreach ($values as $name => $value) {
 			$this->$name = $value;
 		}
+	}
+
+	/**
+	 * @return integer
+	 */
+	public function getId()
+	{
+		return $this->id;
 	}
 
 	/**

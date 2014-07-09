@@ -70,10 +70,10 @@ class DataObjectTest extends \CDbTestCase
 			array(
 				(object)array(
 					'id' => 1,
-					'foo' => (object)array('baz' => 1),
+					'foo' => (object)array('baz' => 1,'id'=>null),
 					'bar' => array(
-						(object)array('baz' => 2),
-						(object)array('baz' => 3),
+						(object)array('baz' => 2,'id'=>null),
+						(object)array('baz' => 3,'id'=>null),
 					),
 					'dte' => '2001-01-01',
 				),
@@ -152,7 +152,7 @@ class DataObjectTest extends \CDbTestCase
 	public function testToFhirValues_EmptyStringsNulled()
 	{
 		$obj = new DataObjectTest_Obj2(array('baz' => ''));
-		$this->assertEquals(array('baz' => null), $obj->toFhirValues());
+		$this->assertEquals(array('baz' => null,'id' => null), $obj->toFhirValues());
 	}
 }
 

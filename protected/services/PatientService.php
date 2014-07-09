@@ -47,6 +47,7 @@ class PatientService extends DeclarativeModelService
 				'gp_ref' => array(self::TYPE_REF, 'gp_id', 'Gp'),
 				'prac_ref' => array(self::TYPE_REF, 'practice_id', 'Practice'),
 				'cb_refs' => array(self::TYPE_REF_LIST, 'commissioningbody_assignments', 'commissioning_body_id', 'CommissioningBody'),
+				'contact_id' => 'contact.id',
 			),
 		),
 		'PatientAddress' => array(

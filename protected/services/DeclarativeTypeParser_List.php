@@ -25,7 +25,7 @@ class DeclarativeTypeParser_List extends DeclarativeTypeParser
 		$data_items = array();
 
 		foreach ($data_list as $data_item) {
-			$data_items[] = $this->mc->modelToResourceParse($data_item, $data_class, new $_data_class);
+			$data_items[] = $this->mc->modelToResourceParse($data_item, $data_class, new $_data_class(array('id' => isset($data_item->id) ? $data_item->id : null)));
 		}
 
 		return $data_items;
