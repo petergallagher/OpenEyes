@@ -35,9 +35,11 @@ class PatientAllergiesServiceTest extends \CDbTestCase
 		$this->assertCount(2,$resource->allergies);
 
 		$this->assertInstanceOf('services\PatientAllergy',$resource->allergies[0]);
+		$this->assertEquals($patient->allergyAssignments[0]->id,$resource->allergies[0]->getId());
 		$this->assertEquals('allergy 1',$resource->allergies[0]->name);
 
 		$this->assertInstanceOf('services\PatientAllergy',$resource->allergies[1]);
+		$this->assertEquals($patient->allergyAssignments[1]->id,$resource->allergies[1]->getId());
 		$this->assertEquals('allergy 2',$resource->allergies[1]->name);
 
 		$this->assertNull($resource->no_allergies_date);
@@ -221,6 +223,7 @@ class PatientAllergiesServiceTest extends \CDbTestCase
 		$this->assertCount(3,$patient->allergyAssignments);
 
 		$this->assertInstanceOf('PatientAllergyAssignment',$patient->allergyAssignments[0]);
+		$this->assertEquals($resource->allergies[0]->getId(),$patient->allergyAssignments[0]->id);
 		$this->assertInstanceOf('Allergy',$patient->allergyAssignments[0]->allergy);
 		$this->assertEquals('allergy 3',$patient->allergyAssignments[0]->allergy->name);
 
@@ -251,6 +254,7 @@ class PatientAllergiesServiceTest extends \CDbTestCase
 		$this->assertCount(3,$patient->allergyAssignments);
 
 		$this->assertInstanceOf('PatientAllergyAssignment',$patient->allergyAssignments[0]);
+		$this->assertEquals($resource->allergies[0]->getId(),$patient->allergyAssignments[0]->id);
 		$this->assertInstanceOf('Allergy',$patient->allergyAssignments[0]->allergy);
 		$this->assertEquals('allergy 3',$patient->allergyAssignments[0]->allergy->name);
 
