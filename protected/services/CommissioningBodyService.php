@@ -39,6 +39,7 @@ class CommissioningBodyService extends DeclarativeModelService
 				'code' => 'code',
 				'name' => 'name',
 				'address' => array(self::TYPE_DATAOBJECT_EXCLUSIVE, 'contact.address', 'Address', 'Address', 'contact_id'),
+				'contact_id' => 'contact.id',
 			),
 		),
 		'Address' => array(

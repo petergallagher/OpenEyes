@@ -38,6 +38,7 @@ class CommissioningBodyServiceTest extends \CDbTestCase
 		$resource = $cs->modelToResource($cb);
 
 		$this->assertEquals(1, $resource->getId());
+		$this->assertEquals($contact->id, $resource->contact_id);
 		$this->assertEquals('Apple',$resource->name);
 		$this->assertEquals('AAPL',$resource->code);
 		$this->assertEquals('Clinical Commissioning Group',$resource->type_ref->fetch()->name);
@@ -66,6 +67,7 @@ class CommissioningBodyServiceTest extends \CDbTestCase
 		$resource->name = 'Frogtown';
 		$resource->code = 'FROGGER';
 		$resource->address = $address;
+		$resource->contact_id = null;
 
 		return $resource;
 	}
@@ -198,6 +200,7 @@ class CommissioningBodyServiceTest extends \CDbTestCase
 	public function testResourceToModel_Save_Update_ModelCountsCorrect()
 	{
 		$resource = $this->getModifiedResource();
+		$resource->contact_id = \CommissioningBody::model()->findByPk(1)->contact_id;
 
 		$total_cbs = count(\CommissioningBody::model()->findAll());
 		$total_contacts = count(\Contact::model()->findAll());
@@ -214,15 +217,19 @@ class CommissioningBodyServiceTest extends \CDbTestCase
 	public function testResourceToModel_Save_Update_ModelIsCorrect()
 	{
 		$resource = $this->getModifiedResource();
+		$resource->contact_id = \CommissioningBody::model()->findByPk(1)->contact_id;
 
 		$cs = new CommissioningBodyService;
 		$cb = $cs->resourceToModel($resource, \CommissioningBody::model()->findByPk(1));
 
 		$this->assertInstanceOf('\CommissioningBody',$cb);
+		$this->assertEquals($resource->contact_id,$cb->contact_id);
 		$this->assertEquals('x0001',$cb->name);
 		$this->assertEquals('x0002',$cb->code);
 
 		$this->assertInstanceOf('\Address',$cb->contact->address);
+		$this->assertEquals($resource->contact_id,$cb->contact->address->contact_id);
+		$this->assertEquals(\CommissioningBody::model()->findByPk(1)->contact->address->id,$cb->contact->address->id);
 		$this->assertEquals('x0007',$cb->contact->address->address1);
 		$this->assertEquals('x0008',$cb->contact->address->address2);
 		$this->assertEquals('x0009',$cb->contact->address->city);
@@ -235,12 +242,15 @@ class CommissioningBodyServiceTest extends \CDbTestCase
 	public function testResourceToModel_Save_Update_DBIsCorrect()
 	{
 		$resource = $this->getModifiedResource();
+		$resource->contact_id = \CommissioningBody::model()->findByPk(1)->contact_id;
 
 		$cs = new CommissioningBodyService;
 		$cb = $cs->resourceToModel($resource, \CommissioningBody::model()->findByPk(1));
 		$cb = \CommissioningBody::model()->findByPk($cb->id);
 
 		$this->assertInstanceOf('\CommissioningBody',$cb);
+		$this->assertEquals($resource->contact_id,$cb->contact_id);
+		$this->assertEquals(\CommissioningBody::model()->findByPk(1)->contact->address->id,$cb->contact->address->id);
 		$this->assertEquals('x0001',$cb->name);
 		$this->assertEquals('x0002',$cb->code);
 
@@ -256,7 +266,7 @@ class CommissioningBodyServiceTest extends \CDbTestCase
 
 	public function testJsonToResource()
 	{
-		$json = '{"code":"AAPL","name":"Apple","address":{"use":null,"line1":"1 Infinite Loop","line2":"","city":"Cupertino","state":"California","zip":"1AA PL3","country":"United States"},"type_ref":{"service":"CommissioningBodyType","id":"1"}}';
+		$json = '{"code":"AAPL","name":"Apple","contact_id":null,"address":{"use":null,"line1":"1 Infinite Loop","line2":"","city":"Cupertino","state":"California","zip":"1AA PL3","country":"United States"},"type_ref":{"service":"CommissioningBodyType","id":"1"}}';
 
 		$cs = new CommissioningBodyService;
 		$resource = $cs->jsonToResource($json);
@@ -276,7 +286,7 @@ class CommissioningBodyServiceTest extends \CDbTestCase
 
 	public function testJsonToModel_NoSave_NoNewRows()
 	{
-		$json = '{"code":"AAPL","name":"Apple","address":{"use":null,"line1":"1 Infinite Loop","line2":"","city":"Cupertino","state":"California","zip":"1AA PL3","country":"United States"},"type_ref":{"service":"CommissioningBodyType","id":"1"}}';
+		$json = '{"code":"AAPL","name":"Apple","contact_id":null,"address":{"use":null,"line1":"1 Infinite Loop","line2":"","city":"Cupertino","state":"California","zip":"1AA PL3","country":"United States"},"type_ref":{"service":"CommissioningBodyType","id":"1"}}';
 
 		$total_cbs = count(\CommissioningBody::model()->findAll());
 		$total_contacts = count(\Contact::model()->findAll());
@@ -292,7 +302,7 @@ class CommissioningBodyServiceTest extends \CDbTestCase
 
 	public function testJsonToModel_NoSave_ModelIsCorrect()
 	{
-		$json = '{"code":"AAPL","name":"Apple","address":{"use":null,"line1":"1 Infinite Loop","line2":"","city":"Cupertino","state":"California","zip":"1AA PL3","country":"United States"},"type_ref":{"service":"CommissioningBodyType","id":"1"}}';
+		$json = '{"code":"AAPL","name":"Apple","contact_id":null,"address":{"use":null,"line1":"1 Infinite Loop","line2":"","city":"Cupertino","state":"California","zip":"1AA PL3","country":"United States"},"type_ref":{"service":"CommissioningBodyType","id":"1"}}';
 
 		$cs = new CommissioningBodyService;
 		$cb = $cs->jsonToModel($json, new \CommissioningBody, false);
@@ -314,7 +324,7 @@ class CommissioningBodyServiceTest extends \CDbTestCase
 
 	public function testJsonToModel_Save_Create_ModelCountsCorrect()
 	{
-		$json = '{"code":"x0001","name":"x0002","address":{"use":null,"line1":"x0003","line2":"x0004","city":"x0004","state":"x0006","zip":"x0007","country":"United Kingdom"},"type_ref":{"service":"CommissioningBodyType","id":"1"}}';
+		$json = '{"code":"x0001","name":"x0002","contact_id":null,"address":{"use":null,"line1":"x0003","line2":"x0004","city":"x0004","state":"x0006","zip":"x0007","country":"United Kingdom"},"type_ref":{"service":"CommissioningBodyType","id":"1"}}';
 
 		$total_cbs = count(\CommissioningBody::model()->findAll());
 		$total_contacts = count(\Contact::model()->findAll());
@@ -330,7 +340,7 @@ class CommissioningBodyServiceTest extends \CDbTestCase
 
 	public function testJsonToModel_Save_Create_ModelIsCorrect()
 	{
-		$json = '{"code":"x0001","name":"x0002","address":{"use":null,"line1":"x0003","line2":"x0004","city":"x0005","state":"x0006","zip":"x0007","country":"United Kingdom"},"type_ref":{"service":"CommissioningBodyType","id":"1"}}';
+		$json = '{"code":"x0001","name":"x0002","contact_id":null,"address":{"use":null,"line1":"x0003","line2":"x0004","city":"x0005","state":"x0006","zip":"x0007","country":"United Kingdom"},"type_ref":{"service":"CommissioningBodyType","id":"1"}}';
 
 		$cs = new CommissioningBodyService;
 		$cb = $cs->jsonToModel($json, new \CommissioningBody);
@@ -352,7 +362,7 @@ class CommissioningBodyServiceTest extends \CDbTestCase
 
 	public function testJsonToModel_Save_Create_DBIsCorrect()
 	{
-		$json = '{"code":"x0001","name":"x0002","address":{"use":null,"line1":"x0003","line2":"x0004","city":"x0005","state":"x0006","zip":"x0007","country":"United Kingdom"},"type_ref":{"service":"CommissioningBodyType","id":"1"}}';
+		$json = '{"code":"x0001","name":"x0002","contact_id":null,"address":{"use":null,"line1":"x0003","line2":"x0004","city":"x0005","state":"x0006","zip":"x0007","country":"United Kingdom"},"type_ref":{"service":"CommissioningBodyType","id":"1"}}';
 
 		$cs = new CommissioningBodyService;
 		$cb = $cs->jsonToModel($json, new \CommissioningBody);
@@ -375,7 +385,7 @@ class CommissioningBodyServiceTest extends \CDbTestCase
 
 	public function testJsonToModel_Save_Update_ModelCountsCorrect()
 	{
-		$json = '{"code":"x0001","name":"x0002","address":{"use":null,"line1":"x0003","line2":"x0004","city":"x0005","state":"x0006","zip":"x0007","country":"United Kingdom"},"type_ref":{"service":"CommissioningBodyType","id":"1"}}';
+		$json = '{"code":"x0001","name":"x0002","contact_id":8,"address":{"use":null,"line1":"x0003","line2":"x0004","city":"x0005","state":"x0006","zip":"x0007","country":"United Kingdom"},"type_ref":{"service":"CommissioningBodyType","id":"1"}}';
 
 		$total_cbs = count(\CommissioningBody::model()->findAll());
 		$total_contacts = count(\Contact::model()->findAll());
@@ -392,7 +402,7 @@ class CommissioningBodyServiceTest extends \CDbTestCase
 
 	public function testJsonToModel_Save_Update_ModelIsCorrect()
 	{
-		$json = '{"code":"x0001","name":"x0002","address":{"use":null,"line1":"x0003","line2":"x0004","city":"x0005","state":"x0006","zip":"x0007","country":"United Kingdom"},"type_ref":{"service":"CommissioningBodyType","id":"1"}}';
+		$json = '{"code":"x0001","name":"x0002","contact_id":8,"address":{"use":null,"line1":"x0003","line2":"x0004","city":"x0005","state":"x0006","zip":"x0007","country":"United Kingdom"},"type_ref":{"service":"CommissioningBodyType","id":"1"}}';
 
 		$cs = new CommissioningBodyService;
 		$cb = $cs->jsonToModel($json, \CommissioningBody::model()->findByPk(1));
@@ -403,6 +413,7 @@ class CommissioningBodyServiceTest extends \CDbTestCase
 
 		$this->assertInstanceOf('\Contact',$cb->contact);
 		$this->assertInstanceOf('\Address',$cb->contact->address);
+		$this->assertEquals(\CommissioningBody::model()->findByPk(1)->contact->address->id,$cb->contact->address->id);
 		$this->assertEquals('x0003',$cb->contact->address->address1);
 		$this->assertEquals('x0004',$cb->contact->address->address2);
 		$this->assertEquals('x0005',$cb->contact->address->city);
@@ -414,7 +425,7 @@ class CommissioningBodyServiceTest extends \CDbTestCase
 
 	public function testJsonToModel_Save_Update_DBIsCorrect()
 	{
-		$json = '{"code":"x0001","name":"x0002","address":{"use":null,"line1":"x0003","line2":"x0004","city":"x0005","state":"x0006","zip":"x0007","country":"United Kingdom"},"type_ref":{"service":"CommissioningBodyType","id":"1"}}';
+		$json = '{"code":"x0001","name":"x0002","contact_id":8,"address":{"use":null,"line1":"x0003","line2":"x0004","city":"x0005","state":"x0006","zip":"x0007","country":"United Kingdom"},"type_ref":{"service":"CommissioningBodyType","id":"1"}}';
 
 		$cs = new CommissioningBodyService;
 		$cb = $cs->jsonToModel($json, \CommissioningBody::model()->findByPk(1));
@@ -426,6 +437,7 @@ class CommissioningBodyServiceTest extends \CDbTestCase
 
 		$this->assertInstanceOf('\Contact',$cb->contact);
 		$this->assertInstanceOf('\Address',$cb->contact->address);
+		$this->assertEquals(\CommissioningBody::model()->findByPk(1)->contact->address->id,$cb->contact->address->id);
 		$this->assertEquals('x0003',$cb->contact->address->address1);
 		$this->assertEquals('x0004',$cb->contact->address->address2);
 		$this->assertEquals('x0005',$cb->contact->address->city);
