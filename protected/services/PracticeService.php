@@ -35,6 +35,7 @@ class PracticeService extends DeclarativeModelService
 				'code' => 'code',
 				'primary_phone' => 'phone',
 				'address' => array(self::TYPE_DATAOBJECT_EXCLUSIVE, 'contact.address', 'Address', 'Address', 'contact_id'),
+				'contact_id' => 'contact.id',
 			),
 		),
 		'Address' => array(

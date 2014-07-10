@@ -24,4 +24,5 @@ class Practice extends Resource
 
 	public $primary_phone;
 	public $address = null;
+	public $contact_id;
 }

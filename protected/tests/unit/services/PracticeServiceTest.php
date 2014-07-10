@@ -32,6 +32,7 @@ class PracticeServiceTest extends \CDbTestCase
 
 		$contact->addresses = array($address);
 		$practice->contact = $contact;
+		$practice->contact_id = $contact->id;
 
 		$ps = new PracticeService;
 
@@ -39,8 +40,18 @@ class PracticeServiceTest extends \CDbTestCase
 
 		$this->assertInstanceOf('services\Practice',$resource);
 		$this->assertEquals(1,$resource->getId());
+		$this->assertEquals($practice->contact_id,$resource->contact_id);
 		$this->assertEquals('AA1',$resource->code);
 		$this->assertEquals('0202 20202020',$resource->primary_phone);
+
+		$this->assertInstanceOf('services\Address',$resource->address);
+		$this->assertEquals($address->id,$resource->address->getId());
+		$this->assertEquals($address->address1,$resource->address->line1);
+		$this->assertEquals($address->address2,$resource->address->line2);
+		$this->assertEquals($address->city,$resource->address->city);
+		$this->assertEquals($address->county,$resource->address->state);
+		$this->assertEquals($address->postcode,$resource->address->zip);
+		$this->assertEquals($address->country->name,$resource->address->country);
 	}
 
 	public function getResource()
@@ -165,12 +176,11 @@ class PracticeServiceTest extends \CDbTestCase
 
 	public function getModifiedResource()
 	{
-		$resource = new Practice;
+		$resource = \Yii::app()->service->Practice(1)->fetch();
 
 		$resource->code = 'x0001';
 		$resource->primary_phone = 'x0002';
 
-		$resource->address = new Address;
 		$resource->address->line1 = 'L1';
 		$resource->address->line2 = 'L2';
 		$resource->address->city = 'L3';
@@ -200,6 +210,28 @@ class PracticeServiceTest extends \CDbTestCase
 		$this->assertEquals($total_countries, count(\Country::model()->findAll()));
 	}
 
+	public function testResourceToModel_Save_Update_ModelIsCorrect()
+	{
+		$resource = $this->getModifiedResource();
+		$model = \Practice::model()->findByPk(1);
+
+		$ps = new PracticeService;
+		$practice = $ps->resourceToModel($resource, $model);
+
+		$this->assertInstanceOf('Practice',$practice);
+		$this->assertEquals('x0001',$practice->code);
+		$this->assertEquals('x0002',$practice->phone);
+
+		$this->assertInstanceOf('Address', $practice->contact->address);
+		$this->assertEquals('L1', $practice->contact->address->address1);
+		$this->assertEquals('L2', $practice->contact->address->address2);
+		$this->assertEquals('L3', $practice->contact->address->city);
+		$this->assertEquals('L4', $practice->contact->address->county);
+		$this->assertEquals('L5', $practice->contact->address->postcode);
+		$this->assertInstanceOf('\Country', $practice->contact->address->country);
+		$this->assertEquals('United Kingdom', $practice->contact->address->country->name);
+	}
+
 	public function testResourceToModel_Save_Update_DBIsCorrect()
 	{
 		$resource = $this->getModifiedResource();
@@ -225,7 +257,7 @@ class PracticeServiceTest extends \CDbTestCase
 
 	public function testJsonToResource()
 	{
-		$json = '{"code":"x0001","primary_phone":"x0002","address":{"use":null,"line1":"x0003","line2":"x0004","city":"x0005","state":"x0006","zip":"x0007","country":"United Kingdom"}}';
+		$json = '{"code":"x0001","primary_phone":"x0002","contact_id":null,"address":{"use":null,"line1":"x0003","line2":"x0004","city":"x0005","state":"x0006","zip":"x0007","country":"United Kingdom"}}';
 
 		$ps = new PracticeService;
 		$resource = $ps->jsonToResource($json);
@@ -245,7 +277,7 @@ class PracticeServiceTest extends \CDbTestCase
 
 	public function testJsonToModel_NoSave_NoNewRows()
 	{
-		$json = '{"code":"x0001","primary_phone":"x0002","address":{"use":null,"line1":"x0003","line2":"x0004","city":"x0005","state":"x0006","zip":"x0007","country":"United Kingdom"}}';
+		$json = '{"code":"x0001","primary_phone":"x0002","contact_id":null,"address":{"use":null,"line1":"x0003","line2":"x0004","city":"x0005","state":"x0006","zip":"x0007","country":"United Kingdom"}}';
 
 		$total_practices = count(\Practice::model()->findAll());
 		$total_contacts = count(\Contact::model()->findAll());
@@ -263,7 +295,7 @@ class PracticeServiceTest extends \CDbTestCase
 
 	public function testJsonToModel_NoSave_ModelIsCorrect()
 	{
-		$json = '{"code":"x0001","primary_phone":"x0002","address":{"use":null,"line1":"x0003","line2":"x0004","city":"x0005","state":"x0006","zip":"x0007","country":"United Kingdom"}}';
+		$json = '{"code":"x0001","primary_phone":"x0002","contact_id":null,"address":{"use":null,"line1":"x0003","line2":"x0004","city":"x0005","state":"x0006","zip":"x0007","country":"United Kingdom"}}';
 
 		$ps = new PracticeService;
 		$practice = $ps->jsonToModel($json, new \Practice, false);
@@ -284,7 +316,7 @@ class PracticeServiceTest extends \CDbTestCase
 
 	public function testJsonToModel_Save_Create_ModelCountsCorrect()
 	{
-		$json = '{"code":"x0001","primary_phone":"x0002","address":{"use":null,"line1":"x0003","line2":"x0004","city":"x0005","state":"x0006","zip":"x0007","country":"United Kingdom"}}';
+		$json = '{"code":"x0001","primary_phone":"x0002","contact_id":null,"address":{"use":null,"line1":"x0003","line2":"x0004","city":"x0005","state":"x0006","zip":"x0007","country":"United Kingdom"}}';
 
 		$total_practices = count(\Practice::model()->findAll());
 		$total_contacts = count(\Contact::model()->findAll());
@@ -302,7 +334,7 @@ class PracticeServiceTest extends \CDbTestCase
 
 	public function testJsonToModel_Save_Create_DBIsCorrect()
 	{
-		$json = '{"code":"x0001","primary_phone":"x0002","address":{"use":null,"line1":"x0003","line2":"x0004","city":"x0005","state":"x0006","zip":"x0007","country":"United Kingdom"}}';
+		$json = '{"code":"x0001","primary_phone":"x0002","contact_id":null,"address":{"use":null,"line1":"x0003","line2":"x0004","city":"x0005","state":"x0006","zip":"x0007","country":"United Kingdom"}}';
 
 		$ps = new PracticeService;
 		$practice = $ps->jsonToModel($json, new \Practice);
@@ -324,7 +356,7 @@ class PracticeServiceTest extends \CDbTestCase
 
 	public function testJsonToModel_Save_Update_ModelCountsCorrect()
 	{
-		$json = '{"code":"x0001","primary_phone":"x0002","address":{"use":null,"line1":"x0003","line2":"x0004","city":"x0005","state":"x0006","zip":"x0007","country":"United Kingdom"}}';
+		$json = $this->getModifiedResource()->serialise();
 
 		$total_practices = count(\Practice::model()->findAll());
 		$total_contacts = count(\Contact::model()->findAll());
@@ -343,9 +375,32 @@ class PracticeServiceTest extends \CDbTestCase
 		$this->assertEquals($total_countries, count(\Country::model()->findAll()));
 	}
 
+	public function testJsonToModel_Save_Update_ModelIsCorrect()
+	{
+		$json = $this->getModifiedResource()->serialise();
+
+		$model = \Practice::model()->findByPk(1);
+
+		$ps = new PracticeService;
+		$practice = $ps->jsonToModel($json, $model);
+
+		$this->assertInstanceOf('Practice',$practice);
+		$this->assertEquals('x0001',$practice->code);
+		$this->assertEquals('x0002',$practice->phone);
+
+		$this->assertInstanceOf('Address', $practice->contact->address);
+		$this->assertEquals('L1', $practice->contact->address->address1);
+		$this->assertEquals('L2', $practice->contact->address->address2);
+		$this->assertEquals('L3', $practice->contact->address->city);
+		$this->assertEquals('L4', $practice->contact->address->county);
+		$this->assertEquals('L5', $practice->contact->address->postcode);
+		$this->assertInstanceOf('\Country', $practice->contact->address->country);
+		$this->assertEquals('United Kingdom', $practice->contact->address->country->name);
+	}
+
 	public function testJsonToModel_Save_Update_DBIsCorrect()
 	{
-		$json = '{"code":"x0001","primary_phone":"x0002","address":{"use":null,"line1":"x0003","line2":"x0004","city":"x0005","state":"x0006","zip":"x0007","country":"United Kingdom"}}';
+		$json = $this->getModifiedResource()->serialise();
 
 		$model = \Practice::model()->findByPk(1);
 
@@ -358,11 +413,11 @@ class PracticeServiceTest extends \CDbTestCase
 		$this->assertEquals('x0002',$practice->phone);
 
 		$this->assertInstanceOf('Address', $practice->contact->address);
-		$this->assertEquals('x0003', $practice->contact->address->address1);
-		$this->assertEquals('x0004', $practice->contact->address->address2);
-		$this->assertEquals('x0005', $practice->contact->address->city);
-		$this->assertEquals('x0006', $practice->contact->address->county);
-		$this->assertEquals('x0007', $practice->contact->address->postcode);
+		$this->assertEquals('L1', $practice->contact->address->address1);
+		$this->assertEquals('L2', $practice->contact->address->address2);
+		$this->assertEquals('L3', $practice->contact->address->city);
+		$this->assertEquals('L4', $practice->contact->address->county);
+		$this->assertEquals('L5', $practice->contact->address->postcode);
 		$this->assertInstanceOf('\Country', $practice->contact->address->country);
 		$this->assertEquals('United Kingdom', $practice->contact->address->country->name);
 	}

@@ -255,7 +255,7 @@ class DeclarativeTypeParser_DataObjectExclusiveExclusiveTest extends \CDbTestCas
 			->with('bodger')
 			->will($this->returnValue(true));
 
-		$model->expects($this->exactly(2))
+		$model->expects($this->exactly(1))
 			->method('getRelatedObject')
 			->with('bodger','badger')
 			->will($this->returnValue('never far away'));
@@ -287,7 +287,7 @@ class DeclarativeTypeParser_DataObjectExclusiveExclusiveTest extends \CDbTestCas
 			->method('expandAttribute')
 			->will($this->returnValue(new \Address));
 
-		$model->expects($this->exactly(2))
+		$model->expects($this->exactly(1))
 			->method('getRelatedObject')
 			->with('bodger','badger')
 			->will($this->returnValue('never far away'));
