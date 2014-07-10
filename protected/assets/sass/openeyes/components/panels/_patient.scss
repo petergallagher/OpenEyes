@@ -55,7 +55,7 @@
 	&.patient {
 		@include panel($padding: 9px 10px);
 		@include border-radius($global-radius);
-		@include background(linear-gradient(top, #fff2d8 0%, #ffe6b3 100%));
+		@include background(image-url("_elements/icons/patient/watermark.png") no-repeat right top, linear-gradient(top, #fff2d8 0%, #ffe6b3 100%));
 		@media print {
 			padding: {
 				top: 2px;
@@ -115,9 +115,6 @@
 				}
 			}
 		}
-		.patient-widgets {
-			display: inline-block;
-		}
 		.hospital-number {
 			margin-bottom: 3px;
 			padding-right: 5px;
@@ -157,42 +154,53 @@
 				}
 			}
 		}
+		.patient-warnings {
+			@include border-radius(2px);
+			position: absolute;
+			top: 8px;
+			right: 0;
+			padding: 2px;
+			color: #fff;
+			background: #DD6831;
+			font-size: rem-calc(11px);
+			line-height: rem-calc(11px);
+			white-space: nowrap;
+		}
+		.patient-widgets {
+			margin-top: -16px;
+			float: right;
+			.stuck & {
+				margin-top: -18px;
+			}
+			li {
+				list-style: none;
+				float: left;
+				width: 17px;
+				height: 17px;
+				margin-right: 10px;
+				&:last-child {
+					margin-right: 0;
+				}
+			}
+		}
 	}
 }
 
 // PATIENT POPUP
 .patient-popup-container {
-	float: right;
-	height: 68px;
-	margin-right: 8px;
-	margin-top: -70px;
 	position: relative;
-	width: 30px;
-	text-align: right;
-	@media screen {
-		.stuck & {
-			height: 30px;
-			width: auto;
-			margin-top: -35px;
-			padding-top: 2px;
-		}
+	top: -43px;
+	.stuck & {
+		top: -23px;
 	}
 	button {
+		margin-top: 45px;
+		.stuck & {
+			margin-top: 25px;
+		}
 		&:active, &:focus {
 			outline: none;
 		}
-	}
-	[class*=icon-patient] {
-		margin-bottom: 13px;
-		@media screen {
-			.stuck & {
-				margin-bottom: 0;
-				margin-right: 4px;
-			}
-		}
-	}
-	[class*=icon-alert] {
-		margin-right: 4px;
 	}
 }
 
@@ -209,38 +217,30 @@
 			width: 2px;
 		};
 		display: none;
-		left: -355px;
+		left: -366px;
 		opacity: 0;
 		padding: 5px;
 		position: absolute;
-		top: 90px;
+		top: 100px;
 		text-align: left;
 		width: 400px;
 		z-index: 9999;
-		@media screen {
-			.stuck & {
-				left: -326px;
-				top: 50px;
-			}
-		}
 		&.show {
 			opacity: 1;
 			top: 72px;
-			@media screen {
-				.stuck & {
-					top: 38px;
-				}
+			.stuck & {
+				top: 52px;
 			}
 		}
 		// Triangle tip
 		&:after {
-			border-bottom: 12px solid #ffb212;
+			border-bottom: 10px solid #ffb212;
 			border-left: 7px solid transparent;
 			border-right: 7px solid transparent;
 			content: "";
 			position: absolute;
-			right: 18px;
-			top: -14px;
+			right: 17px;
+			top: -12px;
 		}
 		.row {
 			background: #fef5e3;
@@ -275,9 +275,9 @@
 			background: #fef8ec;
 			color: #999;
 			font-size: 11px;
-			padding: 4px;
+			padding: 2px;
 			position: absolute;
-			right: 45px;
+			right: 38px;
 			top: -32px;
 			&:after {
 				border-bottom: 4px solid transparent;
@@ -287,11 +287,6 @@
 				position: absolute;
 				right: -4px;
 				top: 7px;
-			}
-			@media screen {
-				.stuck & {
-					right: 76px;
-				}
 			}
 		}
 	}

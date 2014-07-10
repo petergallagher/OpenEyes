@@ -33,16 +33,6 @@
 			<?php echo $this->patient->getGenderString() ?>
 		</span>
 	</div>
-	<!-- Widgets (extra icons, links etc) -->
-	<?php if ($widgets = Yii::app()->params['patient_summary_id_widgets']) {?>
-		<div class="patient-widgets">
-			<?php foreach ($widgets as $w) {
-				$this->widget($w['class'], array(
-					'patient' => $this->patient,
-				));
-			}?>
-		</div>
-	<?php }?>
 	<div class="clearfix">
 		<span class="hospital-number">
 			<span class="screen-only abbr">
@@ -64,4 +54,24 @@
 	<div class="patient-summary-anchor">
 		<?php echo CHtml::link('Patient Summary',array('/patient/view/'.$this->patient->id)); ?>
 	</div>
+
+	<!-- Widgets (extra icons, links etc) -->
+	<ul class="patient-widgets">
+		<?php
+		if ($widgets = Yii::app()->params['patient_summary_id_widgets']) {
+			foreach ($widgets as $w) {?>
+				<li>
+					<?php $this->widget($w['class'], array(
+						'patient' => $this->patient,
+					));?>
+				</li>
+			<?php }
+		}?>
+		<li>
+			<?php $this->widget('application.widgets.PatientSummaryPopup', array(
+				'patient' => $this->patient,
+				'accessLevel' => $this->checkAccess('OprnViewClinical')
+			));?>
+		</li>
+	</ul>
 </div>

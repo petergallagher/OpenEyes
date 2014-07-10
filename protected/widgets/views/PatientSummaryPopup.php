@@ -19,10 +19,21 @@
 ?>
 <div id="patient-popup-container" class="patient-popup-container">
 
+	<!-- Patient warnings -->
+	<?php
+	if ($this->warnings) {?>
+		<div class="patient-warnings">
+			<?php echo join(', ', array_unique(array_map(function($warning) {
+				return $warning['short_msg'];
+			}, $this->warnings)));?>
+		</div>
+	<?php }?>
+
 	<!-- Patient icon -->
-	<button class="toggle-patient-summary-popup icon-patient-patient-id_small<?= count($this->warnings) ? '-warning' : '';?>">
+	<button class="hide toggle-patient-summary-popup icon-patient-patient-id_small<?= count($this->warnings) ? '-warning' : '';?>">
 		Toggle patient summary
 	</button>
+
 	<!-- Quicklook icon -->
 	<button
 		class="toggle-patient-summary-popup icon-alert-quicklook"
