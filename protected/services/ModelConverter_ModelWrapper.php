@@ -190,6 +190,14 @@ class ModelConverter_ModelWrapper
 		return $related_object;
 	}
 
+	public function dissociateReferenceObjectFromModel($relation_name)
+	{
+		list($reference_key, $reference_class, $required_keys) = $this->map->getReferenceObjectForClass($this->getClass(), $relation_name);
+
+		$this->setAttribute($reference_key, null);
+		$this->setAttribute($relation_name, null);
+	}
+
 	protected function setObjectAttributes(&$object, $attributes)
 	{
 		foreach ($attributes as $key => $value) {

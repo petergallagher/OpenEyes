@@ -37,14 +37,17 @@ class PatientOphthalmicDiagnosesServiceTest extends \CDbTestCase
 		$this->assertCount(3,$resource->diagnoses);
 
 		$this->assertInstanceOf('services\PatientDiagnosis',$resource->diagnoses[0]);
+		$this->assertEquals($patient->ophthalmicDiagnoses[0]->id,$resource->diagnoses[0]->getId());
 		$this->assertEquals('Myopia',$resource->diagnoses[0]->disorder);
 		$this->assertEquals('Left',$resource->diagnoses[0]->side);
 
 		$this->assertInstanceOf('services\PatientDiagnosis',$resource->diagnoses[1]);
+		$this->assertEquals($patient->ophthalmicDiagnoses[1]->id,$resource->diagnoses[1]->getId());
 		$this->assertEquals('Posterior vitreous detachment',$resource->diagnoses[1]->disorder);
 		$this->assertEquals('Both',$resource->diagnoses[1]->side);
 
 		$this->assertInstanceOf('services\PatientDiagnosis',$resource->diagnoses[2]);
+		$this->assertEquals($patient->ophthalmicDiagnoses[2]->id,$resource->diagnoses[2]->getId());
 		$this->assertEquals('Retinal lattice degeneration',$resource->diagnoses[2]->disorder);
 		$this->assertEquals('Right',$resource->diagnoses[2]->side);
 	}
@@ -186,7 +189,7 @@ class PatientOphthalmicDiagnosesServiceTest extends \CDbTestCase
 
 	public function testResourceToModel_Save_Update_Modified_ModelCountsCorrect()
 	{
-		$resource = $this->getResource();
+		$resource = $this->getModifiedResource();
 
 		$total_sd = count(\SecondaryDiagnosis::model()->findAll());
 
@@ -208,9 +211,24 @@ class PatientOphthalmicDiagnosesServiceTest extends \CDbTestCase
 		$this->assertEquals($total_sd, count(\SecondaryDiagnosis::model()->findAll()));
 	}
 
+	public function getModifiedResource()
+	{
+		$resource = new PatientOphthalmicDiagnoses;
+
+		$resource->diagnoses[0] = new PatientDiagnosis(array('id'=>1));
+		$resource->diagnoses[0]->disorder = 'Myopia';
+		$resource->diagnoses[0]->side = 'Both';
+
+		$resource->diagnoses[1] = new PatientDiagnosis(array('id'=>2));
+		$resource->diagnoses[1]->disorder = 'Retinal lattice degeneration';
+		$resource->diagnoses[1]->side = 'Right';
+
+		return $resource;
+	}
+
 	public function testResourceToModel_Save_Update_ModelIsCorrect()
 	{
-		$resource = $this->getResource();
+		$resource = $this->getModifiedResource();
 
 		$ps = new PatientOphthalmicDiagnosesService;
 		$patient = $ps->resourceToModel($resource, $this->patients('patient2'));
@@ -219,6 +237,7 @@ class PatientOphthalmicDiagnosesServiceTest extends \CDbTestCase
 		$this->assertCount(2,$patient->ophthalmicDiagnoses);
 
 		$this->assertInstanceOf('SecondaryDiagnosis',$patient->ophthalmicDiagnoses[0]);
+		$this->assertEquals(1,$patient->ophthalmicDiagnoses[0]->id);
 		$this->assertInstanceOf('Disorder',$patient->ophthalmicDiagnoses[0]->disorder);
 		$this->assertEquals('Myopia',$patient->ophthalmicDiagnoses[0]->disorder->term);
 		$this->assertEquals(\Disorder::model()->find('term=?',array('Myopia'))->id,$patient->ophthalmicDiagnoses[0]->disorder_id);
@@ -227,6 +246,7 @@ class PatientOphthalmicDiagnosesServiceTest extends \CDbTestCase
 		$this->assertEquals(\Eye::model()->find('name=?',array('Both'))->id,$patient->ophthalmicDiagnoses[0]->eye_id);
 
 		$this->assertInstanceOf('SecondaryDiagnosis',$patient->ophthalmicDiagnoses[1]);
+		$this->assertEquals(2,$patient->ophthalmicDiagnoses[1]->id);
 		$this->assertInstanceOf('Disorder',$patient->ophthalmicDiagnoses[1]->disorder);
 		$this->assertEquals('Retinal lattice degeneration',$patient->ophthalmicDiagnoses[1]->disorder->term);
 		$this->assertEquals(\Disorder::model()->find('term=?',array('Retinal lattice degeneration'))->id,$patient->ophthalmicDiagnoses[1]->disorder_id);
@@ -237,7 +257,7 @@ class PatientOphthalmicDiagnosesServiceTest extends \CDbTestCase
 
 	public function testResourceToModel_Save_Update_DBIsCorrect()
 	{
-		$resource = $this->getResource();
+		$resource = $this->getModifiedResource();
 
 		$ps = new PatientOphthalmicDiagnosesService;
 		$patient = $ps->resourceToModel($resource, $this->patients('patient2'));
@@ -265,7 +285,7 @@ class PatientOphthalmicDiagnosesServiceTest extends \CDbTestCase
 
 	public function testResourceToModel_Save_Update_NotOphthalmic_Exception()
 	{
-		$resource = $this->getResource();
+		$resource = $this->getModifiedResource();
 
 		$resource->diagnoses[0]->disorder = 'Diabetes mellitus type 1';
 
@@ -411,7 +431,7 @@ class PatientOphthalmicDiagnosesServiceTest extends \CDbTestCase
 
 	public function testJsonToModel_Save_Update_ModelCountsCorrect()
 	{
-		$json = '{"diagnoses":[{"disorder":"Myopia","side":"Left","id":null,"last_modified":null},{"disorder":"Retinal lattice degeneration","side":false,"id":null,"last_modified":null}],"id":null,"last_modified":null,"patient_id":{"id":"2","last_modified":-2208988800}}';
+		$json = '{"diagnoses":[{"disorder":"Myopia","side":"Left","id":"1","last_modified":null},{"disorder":"Retinal lattice degeneration","side":false,"id":"2","last_modified":null}],"id":null,"last_modified":null,"patient_id":{"id":"2","last_modified":-2208988800}}';
 
 		$total_sd = count(\SecondaryDiagnosis::model()->findAll());
 
@@ -423,7 +443,7 @@ class PatientOphthalmicDiagnosesServiceTest extends \CDbTestCase
 
 	public function testJsonToModel_Save_Update_ModelIsCorrect()
 	{
-		$json = '{"diagnoses":[{"disorder":"Myopia","side":"Left","id":null,"last_modified":null},{"disorder":"Retinal lattice degeneration","side":false,"id":null,"last_modified":null}],"id":null,"last_modified":null,"patient_id":{"id":"2","last_modified":-2208988800}}';
+		$json = '{"diagnoses":[{"disorder":"Myopia","side":"Left","id":"1","last_modified":null},{"disorder":"Retinal lattice degeneration","side":false,"id":"2","last_modified":null}],"id":null,"last_modified":null,"patient_id":{"id":"2","last_modified":-2208988800}}';
 
 		$ps = new PatientOphthalmicDiagnosesService;
 		$patient = $ps->jsonToModel($json, $this->patients('patient4'));
@@ -432,6 +452,7 @@ class PatientOphthalmicDiagnosesServiceTest extends \CDbTestCase
 		$this->assertCount(2,$patient->ophthalmicDiagnoses);
 
 		$this->assertInstanceOf('SecondaryDiagnosis',$patient->ophthalmicDiagnoses[0]);
+		$this->assertEquals(1,$patient->ophthalmicDiagnoses[0]->id);
 		$this->assertInstanceOf('Disorder',$patient->ophthalmicDiagnoses[0]->disorder);
 		$this->assertEquals('Myopia',$patient->ophthalmicDiagnoses[0]->disorder->term);
 		$this->assertEquals(\Disorder::model()->find('term=?',array('Myopia'))->id,$patient->ophthalmicDiagnoses[0]->disorder_id);
@@ -440,6 +461,7 @@ class PatientOphthalmicDiagnosesServiceTest extends \CDbTestCase
 		$this->assertEquals(\Eye::model()->find('name=?',array('Left'))->id,$patient->ophthalmicDiagnoses[0]->eye_id);
 
 		$this->assertInstanceOf('SecondaryDiagnosis',$patient->ophthalmicDiagnoses[1]);
+		$this->assertEquals(2,$patient->ophthalmicDiagnoses[1]->id);
 		$this->assertInstanceOf('Disorder',$patient->ophthalmicDiagnoses[1]->disorder);
 		$this->assertEquals('Retinal lattice degeneration',$patient->ophthalmicDiagnoses[1]->disorder->term);
 		$this->assertEquals(\Disorder::model()->find('term=?',array('Retinal lattice degeneration'))->id,$patient->ophthalmicDiagnoses[1]->disorder_id);
@@ -449,7 +471,7 @@ class PatientOphthalmicDiagnosesServiceTest extends \CDbTestCase
 
 	public function testJsonToModel_Save_Update_DBIsCorrect()
 	{
-		$json = '{"diagnoses":[{"disorder":"Myopia","side":"Left","id":null,"last_modified":null},{"disorder":"Retinal lattice degeneration","side":false,"id":null,"last_modified":null}],"id":null,"last_modified":null,"patient_id":{"id":"2","last_modified":-2208988800}}';
+		$json = '{"diagnoses":[{"disorder":"Myopia","side":"Left","id":"1","last_modified":null},{"disorder":"Retinal lattice degeneration","side":false,"id":"2","last_modified":null}],"id":null,"last_modified":null,"patient_id":{"id":"2","last_modified":-2208988800}}';
 
 		$ps = new PatientOphthalmicDiagnosesService;
 		$patient = $ps->jsonToModel($json, $this->patients('patient4'));
@@ -459,8 +481,10 @@ class PatientOphthalmicDiagnosesServiceTest extends \CDbTestCase
 		$this->assertCount(2,$patient->ophthalmicDiagnoses);
 
 
-		foreach ($patient->ophthalmicDiagnoses as $diagnosis) {
+		foreach ($patient->ophthalmicDiagnoses as $i => $diagnosis) {
 			$this->assertInstanceOf('SecondaryDiagnosis',$diagnosis);
+			$this->assertEquals($i+1,$diagnosis->id);
+
 			switch ($diagnosis->disorder->term) {
 				case 'Myopia':
 					$this->assertEquals($this->disorder('myopia'), $diagnosis->disorder);

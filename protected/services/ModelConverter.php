@@ -57,8 +57,6 @@ class ModelConverter
 	{
 		$model = new ModelConverter_ModelWrapper($this->map, $model, $extra_fields);
 
-		$this->service->getComplexReferenceObjects($model, $resource);
-
 		$this->service->setUpRelatedObjects($model, $resource);
 
 		foreach ($this->map->getFieldsForClass($model->getClass()) as $res_attribute => $def) {
@@ -74,6 +72,8 @@ class ModelConverter
 				}
 			}
 		}
+
+		$this->service->getComplexReferenceObjects($model, $resource);
 
 		$save && $this->saveRelatedObjects($model, $resource);
 
@@ -141,6 +141,8 @@ class ModelConverter
 
 		if ($model->haveAllKeysForReferenceObject($relation_name)) {
 			$model->associateReferenceObjectWithModel($relation_name);
+		} else {
+			$model->dissociateReferenceObjectFromModel($relation_name);
 		}
 	}
 
