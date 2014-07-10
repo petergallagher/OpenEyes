@@ -84,13 +84,15 @@ class ModelConverter
 				$class = 'services\\'.$def[0];
 				if (!$parser || \CHtml::modelName($parser) != 'services_'.$def[0]) {
 					if ($save && $parser && method_exists($parser,'resourceToModel_RelatedObjects_DeleteItems')) {
-						$parser->resourceToModel_RelatedObjects_DeleteItems($def[3]);
+						$parser->resourceToModel_RelatedObjects_DeleteItems($last_def[3]);
 					}
 					$parser = new $class($this);
 				}
 				if (method_exists($parser,'resourceToModel_RelatedObjects')) {
 					$parser->resourceToModel_RelatedObjects($model, $def[1], $def[4], $save);
 				}
+
+				$last_def = $def;
 			}
 		}
 

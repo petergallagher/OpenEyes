@@ -225,7 +225,12 @@ class JSONConverterTest extends \CDbTestCase
 
 	public function testParse_FullPatient()
 	{
-		$json = '{"nhs_num":"54321","hos_num":"12345","title":"Mr","family_name":"Aylward","given_name":"Jim","gender_ref":{"service":"Gender","id":1},"birth_date":{"date":"1970-01-01","timezone_type":3,"timezone":"Europe/London"},"date_of_death":null,"primary_phone":"07123 456789","addresses":[{"date_start":{"date":"2014-06-06 16:39:29","timezone_type":3,"timezone":"Europe\/London"},"date_end":{"date":"2014-06-06 16:39:29","timezone_type":3,"timezone":"Europe\/London"},"correspond":false,"transport":false,"use":null,"line1":"flat 1","line2":"bleakley creek","city":"flitchley","state":"london","zip":"ec1v 0dx","country":"United States"}],"care_providers":[],"gp_ref":{"service":"Gp","id":2},"prac_ref":{"service":"Practice","id":5},"cb_refs":[],"id":null,"last_modified":null,"contact_id":null}';
+		$resource = \Yii::app()->service->Patient(1)->fetch();
+
+		$resource->gp_ref = \Yii::app()->service->Gp(2);
+		$resource->prac_ref = \Yii::app()->service->Practice(5);
+
+		$json = $resource->serialise();
 
 		$op = new JSONConverter(new PatientService);
 
@@ -316,7 +321,20 @@ class JSONConverterTest extends \CDbTestCase
 
 	public function testJsonToModel_Save_ModelCountsCorrect()
 	{
-		$json = '{"nhs_num":"54321","hos_num":"12345","title":"Mr","family_name":"Aylward","given_name":"Jim","gender_ref":{"service":"Gender","id":1},"birth_date":{"date":"1970-01-01","timezone_type":3,"timezone":"Europe/London"},"date_of_death":null,"primary_phone":"07123 456789","addresses":[{"date_start":{"date":"2014-06-06 16:39:29","timezone_type":3,"timezone":"Europe\/London"},"date_end":{"date":"2014-06-06 16:39:29","timezone_type":3,"timezone":"Europe\/London"},"correspond":false,"transport":false,"use":null,"line1":"flat 1","line2":"bleakley creek","city":"flitchley","state":"london","zip":"ec1v 0dx","country":"United States"}],"care_providers":[],"gp_ref":{"service":"Gp","id":1},"prac_ref":{"service":"Practice","id":1},"cb_refs":[],"id":null,"last_modified":null,"contact_id":null}';
+		$resource = \Yii::app()->service->Patient(1)->fetch();
+
+		$resource->contact_id = null;
+		$resource->addresses[0] = new PatientAddress;
+		$resource->addresses[0]->date_start = new Date(date('Y-m-d'));
+		$resource->addresses[0]->date_end = new Date(date('Y-m-d'));
+		$resource->addresses[0]->line1 = 'testing 1';
+		$resource->addresses[0]->line2 = 'testing 2';
+		$resource->addresses[0]->city = 'testing 3';
+		$resource->addresses[0]->state = 'testing 4';
+		$resource->addresses[0]->zip = 'testing 5';
+		$resource->addresses[0]->country = 'United Kingdom';
+
+		$json = $resource->serialise();
 
 		$total_patients = count(\Patient::model()->findAll());
 		$total_contacts = count(\Contact::model()->findAll());
@@ -337,7 +355,23 @@ class JSONConverterTest extends \CDbTestCase
 
 	public function testJsonToModel_Save_DBIsCorrect()
 	{
-		$json = '{"nhs_num":"54321","hos_num":"12345","title":"Mr","family_name":"Aylward","given_name":"Jim","gender_ref":{"service":"Gender","id":1},"birth_date":{"date":"1970-01-01","timezone_type":3,"timezone":"Europe/London"},"date_of_death":null,"primary_phone":"07123 456789","addresses":[{"date_start":{"date":"2014-06-06 16:39:29","timezone_type":3,"timezone":"Europe\/London"},"date_end":{"date":"2014-06-06 16:39:29","timezone_type":3,"timezone":"Europe\/London"},"correspond":false,"transport":false,"use":null,"line1":"flat 1","line2":"bleakley creek","city":"flitchley","state":"london","zip":"ec1v 0dx","country":"United States"}],"care_providers":[],"gp_ref":{"service":"Gp","id":1},"prac_ref":{"service":"Practice","id":1},"cb_refs":[],"id":null,"last_modified":null,"contact_id":null}';
+		$resource = \Yii::app()->service->Patient(1)->fetch();
+
+		$resource->contact_id = null;
+		$resource->addresses[0] = new PatientAddress;
+		$resource->addresses[0]->date_start = new Date(date('Y-m-d'));
+		$resource->addresses[0]->date_end = new Date(date('Y-m-d'));
+		$resource->addresses[0]->line1 = 'testing 1';
+		$resource->addresses[0]->line2 = 'testing 2';
+		$resource->addresses[0]->city = 'testing 3';
+		$resource->addresses[0]->state = 'testing 4';
+		$resource->addresses[0]->zip = 'testing 5';
+		$resource->addresses[0]->country = 'United Kingdom';
+
+		$resource->gp_ref = \Yii::app()->service->Gp(1);
+		$resource->prac_ref = \Yii::app()->service->Practice(1);
+
+		$json = $resource->serialise();
 
 		$jc = new JSONConverter(new PatientService);
 		$patient = $jc->jsonToModel($json, new \Patient);
@@ -355,13 +389,13 @@ class JSONConverterTest extends \CDbTestCase
 
 		$this->assertCount(1, $patient->contact->addresses);
 		$this->assertInstanceOf('Address', $patient->contact->addresses[0]);
-		$this->assertEquals('flat 1', $patient->contact->addresses[0]->address1);
-		$this->assertEquals('bleakley creek', $patient->contact->addresses[0]->address2);
-		$this->assertEquals('flitchley', $patient->contact->addresses[0]->city);
-		$this->assertEquals('london', $patient->contact->addresses[0]->county);
-		$this->assertEquals('ec1v 0dx', $patient->contact->addresses[0]->postcode);
+		$this->assertEquals('testing 1', $patient->contact->addresses[0]->address1);
+		$this->assertEquals('testing 2', $patient->contact->addresses[0]->address2);
+		$this->assertEquals('testing 3', $patient->contact->addresses[0]->city);
+		$this->assertEquals('testing 4', $patient->contact->addresses[0]->county);
+		$this->assertEquals('testing 5', $patient->contact->addresses[0]->postcode);
 		$this->assertInstanceOf('\Country', $patient->contact->addresses[0]->country);
-		$this->assertEquals('United States', $patient->contact->addresses[0]->country->name);
+		$this->assertEquals('United Kingdom', $patient->contact->addresses[0]->country->name);
 
 		$this->assertEquals(1, $patient->gp_id);
 		$this->assertEquals(1, $patient->practice_id);

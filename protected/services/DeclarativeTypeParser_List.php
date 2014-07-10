@@ -123,7 +123,13 @@ class DeclarativeTypeParser_List extends DeclarativeTypeParser
 		$data_items = array();
 
 		foreach ($object->$attribute as $data_item) {
-			$data_items[] = $this->mc->jsonToResourceParse($data_item, $model_class, new $data_class(@$data_item->id ? array('id'=>$data_item->id) : null));
+			if (@$data_item->id) {
+				$_data_item = new $data_class(array('id' => $data_item->id));
+			} else {
+				$_data_item = new $data_class;
+			}
+
+			$data_items[] = $this->mc->jsonToResourceParse($data_item, $model_class, $_data_item);
 		}
 
 		return $data_items;
