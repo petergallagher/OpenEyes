@@ -20,6 +20,7 @@
 
 return array(
 	'medication1' => array(
+		'id' => 1,
 		'patient_id' => 1,
 		'drug_id' => 1,
 		'route_id' => 2,
@@ -29,6 +30,7 @@ return array(
 		'dose' => 'loads',
 	),
 	'medication2' => array(
+		'id' => 2,
 		'patient_id' => 1,
 		'drug_id' => 3,
 		'route_id' => 1,

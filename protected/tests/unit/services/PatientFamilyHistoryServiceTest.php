@@ -34,18 +34,21 @@ class PatientFamilyHistoryServiceTest extends \CDbTestCase
 		$this->assertCount(3,$resource->history);
 
 		$this->assertInstanceOf('services\PatientFamilyHistoryItem',$resource->history[0]);
+		$this->assertEquals($patient->familyHistory[0]->id,$resource->history[0]->getId());
 		$this->assertEquals('Uncle',$resource->history[0]->relative);
 		$this->assertEquals('Paternal',$resource->history[0]->side);
 		$this->assertEquals('Maculopathy',$resource->history[0]->condition);
 		$this->assertEquals('Was quite ill',$resource->history[0]->comments);
 
 		$this->assertInstanceOf('services\PatientFamilyHistoryItem',$resource->history[1]);
+		$this->assertEquals($patient->familyHistory[1]->id,$resource->history[1]->getId());
 		$this->assertEquals('Brother',$resource->history[1]->relative);
 		$this->assertEquals('N/A',$resource->history[1]->side);
 		$this->assertEquals('Diabetes',$resource->history[1]->condition);
 		$this->assertEquals('Very ill',$resource->history[1]->comments);
 
 		$this->assertInstanceOf('services\PatientFamilyHistoryItem',$resource->history[2]);
+		$this->assertEquals($patient->familyHistory[2]->id,$resource->history[2]->getId());
 		$this->assertEquals('Aunt',$resource->history[2]->relative);
 		$this->assertEquals('Maternal',$resource->history[2]->side);
 		$this->assertEquals('Cataract',$resource->history[2]->condition);

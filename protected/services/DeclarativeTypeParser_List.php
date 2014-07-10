@@ -17,6 +17,9 @@ namespace services;
 
 class DeclarativeTypeParser_List extends DeclarativeTypeParser
 {
+	private $saved = array();
+	private $to_delete = array();
+
 	public function modelToResourceParse($object, $attribute, $data_class, $param=null)
 	{
 		$data_list = DeclarativeTypeParser::expandObjectAttribute($object, $attribute);
@@ -87,19 +90,30 @@ class DeclarativeTypeParser_List extends DeclarativeTypeParser
 			}
 
 			if ($item->id) {
-				$matched_ids[] = $item->id;
+				$this->saved[\CHtml::modelName($item)][] = $item->id;
 			}
 		}
 
 		if ($save && $data) {
 			foreach ($data as $current_item) {
-				if (!in_array($current_item->id,$matched_ids)) {
-					$this->mc->deleteModel($current_item);
+				if (!in_array($current_item->id,$this->saved[\CHtml::modelName($current_item)])) {
+					$this->to_delete[\CHtml::modelName($current_item)][] = $current_item;
 				}
 			}
 		}
 
 		return $items;
+	}
+
+	public function resourceToModel_RelatedObjects_DeleteItems($model_class_name)
+	{
+		if (!empty($this->to_delete[$model_class_name])) {
+			foreach ($this->to_delete[$model_class_name] as $item) {
+				if (empty($this->saved[$model_class_name]) || !in_array($item->id,$this->saved[$model_class_name])) {
+					$this->mc->deleteModel($item);
+				}
+			}
+		}
 	}
 
 	public function jsonToResourceParse($object, $attribute, $data_class, $model_class)

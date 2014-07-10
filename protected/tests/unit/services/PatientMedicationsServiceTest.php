@@ -39,6 +39,7 @@ class PatientMedicationsServiceTest extends \CDbTestCase
 		$this->assertCount(1,$resource->medications);
 
 		$this->assertInstanceOf('services\PatientMedication',$resource->medications[0]);
+		$this->assertEquals($patient->medications[0]->id,$resource->medications[0]->getId());
 		$this->assertEquals('Abidec drops',$resource->medications[0]->drug);
 		$this->assertEquals('IM',$resource->medications[0]->route);
 		$this->assertEquals('Left',$resource->medications[0]->option);
@@ -51,6 +52,7 @@ class PatientMedicationsServiceTest extends \CDbTestCase
 		$this->assertCount(1,$resource->previous_medications);
 
 		$this->assertInstanceOf('services\PatientMedication',$resource->previous_medications[0]);
+		$this->assertEquals($patient->previous_medications[0]->id,$resource->previous_medications[0]->getId());
 		$this->assertEquals('Acetazolamide 250mg tablets',$resource->previous_medications[0]->drug);
 		$this->assertEquals('Eye',$resource->previous_medications[0]->route);
 		$this->assertEquals('Right',$resource->previous_medications[0]->option);
@@ -244,7 +246,7 @@ class PatientMedicationsServiceTest extends \CDbTestCase
 	{
 		$resource = \Yii::app()->service->PatientMedications($id)->fetch();
 
-		$drug1 = new PatientMedication;
+		$drug1 = new PatientMedication(array('id'=>1));
 		$drug1->drug = 'Acetazolamide 250mg modified release capsules';
 		$drug1->route = 'Nose';
 		$drug1->option = 'Right';
@@ -254,7 +256,7 @@ class PatientMedicationsServiceTest extends \CDbTestCase
 		$drug1->stop_reason = 'Believed themself to be god';
 		$drug1->dose = 'likesomuch';
 
-		$drug2 = new PatientMedication;
+		$drug2 = new PatientMedication(array('id'=>2));
 		$drug2->drug = 'Acetazolamide 250mg modified release capsules';
 		$drug2->route = 'Ocular muscle';
 		$drug2->option = 'Left';
@@ -305,6 +307,7 @@ class PatientMedicationsServiceTest extends \CDbTestCase
 		$this->assertCount(1,$patient->previous_medications);
 
 		$this->assertInstanceOf('Medication',$patient->previous_medications[0]);
+		$this->assertEquals(1,$patient->previous_medications[0]->id);
 		$this->assertInstanceOf('Drug',$patient->previous_medications[0]->drug);
 		$this->assertEquals('Acetazolamide 250mg modified release capsules',$patient->previous_medications[0]->drug->name);
 		$this->assertInstanceOf('DrugRoute',$patient->previous_medications[0]->route);
@@ -322,6 +325,7 @@ class PatientMedicationsServiceTest extends \CDbTestCase
 		$this->assertCount(1,$patient->medications);
 
 		$this->assertInstanceOf('Medication',$patient->medications[0]);
+		$this->assertEquals(2,$patient->medications[0]->id);
 		$this->assertInstanceOf('Drug',$patient->medications[0]->drug);
 		$this->assertEquals('Acetazolamide 250mg modified release capsules',$patient->medications[0]->drug->name);
 		$this->assertInstanceOf('DrugRoute',$patient->medications[0]->route);
@@ -348,6 +352,7 @@ class PatientMedicationsServiceTest extends \CDbTestCase
 		$this->assertCount(1,$patient->previous_medications);
 
 		$this->assertInstanceOf('Medication',$patient->previous_medications[0]);
+		$this->assertEquals(1,$patient->previous_medications[0]->id);
 		$this->assertInstanceOf('Drug',$patient->previous_medications[0]->drug);
 		$this->assertEquals('Acetazolamide 250mg modified release capsules',$patient->previous_medications[0]->drug->name);
 		$this->assertInstanceOf('DrugRoute',$patient->previous_medications[0]->route);
@@ -365,6 +370,7 @@ class PatientMedicationsServiceTest extends \CDbTestCase
 		$this->assertCount(1,$patient->medications);
 
 		$this->assertInstanceOf('Medication',$patient->medications[0]);
+		$this->assertEquals(2,$patient->medications[0]->id);
 		$this->assertInstanceOf('Drug',$patient->medications[0]->drug);
 		$this->assertEquals('Acetazolamide 250mg modified release capsules',$patient->medications[0]->drug->name);
 		$this->assertInstanceOf('DrugRoute',$patient->medications[0]->route);

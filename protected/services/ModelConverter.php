@@ -77,14 +77,25 @@ class ModelConverter
 
 		$save && $this->saveRelatedObjects($model, $resource);
 
+		$parser = null;
+
 		foreach ($this->map->getFieldsForClass($model->getClass()) as $res_attribute => $def) {
 			if (is_array($def)) {
 				$class = 'services\\'.$def[0];
-				$parser = new $class($this);
+				if (!$parser || \CHtml::modelName($parser) != 'services_'.$def[0]) {
+					if ($save && $parser && method_exists($parser,'resourceToModel_RelatedObjects_DeleteItems')) {
+						$parser->resourceToModel_RelatedObjects_DeleteItems($def[3]);
+					}
+					$parser = new $class($this);
+				}
 				if (method_exists($parser,'resourceToModel_RelatedObjects')) {
 					$parser->resourceToModel_RelatedObjects($model, $def[1], $def[4], $save);
 				}
 			}
+		}
+
+		if ($save && $parser && method_exists($parser,'resourceToModel_RelatedObjects_DeleteItems')) {
+			$parser->resourceToModel_RelatedObjects_DeleteItems($def[3]);
 		}
 
 		if ($save) {
