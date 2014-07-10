@@ -36,7 +36,7 @@ abstract class DeclarativeTypeParser
 
 		if (count($attributes) >0) {
 			if (!$object->$attribute) {
-				return false;
+				return null;
 			}
 
 			return self::expandObjectAttribute($object->$attribute, $attributes);

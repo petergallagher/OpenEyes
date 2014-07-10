@@ -297,7 +297,7 @@ class PatientOphthalmicDiagnosesServiceTest extends \CDbTestCase
 
 	public function testJsonToResource()
 	{
-		$json = '{"diagnoses":[{"disorder":"Myopia","side":"Left","id":null,"last_modified":null},{"disorder":"Retinal lattice degeneration","side":false,"id":null,"last_modified":null}],"id":null,"last_modified":null,"patient_id":{"id":"2","last_modified":-2208988800}}';
+		$json = '{"diagnoses":[{"disorder":"Myopia","side":"Left","id":null,"last_modified":null},{"disorder":"Retinal lattice degeneration","side":null,"id":null,"last_modified":null}],"id":null,"last_modified":null,"patient_id":{"id":"2","last_modified":-2208988800}}';
 
 		$ps = new PatientOphthalmicDiagnosesService;
 		$resource = $ps->jsonToResource($json);
@@ -311,12 +311,12 @@ class PatientOphthalmicDiagnosesServiceTest extends \CDbTestCase
 
 		$this->assertInstanceOf('services\PatientDiagnosis',$resource->diagnoses[1]);
 		$this->assertEquals('Retinal lattice degeneration',$resource->diagnoses[1]->disorder);
-		$this->assertFalse($resource->diagnoses[1]->side);
+		$this->assertNull($resource->diagnoses[1]->side);
 	}
 
 	public function testJsonToModel_NoSave_NoNewRows()
 	{
-		$json = '{"diagnoses":[{"disorder":"Myopia","side":"Left","id":null,"last_modified":null},{"disorder":"Retinal lattice degeneration","side":false,"id":null,"last_modified":null}],"id":null,"last_modified":null,"patient_id":{"id":"2","last_modified":-2208988800}}';
+		$json = '{"diagnoses":[{"disorder":"Myopia","side":"Left","id":null,"last_modified":null},{"disorder":"Retinal lattice degeneration","side":null,"id":null,"last_modified":null}],"id":null,"last_modified":null,"patient_id":{"id":"2","last_modified":-2208988800}}';
 
 		$total_sd = count(\SecondaryDiagnosis::model()->findAll());
 
@@ -328,7 +328,7 @@ class PatientOphthalmicDiagnosesServiceTest extends \CDbTestCase
 
 	public function testJsonToModel_NoSave_ModelIsCorrect()
 	{
-		$json = '{"diagnoses":[{"disorder":"Myopia","side":"Left","id":null,"last_modified":null},{"disorder":"Retinal lattice degeneration","side":false,"id":null,"last_modified":null}],"id":null,"last_modified":null,"patient_id":{"id":"2","last_modified":-2208988800}}';
+		$json = '{"diagnoses":[{"disorder":"Myopia","side":"Left","id":null,"last_modified":null},{"disorder":"Retinal lattice degeneration","side":null,"id":null,"last_modified":null}],"id":null,"last_modified":null,"patient_id":{"id":"2","last_modified":-2208988800}}';
 
 		$ps = new PatientOphthalmicDiagnosesService;
 		$patient = $ps->jsonToModel($json, new \Patient, false);
@@ -354,7 +354,7 @@ class PatientOphthalmicDiagnosesServiceTest extends \CDbTestCase
 
 	public function testJsonToModel_Save_Create_ModelCountsCorrect()
 	{
-		$json = '{"diagnoses":[{"disorder":"Myopia","side":"Left","id":null,"last_modified":null},{"disorder":"Retinal lattice degeneration","side":false,"id":null,"last_modified":null}],"id":null,"last_modified":null,"patient_id":{"id":"2","last_modified":-2208988800}}';
+		$json = '{"diagnoses":[{"disorder":"Myopia","side":"Left","id":null,"last_modified":null},{"disorder":"Retinal lattice degeneration","side":null,"id":null,"last_modified":null}],"id":null,"last_modified":null,"patient_id":{"id":"2","last_modified":-2208988800}}';
 
 		$total_sd = count(\SecondaryDiagnosis::model()->findAll());
 
@@ -366,7 +366,7 @@ class PatientOphthalmicDiagnosesServiceTest extends \CDbTestCase
 
 	public function testJsonToModel_Save_Create_ModelIsCorrect()
 	{
-		$json = '{"diagnoses":[{"disorder":"Myopia","side":"Left","id":null,"last_modified":null},{"disorder":"Retinal lattice degeneration","side":false,"id":null,"last_modified":null}],"id":null,"last_modified":null,"patient_id":{"id":"2","last_modified":-2208988800}}';
+		$json = '{"diagnoses":[{"disorder":"Myopia","side":"Left","id":null,"last_modified":null},{"disorder":"Retinal lattice degeneration","side":null,"id":null,"last_modified":null}],"id":null,"last_modified":null,"patient_id":{"id":"2","last_modified":-2208988800}}';
 
 		$ps = new PatientOphthalmicDiagnosesService;
 		$patient = $ps->jsonToModel($json, $this->patients('patient4'));
@@ -392,7 +392,7 @@ class PatientOphthalmicDiagnosesServiceTest extends \CDbTestCase
 
 	public function testJsonToModel_Save_Create_DBIsCorrect()
 	{
-		$json = '{"diagnoses":[{"disorder":"Myopia","side":"Left","id":null,"last_modified":null},{"disorder":"Retinal lattice degeneration","side":false,"id":null,"last_modified":null}],"id":null,"last_modified":null,"patient_id":{"id":"2","last_modified":-2208988800}}';
+		$json = '{"diagnoses":[{"disorder":"Myopia","side":"Left","id":null,"last_modified":null},{"disorder":"Retinal lattice degeneration","side":null,"id":null,"last_modified":null}],"id":null,"last_modified":null,"patient_id":{"id":"2","last_modified":-2208988800}}';
 
 		$ps = new PatientOphthalmicDiagnosesService;
 		$patient = $ps->jsonToModel($json, $this->patients('patient4'));
@@ -421,7 +421,7 @@ class PatientOphthalmicDiagnosesServiceTest extends \CDbTestCase
 
 	public function testJsonToModel_Save_Create_NonOphthalmic_Exception()
 	{
-		$json = '{"diagnoses":[{"disorder":"Diabetes mellitus type 1","side":"Left","id":null,"last_modified":null},{"disorder":"Essential hypertension","side":false,"id":null,"last_modified":null}],"id":null,"last_modified":null,"patient_id":{"id":"2","last_modified":-2208988800}}';
+		$json = '{"diagnoses":[{"disorder":"Diabetes mellitus type 1","side":"Left","id":null,"last_modified":null},{"disorder":"Essential hypertension","side":null,"id":null,"last_modified":null}],"id":null,"last_modified":null,"patient_id":{"id":"2","last_modified":-2208988800}}';
 
 		$this->setExpectedException('Exception','PatientOphthalmicDiagnoses passed a resource containing non-ophthalmic diagnoses');
 
@@ -431,7 +431,7 @@ class PatientOphthalmicDiagnosesServiceTest extends \CDbTestCase
 
 	public function testJsonToModel_Save_Update_ModelCountsCorrect()
 	{
-		$json = '{"diagnoses":[{"disorder":"Myopia","side":"Left","id":"1","last_modified":null},{"disorder":"Retinal lattice degeneration","side":false,"id":"2","last_modified":null}],"id":null,"last_modified":null,"patient_id":{"id":"2","last_modified":-2208988800}}';
+		$json = '{"diagnoses":[{"disorder":"Myopia","side":"Left","id":"1","last_modified":null},{"disorder":"Retinal lattice degeneration","side":null,"id":"2","last_modified":null}],"id":null,"last_modified":null,"patient_id":{"id":"2","last_modified":-2208988800}}';
 
 		$total_sd = count(\SecondaryDiagnosis::model()->findAll());
 
@@ -443,7 +443,7 @@ class PatientOphthalmicDiagnosesServiceTest extends \CDbTestCase
 
 	public function testJsonToModel_Save_Update_ModelIsCorrect()
 	{
-		$json = '{"diagnoses":[{"disorder":"Myopia","side":"Left","id":"1","last_modified":null},{"disorder":"Retinal lattice degeneration","side":false,"id":"2","last_modified":null}],"id":null,"last_modified":null,"patient_id":{"id":"2","last_modified":-2208988800}}';
+		$json = '{"diagnoses":[{"disorder":"Myopia","side":"Left","id":"1","last_modified":null},{"disorder":"Retinal lattice degeneration","side":null,"id":"2","last_modified":null}],"id":null,"last_modified":null,"patient_id":{"id":"2","last_modified":-2208988800}}';
 
 		$ps = new PatientOphthalmicDiagnosesService;
 		$patient = $ps->jsonToModel($json, $this->patients('patient4'));
@@ -471,7 +471,7 @@ class PatientOphthalmicDiagnosesServiceTest extends \CDbTestCase
 
 	public function testJsonToModel_Save_Update_DBIsCorrect()
 	{
-		$json = '{"diagnoses":[{"disorder":"Myopia","side":"Left","id":"1","last_modified":null},{"disorder":"Retinal lattice degeneration","side":false,"id":"2","last_modified":null}],"id":null,"last_modified":null,"patient_id":{"id":"2","last_modified":-2208988800}}';
+		$json = '{"diagnoses":[{"disorder":"Myopia","side":"Left","id":"1","last_modified":null},{"disorder":"Retinal lattice degeneration","side":null,"id":"2","last_modified":null}],"id":null,"last_modified":null,"patient_id":{"id":"2","last_modified":-2208988800}}';
 
 		$ps = new PatientOphthalmicDiagnosesService;
 		$patient = $ps->jsonToModel($json, $this->patients('patient4'));
@@ -502,7 +502,7 @@ class PatientOphthalmicDiagnosesServiceTest extends \CDbTestCase
 
 	public function testJsonToModel_Save_Update_NonOphthalmic_Exception()
 	{
-		$json = '{"diagnoses":[{"disorder":"Diabetes mellitus type 1","side":"Left","id":null,"last_modified":null},{"disorder":"Retinal lattice degeneration","side":false,"id":null,"last_modified":null}],"id":null,"last_modified":null,"patient_id":{"id":"2","last_modified":-2208988800}}';
+		$json = '{"diagnoses":[{"disorder":"Diabetes mellitus type 1","side":"Left","id":null,"last_modified":null},{"disorder":"Retinal lattice degeneration","side":null,"id":null,"last_modified":null}],"id":null,"last_modified":null,"patient_id":{"id":"2","last_modified":-2208988800}}';
 
 		$this->setExpectedException('Exception','PatientOphthalmicDiagnoses passed a resource containing non-ophthalmic diagnoses');
 

@@ -45,7 +45,7 @@ class PatientMedicationsServiceTest extends \CDbTestCase
 		$this->assertEquals('Left',$resource->medications[0]->option);
 		$this->assertEquals('bd',$resource->medications[0]->frequency);
 		$this->assertEquals('loads',$resource->medications[0]->dose);
-		$this->assertFalse($resource->medications[0]->stop_reason);
+		$this->assertNull($resource->medications[0]->stop_reason);
 		$this->assertInstanceOf('services\Date',$resource->medications[0]->start_date);
 		$this->assertNull($resource->medications[0]->end_date);
 
@@ -404,7 +404,7 @@ class PatientMedicationsServiceTest extends \CDbTestCase
 		$this->assertEquals('Left',$resource->medications[0]->option);
 		$this->assertEquals('bd',$resource->medications[0]->frequency);
 		$this->assertEquals('loads',$resource->medications[0]->dose);
-		$this->assertFalse($resource->medications[0]->stop_reason);
+		$this->assertNull($resource->medications[0]->stop_reason);
 		$this->assertInstanceOf('services\Date',$resource->medications[0]->start_date);
 		$this->assertNull($resource->medications[0]->end_date);
 
@@ -424,7 +424,7 @@ class PatientMedicationsServiceTest extends \CDbTestCase
 
 	public function testJsonToModel_NoSave_NoNewRows()
 	{
-		$json = '{"medications":[{"drug":"Abidec drops","route":"IM","option":"Left","frequency":"bd","start_date":{"date":"2012-01-01 00:00:00","timezone_type":3,"timezone":"Europe\/London"},"end_date":null,"dose":"loads","stop_reason":false,"id":null,"last_modified":null}],"previous_medications":[{"drug":"Acetazolamide 250mg tablets","route":"Eye","option":"Right","frequency":"2 hourly","start_date":{"date":"2013-03-03 00:00:00","timezone_type":3,"timezone":"Europe\/London"},"end_date":{"date":"2013-06-06 00:00:00","timezone_type":3,"timezone":"Europe\/London"},"dose":"much","stop_reason":"Started seeing halos and auras","id":null,"last_modified":null}],"id":null,"last_modified":null,"patient_id":{"id":"1","last_modified":-2208988800}}';
+		$json = '{"medications":[{"drug":"Abidec drops","route":"IM","option":"Left","frequency":"bd","start_date":{"date":"2012-01-01 00:00:00","timezone_type":3,"timezone":"Europe\/London"},"end_date":null,"dose":"loads","stop_reason":null,"id":null,"last_modified":null}],"previous_medications":[{"drug":"Acetazolamide 250mg tablets","route":"Eye","option":"Right","frequency":"2 hourly","start_date":{"date":"2013-03-03 00:00:00","timezone_type":3,"timezone":"Europe\/London"},"end_date":{"date":"2013-06-06 00:00:00","timezone_type":3,"timezone":"Europe\/London"},"dose":"much","stop_reason":"Started seeing halos and auras","id":null,"last_modified":null}],"id":null,"last_modified":null,"patient_id":{"id":"1","last_modified":-2208988800}}';
 
 		$total_medications = count(\Medication::model()->findAll());
 
@@ -436,7 +436,7 @@ class PatientMedicationsServiceTest extends \CDbTestCase
 
 	public function testJsonToModel_NoSave_ModelIsCorrect()
 	{
-		$json = '{"medications":[{"drug":"Abidec drops","route":"IM","option":"Left","frequency":"bd","start_date":{"date":"2012-01-01 00:00:00","timezone_type":3,"timezone":"Europe\/London"},"end_date":null,"dose":"loads","stop_reason":false,"id":null,"last_modified":null}],"previous_medications":[{"drug":"Acetazolamide 250mg tablets","route":"Eye","option":"Right","frequency":"2 hourly","start_date":{"date":"2013-03-03 00:00:00","timezone_type":3,"timezone":"Europe\/London"},"end_date":{"date":"2013-06-06 00:00:00","timezone_type":3,"timezone":"Europe\/London"},"dose":"much","stop_reason":"Started seeing halos and auras","id":null,"last_modified":null}],"id":null,"last_modified":null,"patient_id":{"id":"1","last_modified":-2208988800}}';
+		$json = '{"medications":[{"drug":"Abidec drops","route":"IM","option":"Left","frequency":"bd","start_date":{"date":"2012-01-01 00:00:00","timezone_type":3,"timezone":"Europe\/London"},"end_date":null,"dose":"loads","stop_reason":null,"id":null,"last_modified":null}],"previous_medications":[{"drug":"Acetazolamide 250mg tablets","route":"Eye","option":"Right","frequency":"2 hourly","start_date":{"date":"2013-03-03 00:00:00","timezone_type":3,"timezone":"Europe\/London"},"end_date":{"date":"2013-06-06 00:00:00","timezone_type":3,"timezone":"Europe\/London"},"dose":"much","stop_reason":"Started seeing halos and auras","id":null,"last_modified":null}],"id":null,"last_modified":null,"patient_id":{"id":"1","last_modified":-2208988800}}';
 
 		$ps = new PatientMedicationsService;
 		$patient = $ps->jsonToModel($json, $this->patients('patient4'), false);
@@ -478,7 +478,7 @@ class PatientMedicationsServiceTest extends \CDbTestCase
 
 	public function testJsonToModel_Save_Create_ModelCountsCorrect()
 	{
-		$json = '{"medications":[{"drug":"Abidec drops","route":"IM","option":"Left","frequency":"bd","start_date":{"date":"2012-01-01 00:00:00","timezone_type":3,"timezone":"Europe\/London"},"end_date":null,"dose":"loads","stop_reason":false,"id":null,"last_modified":null}],"previous_medications":[{"drug":"Acetazolamide 250mg tablets","route":"Eye","option":"Right","frequency":"2 hourly","start_date":{"date":"2013-03-03 00:00:00","timezone_type":3,"timezone":"Europe\/London"},"end_date":{"date":"2013-06-06 00:00:00","timezone_type":3,"timezone":"Europe\/London"},"dose":"much","stop_reason":"Started seeing halos and auras","id":null,"last_modified":null}],"id":null,"last_modified":null,"patient_id":{"id":"1","last_modified":-2208988800}}';
+		$json = '{"medications":[{"drug":"Abidec drops","route":"IM","option":"Left","frequency":"bd","start_date":{"date":"2012-01-01 00:00:00","timezone_type":3,"timezone":"Europe\/London"},"end_date":null,"dose":"loads","stop_reason":null,"id":null,"last_modified":null}],"previous_medications":[{"drug":"Acetazolamide 250mg tablets","route":"Eye","option":"Right","frequency":"2 hourly","start_date":{"date":"2013-03-03 00:00:00","timezone_type":3,"timezone":"Europe\/London"},"end_date":{"date":"2013-06-06 00:00:00","timezone_type":3,"timezone":"Europe\/London"},"dose":"much","stop_reason":"Started seeing halos and auras","id":null,"last_modified":null}],"id":null,"last_modified":null,"patient_id":{"id":"1","last_modified":-2208988800}}';
 
 		$total_medications = count(\Medication::model()->findAll());
 
@@ -490,7 +490,7 @@ class PatientMedicationsServiceTest extends \CDbTestCase
 
 	public function testJsonToModel_Save_Create_ModelIsCorrect()
 	{
-		$json = '{"medications":[{"drug":"Abidec drops","route":"IM","option":"Left","frequency":"bd","start_date":{"date":"2012-01-01 00:00:00","timezone_type":3,"timezone":"Europe\/London"},"end_date":null,"dose":"loads","stop_reason":false,"id":null,"last_modified":null}],"previous_medications":[{"drug":"Acetazolamide 250mg tablets","route":"Eye","option":"Right","frequency":"2 hourly","start_date":{"date":"2013-03-03 00:00:00","timezone_type":3,"timezone":"Europe\/London"},"end_date":{"date":"2013-06-06 00:00:00","timezone_type":3,"timezone":"Europe\/London"},"dose":"much","stop_reason":"Started seeing halos and auras","id":null,"last_modified":null}],"id":null,"last_modified":null,"patient_id":{"id":"1","last_modified":-2208988800}}';
+		$json = '{"medications":[{"drug":"Abidec drops","route":"IM","option":"Left","frequency":"bd","start_date":{"date":"2012-01-01 00:00:00","timezone_type":3,"timezone":"Europe\/London"},"end_date":null,"dose":"loads","stop_reason":null,"id":null,"last_modified":null}],"previous_medications":[{"drug":"Acetazolamide 250mg tablets","route":"Eye","option":"Right","frequency":"2 hourly","start_date":{"date":"2013-03-03 00:00:00","timezone_type":3,"timezone":"Europe\/London"},"end_date":{"date":"2013-06-06 00:00:00","timezone_type":3,"timezone":"Europe\/London"},"dose":"much","stop_reason":"Started seeing halos and auras","id":null,"last_modified":null}],"id":null,"last_modified":null,"patient_id":{"id":"1","last_modified":-2208988800}}';
 
 		$ps = new PatientMedicationsService;
 		$patient = $ps->jsonToModel($json, $this->patients('patient4'));
@@ -532,7 +532,7 @@ class PatientMedicationsServiceTest extends \CDbTestCase
 
 	public function testJsonToModel_Save_Create_DBIsCorrect()
 	{
-		$json = '{"medications":[{"drug":"Abidec drops","route":"IM","option":"Left","frequency":"bd","start_date":{"date":"2012-01-01 00:00:00","timezone_type":3,"timezone":"Europe\/London"},"end_date":null,"dose":"loads","stop_reason":false,"id":null,"last_modified":null}],"previous_medications":[{"drug":"Acetazolamide 250mg tablets","route":"Eye","option":"Right","frequency":"2 hourly","start_date":{"date":"2013-03-03 00:00:00","timezone_type":3,"timezone":"Europe\/London"},"end_date":{"date":"2013-06-06 00:00:00","timezone_type":3,"timezone":"Europe\/London"},"dose":"much","stop_reason":"Started seeing halos and auras","id":null,"last_modified":null}],"id":null,"last_modified":null,"patient_id":{"id":"1","last_modified":-2208988800}}';
+		$json = '{"medications":[{"drug":"Abidec drops","route":"IM","option":"Left","frequency":"bd","start_date":{"date":"2012-01-01 00:00:00","timezone_type":3,"timezone":"Europe\/London"},"end_date":null,"dose":"loads","stop_reason":null,"id":null,"last_modified":null}],"previous_medications":[{"drug":"Acetazolamide 250mg tablets","route":"Eye","option":"Right","frequency":"2 hourly","start_date":{"date":"2013-03-03 00:00:00","timezone_type":3,"timezone":"Europe\/London"},"end_date":{"date":"2013-06-06 00:00:00","timezone_type":3,"timezone":"Europe\/London"},"dose":"much","stop_reason":"Started seeing halos and auras","id":null,"last_modified":null}],"id":null,"last_modified":null,"patient_id":{"id":"1","last_modified":-2208988800}}';
 
 		$ps = new PatientMedicationsService;
 		$patient = $ps->jsonToModel($json, $this->patients('patient4'));

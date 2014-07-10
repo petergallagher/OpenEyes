@@ -37,7 +37,7 @@ class PatientPreviousOperationsServiceTest extends \CDbTestCase
 		$this->assertEquals($patient->previousOperations[0]->id,$resource->operations[0]->getId());
 		$this->assertEquals('Legs removed',$resource->operations[0]->operation);
 		$this->assertInstanceOf('services\Date',$resource->operations[0]->date);
-		$this->assertFalse($resource->operations[0]->side);
+		$this->assertNull($resource->operations[0]->side);
 
 		$this->assertInstanceOf('services\PatientPreviousOperation',$resource->operations[1]);
 		$this->assertEquals($patient->previousOperations[1]->id,$resource->operations[1]->getId());
@@ -351,7 +351,7 @@ class PatientPreviousOperationsServiceTest extends \CDbTestCase
 		$this->assertEquals(2,$resource->operations[0]->getId());
 		$this->assertEquals('Legs removed',$resource->operations[0]->operation);
 		$this->assertInstanceOf('services\Date',$resource->operations[0]->date);
-		$this->assertFalse($resource->operations[0]->side);
+		$this->assertNull($resource->operations[0]->side);
 
 		$this->assertInstanceOf('services\PatientPreviousOperation',$resource->operations[1]);
 		$this->assertEquals(1,$resource->operations[1]->getId());
@@ -368,7 +368,7 @@ class PatientPreviousOperationsServiceTest extends \CDbTestCase
 
 	public function testJsonToModel_NoSave_NoNewRows()
 	{
-		$json = '{"operations":[{"operation":"Legs removed","date":{"date":"2012-01-02 00:00:00","timezone_type":3,"timezone":"Europe\/London"},"side":false,"id":null,"last_modified":null},{"operation":"Left arm removed","date":{"date":"2013-04-04 00:00:00","timezone_type":3,"timezone":"Europe\/London"},"side":"Left","id":null,"last_modified":null},{"operation":"Eye replaced with bionic implant","date":{"date":"2014-01-22 00:00:00","timezone_type":3,"timezone":"Europe\/London"},"side":"Both","id":null,"last_modified":null}],"id":null,"last_modified":null,"patient_id":{"id":"1","last_modified":-2208988800}}';
+		$json = '{"operations":[{"operation":"Legs removed","date":{"date":"2012-01-02 00:00:00","timezone_type":3,"timezone":"Europe\/London"},"side":null,"id":null,"last_modified":null},{"operation":"Left arm removed","date":{"date":"2013-04-04 00:00:00","timezone_type":3,"timezone":"Europe\/London"},"side":"Left","id":null,"last_modified":null},{"operation":"Eye replaced with bionic implant","date":{"date":"2014-01-22 00:00:00","timezone_type":3,"timezone":"Europe\/London"},"side":"Both","id":null,"last_modified":null}],"id":null,"last_modified":null,"patient_id":{"id":"1","last_modified":-2208988800}}';
 
 		$total_pos = count(\PreviousOperation::model()->findAll());
 
@@ -380,7 +380,7 @@ class PatientPreviousOperationsServiceTest extends \CDbTestCase
 
 	public function testJsonToModel_NoSave_ModelIsCorrect()
 	{
-		$json = '{"operations":[{"operation":"Legs removed","date":{"date":"2012-01-02 00:00:00","timezone_type":3,"timezone":"Europe\/London"},"side":false,"id":null,"last_modified":null},{"operation":"Left arm removed","date":{"date":"2013-04-04 00:00:00","timezone_type":3,"timezone":"Europe\/London"},"side":"Left","id":null,"last_modified":null},{"operation":"Eye replaced with bionic implant","date":{"date":"2014-01-22 00:00:00","timezone_type":3,"timezone":"Europe\/London"},"side":"Both","id":null,"last_modified":null}],"id":null,"last_modified":null,"patient_id":{"id":"1","last_modified":-2208988800}}';
+		$json = '{"operations":[{"operation":"Legs removed","date":{"date":"2012-01-02 00:00:00","timezone_type":3,"timezone":"Europe\/London"},"side":null,"id":null,"last_modified":null},{"operation":"Left arm removed","date":{"date":"2013-04-04 00:00:00","timezone_type":3,"timezone":"Europe\/London"},"side":"Left","id":null,"last_modified":null},{"operation":"Eye replaced with bionic implant","date":{"date":"2014-01-22 00:00:00","timezone_type":3,"timezone":"Europe\/London"},"side":"Both","id":null,"last_modified":null}],"id":null,"last_modified":null,"patient_id":{"id":"1","last_modified":-2208988800}}';
 
 		$ps = new PatientPreviousOperationsService;
 		$patient = $ps->jsonToModel($json, $this->patients('patient2'), false);
@@ -410,7 +410,7 @@ class PatientPreviousOperationsServiceTest extends \CDbTestCase
 
 	public function testJsonToModel_Save_Create_ModelCountsCorrect()
 	{
-		$json = '{"operations":[{"operation":"Legs removed","date":{"date":"2012-01-02 00:00:00","timezone_type":3,"timezone":"Europe\/London"},"side":false,"id":null,"last_modified":null},{"operation":"Left arm removed","date":{"date":"2013-04-04 00:00:00","timezone_type":3,"timezone":"Europe\/London"},"side":"Left","id":null,"last_modified":null},{"operation":"Eye replaced with bionic implant","date":{"date":"2014-01-22 00:00:00","timezone_type":3,"timezone":"Europe\/London"},"side":"Both","id":null,"last_modified":null}],"id":null,"last_modified":null,"patient_id":{"id":"1","last_modified":-2208988800}}';
+		$json = '{"operations":[{"operation":"Legs removed","date":{"date":"2012-01-02 00:00:00","timezone_type":3,"timezone":"Europe\/London"},"side":null,"id":null,"last_modified":null},{"operation":"Left arm removed","date":{"date":"2013-04-04 00:00:00","timezone_type":3,"timezone":"Europe\/London"},"side":"Left","id":null,"last_modified":null},{"operation":"Eye replaced with bionic implant","date":{"date":"2014-01-22 00:00:00","timezone_type":3,"timezone":"Europe\/London"},"side":"Both","id":null,"last_modified":null}],"id":null,"last_modified":null,"patient_id":{"id":"1","last_modified":-2208988800}}';
 
 		$total_pos = count(\PreviousOperation::model()->findAll());
 
@@ -422,7 +422,7 @@ class PatientPreviousOperationsServiceTest extends \CDbTestCase
 
 	public function testJsonToModel_Save_Create_ModelIsCorrect()
 	{
-		$json = '{"operations":[{"operation":"Legs removed","date":{"date":"2012-01-02 00:00:00","timezone_type":3,"timezone":"Europe\/London"},"side":false,"id":null,"last_modified":null},{"operation":"Left arm removed","date":{"date":"2013-04-04 00:00:00","timezone_type":3,"timezone":"Europe\/London"},"side":"Left","id":null,"last_modified":null},{"operation":"Eye replaced with bionic implant","date":{"date":"2014-01-22 00:00:00","timezone_type":3,"timezone":"Europe\/London"},"side":"Both","id":null,"last_modified":null}],"id":null,"last_modified":null,"patient_id":{"id":"1","last_modified":-2208988800}}';
+		$json = '{"operations":[{"operation":"Legs removed","date":{"date":"2012-01-02 00:00:00","timezone_type":3,"timezone":"Europe\/London"},"side":null,"id":null,"last_modified":null},{"operation":"Left arm removed","date":{"date":"2013-04-04 00:00:00","timezone_type":3,"timezone":"Europe\/London"},"side":"Left","id":null,"last_modified":null},{"operation":"Eye replaced with bionic implant","date":{"date":"2014-01-22 00:00:00","timezone_type":3,"timezone":"Europe\/London"},"side":"Both","id":null,"last_modified":null}],"id":null,"last_modified":null,"patient_id":{"id":"1","last_modified":-2208988800}}';
 
 		$ps = new PatientPreviousOperationsService;
 		$patient = $ps->jsonToModel($json, $this->patients('patient2'));
@@ -452,7 +452,7 @@ class PatientPreviousOperationsServiceTest extends \CDbTestCase
 
 	public function testJsonToModel_Save_Create_DBIsCorrect()
 	{
-		$json = '{"operations":[{"operation":"Legs removed","date":{"date":"2012-01-02 00:00:00","timezone_type":3,"timezone":"Europe\/London"},"side":false,"id":null,"last_modified":null},{"operation":"Left arm removed","date":{"date":"2013-04-04 00:00:00","timezone_type":3,"timezone":"Europe\/London"},"side":"Left","id":null,"last_modified":null},{"operation":"Eye replaced with bionic implant","date":{"date":"2014-01-22 00:00:00","timezone_type":3,"timezone":"Europe\/London"},"side":"Both","id":null,"last_modified":null}],"id":null,"last_modified":null,"patient_id":{"id":"1","last_modified":-2208988800}}';
+		$json = '{"operations":[{"operation":"Legs removed","date":{"date":"2012-01-02 00:00:00","timezone_type":3,"timezone":"Europe\/London"},"side":null,"id":null,"last_modified":null},{"operation":"Left arm removed","date":{"date":"2013-04-04 00:00:00","timezone_type":3,"timezone":"Europe\/London"},"side":"Left","id":null,"last_modified":null},{"operation":"Eye replaced with bionic implant","date":{"date":"2014-01-22 00:00:00","timezone_type":3,"timezone":"Europe\/London"},"side":"Both","id":null,"last_modified":null}],"id":null,"last_modified":null,"patient_id":{"id":"1","last_modified":-2208988800}}';
 
 		$ps = new PatientPreviousOperationsService;
 		$patient = $ps->jsonToModel($json, $this->patients('patient2'));
