@@ -387,7 +387,9 @@ class PatientMedicationsServiceTest extends \CDbTestCase
 
 	public function testJsonToResource()
 	{
-		$json = '{"medications":[{"drug":"Abidec drops","route":"IM","option":"Left","frequency":"bd","start_date":{"date":"2012-01-01 00:00:00","timezone_type":3,"timezone":"Europe\/London"},"end_date":null,"dose":"loads","stop_reason":false,"id":null,"last_modified":null}],"previous_medications":[{"drug":"Acetazolamide 250mg tablets","route":"Eye","option":"Right","frequency":"2 hourly","start_date":{"date":"2013-03-03 00:00:00","timezone_type":3,"timezone":"Europe\/London"},"end_date":{"date":"2013-06-06 00:00:00","timezone_type":3,"timezone":"Europe\/London"},"dose":"much","stop_reason":"Started seeing halos and auras","id":null,"last_modified":null}],"id":null,"last_modified":null,"patient_id":{"id":"1","last_modified":-2208988800}}';
+		$patient = \Patient::model()->findByPk(1);
+
+		$json = \Yii::app()->service->PatientMedications(1)->fetch()->serialise();
 
 		$ps = new PatientMedicationsService;
 		$resource = $ps->jsonToResource($json);
@@ -396,6 +398,7 @@ class PatientMedicationsServiceTest extends \CDbTestCase
 		$this->assertCount(1,$resource->medications);
 
 		$this->assertInstanceOf('services\PatientMedication',$resource->medications[0]);
+		$this->assertEquals($patient->medications[0]->id,$resource->medications[0]->getId());
 		$this->assertEquals('Abidec drops',$resource->medications[0]->drug);
 		$this->assertEquals('IM',$resource->medications[0]->route);
 		$this->assertEquals('Left',$resource->medications[0]->option);
@@ -408,6 +411,7 @@ class PatientMedicationsServiceTest extends \CDbTestCase
 		$this->assertCount(1,$resource->previous_medications);
 
 		$this->assertInstanceOf('services\PatientMedication',$resource->previous_medications[0]);
+		$this->assertEquals($patient->previous_medications[0]->id,$resource->previous_medications[0]->getId());
 		$this->assertEquals('Acetazolamide 250mg tablets',$resource->previous_medications[0]->drug);
 		$this->assertEquals('Eye',$resource->previous_medications[0]->route);
 		$this->assertEquals('Right',$resource->previous_medications[0]->option);
@@ -571,7 +575,7 @@ class PatientMedicationsServiceTest extends \CDbTestCase
 
 	public function testJsonToModel_Save_Update_ModelCountsCorrect()
 	{
-		$json = '{"medications":[{"drug":"Abidec drops","route":"IM","option":"Left","frequency":"bd","start_date":{"date":"2012-01-01 00:00:00","timezone_type":3,"timezone":"Europe\/London"},"end_date":null,"dose":"loads","stop_reason":false,"id":null,"last_modified":null}],"previous_medications":[{"drug":"Acetazolamide 250mg tablets","route":"Eye","option":"Right","frequency":"2 hourly","start_date":{"date":"2013-03-03 00:00:00","timezone_type":3,"timezone":"Europe\/London"},"end_date":{"date":"2013-06-06 00:00:00","timezone_type":3,"timezone":"Europe\/London"},"dose":"much","stop_reason":"Started seeing halos and auras","id":null,"last_modified":null}],"id":null,"last_modified":null,"patient_id":{"id":"1","last_modified":-2208988800}}';
+		$json = \Yii::app()->service->PatientMedications(1)->fetch()->serialise();
 
 		$total_medications = count(\Medication::model()->findAll());
 
@@ -583,7 +587,9 @@ class PatientMedicationsServiceTest extends \CDbTestCase
 
 	public function testJsonToModel_Save_Update_ModelIsCorrect()
 	{
-		$json = '{"medications":[{"drug":"Abidec drops","route":"IM","option":"Left","frequency":"bd","start_date":{"date":"2012-01-01 00:00:00","timezone_type":3,"timezone":"Europe\/London"},"end_date":null,"dose":"loads","stop_reason":false,"id":null,"last_modified":null}],"previous_medications":[{"drug":"Acetazolamide 250mg tablets","route":"Eye","option":"Right","frequency":"2 hourly","start_date":{"date":"2013-03-03 00:00:00","timezone_type":3,"timezone":"Europe\/London"},"end_date":{"date":"2013-06-06 00:00:00","timezone_type":3,"timezone":"Europe\/London"},"dose":"much","stop_reason":"Started seeing halos and auras","id":null,"last_modified":null}],"id":null,"last_modified":null,"patient_id":{"id":"1","last_modified":-2208988800}}';
+		$resource = $this->getModifiedResource(1);
+
+		$json = $resource->serialise();
 
 		$ps = new PatientMedicationsService;
 		$patient = $ps->jsonToModel($json, $this->patients('patient1'));
@@ -592,40 +598,44 @@ class PatientMedicationsServiceTest extends \CDbTestCase
 		$this->assertCount(1,$patient->previous_medications);
 
 		$this->assertInstanceOf('Medication',$patient->previous_medications[0]);
+		$this->assertEquals(1,$patient->previous_medications[0]->id);
 		$this->assertInstanceOf('Drug',$patient->previous_medications[0]->drug);
-		$this->assertEquals('Acetazolamide 250mg tablets',$patient->previous_medications[0]->drug->name);
+		$this->assertEquals('Acetazolamide 250mg modified release capsules',$patient->previous_medications[0]->drug->name);
 		$this->assertInstanceOf('DrugRoute',$patient->previous_medications[0]->route);
-		$this->assertEquals('Eye',$patient->previous_medications[0]->route->name);
+		$this->assertEquals('Nose',$patient->previous_medications[0]->route->name);
 		$this->assertInstanceOf('DrugRouteOption',$patient->previous_medications[0]->option);
 		$this->assertEquals('Right',$patient->previous_medications[0]->option->name);
 		$this->assertInstanceOf('DrugFrequency',$patient->previous_medications[0]->frequency);
-		$this->assertEquals('2 hourly',$patient->previous_medications[0]->frequency->name);
-		$this->assertEquals('much',$patient->previous_medications[0]->dose);
+		$this->assertEquals('hourly',$patient->previous_medications[0]->frequency->name);
+		$this->assertEquals('likesomuch',$patient->previous_medications[0]->dose);
 		$this->assertInstanceOf('MedicationStopReason',$patient->previous_medications[0]->stop_reason);
-		$this->assertEquals('Started seeing halos and auras',$patient->previous_medications[0]->stop_reason->name);
-		$this->assertEquals('2013-03-03',$patient->previous_medications[0]->start_date);
-		$this->assertEquals('2013-06-06',$patient->previous_medications[0]->end_date);
+		$this->assertEquals('Believed themself to be god',$patient->previous_medications[0]->stop_reason->name);
+		$this->assertEquals('2012-01-01',$patient->previous_medications[0]->start_date);
+		$this->assertEquals('2012-01-30',$patient->previous_medications[0]->end_date);
 
 		$this->assertCount(1,$patient->medications);
 
 		$this->assertInstanceOf('Medication',$patient->medications[0]);
+		$this->assertEquals(2,$patient->medications[0]->id);
 		$this->assertInstanceOf('Drug',$patient->medications[0]->drug);
-		$this->assertEquals('Abidec drops',$patient->medications[0]->drug->name);
+		$this->assertEquals('Acetazolamide 250mg modified release capsules',$patient->medications[0]->drug->name);
 		$this->assertInstanceOf('DrugRoute',$patient->medications[0]->route);
-		$this->assertEquals('IM',$patient->medications[0]->route->name);
+		$this->assertEquals('Ocular muscle',$patient->medications[0]->route->name);
 		$this->assertInstanceOf('DrugRouteOption',$patient->medications[0]->option);
 		$this->assertEquals('Left',$patient->medications[0]->option->name);
 		$this->assertInstanceOf('DrugFrequency',$patient->medications[0]->frequency);
-		$this->assertEquals('bd',$patient->medications[0]->frequency->name);
-		$this->assertEquals('loads',$patient->medications[0]->dose);
+		$this->assertEquals('od',$patient->medications[0]->frequency->name);
+		$this->assertEquals('one handful',$patient->medications[0]->dose);
 		$this->assertNull($patient->medications[0]->stop_reason);
-		$this->assertEquals('2012-01-01',$patient->medications[0]->start_date);
+		$this->assertEquals('2013-04-04',$patient->medications[0]->start_date);
 		$this->assertNull($patient->medications[0]->end_date);
 	}
 
 	public function testJsonToModel_Save_Update_DBIsCorrect()
 	{
-		$json = '{"medications":[{"drug":"Abidec drops","route":"IM","option":"Left","frequency":"bd","start_date":{"date":"2012-01-01 00:00:00","timezone_type":3,"timezone":"Europe\/London"},"end_date":null,"dose":"loads","stop_reason":false,"id":null,"last_modified":null}],"previous_medications":[{"drug":"Acetazolamide 250mg tablets","route":"Eye","option":"Right","frequency":"2 hourly","start_date":{"date":"2013-03-03 00:00:00","timezone_type":3,"timezone":"Europe\/London"},"end_date":{"date":"2013-06-06 00:00:00","timezone_type":3,"timezone":"Europe\/London"},"dose":"much","stop_reason":"Started seeing halos and auras","id":null,"last_modified":null}],"id":null,"last_modified":null,"patient_id":{"id":"1","last_modified":-2208988800}}';
+		$resource = $this->getModifiedResource(1);
+
+		$json = $resource->serialise();
 
 		$ps = new PatientMedicationsService;
 		$patient = $ps->jsonToModel($json, $this->patients('patient1'));
@@ -635,34 +645,38 @@ class PatientMedicationsServiceTest extends \CDbTestCase
 		$this->assertCount(1,$patient->previous_medications);
 
 		$this->assertInstanceOf('Medication',$patient->previous_medications[0]);
+		$this->assertEquals(1,$patient->previous_medications[0]->id);
 		$this->assertInstanceOf('Drug',$patient->previous_medications[0]->drug);
-		$this->assertEquals('Acetazolamide 250mg tablets',$patient->previous_medications[0]->drug->name);
+		$this->assertEquals('Acetazolamide 250mg modified release capsules',$patient->previous_medications[0]->drug->name);
 		$this->assertInstanceOf('DrugRoute',$patient->previous_medications[0]->route);
-		$this->assertEquals('Eye',$patient->previous_medications[0]->route->name);
+		$this->assertEquals('Nose',$patient->previous_medications[0]->route->name);
 		$this->assertInstanceOf('DrugRouteOption',$patient->previous_medications[0]->option);
 		$this->assertEquals('Right',$patient->previous_medications[0]->option->name);
 		$this->assertInstanceOf('DrugFrequency',$patient->previous_medications[0]->frequency);
-		$this->assertEquals('2 hourly',$patient->previous_medications[0]->frequency->name);
-		$this->assertEquals('much',$patient->previous_medications[0]->dose);
+		$this->assertEquals('hourly',$patient->previous_medications[0]->frequency->name);
+		$this->assertEquals('likesomuch',$patient->previous_medications[0]->dose);
 		$this->assertInstanceOf('MedicationStopReason',$patient->previous_medications[0]->stop_reason);
-		$this->assertEquals('Started seeing halos and auras',$patient->previous_medications[0]->stop_reason->name);
-		$this->assertEquals('2013-03-03',$patient->previous_medications[0]->start_date);
-		$this->assertEquals('2013-06-06',$patient->previous_medications[0]->end_date);
-
+		$this->assertEquals('Believed themself to be god',$patient->previous_medications[0]->stop_reason->name);
+		$this->assertEquals('2012-01-01',$patient->previous_medications[0]->start_date);
+		$this->assertEquals('2012-01-30',$patient->previous_medications[0]->end_date);
+		
 		$this->assertCount(1,$patient->medications);
-
+		
 		$this->assertInstanceOf('Medication',$patient->medications[0]);
+		$this->assertEquals(2,$patient->medications[0]->id);
 		$this->assertInstanceOf('Drug',$patient->medications[0]->drug);
-		$this->assertEquals('Abidec drops',$patient->medications[0]->drug->name);
+		$this->assertEquals('Acetazolamide 250mg modified release capsules',$patient->medications[0]->drug->name);
 		$this->assertInstanceOf('DrugRoute',$patient->medications[0]->route);
-		$this->assertEquals('IM',$patient->medications[0]->route->name);
+		$this->assertEquals('Ocular muscle',$patient->medications[0]->route->name);
 		$this->assertInstanceOf('DrugRouteOption',$patient->medications[0]->option);
 		$this->assertEquals('Left',$patient->medications[0]->option->name);
 		$this->assertInstanceOf('DrugFrequency',$patient->medications[0]->frequency);
-		$this->assertEquals('bd',$patient->medications[0]->frequency->name);
-		$this->assertEquals('loads',$patient->medications[0]->dose);
+		$this->assertEquals('od',$patient->medications[0]->frequency->name);
+		$this->assertEquals('one handful',$patient->medications[0]->dose);
 		$this->assertNull($patient->medications[0]->stop_reason);
-		$this->assertEquals('2012-01-01',$patient->medications[0]->start_date);
+		$this->assertEquals('2013-04-04',$patient->medications[0]->start_date);
 		$this->assertNull($patient->medications[0]->end_date);
+		$this->assertInstanceOf('Patient',$patient);
+		$this->assertCount(1,$patient->previous_medications);
 	}
 }
