@@ -35,10 +35,12 @@ class PatientSystemicDiagnosesServiceTest extends \CDbTestCase
 		$this->assertCount(2,$resource->diagnoses);
 
 		$this->assertInstanceOf('services\PatientDiagnosis',$resource->diagnoses[0]);
+		$this->assertEquals($patient->systemicDiagnoses[0]->id,$resource->diagnoses[0]->getId());
 		$this->assertEquals('Diabetes mellitus type 1',$resource->diagnoses[0]->disorder);
 		$this->assertEquals('Left',$resource->diagnoses[0]->side);
 
 		$this->assertInstanceOf('services\PatientDiagnosis',$resource->diagnoses[1]);
+		$this->assertEquals($patient->systemicDiagnoses[1]->id,$resource->diagnoses[1]->getId());
 		$this->assertEquals('Essential hypertension',$resource->diagnoses[1]->disorder);
 		$this->assertNull($resource->diagnoses[1]->side);
 	}
@@ -175,9 +177,22 @@ class PatientSystemicDiagnosesServiceTest extends \CDbTestCase
 		$patient = $ps->resourceToModel($resource, $this->patients('patient3'));
 	}
 
+	public function getModifiedResource()
+	{
+		$resource = \Yii::app()->service->PatientSystemicDiagnoses(2)->fetch();
+
+		$resource->diagnoses[0]->disorder = 'Myocardial infarction';
+		$resource->diagnoses[0]->side = null;
+
+		$resource->diagnoses[1]->disorder = 'Diabetes mellitus type 2';
+		$resource->diagnoses[1]->side = 'Right';
+
+		return $resource;
+	}
+
 	public function testResourceToModel_Save_Update_Modified_ModelCountsCorrect()
 	{
-		$resource = $this->getResource();
+		$resource = $this->getModifiedResource();
 
 		$total_sd = count(\SecondaryDiagnosis::model()->findAll());
 
@@ -201,7 +216,7 @@ class PatientSystemicDiagnosesServiceTest extends \CDbTestCase
 
 	public function testResourceToModel_Save_Update_ModelIsCorrect()
 	{
-		$resource = $this->getResource();
+		$resource = $this->getModifiedResource();
 
 		$ps = new PatientSystemicDiagnosesService;
 		$patient = $ps->resourceToModel($resource, $this->patients('patient2'));
@@ -210,24 +225,25 @@ class PatientSystemicDiagnosesServiceTest extends \CDbTestCase
 		$this->assertCount(2,$patient->systemicDiagnoses);
 
 		$this->assertInstanceOf('SecondaryDiagnosis',$patient->systemicDiagnoses[0]);
+		$this->assertEquals($resource->diagnoses[0]->getId(),$patient->systemicDiagnoses[0]->id);
 		$this->assertInstanceOf('Disorder',$patient->systemicDiagnoses[0]->disorder);
-		$this->assertEquals('Essential hypertension',$patient->systemicDiagnoses[0]->disorder->term);
-		$this->assertEquals(\Disorder::model()->find('term=?',array('Essential hypertension'))->id,$patient->systemicDiagnoses[0]->disorder_id);
-		$this->assertInstanceOf('Eye',$patient->systemicDiagnoses[0]->eye);
-		$this->assertEquals('Both',$patient->systemicDiagnoses[0]->eye->name);
-		$this->assertEquals(\Eye::model()->find('name=?',array('Both'))->id,$patient->systemicDiagnoses[0]->eye_id);
+		$this->assertEquals('Myocardial infarction',$patient->systemicDiagnoses[0]->disorder->term);
+		$this->assertEquals(\Disorder::model()->find('term=?',array('Myocardial infarction'))->id,$patient->systemicDiagnoses[0]->disorder_id);
+		$this->assertNull($patient->systemicDiagnoses[0]->eye);
 
 		$this->assertInstanceOf('SecondaryDiagnosis',$patient->systemicDiagnoses[1]);
+		$this->assertEquals($resource->diagnoses[1]->getId(),$patient->systemicDiagnoses[1]->id);
 		$this->assertInstanceOf('Disorder',$patient->systemicDiagnoses[1]->disorder);
-		$this->assertEquals('Myocardial infarction',$patient->systemicDiagnoses[1]->disorder->term);
-		$this->assertEquals(\Disorder::model()->find('term=?',array('Myocardial infarction'))->id,$patient->systemicDiagnoses[1]->disorder_id);
-		$this->assertNull($patient->systemicDiagnoses[1]->eye);
-		$this->assertNull($patient->systemicDiagnoses[1]->eye_id);
+		$this->assertEquals('Diabetes mellitus type 2',$patient->systemicDiagnoses[1]->disorder->term);
+		$this->assertEquals(\Disorder::model()->find('term=?',array('Diabetes mellitus type 2'))->id,$patient->systemicDiagnoses[1]->disorder_id);
+		$this->assertInstanceOf('Eye',$patient->systemicDiagnoses[1]->eye);
+		$this->assertEquals(\Eye::model()->find('name=?',array('Right'))->id,$patient->systemicDiagnoses[1]->eye_id);
+		$this->assertEquals('Right',$patient->systemicDiagnoses[1]->eye->name);
 	}
 
 	public function testResourceToModel_Save_Update_DBIsCorrect()
 	{
-		$resource = $this->getResource();
+		$resource = $this->getModifiedResource();
 
 		$ps = new PatientSystemicDiagnosesService;
 		$patient = $ps->resourceToModel($resource, $this->patients('patient2'));
@@ -237,19 +253,20 @@ class PatientSystemicDiagnosesServiceTest extends \CDbTestCase
 		$this->assertCount(2,$patient->systemicDiagnoses);
 
 		$this->assertInstanceOf('SecondaryDiagnosis',$patient->systemicDiagnoses[0]);
+		$this->assertEquals($resource->diagnoses[0]->getId(),$patient->systemicDiagnoses[0]->id);
 		$this->assertInstanceOf('Disorder',$patient->systemicDiagnoses[0]->disorder);
-		$this->assertEquals('Essential hypertension',$patient->systemicDiagnoses[0]->disorder->term);
-		$this->assertEquals(\Disorder::model()->find('term=?',array('Essential hypertension'))->id,$patient->systemicDiagnoses[0]->disorder_id);
-		$this->assertInstanceOf('Eye',$patient->systemicDiagnoses[0]->eye);
-		$this->assertEquals('Both',$patient->systemicDiagnoses[0]->eye->name);
-		$this->assertEquals(\Eye::model()->find('name=?',array('Both'))->id,$patient->systemicDiagnoses[0]->eye_id);
+		$this->assertEquals('Myocardial infarction',$patient->systemicDiagnoses[0]->disorder->term);
+		$this->assertEquals(\Disorder::model()->find('term=?',array('Myocardial infarction'))->id,$patient->systemicDiagnoses[0]->disorder_id);
+		$this->assertNull($patient->systemicDiagnoses[0]->eye);
 
 		$this->assertInstanceOf('SecondaryDiagnosis',$patient->systemicDiagnoses[1]);
+		$this->assertEquals($resource->diagnoses[1]->getId(),$patient->systemicDiagnoses[1]->id);
 		$this->assertInstanceOf('Disorder',$patient->systemicDiagnoses[1]->disorder);
-		$this->assertEquals('Myocardial infarction',$patient->systemicDiagnoses[1]->disorder->term);
-		$this->assertEquals(\Disorder::model()->find('term=?',array('Myocardial infarction'))->id,$patient->systemicDiagnoses[1]->disorder_id);
-		$this->assertNull($patient->systemicDiagnoses[1]->eye);
-		$this->assertNull($patient->systemicDiagnoses[1]->eye_id);
+		$this->assertEquals('Diabetes mellitus type 2',$patient->systemicDiagnoses[1]->disorder->term);
+		$this->assertEquals(\Disorder::model()->find('term=?',array('Diabetes mellitus type 2'))->id,$patient->systemicDiagnoses[1]->disorder_id);
+		$this->assertInstanceOf('Eye',$patient->systemicDiagnoses[1]->eye);
+		$this->assertEquals(\Eye::model()->find('name=?',array('Right'))->id,$patient->systemicDiagnoses[1]->eye_id);
+		$this->assertEquals('Right',$patient->systemicDiagnoses[1]->eye->name);
 	}
 
 	public function testResourceToModel_Save_Update_NotSystemic_Exception()
@@ -266,7 +283,7 @@ class PatientSystemicDiagnosesServiceTest extends \CDbTestCase
 
 	public function testJsonToResource()
 	{
-		$json = '{"diagnoses":[{"disorder":"Diabetes mellitus type 1","side":"Left","id":null,"last_modified":null},{"disorder":"Essential hypertension","side":null,"id":null,"last_modified":null}],"id":null,"last_modified":null,"patient_id":{"id":"2","last_modified":-2208988800}}';
+		$json = \Yii::app()->service->PatientSystemicDiagnoses(2)->fetch()->serialise();
 
 		$ps = new PatientSystemicDiagnosesService;
 		$resource = $ps->jsonToResource($json);
@@ -275,17 +292,19 @@ class PatientSystemicDiagnosesServiceTest extends \CDbTestCase
 		$this->assertCount(2,$resource->diagnoses);
 
 		$this->assertInstanceOf('services\PatientDiagnosis',$resource->diagnoses[0]);
+		$this->assertEquals(5,$resource->diagnoses[0]->getId());
 		$this->assertEquals('Diabetes mellitus type 1',$resource->diagnoses[0]->disorder);
 		$this->assertEquals('Left',$resource->diagnoses[0]->side);
 
 		$this->assertInstanceOf('services\PatientDiagnosis',$resource->diagnoses[1]);
+		$this->assertEquals(4,$resource->diagnoses[1]->getId());
 		$this->assertEquals('Essential hypertension',$resource->diagnoses[1]->disorder);
 		$this->assertNull($resource->diagnoses[1]->side);
 	}
 
 	public function testJsonToModel_NoSave_NoNewRows()
 	{
-		$json = '{"diagnoses":[{"disorder":"Diabetes mellitus type 1","side":"Left","id":null,"last_modified":null},{"disorder":"Essential hypertension","side":null,"id":null,"last_modified":null}],"id":null,"last_modified":null,"patient_id":{"id":"2","last_modified":-2208988800}}';
+		$json = \Yii::app()->service->PatientSystemicDiagnoses(2)->fetch()->serialise();
 
 		$total_sd = count(\SecondaryDiagnosis::model()->findAll());
 
@@ -297,7 +316,7 @@ class PatientSystemicDiagnosesServiceTest extends \CDbTestCase
 
 	public function testJsonToModel_NoSave_ModelIsCorrect()
 	{
-		$json = '{"diagnoses":[{"disorder":"Diabetes mellitus type 1","side":"Left","id":null,"last_modified":null},{"disorder":"Essential hypertension","side":null,"id":null,"last_modified":null}],"id":null,"last_modified":null,"patient_id":{"id":"2","last_modified":-2208988800}}';
+		$json = \Yii::app()->service->PatientSystemicDiagnoses(2)->fetch()->serialise();
 
 		$ps = new PatientSystemicDiagnosesService;
 		$patient = $ps->jsonToModel($json, new \Patient, false);
@@ -398,7 +417,7 @@ class PatientSystemicDiagnosesServiceTest extends \CDbTestCase
 
 	public function testJsonToModel_Save_Update_ModelCountsCorrect()
 	{
-		$json = '{"diagnoses":[{"disorder":"Diabetes mellitus type 1","side":"Left","id":null,"last_modified":null},{"disorder":"Essential hypertension","side":null,"id":null,"last_modified":null}],"id":null,"last_modified":null,"patient_id":{"id":"2","last_modified":-2208988800}}';
+		$json = $this->getModifiedResource()->serialise();
 
 		$total_sd = count(\SecondaryDiagnosis::model()->findAll());
 
@@ -410,7 +429,8 @@ class PatientSystemicDiagnosesServiceTest extends \CDbTestCase
 
 	public function testJsonToModel_Save_Update_ModelIsCorrect()
 	{
-		$json = '{"diagnoses":[{"disorder":"Diabetes mellitus type 1","side":"Left","id":null,"last_modified":null},{"disorder":"Essential hypertension","side":null,"id":null,"last_modified":null}],"id":null,"last_modified":null,"patient_id":{"id":"2","last_modified":-2208988800}}';
+		$resource = $this->getModifiedResource();
+		$json = $resource->serialise();
 
 		$ps = new PatientSystemicDiagnosesService;
 		$patient = $ps->jsonToModel($json, $this->patients('patient4'));
@@ -419,24 +439,26 @@ class PatientSystemicDiagnosesServiceTest extends \CDbTestCase
 		$this->assertCount(2,$patient->systemicDiagnoses);
 
 		$this->assertInstanceOf('SecondaryDiagnosis',$patient->systemicDiagnoses[0]);
+		$this->assertEquals($resource->diagnoses[0]->getId(),$patient->systemicDiagnoses[0]->id);
 		$this->assertInstanceOf('Disorder',$patient->systemicDiagnoses[0]->disorder);
-		$this->assertEquals('Diabetes mellitus type 1',$patient->systemicDiagnoses[0]->disorder->term);
-		$this->assertEquals(\Disorder::model()->find('term=?',array('Diabetes mellitus type 1'))->id,$patient->systemicDiagnoses[0]->disorder_id);
-		$this->assertInstanceOf('Eye',$patient->systemicDiagnoses[0]->eye);
-		$this->assertEquals('Left',$patient->systemicDiagnoses[0]->eye->name);
-		$this->assertEquals(\Eye::model()->find('name=?',array('Left'))->id,$patient->systemicDiagnoses[0]->eye_id);
+		$this->assertEquals('Myocardial infarction',$patient->systemicDiagnoses[0]->disorder->term);
+		$this->assertEquals(\Disorder::model()->find('term=?',array('Myocardial infarction'))->id,$patient->systemicDiagnoses[0]->disorder_id);
+		$this->assertNull($patient->systemicDiagnoses[0]->eye);
 
 		$this->assertInstanceOf('SecondaryDiagnosis',$patient->systemicDiagnoses[1]);
+		$this->assertEquals($resource->diagnoses[1]->getId(),$patient->systemicDiagnoses[1]->id);
 		$this->assertInstanceOf('Disorder',$patient->systemicDiagnoses[1]->disorder);
-		$this->assertEquals('Essential hypertension',$patient->systemicDiagnoses[1]->disorder->term);
-		$this->assertEquals(\Disorder::model()->find('term=?',array('Essential hypertension'))->id,$patient->systemicDiagnoses[1]->disorder_id);
-		$this->assertNull($patient->systemicDiagnoses[1]->eye);
-		$this->assertNull($patient->systemicDiagnoses[1]->eye_id);
+		$this->assertEquals('Diabetes mellitus type 2',$patient->systemicDiagnoses[1]->disorder->term);
+		$this->assertEquals(\Disorder::model()->find('term=?',array('Diabetes mellitus type 2'))->id,$patient->systemicDiagnoses[1]->disorder_id);
+		$this->assertInstanceOf('Eye',$patient->systemicDiagnoses[1]->eye);
+		$this->assertEquals(\Eye::model()->find('name=?',array('Right'))->id,$patient->systemicDiagnoses[1]->eye_id);
+		$this->assertEquals('Right',$patient->systemicDiagnoses[1]->eye->name);
 	}
 
 	public function testJsonToModel_Save_Update_DBIsCorrect()
 	{
-		$json = '{"diagnoses":[{"disorder":"Diabetes mellitus type 1","side":"Left","id":null,"last_modified":null},{"disorder":"Essential hypertension","side":null,"id":null,"last_modified":null}],"id":null,"last_modified":null,"patient_id":{"id":"2","last_modified":-2208988800}}';
+		$resource = $this->getModifiedResource();
+		$json = $resource->serialise();
 
 		$ps = new PatientSystemicDiagnosesService;
 		$patient = $ps->jsonToModel($json, $this->patients('patient4'));
@@ -446,17 +468,20 @@ class PatientSystemicDiagnosesServiceTest extends \CDbTestCase
 		$this->assertCount(2,$patient->systemicDiagnoses);
 
 		$this->assertInstanceOf('SecondaryDiagnosis',$patient->systemicDiagnoses[0]);
+		$this->assertEquals($resource->diagnoses[0]->getId(),$patient->systemicDiagnoses[0]->id);
 		$this->assertInstanceOf('Disorder',$patient->systemicDiagnoses[0]->disorder);
-		$this->assertEquals('Diabetes mellitus type 1',$patient->systemicDiagnoses[0]->disorder->term);
-		$this->assertEquals(\Disorder::model()->find('term=?',array('Diabetes mellitus type 1'))->id,$patient->systemicDiagnoses[0]->disorder_id);
-		$this->assertInstanceOf('Eye',$patient->systemicDiagnoses[0]->eye);
-		$this->assertEquals('Left',$patient->systemicDiagnoses[0]->eye->name);		$this->assertEquals(\Eye::model()->find('name=?',array('Left'))->id,$patient->systemicDiagnoses[0]->eye_id);
+		$this->assertEquals('Myocardial infarction',$patient->systemicDiagnoses[0]->disorder->term);
+		$this->assertEquals(\Disorder::model()->find('term=?',array('Myocardial infarction'))->id,$patient->systemicDiagnoses[0]->disorder_id);
+		$this->assertNull($patient->systemicDiagnoses[0]->eye);
+
 		$this->assertInstanceOf('SecondaryDiagnosis',$patient->systemicDiagnoses[1]);
+		$this->assertEquals($resource->diagnoses[1]->getId(),$patient->systemicDiagnoses[1]->id);
 		$this->assertInstanceOf('Disorder',$patient->systemicDiagnoses[1]->disorder);
-		$this->assertEquals('Essential hypertension',$patient->systemicDiagnoses[1]->disorder->term);
-		$this->assertEquals(\Disorder::model()->find('term=?',array('Essential hypertension'))->id,$patient->systemicDiagnoses[1]->disorder_id);
-		$this->assertNull($patient->systemicDiagnoses[1]->eye);
-		$this->assertNull($patient->systemicDiagnoses[1]->eye_id);
+		$this->assertEquals('Diabetes mellitus type 2',$patient->systemicDiagnoses[1]->disorder->term);
+		$this->assertEquals(\Disorder::model()->find('term=?',array('Diabetes mellitus type 2'))->id,$patient->systemicDiagnoses[1]->disorder_id);
+		$this->assertInstanceOf('Eye',$patient->systemicDiagnoses[1]->eye);
+		$this->assertEquals(\Eye::model()->find('name=?',array('Right'))->id,$patient->systemicDiagnoses[1]->eye_id);
+		$this->assertEquals('Right',$patient->systemicDiagnoses[1]->eye->name);
 	}
 
 	public function testJsonToModel_Save_Update_NonSystemic_Exception()
