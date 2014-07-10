@@ -36,7 +36,12 @@ class DeclarativeTypeParser_Elements extends DeclarativeTypeParser
 
 			$relations = $element->relations();
 
-			$_element = new $data_class;
+			if ($id = method_exists($element,'getId') ? $element->getId() : @$element->id) {
+				$_element = new $data_class(array('id' => $id));
+			} else {
+				$_element = new $data_class;
+			}
+
 			$_element->_class_name = \CHtml::modelName($element);
 
 			foreach ($_element->fields() as $field) {
@@ -119,9 +124,9 @@ class DeclarativeTypeParser_Elements extends DeclarativeTypeParser
 
 			$data_class = $_element->_class_name;
 
-			if (\CHtml::modelName($model) == 'services_ModelConverter_ModelWrapper' && $model->getId()) {
-				if (!$element = $data_class::model()->find('event_id=?',array($model->getId()))) {
-					$element = new $data_class;
+			if ($_element->getId()) {
+				if (!$element = $data_class::model()->findByPk($_element->getId())) {
+					throw new \Exception("$data_class not found: ".$_element->getId());
 				}
 			} else {
 				if ($data_class === null) {

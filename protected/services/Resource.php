@@ -74,6 +74,14 @@ abstract class Resource extends DataObject
 	}
 
 	/**
+	 * @param integer $id
+	 */
+	public function setId($id)
+	{
+		$this->id = $id;
+	}
+
+	/**
 	 * Get version ID of this resource (null if not an internal resource)
 	 *
 	 * @return int|null

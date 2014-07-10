@@ -122,6 +122,14 @@ abstract class DataObject implements FhirCompatible
 	}
 
 	/**
+	 * @param integer $id
+	 */
+	public function setId($id)
+	{
+		$this->id = $id;
+	}
+
+	/**
 	 * Compare two DataObjects in terms of their public properties
 	 *
 	 * @param DataObject $object

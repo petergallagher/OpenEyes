@@ -41,9 +41,11 @@ class DeclarativeTypeParser_DataObjectExclusive extends DeclarativeTypeParser
 					$id = @$resource->$res_attribute->id;
 				}
 
-				$id && $model_item = $model_class::model()->findByPk($id);
-
-				if (!@$model_item) {
+				if ($id) {
+					if (!$model_item = $model_class::model()->findByPk($id)) {
+						throw new \Exception("$model_class not found: $id");
+					}
+				} else {
 					$model_item = new $model_class;
 				}
 
