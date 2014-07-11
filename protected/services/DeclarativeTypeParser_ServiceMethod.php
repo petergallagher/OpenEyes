@@ -15,35 +15,20 @@
 
 namespace services;
 
-class DateTime extends \DateTime implements FhirCompatible
+class DeclarativeTypeParser_ServiceMethod extends DeclarativeTypeParser
 {
-	static public function fromFhir($value)
+	public function modelToResourceParse($object, $attribute, $data_class, $param=null)
 	{
-		return new self($value);
+		return $this->mc->service->{"modelToResource_".$attribute}(DeclarativeTypeParser::expandObjectAttribute($object, $attribute));
 	}
 
-	public function toFhir()
+	public function resourceToModelParse(&$model, $resource, $model_attribute, $res_attribute, $model_class, $param1, $save)
 	{
-		return $this->format(DATE_RFC3339);
+		$model->setAttribute($model_attribute,$this->mc->service->{"resourceToModel_".$res_attribute}($resource->$res_attribute));
 	}
 
-	public function toModelValue()
+	public function jsonToResourceParse($object, $attribute, $data_class, $model_class)
 	{
-		return $this->format('Y-m-d H:i:s');
-	}
-
-	static public function fromObject($object)
-	{
-		$dtz = new \DateTimeZone($object->timezone);
-
-		return new self($object->date, $dtz);
-	}
-
-	/**
-	 * @return Date
-	 */
-	public function toDate()
-	{
-		return new Date($this->format('Y-m-d'), $this->getTimezone());
+		return $object->$attribute;
 	}
 }

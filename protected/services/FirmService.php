@@ -15,35 +15,30 @@
 
 namespace services;
 
-class DateTime extends \DateTime implements FhirCompatible
+class FirmService extends DeclarativeModelService
 {
-	static public function fromFhir($value)
-	{
-		return new self($value);
-	}
+	static protected $operations = array(self::OP_READ, self::OP_UPDATE, self::OP_DELETE, self::OP_CREATE, self::OP_SEARCH);
 
-	public function toFhir()
-	{
-		return $this->format(DATE_RFC3339);
-	}
+	static protected $search_params = array(
+		'id' => self::TYPE_TOKEN,
+		'identifier' => self::TYPE_TOKEN,
+	);
 
-	public function toModelValue()
-	{
-		return $this->format('Y-m-d H:i:s');
-	}
+	static protected $primary_model = 'Firm';
 
-	static public function fromObject($object)
-	{
-		$dtz = new \DateTimeZone($object->timezone);
+	static public $model_map = array(
+		'Firm' => array(
+			'fields' => array(
+				'name' => 'name',
+				'subspecialty' => 'subspecialty',
+				'pas_code' => 'pas_code',
+				'active' => 'active',
+				'consultant_ref' => array(self::TYPE_REF, 'consultant_id', 'Consultant'),
+			),
+		)
+	);
 
-		return new self($object->date, $dtz);
-	}
-
-	/**
-	 * @return Date
-	 */
-	public function toDate()
+	public function search(array $params)
 	{
-		return new Date($this->format('Y-m-d'), $this->getTimezone());
 	}
 }

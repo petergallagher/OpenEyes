@@ -44,7 +44,7 @@ class ModelConverter
 			if (is_array($def)) {
 				$class = 'services\\'.$def[0];
 				$parser = new $class($this);
-				$resource->$res_attribute = $parser->modelToResourceParse($object, $def[1], $def[2], @$def[3]);
+				$resource->$res_attribute = $parser->modelToResourceParse($object, $def[1], @$def[2], @$def[3]);
 			} else {
 				$resource->$res_attribute = $this->service->expandModelAttribute($object, $def);
 			}
@@ -63,7 +63,7 @@ class ModelConverter
 			if (is_array($def)) {
 				$class = 'services\\'.$def[0];
 				$parser = new $class($this);
-				$parser->resourceToModelParse($model, $resource, $def[1], $res_attribute, $def[2], @$def[3], $save);
+				$parser->resourceToModelParse($model, $resource, $def[1], $res_attribute, @$def[2], @$def[3], $save);
 			} else {
 				if ($this->isReferenceObjectAttribute($model, $def)) {
 					$this->mapResourceReferenceObjectToModel($model, $def, $resource->$res_attribute);

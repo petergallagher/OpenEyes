@@ -208,6 +208,7 @@ return array(
 				'services\RTTService',
 				'services\DisorderService',
 				'services\ProcedureService',
+				'services\FirmService',
 			),
 		),
 		'session' => array(

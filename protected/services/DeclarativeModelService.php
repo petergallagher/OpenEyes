@@ -26,6 +26,7 @@ class DeclarativeModelService extends ModelService
 	const TYPE_RESOURCE = 'DeclarativeTypeParser_Resource';
 	const TYPE_REF_LIST = 'DeclarativeTypeParser_RefList';
 	const TYPE_ELEMENTS = 'DeclarativeTypeParser_Elements';
+	const TYPE_SERVICEMETHOD = 'DeclarativeTypeParser_ServiceMethod';
 
 	/**
 	 * @param BaseActiveRecord $model

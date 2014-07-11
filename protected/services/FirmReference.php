@@ -15,35 +15,6 @@
 
 namespace services;
 
-class DateTime extends \DateTime implements FhirCompatible
+class FirmReference extends ModelReference
 {
-	static public function fromFhir($value)
-	{
-		return new self($value);
-	}
-
-	public function toFhir()
-	{
-		return $this->format(DATE_RFC3339);
-	}
-
-	public function toModelValue()
-	{
-		return $this->format('Y-m-d H:i:s');
-	}
-
-	static public function fromObject($object)
-	{
-		$dtz = new \DateTimeZone($object->timezone);
-
-		return new self($object->date, $dtz);
-	}
-
-	/**
-	 * @return Date
-	 */
-	public function toDate()
-	{
-		return new Date($this->format('Y-m-d'), $this->getTimezone());
-	}
 }

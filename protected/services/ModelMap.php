@@ -41,14 +41,16 @@ class ModelMap
 				if (is_array($def)) {
 					$relations = array();
 
-					if (is_array($def[1])) {
-						foreach ($def[1] as $field) {
-							if ($pos = strpos($field,'.')) {
-								$relations[] = substr($field,0,$pos);
+					if (isset($def[0])) {
+						if (is_array($def[1])) {
+							foreach ($def[1] as $field) {
+								if ($pos = strpos($field,'.')) {
+									$relations[] = substr($field,0,$pos);
+								}
 							}
+						} else if ($pos = strpos($def[1],'.')) {
+							$relations = array(substr($def[1],0,$pos));
 						}
-					} else if ($pos = strpos($def[1],'.')) {
-						$relations = array(substr($def[1],0,$pos));
 					}
 
 					foreach ($relations as $relation) {
