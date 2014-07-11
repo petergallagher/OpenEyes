@@ -91,6 +91,8 @@ class PatientController extends BaseController
 	{
 		parent::storeData();
 
+		Yii::app()->clientScript->registerPackage('core.patient');
+
 		$this->firm = Firm::model()->findByPk($this->selectedFirmId);
 
 		if (!isset($this->firm)) {
@@ -107,8 +109,6 @@ class PatientController extends BaseController
 	 */
 	public function actionView($id)
 	{
-		Yii::app()->assetManager->registerScriptFile('js/patientSummary.js');
-
 		$this->patient = $this->loadModel($id);
 
 		$tabId = !empty($_GET['tabId']) ? $_GET['tabId'] : 0;
@@ -271,7 +271,6 @@ class PatientController extends BaseController
 
 	public function actionEpisodes()
 	{
-		$this->layout = '//layouts/events_and_episodes';
 		$this->patient = $this->loadModel($_GET['id']);
 
 		$episodes = $this->patient->episodes;
@@ -322,7 +321,6 @@ class PatientController extends BaseController
 			throw new SystemException('Episode not found: '.$id);
 		}
 
-		$this->layout = '//layouts/events_and_episodes';
 		$this->patient = $this->episode->patient;
 
 		$episodes = $this->patient->episodes;
@@ -391,9 +389,7 @@ class PatientController extends BaseController
 		}
 
 		$this->patient = $this->episode->patient;
-		$this->layout = '//layouts/events_and_episodes';
-
-		$episodes = $this->patient->episodes;
+			$episodes = $this->patient->episodes;
 		// TODO: verify if ordered_episodes complete supercedes need for unordered $episodes
 		$ordered_episodes = $this->patient->getOrderedEpisodes();
 		$legacyepisodes = $this->patient->legacyepisodes;

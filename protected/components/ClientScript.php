@@ -19,6 +19,47 @@
 
 class ClientScript extends CClientScript
 {
+
+	/**
+	 * Remove package scripts. Read through all scripts (and dependant scripts) defined
+	 * in a package, and add them to the scriptMap to prevent outputting them in a response.
+	 * @param  string $packageName Name of the package.
+	 */
+	public function removePackageScripts($packageName=null)
+	{
+		if (!$packageName) return;
+		$package = $this->packages[$packageName];
+
+		// Process dependencies first.
+		if (isset($package['depends']) && $package['depends']) {
+			foreach($package['depends'] as $dependantPackage) {
+				$this->removePackageScripts($dependantPackage);
+			}
+		}
+
+		// Now remove all css and js files defined in this package.
+		foreach(array('js','css') as $type) {
+			if (isset($package[$type])) {
+				foreach($package[$type] as $file) {
+					$this->scriptMap[basename($file)] = false;
+				}
+			}
+		}
+	}
+
+	/**
+	 * Renders the registered scripts.
+	 * @param string $output the existing output that needs to be inserted with script tags
+	 */
+	public function render(&$output)
+	{
+		// Remove all core and core-dependant registered scripts for AJAX requests.
+		if (Yii::app()->request->isAjaxRequest) {
+			$this->removePackageScripts('core');
+		}
+		parent::render($output);
+	}
+
 	/**
 	 * Extending unifyScripts in order to hook the cache buster in at the right
 	 * point in the render method

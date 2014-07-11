@@ -66,33 +66,20 @@ class BaseController extends Controller
 	}
 
 	/**
-	 * Sets up the yii assetManager properties
+	 * Register packages or script/css files.
 	 */
-	protected function setupAssetManager()
+	protected function registerAssets()
 	{
-
-		$assetManager = Yii::app()->assetManager;
-
-		// Set AssetManager properties.
-		$assetManager->isPrintRequest = $this->isPrintAction($this->action->id);
-		$assetManager->isAjaxRequest = Yii::app()->getRequest()->getIsAjaxRequest();
-
-		//FIXME: currently we are resetting the assetmanager list for PDFs because of the TCPDF processing of
+		// FIXME: currently we are resetting the assetmanager list for PDFs because of the TCPDF processing of
 		// stylesheets. Ideally we should suppress the inclusion here. (Or we should be using a different approach
 		// to render the HTML template for the TCPDF engine)
 
-		// Register the main stylesheet without pre-registering to ensure it's always output first.
-		$assetManager->registerCssFile('css/style.css', null, null, AssetManager::OUTPUT_ALL, false);
-
-		// Prevent certain assets from being outputted in certain conditions.
-		$assetManager->adjustScriptMapping();
+		Yii::app()->clientScript->registerPackage('core');
 	}
 
 	protected function beforeAction($action)
 	{
 		$app = Yii::app();
-
-		$this->setupAssetManager();
 
 		if ($app->params['ab_testing']) {
 			if ($app->user->isGuest) {
@@ -115,16 +102,6 @@ class BaseController extends Controller
 		}
 
 		return parent::beforeAction($action);
-	}
-
-	/**
-	 * This method is invoked after the view is rendered. We register the assets here
-	 * as assets might be pre-registered within the views.
-	 */
-	protected function afterRender($view, &$output)
-	{
-		// Register all assets that we pre-registered.
-		Yii::app()->getAssetManager()->registerFiles($this->isPrintAction($this->action->id));
 	}
 
 	protected function setSessionPatient($patient)
@@ -153,6 +130,7 @@ class BaseController extends Controller
 
 	protected function beforeRender($view)
 	{
+		$this->registerAssets();
 		$this->processJsVars();
 		return parent::beforeRender($view);
 	}

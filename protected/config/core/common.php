@@ -105,6 +105,55 @@ return array(
 					),
 					'basePath' => 'application.assets',
 					'depends' => array('jquery'),
+				),
+				'core.libs' => array(
+					'js' => array(
+						'js/modernizr.custom.js',
+						'js/jquery.printElement.min.js',
+						'js/jquery.hoverIntent.min.js',
+						'js/jquery.autosize.js',
+						'js/jquery.getUrlParam.js',
+						'js/libs/uri-1.10.2.js',
+					),
+					'basePath' => 'application.assets',
+					'depends' => array(
+						'jquery',
+						'jquery.ui',
+						'mustache',
+						'eventemitter2'
+					)
+				),
+				'core' => array(
+					'css' => array(
+						'css/style.css'
+					),
+					'js' => array(
+						'js/print.js',
+						'js/buttons.js',
+						'js/OpenEyes.js',
+						'js/OpenEyes.Util.js',
+						'js/OpenEyes.Util.EventEmitter.js',
+						'js/OpenEyes.UI.js',
+						'js/OpenEyes.UI.StickyElement.js',
+						'js/OpenEyes.UI.Tooltip.js',
+						'js/OpenEyes.UI.Dialog.js',
+						'js/OpenEyes.UI.Dialog.Alert.js',
+						'js/OpenEyes.UI.Dialog.Confirm.js',
+						'js/OpenEyes.UI.Widgets.js',
+						'js/OpenEyes.UI.FieldImages.js',
+						'js/script.js'
+					),
+					'basePath' => 'application.assets',
+					'depends' => array('core.libs')
+				),
+				'core.patient' => array(
+					'js' => array(
+						'js/events_and_episodes.js',
+						'js/jquery.textarea.js',
+						'js/patientSummary.js'
+					),
+					'basePath' => 'application.assets',
+					'depends' => array('core')
 				)
 			),
 		),
