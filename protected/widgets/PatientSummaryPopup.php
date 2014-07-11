@@ -21,7 +21,6 @@ class PatientSummaryPopup extends BaseCWidget
 {
 
 	public $patient;
-	public $accessLevel;
 
 	public static $LIST_SEPARATOR = ',<br/>';
 
@@ -41,7 +40,10 @@ class PatientSummaryPopup extends BaseCWidget
 		// Yii::app()->clientScript->registerPackage('patientSummaryPopup');
 
 		$this->cviStatus = $this->patient->getOPHInfo()->cvi_status->name;
-		$this->warnings = $this->patient->getWarnings($this->accessLevel);
+
+		$this->warnings = $this->patient->getWarnings(
+			Yii::app()->user->checkAccess('OprnViewClinical')
+		);
 
 		$this->ophthalmicDiagnoses = join(
 			self::$LIST_SEPARATOR,

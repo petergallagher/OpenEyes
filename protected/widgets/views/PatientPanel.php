@@ -23,10 +23,7 @@
 		<?php echo CHtml::link($this->patient->getDisplayName(),array('/patient/view/'.$this->patient->id)) ?>
 		<!-- Age -->
 		<span class="patient-age">
-			<?php
-			$age = $this->patient->isDeceased() ? 'Deceased' : $this->patient->getAge();
-			echo "($age)";
-			?>
+			(<?php echo $this->age; ?>)
 		</span>
 		<!-- Gender -->
 		<span class="icon icon-alert icon-alert-<?php echo strtolower($this->patient->getGenderString()) ?>_trans">
@@ -57,21 +54,8 @@
 
 	<!-- Widgets (extra icons, links etc) -->
 	<ul class="patient-widgets">
-		<?php
-		if ($widgets = Yii::app()->params['patient_summary_id_widgets']) {
-			foreach ($widgets as $w) {?>
-				<li>
-					<?php $this->widget($w['class'], array(
-						'patient' => $this->patient,
-					));?>
-				</li>
-			<?php }
+		<?php foreach ($this->widgets as $widget) {
+			echo "<li>{$widget}</li>";
 		}?>
-		<li>
-			<?php $this->widget('application.widgets.PatientSummaryPopup', array(
-				'patient' => $this->patient,
-				'accessLevel' => $this->checkAccess('OprnViewClinical')
-			));?>
-		</li>
 	</ul>
 </div>
