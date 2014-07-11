@@ -205,7 +205,9 @@ abstract class DataObject implements FhirCompatible
 	private function serialiseSubObjects($values)
 	{
 		foreach ($values as $key => $value) {
-			if ($value instanceof DataObject) {
+			if ($value instanceof \services\Date) {
+				$values[$key] = $value->serialise();
+			} else if ($value instanceof DataObject) {
 				$values[$key] = array();
 				foreach ($value as $_key => $_value) {
 					if ($_value instanceof ModelReference) {
@@ -213,8 +215,14 @@ abstract class DataObject implements FhirCompatible
 							'service' => $_value->getServiceName(),
 							'id' => $_value->getId(),
 						);
+					} else if (is_array($_value)) {
+						$values[$key][$_key] = $this->serialiseSubObjects($_value);
 					} else {
-						$values[$key][$_key] = $_value;
+						if ($_value instanceof \services\Date) {
+							$values[$key][$_key] = $_value->serialise();
+						} else {
+							$values[$key][$_key] = $_value;
+						}
 					}
 				}
 			} else if ($value instanceof ModelReference) {

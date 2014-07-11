@@ -115,6 +115,11 @@ class DeclarativeTypeParser_Elements extends DeclarativeTypeParser
 	{
 		$elements = array();
 
+		if ($resource instanceof \stdClass) {
+			// Convert json->stdClas object to a resource object
+			$resource->$res_attribute = $this->jsonToResourceParse($resource, $res_attribute, null, null);
+		}
+
 		foreach ($resource->$res_attribute as $_element) {
 			if ($_element instanceof ModelReference) {
 				$model_class = $_element->getModelClass();
@@ -196,7 +201,11 @@ class DeclarativeTypeParser_Elements extends DeclarativeTypeParser
 		foreach ($element->references() as $field) {
 			$reference_class = $relations[$field][1];
 
-			$model->$field = $element->{$field."_ref"} ? $reference_class::model()->findByPk($element->{$field."_ref"}->getId()) : null;
+			if ($id = method_exists($element->{$field."_ref"},'getId') ? $element->{$field."_ref"}->getId() : @$element->{$field."_ref"}->id) {
+				$model->$field = $reference_class::model()->findByPk($id);
+			} else {
+				$model->$field = null;
+			}
 			$model->{$field."_id"} = $model->$field ? $model->$field->primaryKey : null;
 		}
 	}
@@ -214,41 +223,70 @@ class DeclarativeTypeParser_Elements extends DeclarativeTypeParser
 
 	public function jsonToResourceParse($object, $attribute, $data_class, $model_class)
 	{
-		/*
-		$data_class = 'services\\'.$data_class;
+		$element_list = DeclarativeTypeParser::expandObjectAttribute($object, $attribute);
 
-		$data_items = array();
+		$resource_items = array();
 
-		foreach ($object->$attribute as $data_item) {
-			$data_items[] = $this->mc->jsonToResourceParse($data_item, $model_class, new $data_class);
+		foreach ($element_list as $element) {
+			if (!isset($module_class)) {
+				preg_match('/^Element_(.*?)_/',$element->_class_name,$m);
+				$module_class = $m[1];
+			}
+			$resource_items[] = $this->jsonToResourceParse_TranslateObject($module_class, $element);
 		}
 
-		return $data_items;
-		*/
+		return $resource_items;
 	}
 
-/*
-	public function saveListItem($item)
+	protected function jsonToResourceParse_TranslateObject($module_class, $object)
 	{
-		if ($related_objects = $this->mc->service->map->getRelatedObjectsForClass(get_class($item))) {
-			foreach ($related_objects as $relation => $def) {
-				if (@$def['save'] != 'no') {
-					if ($item->$relation) {
-						foreach ($this->mc->service->map->getRelatedObjectRelatedObjectsForClass(get_class($item), $relation) as $related_def) {
-							$this->mc->saveModel($item->$relation->{$related_def[1]});
-							$item->$relation->{$related_def[0]} = $item->$relation->{$related_def[1]}->primaryKey;
-						}
+		if (stristr($object->_class_name,$module_class)) {
+			$data_class = '\\OEModule\\'.$module_class.'\\services\\'.$object->_class_name;
+		} else {
+			$data_class = '\\services\\'.$object->_class_name;
+		}
 
-						$this->mc->saveModel($item->$relation);
+		if (@$object->id) {
+			$_object = new $data_class(array('id' => $object->id));
+		} else {
+			$_object = new $data_class;
+		}
 
-						$parent_attribute = preg_replace('/^.*\./','',$def[0]);
-						$item->$parent_attribute = $item->$relation->primaryKey;
+		$_object->_class_name = $object->_class_name;
+
+		foreach ($object as $key => $value) {
+			if (in_array($key,array('id','_class_name'))) continue;
+
+			if (preg_match('/_ref$/',$key)) {
+				$_object->$key = $value ? \Yii::app()->service->{$value->service}($value->id) : null;
+			} else if ($value instanceof \stdClass) {
+				if (array_keys((array)$value) == array('date','timezone_type','timezone')) {
+					$timezone = new \DateTimeZone($value->timezone);
+					if (strlen($value->date) == 10) {
+						$_object->$key = new Date($value->date,$timezone);
+					} else {
+						$_object->$key = new DateTime($value->date,$timezone);
+					}
+				} else {
+					$_object->$key = $this->jsonToResourceParse_TranslateObject($value);
+				}
+			} else if (is_array($value)) {
+				$_child_items = array();
+
+				foreach ($value as $_child_object) {
+					if (array_keys((array)$_child_object) == array('service','id')) {
+						$_child_items[] = \Yii::app()->service->{$_child_object->service}($_child_object->id);
+					} else {
+						$_child_items[] = $this->jsonToResourceParse_TranslateObject($module_class, $_child_object);
 					}
 				}
+
+				$_object->$key = $_child_items;
+			} else {
+				$_object->$key = $value;
 			}
 		}
 
-		$this->mc->saveModel($item);
+		return $_object;
 	}
-	*/
 }

@@ -38,4 +38,13 @@ class Date extends \DateTime implements FhirCompatible
 	{
 		return $this->format('Y-m-d');
 	}
+
+	public function serialise()
+	{
+		$clone = clone $this;
+		$clone = (array)$clone;
+		$clone['date'] = substr($clone['date'],0,10);
+
+		return $clone;
+	}
 }
