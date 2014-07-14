@@ -61,7 +61,9 @@ class DeclarativeTypeParser_List extends DeclarativeTypeParser
 			list($related_object_name, $related_object_attribute) = array($model_attribute,null);
 		}
 
-		$copy_attribute && $model->relatedObjectCopyAttributeFromModel($related_object_name,$related_object_attribute,$copy_attribute);
+		if (!($copy_attribute && $model->relatedObjectCopyAttributeFromModel($related_object_name,$related_object_attribute,$copy_attribute))) {
+			$save = false;
+		}
 
 		$attribute = $related_object_attribute ? $related_object_name.'.'.$related_object_attribute : $related_object_name;
 

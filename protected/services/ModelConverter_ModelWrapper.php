@@ -143,13 +143,19 @@ class ModelConverter_ModelWrapper
 					if (is_array($attribute)) {
 						foreach ($attribute as $key => $value) {
 							$this->related_objects[$related_object_one][$related_object_two][$i]->$key = $this->expandAttribute($value);
+
+							return (boolean)$this->expandAttribute($value);
 						}
 					} else {
 						$this->related_objects[$related_object_one][$related_object_two][$i]->$attribute = $this->expandAttribute($attribute);
+
+						return (boolean)$this->expandAttribute($attribute);
 					}
 				}
 			} else {
 				$this->related_objects[$related_object_one][$related_object_two]->$attribute = $this->expandAttribute($attribute);
+
+				return (boolean)$this->expandAttribute($attribute);
 			}
 		}
 	}
