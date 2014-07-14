@@ -49,11 +49,9 @@ class PatientCVIStatusService extends DeclarativeModelService
 	public function setModelAttributeFromResource(&$model, $attribute, $resource_value)
 	{
 		if ($attribute == 'cvi_status.cvi_status.name') {
-			$id = method_exists($model,'getId') ? $model->getId() : @$model->id;
-
-			if (!$id || (!$oph_info = \PatientOphInfo::model()->find('patient_id=?',array($id)))) {
+			if (!$oph_info = $model->expandAttribute('cvi_status')) {
 				$oph_info = new \PatientOphInfo;
-				$oph_info->patient_id = $id;
+				$oph_info->patient_id = method_exists($model,'getId') ? $model->getId() : $model->id;
 			}
 
 			if (!$cvi_status = \PatientOphInfoCviStatus::model()->find('name=?',array($resource_value))) {

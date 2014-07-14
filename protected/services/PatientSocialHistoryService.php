@@ -62,4 +62,29 @@ class PatientSocialHistoryService extends DeclarativeModelService
 	public function search(array $params)
 	{
 	}
+
+	public function setModelAttributeFromResource(&$model, $attribute, $resource_value)
+	{
+		if (preg_match('/^socialHistory\.(.*?)\./',$attribute,$m)) {
+			if (!$socialHistory = $model->expandAttribute('socialHistory')) {
+				$socialHistory = new \SocialHistory;
+				$socialHistory->patient_id = method_exists($model,'getId') ? $model->getId() : $model->id;
+			}
+
+			$relation_def = PatientSocialHistoryService::$model_map['Patient']['related_objects']['socialHistory']['children'][$m[1]];
+			$class = '\\'.$relation_def[1];
+
+			if (!$lookup = $class::model()->find('name=?',array($resource_value))) {
+				$lookup = new $class;
+				$lookup->name = $resource_value;
+			}
+
+			$socialHistory->{$relation_def[0]} = $lookup->id;
+
+			$attribute = 'socialHistory';
+			$resource_value = $socialHistory;
+		}
+
+		parent::setModelAttributeFromResource($model, $attribute, $resource_value);
+	}
 }
