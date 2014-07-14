@@ -112,6 +112,10 @@ class ModelConverter
 					}
 				}
 			}
+
+			if (method_exists($this->service,'resourceToModel_AfterSave')) {
+				$this->service->resourceToModel_AfterSave($model);
+			}
 		}
 
 		return $model->getModel();
