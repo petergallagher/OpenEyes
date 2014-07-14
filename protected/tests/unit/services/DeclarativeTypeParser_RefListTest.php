@@ -66,6 +66,7 @@ class DeclarativeTypeParser_RefListTest extends \CDbTestCase
 
 		$a = 1;
 		$p = new DeclarativeTypeParser_RefList($a);
+		$p->mc = new ModelConverter(new PatientService);
 
 		$resource = (object)array(
 			'linux' => 'kernel'
