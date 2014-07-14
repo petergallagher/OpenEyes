@@ -108,7 +108,7 @@ class ModelConverter
 					$class = 'services\\'.$def[0];
 					$parser = new $class($this);
 					if (method_exists($parser,'resourceToModel_AfterSave')) {
-						$parser->resourceToModel_AfterSave($model);
+						$parser->resourceToModel_AfterSave($model, $resource);
 					}
 				}
 			}

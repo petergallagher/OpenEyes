@@ -29,6 +29,11 @@ class ElementDataObject extends DataObject
 		return array();
 	}
 
+	public function relation_fields()
+	{
+		return array();
+	}
+
 	public function references()
 	{
 		return array();

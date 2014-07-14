@@ -100,6 +100,14 @@ class DeclarativeTypeParser_Elements extends DeclarativeTypeParser
 				}
 			}
 
+			foreach ($_element->relation_fields() as $relation => $fields) {
+				if ($element->$relation) {
+					foreach ($fields as $field) {
+						$_element->$field = $element->$relation->$field;
+					}
+				}
+			}
+
 			foreach ($_element->references() as $field) {
 				$reference_class = $relations[$field][1];
 				$_element->{$field."_ref"} = \Yii::app()->service->$reference_class($element->{$field."_id"});
@@ -143,6 +151,7 @@ class DeclarativeTypeParser_Elements extends DeclarativeTypeParser
 
 			$this->resourceToModelParse_Fields($element, $_element);
 			$this->resourceToModelParse_Relations($element, $_element, $resource, $res_attribute);
+			$this->resourceToModelParse_RelationFields($element, $_element);
 			$this->resourceToModelParse_References($element, $_element);
 
 			$elements[] = $element;
@@ -194,6 +203,27 @@ class DeclarativeTypeParser_Elements extends DeclarativeTypeParser
 		}
 	}
 
+	public function resourceToModelParse_RelationFields(&$model, &$element)
+	{
+		$relations = $model->relations();
+
+		foreach ($element->relation_fields() as $relation => $fields) {
+			$class_name = $relations[$relation][1];
+			$attribute = $relations[$relation][2];
+
+			if (!$object = $model->$relation) {
+				$object = new $class_name;
+				$object->$attribute = $model->primaryKey;
+			}
+
+			foreach ($fields as $field) {
+				$object->$field = $element->$field;
+			}
+
+			$model->$relation = $object;
+		}
+	}
+
 	public function resourceToModelParse_References(&$model, &$element)
 	{
 		$relations = $model->relations();
@@ -210,14 +240,26 @@ class DeclarativeTypeParser_Elements extends DeclarativeTypeParser
 		}
 	}
 
-	public function resourceToModel_AfterSave($model)
+	public function resourceToModel_AfterSave($model, $resource)
 	{
 		$elements = $model->expandAttribute('_elements');
 
-		foreach ($elements as $element) {
+		foreach ($elements as $i => $element) {
 			$element->event_id = $model->getId();
 
 			$this->mc->saveModel($element);
+
+			$relations = $element->relations();
+
+			foreach ($resource->elements[$i]->relation_fields() as $relation => $fields) {
+				$attribute = $relations[$relation][2];
+
+				if ($object = $element->$relation) {
+					$object->$attribute = $element->primaryKey;
+
+					$this->mc->saveModel($object);
+				}
+			}
 		}
 	}
 
