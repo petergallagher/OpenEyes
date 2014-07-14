@@ -25,6 +25,7 @@ class ClientScript extends CClientScript
 	 * in a package, and add them to the scriptMap to prevent outputting them in a response.
 	 * @param  string $packageName Name of the package.
 	 */
+	/*
 	public function removePackageScripts($packageName=null)
 	{
 		if (!$packageName) return;
@@ -46,11 +47,13 @@ class ClientScript extends CClientScript
 			}
 		}
 	}
+	*/
 
 	/**
 	 * Renders the registered scripts.
 	 * @param string $output the existing output that needs to be inserted with script tags
 	 */
+	/*
 	public function render(&$output)
 	{
 		// Remove all core and core-dependant registered scripts for AJAX requests.
@@ -59,6 +62,7 @@ class ClientScript extends CClientScript
 		}
 		parent::render($output);
 	}
+	*/
 
 	/**
 	 * Extending unifyScripts in order to hook the cache buster in at the right
