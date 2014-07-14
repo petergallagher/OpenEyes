@@ -28,17 +28,36 @@ class FirmService extends DeclarativeModelService
 
 	static public $model_map = array(
 		'Firm' => array(
+			'related_objects' => array(
+				'serviceSubspecialtyAssignment' => array('service_subspecialty_assignment_id', 'ServiceSubspecialtyAssignment', 'save' => 'no', 'children' => array(
+					'subspecialty' => array('subspecialty_id', 'Subspecialty'),
+				)),
+			),
 			'fields' => array(
 				'name' => 'name',
-				'subspecialty' => 'subspecialty',
+				'subspecialty' => 'serviceSubspecialtyAssignment.subspecialty.name',
 				'pas_code' => 'pas_code',
 				'active' => 'active',
-				'consultant_ref' => array(self::TYPE_REF, 'consultant_id', 'Consultant'),
+				'consultant_ref' => array(self::TYPE_REF, 'consultant_id', 'User'),
 			),
 		)
 	);
 
 	public function search(array $params)
 	{
+	}
+
+	public function setModelAttributeFromResource(&$model, $attribute, $resource_value)
+	{
+		if ($attribute == 'serviceSubspecialtyAssignment.subspecialty.name') {
+			if (!$subspecialty = \Subspecialty::model()->find('name=?',array($resource_value))) {
+				throw new \Exception("Subspecialty not found: $resource_value");
+			}
+
+			$attribute = 'service_subspecialty_assignment_id';
+			$resource_value = $subspecialty->serviceSubspecialtyAssignment->id;
+		}
+
+		parent::setModelAttributeFromResource($model, $attribute, $resource_value);
 	}
 }

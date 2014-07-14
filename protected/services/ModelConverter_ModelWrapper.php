@@ -72,7 +72,33 @@ class ModelConverter_ModelWrapper
 
 	public function isRelatedObject($relation_name)
 	{
-		return isset($this->related_object_definitions[$relation_name]);
+		$relation_names = explode('.',$relation_name);
+		$relation_name = array_shift($relation_names);
+
+		if (isset($this->related_object_definitions[$relation_name])) {
+			if (empty($relation_names)) {
+				return $this->related_object_definitions[$relation_name];
+			}
+
+			return (boolean)$this->findRelatedObjectThroughChildRelations($relation_names, $this->related_object_definitions[$relation_name]);
+		}
+
+		return false;
+	}
+
+	private function findRelatedObjectThroughChildRelations($relation_names, $definition)
+	{
+		$relation_name = array_shift($relation_names);
+
+		if (isset($definition['children'][$relation_name])) {
+			if (empty($relation_names)) {
+				return $definition['children'][$relation_name];
+			}
+
+			return $this->findRelatedObjectThroughChildRelations($relation_names, $definition['children'][$relation_name]); 
+		}
+
+		return false;
 	}
 
 	public function save()

@@ -153,19 +153,21 @@ class ModelConverter
 	protected function saveRelatedObjects(&$model, $resource)
 	{
 		foreach ($model->getRelatedObjectDefinitions() as $relation_name => $def) {
-			$attribute = $this->service->getRelatedObjectAttribute($relation_name, $def, $resource);
-			$related_object_value = $this->service->getRelatedObjectValue($model, $relation_name, $def, $resource);
+			if (@$def['save'] != 'no') {
+				$attribute = $this->service->getRelatedObjectAttribute($relation_name, $def, $resource);
+				$related_object_value = $this->service->getRelatedObjectValue($model, $relation_name, $def, $resource);
 
-			$object_relation = ($pos = strpos($attribute,'.')) ? substr($attribute,0,$pos).'.'.$relation_name : $relation_name;
+				$object_relation = ($pos = strpos($attribute,'.')) ? substr($attribute,0,$pos).'.'.$relation_name : $relation_name;
 
-			if ($related_object = $model->expandAttribute($object_relation)) {
-				if (isset($def[2])) {
-					$related_object->{$def[2]} = $model->getId();
+				if ($related_object = $model->expandAttribute($object_relation)) {
+					if (isset($def[2])) {
+						$related_object->{$def[2]} = $model->getId();
+					}
+
+					$this->saveModel($related_object);
+
+					$attribute && $model->setAttribute($attribute, $related_object->id);
 				}
-
-				$this->saveModel($related_object);
-
-				$attribute && $model->setAttribute($attribute, $related_object->id);
 			}
 		}
 	}
