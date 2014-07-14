@@ -209,6 +209,9 @@ return array(
 				'services\DisorderService',
 				'services\ProcedureService',
 				'services\FirmService',
+				'services\SpecialtyTypeService',
+				'services\SpecialtyService',
+				'services\SubspecialtyService',
 			),
 		),
 		'session' => array(
