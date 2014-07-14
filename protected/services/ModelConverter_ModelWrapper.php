@@ -77,7 +77,7 @@ class ModelConverter_ModelWrapper
 
 		if (isset($this->related_object_definitions[$relation_name])) {
 			if (empty($relation_names)) {
-				return $this->related_object_definitions[$relation_name];
+				return (boolean)$this->related_object_definitions[$relation_name];
 			}
 
 			return (boolean)$this->findRelatedObjectThroughChildRelations($relation_names, $this->related_object_definitions[$relation_name]);

@@ -156,6 +156,29 @@ class ModelConverter_ModelWrapperTest extends \CDbTestCase
 		$this->assertFalse($w->isRelatedObject('notrelated'));
 	}
 
+	public function testIsRelatedObject_ThroughChildren()
+	{
+		$address = new \Address;
+
+		$this->map->expects($this->once())
+			->method('getRelatedObjectsForClass')
+			->with('Address')
+			->will($this->returnValue(array(
+				'related' => array('children' => array(
+					'related2' => array('children' => array(
+						'related3' => 'blah'
+					))
+				))
+			)));
+
+		$w = new ModelConverter_ModelWrapper($this->map, $address);
+
+		$this->assertTrue($w->isRelatedObject('related'));
+		$this->assertTrue($w->isRelatedObject('related.related2'));
+		$this->assertTrue($w->isRelatedObject('related.related2.related3'));
+		$this->assertFalse($w->isRelatedObject('notrelated'));
+	}
+
 	public function testSave_Errors()
 	{
 		$address = $this->getMockBuilder('Address')
