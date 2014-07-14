@@ -133,6 +133,12 @@ class BaseEventTypeController extends BaseModuleController
 		return parent::init();
 	}
 
+	protected function registerAssets()
+	{
+		parent::registerAssets();
+		Yii::app()->clientScript->registerPackage('events_and_episodes');
+	}
+
 	public function accessRules()
 	{
 		// Allow logged in users - the main authorisation check happens later in verifyActionAccess
@@ -315,14 +321,8 @@ class BaseEventTypeController extends BaseModuleController
 	 */
 	protected function beforeAction($action)
 	{
-		// Automatic file inclusion unless it's an ajax call
-		if ($this->assetPath && !Yii::app()->getRequest()->getIsAjaxRequest()) {
-			if (!$this->isPrintAction($action->id)) {
-				// nested elements behaviour
-				//TODO: possibly put this into standard js library for events
-				Yii::app()->getClientScript()->registerScript('nestedElementJS', 'var moduleName = "' . $this->getModule()->name . '";', CClientScript::POS_HEAD);
-				Yii::app()->assetManager->registerScriptFile('js/nested_elements.js');
-			}
+		if (!Yii::app()->request->isAjaxRequest && !$this->isPrintAction($action->id)) {
+			Yii::app()->clientScript->registerScript('nestedElementJS', 'var moduleName = "' . $this->getModule()->name . '";', CClientScript::POS_HEAD);
 		}
 
 		$this->setFirmFromSession();

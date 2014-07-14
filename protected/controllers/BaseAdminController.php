@@ -28,10 +28,14 @@ class BaseAdminController extends BaseController
 		return array(array('allow', 'roles' => array('admin')));
 	}
 
+	protected function registerAssets()
+	{
+		parent::registerAssets();
+		Yii::app()->clientScript->registerPackage('admin');
+	}
+
 	protected function beforeAction($action)
 	{
-		Yii::app()->assetManager->registerCssFile('css/admin.css', null, 10);
-		Yii::app()->assetManager->registerScriptFile('js/admin.js', null, 10);
 		$this->jsVars['items_per_page'] = $this->items_per_page;
 
 		if (!empty($_POST['GenericAdminModel'])) {

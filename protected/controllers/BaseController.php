@@ -65,18 +65,6 @@ class BaseController extends Controller
 		return in_array($action, $this->printActions());
 	}
 
-	/**
-	 * Register packages or script/css files.
-	 */
-	protected function registerAssets()
-	{
-		// FIXME: currently we are resetting the assetmanager list for PDFs because of the TCPDF processing of
-		// stylesheets. Ideally we should suppress the inclusion here. (Or we should be using a different approach
-		// to render the HTML template for the TCPDF engine)
-
-		Yii::app()->clientScript->registerPackage('core');
-	}
-
 	protected function beforeAction($action)
 	{
 		$app = Yii::app();
@@ -133,6 +121,18 @@ class BaseController extends Controller
 		$this->registerAssets();
 		$this->processJsVars();
 		return parent::beforeRender($view);
+	}
+
+	/**
+	 * Register packages and/or script/css files.
+	 */
+	protected function registerAssets()
+	{
+		// FIXME: currently we are resetting the assetmanager list for PDFs because of the TCPDF processing of
+		// stylesheets. Ideally we should suppress the inclusion here. (Or we should be using a different approach
+		// to render the HTML template for the TCPDF engine)
+
+		Yii::app()->clientScript->registerPackage('core');
 	}
 
 	public function processJsVars()

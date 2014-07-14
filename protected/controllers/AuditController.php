@@ -58,7 +58,7 @@ class AuditController extends BaseController
 		Yii::app()->assetManager->registerScriptFile('js/audit.js');
 		$this->renderPartial('_list', array('data' => $data), false, true);
 		echo "<!-------------------------->";
-		$this->renderPartial('_pagination', array('data' => $data), false, true);
+		$this->renderPartial('_pagination', array('data' => $data), false, false);
 	}
 
 	public function criteria($count=false)

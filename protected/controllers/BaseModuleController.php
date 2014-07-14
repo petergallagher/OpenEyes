@@ -32,20 +32,6 @@ class BaseModuleController extends BaseController {
 	/* @var string css class for the module */
 	public $moduleNameCssClass = '';
 
-	/**
-	 * Determines the assetPath for the controller from the module
-	 */
-	public function init()
-	{
-		$this->modulePathAlias = 'application.modules.'.$this->getModule()->name;
-		$this->assetPathAlias = $this->modulePathAlias .'.assets';
-
-		// Set asset path
-		if (file_exists(Yii::getPathOfAlias($this->assetPathAlias))) {
-			$this->assetPath = Yii::app()->assetManager->getPublishedPathOfAlias('application.modules.'.$this->getModule()->name.'.assets');
-		}
-		return parent::init();
-	}
 
 	/**
 	 * The EventType class for this module
@@ -93,6 +79,14 @@ class BaseModuleController extends BaseController {
 		// Set the module CSS class name.
 		$this->moduleNameCssClass = strtolower($this->module->id);
 
+		$this->modulePathAlias = 'application.modules.'.$this->getModule()->name;
+		$this->assetPathAlias = $this->modulePathAlias .'.assets';
+
+		// Set asset path
+		if (file_exists(Yii::getPathOfAlias($this->assetPathAlias))) {
+			$this->assetPath = Yii::app()->assetManager->getPublishedPathOfAlias($this->assetPathAlias);
+		}
+
 		return parent::beforeAction($action);
 	}
 
@@ -114,16 +108,18 @@ class BaseModuleController extends BaseController {
 			$paths[] = $inherited->name;
 		}
 		$paths[] = $module->name;
+		$clientScript = Yii::app()->clientScript;
 
 		foreach ($paths as $p) {
 			$package = $this->createModulePackage($p);
-			Yii::app()->clientScript->addPackage($p, $package);
-			Yii::app()->clientScript->registerPackage($p);
+			$clientScript->addPackage($p, $package);
+			$clientScript->registerPackage($p);
 		}
 	}
 
 	/**
-	 * Creates a client-side package for a specified module.
+	 * Creates a client-side package for this specified module. Package settings
+	 * defined in module config will get merged.
 	 * @param  string $moduleName Name of the module.
 	 */
 	protected function createModulePackage($moduleName=null)
@@ -135,29 +131,33 @@ class BaseModuleController extends BaseController {
 		$assetPathAlias = 'application.modules.'.$moduleName.'.assets';
 		$assetPath = Yii::getPathOfAlias($assetPathAlias);
 
-		$package = @Yii::app()->clientScript->packages[$p] ?: array();
+		$package = @Yii::app()->clientScript->packages[$moduleName] ?: array();
 
 		// Existing package settings will take precedence!
 		$package  = CMap::mergeArray(array(
 			'js' => array(),
 			'css' => array(),
-			'basePath' => $assetPathAlias
+			'basePath' => $assetPathAlias,
+			'depends' => array('events_and_episodes')
 		), $package);
 
 		// Register module print css
 		if ($isPrintAction && file_exists($assetPath.'/css/print.css')) {
 			$package['css'][] = 'css/print.css';
 		}
+
 		// Register module js
 		if ($isScreenAction && file_exists($assetPath.'/js/module.js')) {
 			$package['js'][] = 'js/module.js';
 		}
+
 		// Register controller specific js (note for this to work, controllers in child modules must be named the same
 		// as the corresponding controller in the parent module(s)
 		$controllerScript = Helper::getNSShortname($this);
 		if ($isScreenAction && file_exists($assetPath.'/js/'.$controllerScript.'.js')) {
 			$package['js'][] = 'js/'.$controllerScript.'.js';
 		}
+
 		// Register module css
 		if (!$isAjaxRequest && file_exists($assetPath.'/css/module.css')) {
 			$package['css'][] = 'css/module.css';

@@ -87,11 +87,15 @@ class PatientController extends BaseController
 		);
 	}
 
+	protected function registerAssets()
+	{
+		parent::registerAssets();
+		Yii::app()->clientScript->registerPackage('patient_summary');
+	}
+
 	protected function beforeAction($action)
 	{
 		parent::storeData();
-
-		Yii::app()->clientScript->registerPackage('core.patient');
 
 		$this->firm = Firm::model()->findByPk($this->selectedFirmId);
 
