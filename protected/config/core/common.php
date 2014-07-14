@@ -146,11 +146,35 @@ return array(
 					'basePath' => 'application.assets',
 					'depends' => array('core.libs')
 				),
-				'core.patient' => array(
+				'events_and_episodes' => array(
 					'js' => array(
 						'js/events_and_episodes.js',
 						'js/jquery.textarea.js',
+						'js/nested_elements.js'
+					),
+					'basePath' => 'application.assets',
+					'depends' => array('core')
+				),
+				'split_event' => array(
+					'js' => array(
+						'js/spliteventtype.js'
+					),
+					'basePath' => 'application.assets',
+					'depends' => array('events_and_episodes')
+				),
+				'patient_summary' => array(
+					'js' => array(
 						'js/patientSummary.js'
+					),
+					'basePath' => 'application.assets',
+					'depends' => array('events_and_episodes')
+				),
+				'admin' => array(
+					'css' => array(
+						'css/admin.css'
+					),
+					'js' => array(
+						'js/admin.js'
 					),
 					'basePath' => 'application.assets',
 					'depends' => array('core')
