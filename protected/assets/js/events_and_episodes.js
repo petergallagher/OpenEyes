@@ -112,7 +112,8 @@ $(document).ready(function(){
 		}
 	});
 
-	$('select.linked-fields').change(function() {
+	// Handle form fields that have linked fields to show/hide
+	$(this).on('change', 'select.linked-fields', function() {
 		var fields = $(this).data('linked-fields').split(',');
 		var values = $(this).data('linked-values').split(',');
 
@@ -133,7 +134,9 @@ $(document).ready(function(){
 		}
 	});
 
-	$('input[type="radio"].linked-fields').click(function() {
+	$(this).on('click', 'input[type="radio"].linked-fields', function() {
+		var element_name = $(this).attr('name').replace(/\[.*$/,'');
+
 		var fields = $(this).data('linked-fields').split(',');
 		var values = $(this).data('linked-values').split(',');
 
@@ -148,7 +151,9 @@ $(document).ready(function(){
 		}
 	});
 
-	$('input[type="checkbox"].linked-fields').click(function() {
+	$(this).on('click', 'input[type="checkbox"].linked-fields', function() {
+		var element_name = $(this).attr('name').replace(/\[.*$/,'');
+
 		var fields = $(this).data('linked-fields').split(',');
 
 		if ($(this).is(':checked')) {
