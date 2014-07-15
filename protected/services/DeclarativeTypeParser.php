@@ -108,4 +108,23 @@ abstract class DeclarativeTypeParser
 
 		return '\\services\\'.$model_class;
 	}
+
+	public function createResourceObjectFromModel($data_class, $model)
+	{
+		if ($id = method_exists($model,'getId') ? $model->getId() : @$model->id) {
+			$object = new $data_class(array('id' => $id));
+		} else {
+			$object = new $data_class;
+		}
+
+		if ($object instanceof ElementDataObject) {
+			if (isset($model->_class_name)) {
+				$object->_class_name = $model->_class_name;
+			} else {
+				$object->_class_name = \CHtml::modelName($model);
+			}
+		}
+
+		return $object;
+	}
 }

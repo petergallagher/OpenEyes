@@ -23,88 +23,103 @@ class DeclarativeTypeParser_Elements extends DeclarativeTypeParser
 
 		$resource_items = array();
 
-		foreach ($element_list as $element) {
-			$data_class = $this->getServiceClassFromModelClass($element);
+		foreach ($element_list as $model_element) {
+			$data_class = $this->getServiceClassFromModelClass($model_element);
 
-			$relations = $element->relations();
+			$relations = $model_element->relations();
 
-			if ($id = method_exists($element,'getId') ? $element->getId() : @$element->id) {
-				$_element = new $data_class(array('id' => $id));
-			} else {
-				$_element = new $data_class;
+			$resource_element = $this->createResourceObjectFromModel($data_class, $model_element);
+
+			foreach ($resource_element->fields() as $field) {
+				$resource_element->$field = $this->modelToResourceParse_FieldValue($model_element->$field);
 			}
 
-			$_element->_class_name = \CHtml::modelName($element);
-
-			foreach ($_element->fields() as $field) {
-				if (preg_match('/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/',$element->$field)) {
-					$_element->$field = new Date($element->$field);
-				} else if (preg_match('/^[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}$/',$element->$field)) {
-					$_element->$field = new DateTime($element->$field);
-				} else {
-					$_element->$field = $element->$field;
-				}
+			foreach ($resource_element->relations() as $relation) {
+				$resource_element->$relation = $this->modelToResourceParse_Relation($model_element, $relation, $relations);
 			}
 
-			foreach ($_element->relations() as $relation) {
-				if (!isset($relations[$relation])) {
-					throw new \Exception("relation $relation is not defined on element class ".\CHtml::modelName($element));
-				}
+			$this->modelToResourceParse_RelationFields($resource_element, $model_element);
+			$this->modelToResourceParse_References($resource_element, $model_element, $relations);
 
-				switch ($relations[$relation][0]) {
-					case 'CBelongsToRelation':
-						$_element->$relation = $element->$relation ? $element->$relation->name : null;
-						break;
-					case 'CHasManyRelation':
-						$list = array();
-
-						$recur = false;
-						$data_class = null;
-
-						foreach ($element->$relation as $item) {
-							if (!$data_class) {
-								$data_class = $this->getServiceClassFromModelClass($item);
-
-								$data_item = new $data_class;
-
-								if ($data_item instanceof ElementDataObject) {
-									$recur = true;
-									break;
-								}
-							}
-
-							$item_class = \CHtml::modelName($item);
-							$list[] = \Yii::app()->service->$item_class($item->primaryKey);
-						}
-
-						if ($recur) {
-							$_element->$relation = $this->modelToResourceParse($element, $relation, null);
-						} else {
-							$_element->$relation = $list;
-						}
-						break;
-					default:
-						throw new \Exception("Unhandled relation type: ".$relations[$relation][0]);
-				}
-			}
-
-			foreach ($_element->relation_fields() as $relation => $fields) {
-				if ($element->$relation) {
-					foreach ($fields as $field) {
-						$_element->$field = $element->$relation->$field;
-					}
-				}
-			}
-
-			foreach ($_element->references() as $field) {
+			foreach ($resource_element->references() as $field) {
 				$reference_class = $relations[$field][1];
-				$_element->{$field."_ref"} = \Yii::app()->service->$reference_class($element->{$field."_id"});
+				$resource_element->{$field."_ref"} = \Yii::app()->service->$reference_class($model_element->{$field."_id"});
 			}
 
-			$data_items[] = $_element;
+			$data_items[] = $resource_element;
 		}
 
 		return $data_items;
+	}
+
+	public function modelToResourceParse_FieldValue($value)
+	{
+		if (preg_match('/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/',$value)) {
+			return new Date($value);
+		} else if (preg_match('/^[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}$/',$value)) {
+			return new DateTime($value);
+		}
+
+		return $value;
+	}
+
+	public function modelToResourceParse_Relation($model_element, $relation, $relations)
+	{
+		if (!isset($relations[$relation])) {
+			throw new \Exception("relation $relation is not defined on element class ".\CHtml::modelName($model_element));
+		}
+
+		switch ($relations[$relation][0]) {
+			case 'CBelongsToRelation':
+				return $model_element->$relation ? $model_element->$relation->name : null;
+			case 'CHasManyRelation':
+				$list = array();
+
+				$recur = false;
+				$data_class = null;
+
+				foreach ($model_element->$relation as $item) {
+					if (!$data_class) {
+						$data_class = $this->getServiceClassFromModelClass($item);
+
+						$data_item = new $data_class;
+
+						if ($data_item instanceof ElementDataObject) {
+							$recur = true;
+							break;
+						}
+					}
+
+					$item_class = \CHtml::modelName($item);
+					$list[] = \Yii::app()->service->$item_class($item->primaryKey);
+				}
+
+				return $recur
+					?	$this->modelToResourceParse($model_element, $relation, null)
+					: $list;
+
+			default:
+				throw new \Exception("Unhandled relation type: ".$relations[$relation][0]);
+		}
+	}
+
+	public function modelToResourceParse_RelationFields(&$resource_element, $model_element)
+	{
+		foreach ($resource_element->relation_fields() as $relation => $fields) {
+			if ($model_element->$relation) {
+				foreach ($fields as $field) {
+					$resource_element->$field = $model_element->$relation->$field;
+				}
+			}
+		}
+	}
+
+	public function modelToResourceParse_References(&$resource_element, $model_element, $relations)
+	{
+		foreach ($resource_element->references() as $field) {
+			$reference_class = $relations[$field][1];
+			$resource_element->{$field."_ref"} = \Yii::app()->service->$reference_class($model_element->{$field."_id"});
+		}
 	}
 
 	public function resourceToModelParse(&$model, $resource, $model_attribute, $res_attribute, $param1, $model_class, $save)
@@ -268,13 +283,7 @@ class DeclarativeTypeParser_Elements extends DeclarativeTypeParser
 	{
 		$data_class = $this->getServiceClassFromModelClass($object->_class_name);
 
-		if (@$object->id) {
-			$_object = new $data_class(array('id' => $object->id));
-		} else {
-			$_object = new $data_class;
-		}
-
-		$_object->_class_name = $object->_class_name;
+		$_object = $this->createResourceObjectFromModel($data_class, $object);
 
 		foreach ($object as $key => $value) {
 			if (in_array($key,array('id','_class_name'))) continue;
