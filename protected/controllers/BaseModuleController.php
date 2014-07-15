@@ -108,19 +108,19 @@ class BaseModuleController extends BaseController {
 			$paths[] = $inherited->name;
 		}
 		$paths[] = $module->name;
-		$clientScript = Yii::app()->clientScript;
 
 		foreach ($paths as $p) {
 			$package = $this->createModulePackage($p);
-			$clientScript->addPackage($p, $package);
-			$clientScript->registerPackage($p);
+			Yii::app()->clientScript
+				->addPackage($p, $package)
+				->registerPackage($p);
 		}
 	}
 
 	/**
-	 * Creates a client-side package for this specified module. Package settings
-	 * defined in module config will get merged.
+	 * Creates a client-side package for this module.
 	 * @param  string $moduleName Name of the module.
+	 * @return array The package definition.
 	 */
 	protected function createModulePackage($moduleName=null)
 	{
@@ -128,42 +128,27 @@ class BaseModuleController extends BaseController {
 		$isAjaxRequest = Yii::app()->getRequest()->getIsAjaxRequest();
 		$isScreenAction = (!$isPrintAction && !$isAjaxRequest);
 
-		$assetPathAlias = 'application.modules.'.$moduleName.'.assets';
-		$assetPath = Yii::getPathOfAlias($assetPathAlias);
-
-		$package = @Yii::app()->clientScript->packages[$moduleName] ?: array();
-
-		// Existing package settings will take precedence!
-		$package  = CMap::mergeArray(array(
+		$package  = array(
 			'js' => array(),
 			'css' => array(),
-			'basePath' => $assetPathAlias,
+			'basePath' => 'application.modules.'.$moduleName.'.assets',
 			'depends' => array('events_and_episodes')
-		), $package);
+		);
 
-		// Register module print css
-		if ($isPrintAction && file_exists($assetPath.'/css/print.css')) {
+		if ($isPrintAction) {
 			$package['css'][] = 'css/print.css';
 		}
-
-		// Register module js
-		if ($isScreenAction && file_exists($assetPath.'/js/module.js')) {
+		if ($isScreenAction) {
 			$package['js'][] = 'js/module.js';
+			// Register controller specific js (note for this to work, controllers in child modules must be named the same
+			// as the corresponding controller in the parent module(s)
+			$package['js'][] = 'js/'.Helper::getNSShortname($this).'.js';
 		}
-
-		// Register controller specific js (note for this to work, controllers in child modules must be named the same
-		// as the corresponding controller in the parent module(s)
-		$controllerScript = Helper::getNSShortname($this);
-		if ($isScreenAction && file_exists($assetPath.'/js/'.$controllerScript.'.js')) {
-			$package['js'][] = 'js/'.$controllerScript.'.js';
-		}
-
-		// Register module css
-		if (!$isAjaxRequest && file_exists($assetPath.'/css/module.css')) {
+		if (!$isAjaxRequest) {
 			$package['css'][] = 'css/module.css';
 		}
 
-		return $package;
+		return Yii::app()->clientScript->createPackage($moduleName, $package);
 	}
 
 	/**

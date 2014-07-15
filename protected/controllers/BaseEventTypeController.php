@@ -950,7 +950,7 @@ class BaseEventTypeController extends BaseModuleController
 		}
 
 		// Clear script requirements as all the base css and js will already be on the page
-		Yii::app()->assetManager->reset();
+		Yii::app()->clientScript->reset();
 
 		$this->episode = $this->getEpisode();
 
@@ -1515,7 +1515,7 @@ class BaseEventTypeController extends BaseModuleController
 	protected function printPDF($id, $elements, $template='print', $params=array())
 	{
 		// Remove any existing assets that have been pre-registered.
-		Yii::app()->assetManager->reset();
+		Yii::app()->clientScript->reset();
 
 		$this->layout = '//layouts/pdf';
 		$pdf_print = new OEPDFPrint('Openeyes', 'PDF', 'PDF');

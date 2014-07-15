@@ -34,12 +34,20 @@ class ModuleAdminController extends BaseAdminController
 	{
 		parent::registerAssets();
 
-		if (file_exists("protected/modules/".$this->getModule()->name."/assets/js/admin.js")) {
-			Yii::app()->assetManager->registerScriptFile('js/admin.js', $this->assetPathAlias);
-		}
-		if (file_exists("protected/modules/".$this->getModule()->name."/assets/css/admin.css")) {
-			Yii::app()->assetManager->registerCssFile('css/admin.css', $this->assetPathAlias);
-		}
-		Yii::app()->assetManager->registerCssFile('css/module.css', $this->assetPathAlias);
+		$packageName = $this->getModule()->name.'_admin';
+
+		$package = Yii::app()->clientScript->createPackage($packageName, array(
+			'js' => array('js/admin.js'),
+			'css' => array(
+				'css/admin.css',
+				'css/module.css'
+			),
+			'basePath' => $this->assetPathAlias,
+			'depends' => array()
+		));
+
+		Yii::app()->clientScript
+			->addPackage($packageName, $package)
+			->registerPackage($packageName);
 	}
 }

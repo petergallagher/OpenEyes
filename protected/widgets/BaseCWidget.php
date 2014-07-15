@@ -29,6 +29,8 @@ class BaseCWidget extends CWidget
 
 	public function init()
 	{
+		$this->registerAssets();
+
 		if (is_object($this->element) && $this->field) {
 			$this->value = $this->element->{$this->field};
 		}
@@ -48,11 +50,6 @@ class BaseCWidget extends CWidget
 			}
 		}
 		*/
-
-		// if the widget has javascript, load it in
-		if (file_exists("protected/widgets/js/".get_class($this).".js")) {
-			$this->assetFolder = Yii::app()->getAssetManager()->publish('protected/widgets/js');
-		}
 	}
 
 	public function render($view, $data=null, $return=false)
@@ -62,12 +59,31 @@ class BaseCWidget extends CWidget
 		} else {
 			$data = get_object_vars($this);
 		}
-		parent::render('widgetHeader', $data, $return);
 		parent::render($view, $data, $return);
 	}
 
 	public function run()
 	{
 		$this->render(get_class($this));
+	}
+
+	protected function registerAssets()
+	{
+		$packageName = get_class($this);
+		$package = $this->createPackage($packageName);
+
+		Yii::app()->clientScript
+			->addPackage($packageName, $package)
+			->registerPackage($packageName);
+	}
+
+	protected function createPackage($name=null)
+	{
+		return Yii::app()->clientScript->createPackage($name, array(
+			'js' => array("js/{$name}.js"),
+			'css' => array(),
+			'basePath' => 'application.widgets',
+			'depends' => array()
+		));
 	}
 }

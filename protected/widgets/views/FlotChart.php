@@ -13,7 +13,6 @@
  * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
  */
 
-Yii::app()->clientScript->registerPackage('flot');
 if ($this->legend_id) {
 	Yii::app()->clientScript->registerCss($this->legend_id, "#{$this->legend_id} .legendLabel { width: 100%; }");
 }

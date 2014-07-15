@@ -178,6 +178,9 @@ return array(
 					),
 					'basePath' => 'application.assets',
 					'depends' => array('core')
+				),
+				'FlotChart' => array(
+					'depends' => array('flot')
 				)
 			),
 		),
