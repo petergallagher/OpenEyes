@@ -47,7 +47,9 @@ class OEMigrationTest extends CDbTestCase
 		if (Yii::app()->db->getSchema()->getTable('et_ophtroperationbooking_diagnosis')) {
 			Yii::app()->db->createCommand("delete from et_ophtroperationbooking_diagnosis")->query();
 			Yii::app()->db->createCommand("delete from ophtroperationbooking_operation_procedures_procedures")->query();
+			Yii::app()->db->createCommand("update et_ophtroperationbooking_operation set latest_booking_id = null")->query();
 			Yii::app()->db->createCommand("delete from ophtroperationbooking_operation_booking")->query();
+			Yii::app()->db->createCommand("delete from ophtroperationbooking_operation_date_letter_sent")->query();
 			Yii::app()->db->createCommand("delete from et_ophtroperationbooking_operation")->query();
 			Yii::app()->db->createCommand("delete from et_ophtroperationbooking_scheduleope")->query();
 		}
