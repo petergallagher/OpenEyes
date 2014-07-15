@@ -78,7 +78,7 @@ class DeclarativeTypeParser_Elements extends DeclarativeTypeParser
 						}
 
 						if ($recur) {
-							$_element->$relation = $this->modelToResourceParse($element, $relation);
+							$_element->$relation = $this->modelToResourceParse($element, $relation, null);
 						} else {
 							$_element->$relation = $list;
 						}
