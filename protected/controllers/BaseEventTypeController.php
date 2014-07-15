@@ -902,9 +902,6 @@ class BaseEventTypeController extends BaseModuleController
 			throw new CHttpException(404, 'Unknown Patient');
 		}
 
-		// Clear script requirements as all the base css and js will already be on the page
-		Yii::app()->assetManager->reset();
-
 		$this->patient = $patient;
 
 		$this->setFirmFromSession();
