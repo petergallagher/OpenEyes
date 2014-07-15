@@ -15,7 +15,25 @@
 
 namespace services;
 
-class Service extends \services\Resource
+class ServiceService extends \services\DeclarativeModelService
 {
-	public $name;
+	static protected $operations = array(self::OP_READ, self::OP_UPDATE, self::OP_CREATE, self::OP_SEARCH);
+
+	static protected $search_params = array(
+		'id' => self::TYPE_TOKEN,
+	);
+
+	static protected $primary_model = 'Service';
+
+	static public $model_map = array(
+		'Service' => array(
+			'fields' => array(
+				'name' => 'name',
+			),
+		),
+	);
+
+	public function search(array $params)
+	{
+	}
 }

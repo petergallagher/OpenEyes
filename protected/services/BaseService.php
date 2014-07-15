@@ -15,7 +15,35 @@
 
 namespace services;
 
-class Service extends \services\Resource
+interface BaseService
 {
-	public $name;
+	/**
+	 * @param array $params
+	 * @return Service
+	 */
+	static public function load(array $params = array());
+
+	/**
+	 * Get a reference to the resource with the specified ID
+	 *
+	 * @param scalar $id
+	 * @return ResourceReference
+	 */
+	public function getReference($id);
+
+	/**
+	 * Create a new resource and return a reference to it
+	 *
+	 * @param Resource $resource
+	 * @return ResourceReference
+	 */
+	public function create(Resource $resource);
+
+	/**
+	 * Search for resources according to the parameters passed
+	 *
+	 * @param array $params
+	 * @return Resource[]
+	 */
+	public function search(array $params);
 }

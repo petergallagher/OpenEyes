@@ -212,6 +212,7 @@ return array(
 				'services\SpecialtyTypeService',
 				'services\SpecialtyService',
 				'services\SubspecialtyService',
+				'services\ServiceService',
 			),
 		),
 		'session' => array(

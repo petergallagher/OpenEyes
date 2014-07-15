@@ -18,7 +18,7 @@ namespace services;
 /**
  * Internally implemented services
  */
-abstract class InternalService implements Service
+abstract class InternalService implements BaseService
 {
 	// Available operations (values taken from http://hl7.org/implement/standards/fhir/type-restful-operation.html)
 	const OP_READ = 'read';

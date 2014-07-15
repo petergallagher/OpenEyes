@@ -15,7 +15,6 @@
 
 namespace services;
 
-class Service extends \services\Resource
+class ServiceReference extends \services\ModelReference
 {
-	public $name;
 }
