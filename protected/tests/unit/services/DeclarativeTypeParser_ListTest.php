@@ -296,7 +296,7 @@ class DeclarativeTypeParser_ListTest extends \CDbTestCase
 		$p->resourceToModel_RelatedObjects($model, 'testing', 'keyboard', null);
 	}
 
-	public function testResourceToModel_RelatedObjects_Save()
+	public function testResourceToModel_RelatedObjects_Save_FalseCopyAttribute()
 	{
 		$model = $this->getMockBuilder('services\ModelConverter_ModelWrapper')
 			->disableOriginalConstructor()
@@ -312,6 +312,41 @@ class DeclarativeTypeParser_ListTest extends \CDbTestCase
 			->method('getRelatedObject')
 			->with('testing',null)
 			->will($this->returnValue('hog'));
+
+		$p = $this->getMockBuilder('services\DeclarativeTypeParser_List')
+			->disableOriginalConstructor()
+			->setMethods(array('filterListItems'))
+			->getMock();
+
+		$p->expects($this->once())
+			->method('filterListItems')
+			->with('hedge',null,'hog',false)
+			->will($this->returnValue('one'));
+
+		$p->resourceToModel_RelatedObjects($model, 'testing', 'keyboard', true);
+	}
+
+	public function testResourceToModel_RelatedObjects_Save_TrueCopyAttribute()
+	{
+		$model = $this->getMockBuilder('services\ModelConverter_ModelWrapper')
+			->disableOriginalConstructor()
+			->setMethods(array('relatedObjectCopyAttributeFromModel','setAttribute','expandAttribute','getRelatedObject'))
+			->getMock();
+
+		$model->expects($this->once())
+			->method('expandAttribute')
+			->with('testing')
+			->will($this->returnValue('hedge'));
+
+		$model->expects($this->once())
+			->method('getRelatedObject')
+			->with('testing',null)
+			->will($this->returnValue('hog'));
+
+		$model->expects($this->once())
+			->method('relatedObjectCopyAttributeFromModel')
+			->with('testing',null,'keyboard')
+			->will($this->returnValue(true));
 
 		$p = $this->getMockBuilder('services\DeclarativeTypeParser_List')
 			->disableOriginalConstructor()

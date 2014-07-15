@@ -120,7 +120,7 @@ class DeclarativeTypeParser_List extends DeclarativeTypeParser
 
 	public function jsonToResourceParse($object, $attribute, $data_class, $model_class)
 	{
-		$data_class = 'services\\'.$data_class;
+		$data_class = $this->getServiceClassFromModelClass($data_class);
 
 		$data_items = array();
 

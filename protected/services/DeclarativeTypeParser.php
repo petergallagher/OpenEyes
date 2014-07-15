@@ -87,4 +87,25 @@ abstract class DeclarativeTypeParser
 
 		return true;
 	}
+
+	public function getServiceClassFromModelClass($model_class)
+	{
+		if (is_object($model_class)) {
+			$model_class = \CHtml::modelName($model_class);
+		}
+
+		if ($model_class[0] == '\\') {
+			return $model_class;
+		}
+
+		if (preg_match('/^Element_(.*?)_/',$model_class,$m)) {
+			return '\\OEModule\\'.$m[1].'\\services\\'.$model_class;
+		} else if (preg_match('/^([A-Z][a-z]{2}[A-Z][a-z][A-Z][a-z]+)_/',$model_class,$m)) {
+			if ($event_type = \EventType::model()->find('class_name=?',array($m[1]))) {
+				return '\\OEModule\\'.$m[1].'\\services\\'.$model_class;
+			}
+		}
+
+		return '\\services\\'.$model_class;
+	}
 }

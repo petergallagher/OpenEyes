@@ -137,6 +137,8 @@ class ModelConverter_ModelWrapper
 
 	public function relatedObjectCopyAttributeFromModel($related_object_one, $related_object_two, $attribute)
 	{
+		$return = false;
+
 		if (@$this->related_objects[$related_object_one][$related_object_two]) {
 			if (is_array($this->related_objects[$related_object_one][$related_object_two])) {
 				foreach ($this->related_objects[$related_object_one][$related_object_two] as $i => $item) {
@@ -144,20 +146,22 @@ class ModelConverter_ModelWrapper
 						foreach ($attribute as $key => $value) {
 							$this->related_objects[$related_object_one][$related_object_two][$i]->$key = $this->expandAttribute($value);
 
-							return (boolean)$this->expandAttribute($value);
+							$return = (boolean)$this->expandAttribute($value);
 						}
 					} else {
 						$this->related_objects[$related_object_one][$related_object_two][$i]->$attribute = $this->expandAttribute($attribute);
 
-						return (boolean)$this->expandAttribute($attribute);
+						$return = (boolean)$this->expandAttribute($attribute);
 					}
 				}
 			} else {
 				$this->related_objects[$related_object_one][$related_object_two]->$attribute = $this->expandAttribute($attribute);
 
-				return (boolean)$this->expandAttribute($attribute);
+				$return = (boolean)$this->expandAttribute($attribute);
 			}
 		}
+
+		return $return;
 	}
 
 	public function expandAttribute($attributes)

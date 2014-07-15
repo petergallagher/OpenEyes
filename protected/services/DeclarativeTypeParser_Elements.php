@@ -17,22 +17,14 @@ namespace services;
 
 class DeclarativeTypeParser_Elements extends DeclarativeTypeParser
 {
-	public function modelToResourceParse($object, $attribute, $module_class, $param=null)
+	public function modelToResourceParse($object, $attribute, $data_class, $param=null)
 	{
 		$element_list = DeclarativeTypeParser::expandObjectAttribute($object, $attribute);
 
 		$resource_items = array();
 
 		foreach ($element_list as $element) {
-			if (!$module_class) {
-				$module_class = $element->event->eventType->class_name;
-			}
-
-			if (strstr(\CHtml::modelName($element),$module_class)) {
-				$data_class = 'OEModule\\'.$module_class.'\\services\\'.\CHtml::modelName($element);
-			} else {
-				$data_class = '\\services\\'.\CHtml::modelName($element);
-			}
+			$data_class = $this->getServiceClassFromModelClass($element);
 
 			$relations = $element->relations();
 
@@ -71,11 +63,7 @@ class DeclarativeTypeParser_Elements extends DeclarativeTypeParser
 
 						foreach ($element->$relation as $item) {
 							if (!$data_class) {
-								if (strstr(\CHtml::modelName($item),$module_class)) {
-									$data_class = 'OEModule\\'.$module_class.'\\services\\'.\CHtml::modelName($item);
-								} else {
-									$data_class = '\\services\\'.\CHtml::modelName($item);
-								}
+								$data_class = $this->getServiceClassFromModelClass($item);
 
 								$data_item = new $data_class;
 
@@ -90,7 +78,7 @@ class DeclarativeTypeParser_Elements extends DeclarativeTypeParser
 						}
 
 						if ($recur) {
-							$_element->$relation = $this->modelToResourceParse($element, $relation, $module_class);
+							$_element->$relation = $this->modelToResourceParse($element, $relation);
 						} else {
 							$_element->$relation = $list;
 						}
@@ -270,23 +258,15 @@ class DeclarativeTypeParser_Elements extends DeclarativeTypeParser
 		$resource_items = array();
 
 		foreach ($element_list as $element) {
-			if (!isset($module_class)) {
-				preg_match('/^Element_(.*?)_/',$element->_class_name,$m);
-				$module_class = $m[1];
-			}
-			$resource_items[] = $this->jsonToResourceParse_TranslateObject($module_class, $element);
+			$resource_items[] = $this->jsonToResourceParse_TranslateObject($element);
 		}
 
 		return $resource_items;
 	}
 
-	protected function jsonToResourceParse_TranslateObject($module_class, $object)
+	protected function jsonToResourceParse_TranslateObject($object)
 	{
-		if (stristr($object->_class_name,$module_class)) {
-			$data_class = '\\OEModule\\'.$module_class.'\\services\\'.$object->_class_name;
-		} else {
-			$data_class = '\\services\\'.$object->_class_name;
-		}
+		$data_class = $this->getServiceClassFromModelClass($object->_class_name);
 
 		if (@$object->id) {
 			$_object = new $data_class(array('id' => $object->id));
@@ -319,7 +299,7 @@ class DeclarativeTypeParser_Elements extends DeclarativeTypeParser
 					if (array_keys((array)$_child_object) == array('service','id')) {
 						$_child_items[] = \Yii::app()->service->{$_child_object->service}($_child_object->id);
 					} else {
-						$_child_items[] = $this->jsonToResourceParse_TranslateObject($module_class, $_child_object);
+						$_child_items[] = $this->jsonToResourceParse_TranslateObject($_child_object);
 					}
 				}
 
