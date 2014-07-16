@@ -43,14 +43,10 @@ class ClientScript extends CClientScript
 	protected function setupCache()
 	{
 		$this->canCache = (!defined('YII_DEBUG') || !YII_DEBUG);
-		$this->cache = Yii::app()->cache;
 
 		if ($this->canCache) {
-			if (!$arr = $this->cache->get(self::CACHE_KEY)) {
-				$arr = array();
-				$this->cache->set(self::CACHE_KEY, $arr);
-			}
-			$this->cacheData = $arr;
+			$this->cache = Yii::app()->cache;
+			$this->cacheData = $this->cache->get(self::CACHE_KEY) ?: array();
 		}
 	}
 

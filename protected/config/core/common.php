@@ -88,6 +88,14 @@ return array(
 					'basePath' => 'application.assets.components',
 					'depends'=>array('jquery'),
 				),
+				'jquery.validation' => array(
+					'js' => array(
+						'js/jquery.validate.min.js',
+						'js/additional-validators.js'
+					),
+					'basePath' => 'application.assets',
+					'depends' => array('jquery')
+				),
 				'mustache' => array(
 					'js' => array('mustache/mustache.js'),
 					'basePath' => 'application.assets.components'
@@ -116,12 +124,7 @@ return array(
 						'js/libs/uri-1.10.2.js',
 					),
 					'basePath' => 'application.assets',
-					'depends' => array(
-						'jquery',
-						'jquery.ui',
-						'mustache',
-						'eventemitter2'
-					)
+					'depends' => array('jquery')
 				),
 				'core' => array(
 					'css' => array(
@@ -144,7 +147,13 @@ return array(
 						'js/script.js'
 					),
 					'basePath' => 'application.assets',
-					'depends' => array('core.libs')
+					'depends' => array(
+						'jquery',
+						'jquery.ui',
+						'mustache',
+						'eventemitter2',
+						'core.libs',
+					)
 				),
 				'events_and_episodes' => array(
 					'js' => array(
@@ -179,9 +188,15 @@ return array(
 					'basePath' => 'application.assets',
 					'depends' => array('core')
 				),
+				'profile' => array(
+					'css' => array('css/admin.css'),
+					'js' => array('js/profile.js'),
+					'basePath' => 'application.assets',
+					// 'depends' => array('admin')
+				),
 				'FlotChart' => array(
 					'depends' => array('flot')
-				),
+				)
 			),
 		),
 		'db' => array(

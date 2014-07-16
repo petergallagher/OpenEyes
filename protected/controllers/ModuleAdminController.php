@@ -43,7 +43,7 @@ class ModuleAdminController extends BaseAdminController
 				'css/module.css'
 			),
 			'basePath' => $this->assetPathAlias,
-			'depends' => array()
+			'depends' => array('admin')
 		));
 
 		Yii::app()->clientScript
