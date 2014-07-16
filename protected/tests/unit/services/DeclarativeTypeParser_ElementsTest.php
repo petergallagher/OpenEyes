@@ -351,7 +351,7 @@ class DeclarativeTypeParser_ElementsTest extends \CDbTestCase
 		$this->assertEquals('test2',$result[0]->address2);
 	}
 
-	public function testResourceToModelParse_Relations()
+	public function testResourceToModelParse_Relations_BelongsTo()
 	{
 		$model = $this->getMockBuilder('services\ModelConverter_ModelWrapper')
 			->disableOriginalConstructor()
@@ -385,6 +385,73 @@ class DeclarativeTypeParser_ElementsTest extends \CDbTestCase
 		$this->assertEquals(\Country::model()->findByPk(1),$result[0]->country);
 	}
 
+	public function testResourceToModelParse_Relations_HasMany()
+	{
+		$model = $this->getMockBuilder('services\ModelConverter_ModelWrapper')
+			->disableOriginalConstructor()
+			->setMethods(array('getModelClass','setAttribute'))
+			->getMock();
+
+		$_element = new DeclarativeTypeParser_ElementsTest_Element3Class;
+		$_element->_class_name = 'services\DeclarativeTypeParser_ElementsTest_Model3Class';
+		$_element->sites = array(
+			\Yii::app()->service->Site(1),
+			\Yii::app()->service->Site(2),
+		);
+
+		$object = new DeclarativeTypeParser_ElementsTest_Element3Class;
+		$object->data = array($_element);
+
+		$element = new DeclarativeTypeParser_ElementsTest_Model3Class;
+		$element->sites = array(
+			$this->sites('site1'),
+			$this->sites('site2'),
+		);
+
+		$model->expects($this->once())
+			->method('setAttribute')
+			->with('_elements',array($element));
+
+		$p = $this->getMockBuilder('services\DeclarativeTypeParser_Elements')
+			->disableOriginalConstructor()
+			->setMethods(array('createResourceObjectFromModel'))
+			->getMock();
+
+		$result = $p->resourceToModelParse($model, $object, null, 'data', null, null, false);
+
+		$this->assertCount(1,$result);
+		$this->assertCount(2,$result[0]->sites);
+		$this->assertEquals($this->sites('site1'),$result[0]->sites[0]);
+		$this->assertEquals($this->sites('site2'),$result[0]->sites[1]);
+	}
+
+	public function testResourceToModelParse_Relations_UnhandledRelationType()
+	{
+		$model = $this->getMockBuilder('services\ModelConverter_ModelWrapper')
+			->disableOriginalConstructor()
+			->setMethods(array('getModelClass','setAttribute'))
+			->getMock();
+
+		$_element = new DeclarativeTypeParser_ElementsTest_Element4Class;
+		$_element->_class_name = 'services\DeclarativeTypeParser_ElementsTest_Model4Class';
+		$_element->sites = array(
+			\Yii::app()->service->Site(1),
+			\Yii::app()->service->Site(2),
+		);
+
+		$object = new DeclarativeTypeParser_ElementsTest_Element4Class;
+		$object->data = array($_element);
+
+		$p = $this->getMockBuilder('services\DeclarativeTypeParser_Elements')
+			->disableOriginalConstructor()
+			->setMethods(array('createResourceObjectFromModel'))
+			->getMock();
+
+		$this->setExpectedException('Exception','Unhandled relation type: CManyManyRelation');
+
+		$result = $p->resourceToModelParse($model, $object, null, 'data', null, null, false);
+	}
+
 	public function testResourceToModelParse_RelationFields()
 	{
 		$model = $this->getMockBuilder('services\ModelConverter_ModelWrapper')
@@ -415,6 +482,229 @@ class DeclarativeTypeParser_ElementsTest extends \CDbTestCase
 		$this->assertEquals('534',$result[0]->lastReferral->refno);
 		$this->assertEquals('TEST',$result[0]->lastReferral->referrer);
 	}
+
+	public function testResourceToModelParse_References()
+	{
+		$model = $this->getMockBuilder('services\ModelConverter_ModelWrapper')
+			->disableOriginalConstructor()
+			->setMethods(array('getModelClass','setAttribute'))
+			->getMock();
+
+		$_element = new DeclarativeTypeParser_ElementsTest_Element6Class;
+		$_element->_class_name = 'services\DeclarativeTypeParser_ElementsTest_Model6Class';
+		$_element->site_ref = \Yii::app()->service->Site(1);
+
+		$object = new DeclarativeTypeParser_ElementsTest_Element6Class;
+		$object->data = array($_element);
+
+		$element = new DeclarativeTypeParser_ElementsTest_Model6Class;
+		$element->site_id = 1;
+		$element->site = \Site::model()->findByPk(1);
+
+		$model->expects($this->once())
+			->method('setAttribute')
+			->with('_elements',array($element));
+
+		$p = $this->getMockBuilder('services\DeclarativeTypeParser_Elements')
+			->disableOriginalConstructor()
+			->setMethods(array('createResourceObjectFromModel'))
+			->getMock();
+
+		$result = $p->resourceToModelParse($model, $object, null, 'data', null, null, false);
+
+		$this->assertCount(1,$result);
+		$this->assertEquals(1,$result[0]->site_id);
+		$this->assertEquals(\Site::model()->findByPk(1),$result[0]->site);
+	}
+
+	public function testResourceToModelParse_FieldValue_Date()
+	{
+		$a = 1;
+		$p = new DeclarativeTypeParser_Elements($a);
+		$this->assertEquals('2013-03-03',$p->resourceToModelParse_FieldValue(new Date('2013-03-03')));
+	}
+
+	public function testResourceToModelParse_FieldValue_DateTime()
+	{
+		$a = 1;
+		$p = new DeclarativeTypeParser_Elements($a);
+		$this->assertEquals('2013-03-03 13:33:37',$p->resourceToModelParse_FieldValue(new DateTime('2013-03-03 13:33:37')));
+	}
+
+	public function testResourceToModelParse_FieldValue_RawValue()
+	{
+		$a = 1;
+		$p = new DeclarativeTypeParser_Elements($a);
+		$this->assertEquals('test2183912',$p->resourceToModelParse_FieldValue('test2183912'));
+	}
+
+	public function testResourceToModelParse_Relations_Method_BelongsTo()
+	{
+		$resource_element = new DeclarativeTypeParser_ElementsTest_Element2Class;
+		$resource_element->_class_name = 'services\DeclarativeTypeParser_ElementsTest_Model2Class';
+		$resource_element->country = \Country::model()->findByPk(1);
+
+		$a = 1;
+		$p = new DeclarativeTypeParser_Elements($a);
+
+		$model_element = new DeclarativeTypeParser_ElementsTest_Model2Class;
+
+		$p->resourceToModelParse_Relations($model_element, $resource_element, null, null);
+
+		$this->assertEquals(1,$model_element->country_id);
+		$this->assertEquals(\Country::model()->findByPk(1),$model_element->country);
+	}
+
+	public function testResourceToModelParse_Relations_Method_HasMany()
+	{
+		$resource_element = new DeclarativeTypeParser_ElementsTest_Element3Class;
+		$resource_element->_class_name = 'services\DeclarativeTypeParser_ElementsTest_Model3Class';
+		$resource_element->sites = array(
+			\Yii::app()->service->Site(1),
+			\Yii::app()->service->Site(2),
+		);
+
+		$a = 1;
+		$p = new DeclarativeTypeParser_Elements($a);
+
+		$model_element = new DeclarativeTypeParser_ElementsTest_Model3Class;
+
+		$p->resourceToModelParse_Relations($model_element, $resource_element, $resource_element, 'sites');
+
+		$this->assertEquals(array($this->sites('site1'),$this->sites('site2')),$model_element->sites);
+	}
+
+	public function testResourceToModelParse_Relations_Method_UnhandledRelationType()
+	{
+		$resource_element = new DeclarativeTypeParser_ElementsTest_Element4Class;
+		$resource_element->_class_name = 'services\DeclarativeTypeParser_ElementsTest_Model4Class';
+		$resource_element->sites = array(
+			\Yii::app()->service->Site(1),
+			\Yii::app()->service->Site(2),
+		);
+
+		$a = 1;
+		$p = new DeclarativeTypeParser_Elements($a);
+
+		$model_element = new DeclarativeTypeParser_ElementsTest_Model4Class;
+
+		$this->setExpectedException('Exception','Unhandled relation type: CManyManyRelation');
+
+		$p->resourceToModelParse_Relations($model_element, $resource_element, $resource_element, 'sites');
+	}
+
+	public function testResourceToModelParse_RelationFields_Method()
+	{
+		$a = 1;
+		$p = new DeclarativeTypeParser_Elements($a);
+
+		$resource_element = new DeclarativeTypeParser_ElementsTest_Element8Class(array('id'=>1));
+		$resource_element->_class_name = 'Patient';
+		$resource_element->refno = '534';
+		$resource_element->referrer = 'TEST';
+
+		$model_element = $this->patients('patient1');
+		$model_element->lastReferral->refno = '123';
+		$model_element->lastReferral->referrer = '123';
+
+		$p->resourceToModelParse_RelationFields($model_element, $resource_element);
+
+		$this->assertInstanceOf('Referral',$model_element->lastReferral);
+		$this->assertEquals(3,$model_element->lastReferral->id);
+		$this->assertEquals('534',$model_element->lastReferral->refno);
+		$this->assertEquals('TEST',$model_element->lastReferral->referrer);
+	}
+
+	public function testResourceToModelParse_References_Method()
+	{
+		$a = 1;
+		$p = new DeclarativeTypeParser_Elements($a);
+
+		$resource_element = new DeclarativeTypeParser_ElementsTest_Element6Class;
+		$resource_element->_class_name = 'services\DeclarativeTypeParser_ElementsTest_Model6Class';
+		$resource_element->site_ref = \Yii::app()->service->Site(1);
+
+		$model_element = new DeclarativeTypeParser_ElementsTest_Model6Class;
+
+		$p->resourceToModelParse_References($model_element, $resource_element);
+
+		$this->assertEquals(1,$model_element->site_id);
+		$this->assertEquals($this->sites('site1'),$model_element->site);
+	}
+
+	public function testResourceToModel_AfterSave_SaveElements()
+	{
+		$mc = $this->getMockBuilder('services\ModelConverter')
+			->disableOriginalConstructor()
+			->setMethods(array('saveModel'))
+			->getMock();
+
+		$address1 = new DeclarativeTypeParser_ElementsTest_Model9Class;
+		$address1->address1 = 'one';
+		$address2 = new DeclarativeTypeParser_ElementsTest_Model9Class;
+		$address2->address1 = 'two';
+		$address3 = new DeclarativeTypeParser_ElementsTest_Model9Class;
+		$address3->address1 = 'three';
+
+		$model = new DeclarativeTypeParser_ElementsTest_Model8Class;
+		$model->id = 123;
+		$model->_elements = array(clone $address1,clone $address2,clone $address3);
+
+		$model = new ModelConverter_ModelWrapper(new ModelMap(PatientService::$model_map),$model);
+
+		$address1->event_id = 123;
+		$address2->event_id = 123;
+		$address3->event_id = 123;
+
+		$mc->expects($this->at(0))->method('saveModel')->with($address1);
+		$mc->expects($this->at(1))->method('saveModel')->with($address2);
+		$mc->expects($this->at(2))->method('saveModel')->with($address3);
+
+		$resource_element = $this->getMockBuilder('services\DeclarativeTypeParser_ElementsTest_Element5Class')
+			->setMethods(array('relation_fields'))
+			->getMock();
+
+		$resource_element->expects($this->any())
+			->method('relation_fields')
+			->will($this->returnValue(array()));
+
+		$resource = new DeclarativeTypeParser_ElementsTest_Element9Class;
+		$resource->elements = array($resource_element,$resource_element,$resource_element);
+
+		$p = new DeclarativeTypeParser_Elements($mc);
+		$p->resourceToModel_AfterSave($model, $resource);
+	}
+
+	public function testResourceToModel_AfterSave_SaveRelationFields()
+	{
+		$mc = $this->getMockBuilder('services\ModelConverter')
+			->disableOriginalConstructor()
+			->setMethods(array('saveModel'))
+			->getMock();
+
+		$patient = $this->patients('patient1');
+
+		$address1 = new DeclarativeTypeParser_ElementsTest_Model10Class;
+		$address1->lastReferral = $this->referrals('referral1');
+
+		$model = new DeclarativeTypeParser_ElementsTest_Model8Class;
+		$model->id = 123;
+		$model->_elements = array($address1);
+
+		$model = new ModelConverter_ModelWrapper(new ModelMap(PatientService::$model_map),$model);
+
+		$resource_element = new DeclarativeTypeParser_ElementsTest_Element8Class;
+
+		$resource = new DeclarativeTypeParser_ElementsTest_Element9Class;
+		$resource->elements = array($resource_element);
+
+		$mc->expects($this->at(1))
+			->method('saveModel')
+			->with($this->referrals('referral1'));
+
+		$p = new DeclarativeTypeParser_Elements($mc);
+		$p->resourceToModel_AfterSave($model, $resource); 
+	}
 }
 
 class DeclarativeTypeParser_ElementsTest_ModelClass extends \Address { public function relations() { return array(); } }
@@ -432,3 +722,7 @@ class DeclarativeTypeParser_ElementsTest_Element6Class extends \services\Element
 class DeclarativeTypeParser_ElementsTest_Model7Class extends \Site { public $site_id; public function relations() { return array('site' => array(self::BELONGS_TO, 'Site', 'site_id')); } }
 class DeclarativeTypeParser_ElementsTest_Element7Class extends \services\ElementDataObject { public function references() { return array('site'); }}
 class DeclarativeTypeParser_ElementsTest_Element8Class extends \services\ElementDataObject { public function relation_fields() { return array('lastReferral' => array('refno','referrer')); } }
+class DeclarativeTypeParser_ElementsTest_Model8Class extends \Site { public $_elements; }
+class DeclarativeTypeParser_ElementsTest_Model9Class extends \Address { public $event_id; }
+class DeclarativeTypeParser_ElementsTest_Element9Class extends \services\ElementDataObject { public $elements; }
+class DeclarativeTypeParser_ElementsTest_Model10Class extends \Patient { public $event_id; }
