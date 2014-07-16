@@ -705,6 +705,31 @@ class DeclarativeTypeParser_ElementsTest extends \CDbTestCase
 		$p = new DeclarativeTypeParser_Elements($mc);
 		$p->resourceToModel_AfterSave($model, $resource); 
 	}
+
+	public function testJsonToResourceParse()
+	{
+		$p = $this->getMockBuilder('services\DeclarativeTypeParser_Elements')
+			->disableOriginalConstructor()
+			->setMethods(array('jsonToResourceParse_TranslateObject'))
+			->getMock();
+
+		$p->expects($this->at(0))
+			->method('jsonToResourceParse_TranslateObject')
+			->with('one');
+
+		$p->expects($this->at(1))
+			->method('jsonToResourceParse_TranslateObject')
+			->with('two');
+
+		$p->expects($this->at(2))
+			->method('jsonToResourceParse_TranslateObject')
+			->with('three');
+
+		$object = new \stdClass;
+		$object->data = array('one','two','three');
+
+		$p->jsonToResourceParse($object, 'data', null, null);
+	}
 }
 
 class DeclarativeTypeParser_ElementsTest_ModelClass extends \Address { public function relations() { return array(); } }
