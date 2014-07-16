@@ -51,6 +51,7 @@ class OEMigrationTest extends CDbTestCase
 			Yii::app()->db->createCommand("delete from ophtroperationbooking_operation_booking")->query();
 			Yii::app()->db->createCommand("delete from ophtroperationbooking_operation_date_letter_sent")->query();
 			Yii::app()->db->createCommand("delete from et_ophtroperationbooking_operation")->query();
+			Yii::app()->db->createCommand("delete from ophtroperationbooking_scheduleope_patientunavail")->query();
 			Yii::app()->db->createCommand("delete from et_ophtroperationbooking_scheduleope")->query();
 		}
 
