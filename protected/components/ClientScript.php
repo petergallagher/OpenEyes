@@ -51,7 +51,6 @@ class ClientScript extends CClientScript
 				$this->cache->set(self::CACHE_KEY, $arr);
 			}
 			$this->cacheData = $arr;
-			print_r($this->cacheData);
 		}
 	}
 
@@ -128,7 +127,7 @@ class ClientScript extends CClientScript
 	}
 
 	/**
-	 * Creates a package. Will remove referenced asset files that do not exist on the filesystem.
+	 * Creates a package. Will not add referenced asset files that do not exist on the filesystem.
 	 * @param  string $name the name of the package
 	 * @param  array $definition the definition array of the package.
 	 * @return array The formatted package array definition
@@ -140,8 +139,7 @@ class ClientScript extends CClientScript
 		foreach(array('css','js') as $type) {
 			foreach($definition[$type] as $i => $file) {
 				$filePath = $path.DIRECTORY_SEPARATOR.$file;
-				$exists = $this->checkExists($filePath);
-				if (!$exists) {
+				if (!$this->checkExists($filePath)) {
 					unset($definition[$type][$i]);
 				}
 			}

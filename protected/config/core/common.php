@@ -181,7 +181,7 @@ return array(
 				),
 				'FlotChart' => array(
 					'depends' => array('flot')
-				)
+				),
 			),
 		),
 		'db' => array(

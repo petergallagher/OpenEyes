@@ -124,28 +124,20 @@ class BaseModuleController extends BaseController {
 	 */
 	protected function createModulePackage($moduleName=null)
 	{
-		$isPrintAction = $this->isPrintAction($this->action->id);
-		$isAjaxRequest = Yii::app()->getRequest()->getIsAjaxRequest();
-		$isScreenAction = (!$isPrintAction && !$isAjaxRequest);
-
 		$package  = array(
 			'js' => array(),
-			'css' => array(),
+			'css' => array('css/module.css'),
 			'basePath' => 'application.modules.'.$moduleName.'.assets',
 			'depends' => array('events_and_episodes')
 		);
 
-		if ($isPrintAction) {
+		if ($this->isPrintAction($this->action->id)) {
 			$package['css'][] = 'css/print.css';
-		}
-		if ($isScreenAction) {
+		} else {
 			$package['js'][] = 'js/module.js';
 			// Register controller specific js (note for this to work, controllers in child modules must be named the same
 			// as the corresponding controller in the parent module(s)
 			$package['js'][] = 'js/'.Helper::getNSShortname($this).'.js';
-		}
-		if (!$isAjaxRequest) {
-			$package['css'][] = 'css/module.css';
 		}
 
 		return Yii::app()->clientScript->createPackage($moduleName, $package);

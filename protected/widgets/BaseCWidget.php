@@ -70,20 +70,16 @@ class BaseCWidget extends CWidget
 	protected function registerAssets()
 	{
 		$packageName = get_class($this);
-		$package = $this->createPackage($packageName);
 
-		Yii::app()->clientScript
-			->addPackage($packageName, $package)
-			->registerPackage($packageName);
-	}
-
-	protected function createPackage($name=null)
-	{
-		return Yii::app()->clientScript->createPackage($name, array(
-			'js' => array("js/{$name}.js"),
+		$package = Yii::app()->clientScript->createPackage($packageName, array(
+			'js' => array("js/{$packageName}.js"),
 			'css' => array(),
 			'basePath' => 'application.widgets',
 			'depends' => array()
 		));
+
+		Yii::app()->clientScript
+			->addPackage($packageName, $package)
+			->registerPackage($packageName);
 	}
 }
