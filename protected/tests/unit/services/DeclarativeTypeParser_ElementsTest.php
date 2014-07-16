@@ -21,6 +21,8 @@ class DeclarativeTypeParser_ElementsTest extends \CDbTestCase
 		'sites' => 'Site',
 		'institutions' => 'Institution',
 		'countries' => 'Country',
+		'referrals' => 'Referral',
+		'patients' => 'Patient',
 	);
 
 	public function testModelToResourceParse_Fields()
@@ -348,6 +350,71 @@ class DeclarativeTypeParser_ElementsTest extends \CDbTestCase
 		$this->assertEquals('test1',$result[0]->address1);
 		$this->assertEquals('test2',$result[0]->address2);
 	}
+
+	public function testResourceToModelParse_Relations()
+	{
+		$model = $this->getMockBuilder('services\ModelConverter_ModelWrapper')
+			->disableOriginalConstructor()
+			->setMethods(array('getModelClass','setAttribute'))
+			->getMock();
+
+		$_element = new DeclarativeTypeParser_ElementsTest_Element2Class;
+		$_element->_class_name = 'services\DeclarativeTypeParser_ElementsTest_Model2Class';
+		$_element->country = \Country::model()->findByPk(1);
+
+		$object = new DeclarativeTypeParser_ElementsTest_Element2Class;
+		$object->data = array($_element);
+
+		$element = new DeclarativeTypeParser_ElementsTest_Model2Class;
+		$element->country_id = 1;
+		$element->country = \Country::model()->findByPk(1);
+
+		$model->expects($this->once())
+			->method('setAttribute')
+			->with('_elements',array($element));
+
+		$p = $this->getMockBuilder('services\DeclarativeTypeParser_Elements')
+			->disableOriginalConstructor()
+			->setMethods(array('createResourceObjectFromModel'))
+			->getMock();
+
+		$result = $p->resourceToModelParse($model, $object, null, 'data', null, null, false);
+
+		$this->assertCount(1,$result);
+		$this->assertEquals(1,$result[0]->country_id);
+		$this->assertEquals(\Country::model()->findByPk(1),$result[0]->country);
+	}
+
+	public function testResourceToModelParse_RelationFields()
+	{
+		$model = $this->getMockBuilder('services\ModelConverter_ModelWrapper')
+			->setConstructorArgs(array(new ModelMap(PatientService::$model_map),new \Patient))
+			->setMethods(array('getModelClass','setAttribute'))
+			->getMock();
+
+		$_element = new DeclarativeTypeParser_ElementsTest_Element8Class(array('id'=>1));
+		$_element->_class_name = 'Patient';
+		$_element->refno = '534';
+		$_element->referrer = 'TEST';
+
+		$object = new DeclarativeTypeParser_ElementsTest_Element8Class;
+		$object->data = array($_element);
+
+		$p = $this->getMockBuilder('services\DeclarativeTypeParser_Elements')
+			->disableOriginalConstructor()
+			->setMethods(array('createResourceObjectFromModel'))
+			->getMock();
+
+		$result = $p->resourceToModelParse($model, $object, null, 'data', null, null, false);
+
+		$this->assertCount(1,$result);
+		$this->assertInstanceOf('Patient',$result[0]);
+		$this->assertEquals(1,$result[0]->id);
+		$this->assertInstanceOf('Referral',$result[0]->lastReferral);
+		$this->assertEquals(3,$result[0]->lastReferral->id);
+		$this->assertEquals('534',$result[0]->lastReferral->refno);
+		$this->assertEquals('TEST',$result[0]->lastReferral->referrer);
+	}
 }
 
 class DeclarativeTypeParser_ElementsTest_ModelClass extends \Address { public function relations() { return array(); } }
@@ -358,9 +425,10 @@ class DeclarativeTypeParser_ElementsTest_Model3Class extends \Address { public f
 class DeclarativeTypeParser_ElementsTest_Element3Class extends \services\ElementDataObject { public function relations() { return array('sites'); } }
 class DeclarativeTypeParser_ElementsTest_Model4Class extends \Address { public function relations() { return array('sites' => array(self::MANY_MANY, 'Site', 'blah_id')); } }
 class DeclarativeTypeParser_ElementsTest_Element4Class extends \services\ElementDataObject { public function relations() { return array('sites'); } }
-class DeclarativeTypeParser_ElementsTest_Model5Class extends \Address { public function relations() { return array('site' => array(self::BELONGS_TO, 'Site', 'site_id')); } }
+class DeclarativeTypeParser_ElementsTest_Model5Class extends \Address { public $site_id; public function relations() { return array('site' => array(self::BELONGS_TO, 'Site', 'site_id')); } }
 class DeclarativeTypeParser_ElementsTest_Element5Class extends \services\ElementDataObject { public function relation_fields() { return array('site' => array('name','short_name')); } }
 class DeclarativeTypeParser_ElementsTest_Model6Class extends \Site { public $site_id; public function relations() { return array('site' => array(self::BELONGS_TO, 'Site', 'site_id')); } }
 class DeclarativeTypeParser_ElementsTest_Element6Class extends \services\ElementDataObject { public $site_ref; public function references() { return array('site'); }}
 class DeclarativeTypeParser_ElementsTest_Model7Class extends \Site { public $site_id; public function relations() { return array('site' => array(self::BELONGS_TO, 'Site', 'site_id')); } }
 class DeclarativeTypeParser_ElementsTest_Element7Class extends \services\ElementDataObject { public function references() { return array('site'); }}
+class DeclarativeTypeParser_ElementsTest_Element8Class extends \services\ElementDataObject { public function relation_fields() { return array('lastReferral' => array('refno','referrer')); } }
