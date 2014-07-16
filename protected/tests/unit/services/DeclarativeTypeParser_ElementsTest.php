@@ -313,6 +313,41 @@ class DeclarativeTypeParser_ElementsTest extends \CDbTestCase
 		$this->assertInstanceOf('services\SiteReference',$resource_element->site_ref);
 		$this->assertEquals(1,$resource_element->site_ref->getId());
 	}
+
+	public function testResourceToModelParse_Fields()
+	{
+		$model = $this->getMockBuilder('services\ModelConverter_ModelWrapper')
+			->disableOriginalConstructor()
+			->setMethods(array('getModelClass','setAttribute'))
+			->getMock();
+
+		$_element = new DeclarativeTypeParser_ElementsTest_ElementClass;
+		$_element->_class_name = 'services\DeclarativeTypeParser_ElementsTest_ModelClass';
+		$_element->address1 = 'test1';
+		$_element->address2 = 'test2';
+
+		$object = new DeclarativeTypeParser_ElementsTest_ElementClass;
+		$object->data = array($_element);
+
+		$element = new DeclarativeTypeParser_ElementsTest_ModelClass;
+		$element->address1 = 'test1';
+		$element->address2 = 'test2';
+
+		$model->expects($this->once())
+			->method('setAttribute')
+			->with('_elements',array($element));
+
+		$p = $this->getMockBuilder('services\DeclarativeTypeParser_Elements')
+			->disableOriginalConstructor()
+			->setMethods(array('createResourceObjectFromModel'))
+			->getMock();
+
+		$result = $p->resourceToModelParse($model, $object, null, 'data', null, null, false);
+
+		$this->assertCount(1,$result);
+		$this->assertEquals('test1',$result[0]->address1);
+		$this->assertEquals('test2',$result[0]->address2);
+	}
 }
 
 class DeclarativeTypeParser_ElementsTest_ModelClass extends \Address { public function relations() { return array(); } }

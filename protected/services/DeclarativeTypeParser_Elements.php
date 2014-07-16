@@ -160,7 +160,7 @@ class DeclarativeTypeParser_Elements extends DeclarativeTypeParser
 			$elements[] = $element;
 		}
 
-		if (\CHtml::modelName($model) == 'services_ModelConverter_ModelWrapper') {
+		if ($model instanceof ModelConverter_ModelWrapper) {
 			$model->setAttribute('_elements',$elements);
 		}
 
