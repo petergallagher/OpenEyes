@@ -308,7 +308,7 @@ class DeclarativeTypeParser_ElementsTest extends \CDbTestCase
 		$a = 1;
 		$p = new DeclarativeTypeParser_Elements($a);
 
-		$p->modelToResourceParse_RelationFields($resource_element, $model_element);
+		$p->modelToResourceParse_References($resource_element, $model_element, $model_element->relations());
 
 		$this->assertInstanceOf('services\SiteReference',$resource_element->site_ref);
 		$this->assertEquals(1,$resource_element->site_ref->getId());
