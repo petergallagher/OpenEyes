@@ -21,35 +21,48 @@ class DeclarativeTypeParser_Elements extends DeclarativeTypeParser
 	{
 		$element_list = DeclarativeTypeParser::expandObjectAttribute($object, $attribute);
 
-		$resource_items = array();
+		if (is_array($element_list)) {
+			$data_items = array();
 
-		foreach ($element_list as $model_element) {
-			$data_class = $this->getServiceClassFromModelClass($model_element);
-
-			$relations = $model_element->relations();
-
-			$resource_element = $this->createResourceObjectFromModel($data_class, $model_element);
-
-			foreach ($resource_element->fields() as $field) {
-				$resource_element->$field = $this->modelToResourceParse_FieldValue($model_element->$field);
+			foreach ($element_list as $model_element) {
+				$data_items[] = $this->modelToResourceParse_ParseObject($model_element);
 			}
 
-			foreach ($resource_element->relations() as $relation) {
-				$resource_element->$relation = $this->modelToResourceParse_Relation($model_element, $relation, $relations);
-			}
-
-			$this->modelToResourceParse_RelationFields($resource_element, $model_element);
-			$this->modelToResourceParse_References($resource_element, $model_element, $relations);
-
-			foreach ($resource_element->references() as $field) {
-				$reference_class = $relations[$field][1];
-				$resource_element->{$field."_ref"} = \Yii::app()->service->$reference_class($model_element->{$field."_id"});
-			}
-
-			$data_items[] = $resource_element;
+			return $data_items;
 		}
 
-		return $data_items;
+		return $this->modelToResourceParse_ParseObject($element_list);
+	}
+
+	public function modelToResourceParse_ParseObject($model_element)
+	{
+		$data_class = $this->getServiceClassFromModelClass($model_element);
+
+		$relations = $model_element->relations();
+
+		$resource_element = $this->createResourceObjectFromModel($data_class, $model_element);
+
+		foreach ($resource_element->fields() as $field) {
+			$resource_element->$field = $this->modelToResourceParse_FieldValue($model_element->$field);
+		}
+
+		foreach ($resource_element->lookup_relations() as $relation) {
+			$resource_element->$relation = $model_element->$relation ? $model_element->$relation->name : null;
+		}
+
+		foreach ($resource_element->dataobject_relations() as $relation) {
+			$resource_element->$relation = $this->modelToResourceParse_Relation($model_element, $relation, $relations);
+		}
+
+		$this->modelToResourceParse_RelationFields($resource_element, $model_element);
+		$this->modelToResourceParse_References($resource_element, $model_element, $relations);
+
+		foreach ($resource_element->references() as $field) {
+			$reference_class = $relations[$field][1];
+			$resource_element->{$field."_ref"} = \Yii::app()->service->$reference_class($model_element->{$field."_id"});
+		}
+
+		return $resource_element;
 	}
 
 	public function modelToResourceParse_FieldValue($value)
@@ -70,8 +83,8 @@ class DeclarativeTypeParser_Elements extends DeclarativeTypeParser
 		}
 
 		switch ($relations[$relation][0]) {
-			case 'CBelongsToRelation':
-				return $model_element->$relation ? $model_element->$relation->name : null;
+			case 'CHasOneRelation':
+				return $model_element->$relation ? $this->modelToResourceParse($model_element, $relation, null) : null;
 			case 'CHasManyRelation':
 				$list = array();
 
@@ -131,43 +144,61 @@ class DeclarativeTypeParser_Elements extends DeclarativeTypeParser
 			$resource->$res_attribute = $this->jsonToResourceParse($resource, $res_attribute, null, null);
 		}
 
-		foreach ($resource->$res_attribute as $resource_element) {
-			if ($resource_element instanceof ModelReference) {
-				$model_class = $resource_element->getModelClass();
-				$elements[] = $model_class::model()->findByPk($resource_element->getId());
-				continue;
-			}
-
-			$data_class = $resource_element->_class_name;
-
-			if ($resource_element->getId()) {
-				if (!$model_element = $data_class::model()->findByPk($resource_element->getId())) {
-					throw new \Exception("$data_class not found: ".$resource_element->getId());
-				}
-			} else {
-				if ($data_class === null) {
-					throw new \Exception("data_class cannot be null");
+		if (is_array($resource->$res_attribute)) {
+			foreach ($resource->$res_attribute as $resource_element) {
+				if ($resource_element instanceof ModelReference) {
+					$model_class = $resource_element->getModelClass();
+					$elements[] = $model_class::model()->findByPk($resource_element->getId());
+					continue;
 				}
 
-				$model_element = new $data_class;
+				$elements[] = $this->resourceToModelParse_ParseObject($resource_element, $resource, $res_attribute);
 			}
 
-			foreach ($resource_element->fields() as $field) {
-				$model_element->$field = $this->resourceToModelParse_FieldValue($resource_element->$field);
+			if ($model instanceof ModelConverter_ModelWrapper) {
+				$model->setAttribute('_elements',$elements);
 			}
 
-			$this->resourceToModelParse_Relations($model_element, $resource_element, $resource, $res_attribute);
-			$this->resourceToModelParse_RelationFields($model_element, $resource_element);
-			$this->resourceToModelParse_References($model_element, $resource_element);
-
-			$elements[] = $model_element;
+			return $elements;
 		}
 
-		if ($model instanceof ModelConverter_ModelWrapper) {
-			$model->setAttribute('_elements',$elements);
+		return $this->resourceToModelParse_ParseObject($resource->$res_attribute, $resource, $res_attribute);
+	}
+
+	public function resourceToModelParse_ParseObject($resource_element, $resource, $res_attribute)
+	{
+		$data_class = $resource_element->_class_name;
+
+		if ($resource_element->getId()) {
+			if (!$model_element = $data_class::model()->findByPk($resource_element->getId())) {
+				throw new \Exception("$data_class not found: ".$resource_element->getId());
+			}
+		} else {
+			if ($data_class === null) {
+				throw new \Exception("data_class cannot be null");
+			}
+
+			$model_element = new $data_class;
 		}
 
-		return $elements;
+		$relations = $model_element->relations();
+
+		foreach ($resource_element->fields() as $field) {
+			$model_element->$field = $this->resourceToModelParse_FieldValue($resource_element->$field);
+		}
+
+		foreach ($resource_element->lookup_relations() as $index => $relation) {
+			$related_class = $relations[$relation][1];
+			$attribute = isset($relations[$relation]['order']) ? $relations[$relation]['order'] : 'name';
+			$model_element->$relation = $resource_element->$relation ? $related_class::model()->find($attribute.'=?',array($resource_element->$relation)) : null;
+			$model_element->{$relations[$relation][2]} = $model_element->$relation ? $model_element->$relation->primaryKey : null;
+		}
+
+		$this->resourceToModelParse_Relations($model_element, $resource_element, $resource, $res_attribute, $relations);
+		$this->resourceToModelParse_RelationFields($model_element, $resource_element);
+		$this->resourceToModelParse_References($model_element, $resource_element);
+
+		return $model_element;
 	}
 
 	public function resourceToModelParse_FieldValue($resource_value)
@@ -181,21 +212,17 @@ class DeclarativeTypeParser_Elements extends DeclarativeTypeParser
 		return $resource_value;
 	}
 
-	public function resourceToModelParse_Relations(&$model_element, $resource_element, $resource, $res_attribute)
+	public function resourceToModelParse_Relations(&$model_element, $resource_element, $resource, $res_attribute, $relations)
 	{
-		$relations = $model_element->relations();
-
-		foreach ($resource_element->relations() as $index => $relation) {
+		foreach ($resource_element->dataobject_relations() as $index => $relation) {
 			if (!isset($relations[$relation])) {
 				throw new \Exception("relation $relation is not defined on element class ".\CHtml::modelName($model_element));
 			}
 
 			switch ($relations[$relation][0]) {
-				case 'CBelongsToRelation':
-					$related_class = $relations[$relation][1];
-					$attribute = isset($relations[$relation]['order']) ? $relations[$relation]['order'] : 'name';
-					$model_element->$relation = $resource_element->$relation ? $related_class::model()->find($attribute.'=?',array($resource_element->$relation)) : null;
-					$model_element->{$relations[$relation][2]} = $model_element->$relation ? $model_element->$relation->primaryKey : null;
+				case 'CHasOneRelation':
+					$a = 1;
+					$model_element->$relation = $resource_element->$relation ? $this->resourceToModelParse($a, $resource_element, null, $relation, null, null, null) : null;
 					break;
 				case 'CHasManyRelation':
 					$a = 1;
@@ -253,6 +280,10 @@ class DeclarativeTypeParser_Elements extends DeclarativeTypeParser
 
 			$this->mc->saveModel($element);
 
+			if (method_exists($this->mc->service,'resourceToModel_AfterSave_'.\CHtml::modelName($element))) {
+				$this->mc->service->{"resourceToModel_AfterSave_".\CHtml::modelName($element)}($element);
+			}
+
 			$relations = $element->relations();
 
 			foreach ($resource->elements[$i]->relation_fields() as $relation => $fields) {
@@ -262,6 +293,18 @@ class DeclarativeTypeParser_Elements extends DeclarativeTypeParser
 					$object->$attribute = $element->primaryKey;
 
 					$this->mc->saveModel($object);
+				}
+			}
+
+			foreach ($resource->elements[$i]->dataobject_relations() as $relation) {
+				if ($relations[$relation][0] == 'CHasOneRelation') {
+					$attribute = $relations[$relation][2];
+
+					if ($object = $element->$relation) {
+						$object->$attribute = $element->primaryKey;
+
+						$this->mc->saveModel($object);
+					}
 				}
 			}
 		}

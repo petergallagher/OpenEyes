@@ -24,7 +24,12 @@ class ElementDataObject extends DataObject
 		return array();
 	}
 
-	public function relations()
+	public function dataobject_relations()
+	{
+		return array();
+	}
+
+	public function lookup_relations()
 	{
 		return array();
 	}
