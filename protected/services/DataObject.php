@@ -204,38 +204,31 @@ abstract class DataObject implements FhirCompatible
 
 	private function serialiseSubObjects($values)
 	{
+		$data = array();
+
 		foreach ($values as $key => $value) {
-			if ($value instanceof \services\Date) {
-				$values[$key] = $value->serialise();
-			} else if ($value instanceof DataObject) {
-				$values[$key] = array();
-				foreach ($value as $_key => $_value) {
-					if ($_value instanceof ModelReference) {
-						$values[$key][$_key] = array(
-							'service' => $_value->getServiceName(),
-							'id' => $_value->getId(),
-						);
-					} else if (is_array($_value)) {
-						$values[$key][$_key] = $this->serialiseSubObjects($_value);
-					} else {
-						if ($_value instanceof \services\Date) {
-							$values[$key][$_key] = $_value->serialise();
-						} else {
-							$values[$key][$_key] = $_value;
-						}
-					}
-				}
-			} else if ($value instanceof ModelReference) {
-				$values[$key] = array(
-					'service' => $value->getServiceName(),
-					'id' => $value->getId(),
-				);
-			} else if (is_array($value)) {
-				$values[$key] = $this->serialiseSubObjects($value);
-			}
+			$data[$key] = $this->serialiseSubObject($value);
 		}
 
-		return $values;
+		return $data;
+	}
+
+	private function serialiseSubObject($value)
+	{
+		if ($value instanceof \services\Date) {
+			return $value->serialise();
+		} else if ($value instanceof DataObject) {
+			return $this->serialiseSubObjects($value);
+		} else if ($value instanceof ModelReference) {
+			return array(
+				'service' => $value->getServiceName(),
+				'id' => $value->getId(),
+			);
+		} else if (is_array($value)) {
+			return $this->serialiseSubObjects($value);
+		}
+
+		return $value;
 	}
 
 	static public function fromObject($object)
