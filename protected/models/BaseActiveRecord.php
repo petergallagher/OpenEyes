@@ -208,7 +208,7 @@ class BaseActiveRecord extends CActiveRecord
 		}
 
 		if ($new_objs) {
-			foreach ($new_objs as $new) {
+			foreach ($new_objs as $i => $new) {
 				if ($save = @$orig_by_id[$new->getPrimaryKey()]) {
 					unset($orig_by_id[$new->getPrimaryKey()]);
 				}
@@ -218,6 +218,11 @@ class BaseActiveRecord extends CActiveRecord
 				$save->attributes = $this->getRelationsDefaults($name);
 				$save->{$thru->foreignKey} = $this->getPrimaryKey();
 				$save->{$rel->foreignKey} = $new->getPrimaryKey();
+
+				if ($save->hasAttribute('display_order')) {
+					$save->display_order = $i + 1;
+				}
+
 				if (!$save->save()) {
 					throw new Exception("unable to save new through relation {$thru->name} for {$name}" . print_r($save->getErrors(), true));
 				}
