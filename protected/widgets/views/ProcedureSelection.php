@@ -131,20 +131,14 @@
 						<td>
 							Calculated Total Duration:
 						</td>
-						<td id="projected_duration_<?php echo $identifier?>">
-							<?php echo CHtml::encode($totalDuration)?> mins
+						<td class="ProcedureSelectionProjectedDuration" data-element="<?php echo CHtml::modelName($element)?>" data-field="<?php echo $field?>">
+							<?php echo CHtml::encode($calculated_total_duration)?> mins
 						</td>
 						<td>
 							Estimated Total Duration:
 						</td>
 						<td>
-							<input
-								type="text"
-								value="<?php echo $total_duration?>"
-								id="<?php echo $class?>_total_duration_<?php echo $identifier?>"
-								name="<?php echo $class?>[total_duration_<?php echo $identifier?>]"
-								style="width:60px"
-								/>
+							<?php echo CHtml::textField(CHtml::modelName($element).'[total_duration]',$element->total_duration,array('class' => 'ProcedureSelectionEstimatedDuration', 'data-element' => CHtml::modelName($element), 'data-field' => $field))?>
 						</td>
 					</tr>
 					</tfoot>

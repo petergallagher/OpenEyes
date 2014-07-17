@@ -101,7 +101,7 @@ class ProcedureSelection extends BaseFieldWidget
 				$found = false;
 				if ($this->selected_procedures) {
 					foreach ($this->selected_procedures as $procedure) {
-						if ($procedure->id == $proc_id) {
+						if ($procedure['id'] == $proc_id) {
 							$found = true; break;
 						}
 					}
