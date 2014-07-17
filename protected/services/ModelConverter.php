@@ -97,6 +97,7 @@ class ModelConverter
 			}
 		}
 
+
 		if ($save && $parser && method_exists($parser,'resourceToModel_RelatedObjects_DeleteItems')) {
 			$parser->resourceToModel_RelatedObjects_DeleteItems($def[3]);
 		}
@@ -118,6 +119,7 @@ class ModelConverter
 				$this->service->resourceToModel_AfterSave($model);
 			}
 		}
+
 
 		return $model->getModel();
 	}

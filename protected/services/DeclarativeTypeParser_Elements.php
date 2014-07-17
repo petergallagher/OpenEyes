@@ -59,7 +59,7 @@ class DeclarativeTypeParser_Elements extends DeclarativeTypeParser
 
 		foreach ($resource_element->references() as $field) {
 			$reference_class = $relations[$field][1];
-			$resource_element->{$field."_ref"} = \Yii::app()->service->$reference_class($model_element->{$field."_id"});
+			$resource_element->{$field."_ref"} = $model_element->{$field."_id"} ? \Yii::app()->service->$reference_class($model_element->{$field."_id"}) : null;
 		}
 
 		return $resource_element;
@@ -121,7 +121,7 @@ class DeclarativeTypeParser_Elements extends DeclarativeTypeParser
 		foreach ($resource_element->relation_fields() as $relation => $fields) {
 			if ($model_element->$relation) {
 				foreach ($fields as $field) {
-					$resource_element->$field = $model_element->$relation->$field;
+					$resource_element->$field = $this->modelToResourceParse_FieldValue($model_element->$relation->$field);
 				}
 			}
 		}
@@ -248,7 +248,7 @@ class DeclarativeTypeParser_Elements extends DeclarativeTypeParser
 			}
 
 			foreach ($fields as $field) {
-				$object->$field = $resource_element->$field;
+				$object->$field = $this->resourceToModelParse_FieldValue($resource_element->$field);
 			}
 
 			$model_element->$relation = $object;
@@ -271,7 +271,7 @@ class DeclarativeTypeParser_Elements extends DeclarativeTypeParser
 		}
 	}
 
-	public function resourceToModel_AfterSave($model, $resource)
+	public function resourceToModel_AfterSave(&$model, $resource)
 	{
 		$elements = $model->expandAttribute('_elements');
 
