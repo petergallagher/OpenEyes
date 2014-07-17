@@ -38,13 +38,17 @@ class ModelConverter
 		return $this->modelToResourceParse($object, get_class($object), $resource);
 	}
 
+	protected function getParserByName($name)
+	{
+		$class = 'services\\'.$name;
+		return new $class($this);
+	}
+
 	public function modelToResourceParse($object, $object_class_name, &$resource)
 	{
 		foreach ($this->map->getFieldsForClass($object_class_name) as $res_attribute => $def) {
 			if (is_array($def)) {
-				$class = 'services\\'.$def[0];
-				$parser = new $class($this);
-				$resource->$res_attribute = $parser->modelToResourceParse($object, $def[1], @$def[2], @$def[3]);
+				$resource->$res_attribute = $this->getParserByName($def[0])->modelToResourceParse($object, $def[1], @$def[2], @$def[3]);
 			} else {
 				$resource->$res_attribute = $this->service->expandModelAttribute($object, $def);
 			}
@@ -61,9 +65,7 @@ class ModelConverter
 
 		foreach ($this->map->getFieldsForClass($model->getClass()) as $res_attribute => $def) {
 			if (is_array($def)) {
-				$class = 'services\\'.$def[0];
-				$parser = new $class($this);
-				$parser->resourceToModelParse($model, $resource, $def[1], $res_attribute, @$def[2], @$def[3], $save);
+				$this->getParserByName($def[0])->resourceToModelParse($model, $resource, $def[1], $res_attribute, @$def[2], @$def[3], $save);
 			} else {
 				if ($this->isReferenceObjectAttribute($model, $def)) {
 					$this->mapResourceReferenceObjectToModel($model, $def, $resource->$res_attribute);
@@ -81,12 +83,11 @@ class ModelConverter
 
 		foreach ($this->map->getFieldsForClass($model->getClass()) as $res_attribute => $def) {
 			if (is_array($def)) {
-				$class = 'services\\'.$def[0];
 				if (!$parser || \CHtml::modelName($parser) != 'services_'.$def[0]) {
 					if ($save && $parser && method_exists($parser,'resourceToModel_RelatedObjects_DeleteItems')) {
 						$parser->resourceToModel_RelatedObjects_DeleteItems($last_def[3]);
 					}
-					$parser = new $class($this);
+					$parser = $this->getParserByName($def[0]);
 				}
 				if (method_exists($parser,'resourceToModel_RelatedObjects')) {
 					$parser->resourceToModel_RelatedObjects($model, $def[1], $def[4], $save);
@@ -105,8 +106,8 @@ class ModelConverter
 
 			foreach ($this->map->getFieldsForClass($model->getClass()) as $res_attribute => $def) {
 				if (is_array($def)) {
-					$class = 'services\\'.$def[0];
-					$parser = new $class($this);
+					$parser = $this->getParserByName($def[0]);
+
 					if (method_exists($parser,'resourceToModel_AfterSave')) {
 						$parser->resourceToModel_AfterSave($model, $resource);
 					}
