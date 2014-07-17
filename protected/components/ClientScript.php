@@ -19,8 +19,15 @@
 
 class ClientScript extends CClientScript
 {
+	protected $cacheBuster;
+
+	public function __construct(CacheBuster $cacheBuster = null)
+	{
+		$this->cacheBuster = $cacheBuster ?: Yii::app()->cacheBuster;
+	}
+
 	/**
-	 * Remove package scripts. Read through all scripts (and dependant scripts) defined
+	 * Remove package scripts. Read through all files (and dependant scripts) defined
 	 * in a package, and add them to the scriptMap to prevent outputting them in a response.
 	 * @param  string $packageName Name of the package.
 	 */
@@ -54,7 +61,7 @@ class ClientScript extends CClientScript
 	{
 		parent::unifyScripts();
 
-		$cacheBuster = Yii::app()->cacheBuster;
+		$cacheBuster = $this->cacheBuster;
 
 		// JS
 		foreach ($this->scriptFiles as $pos => $scriptFiles) {
@@ -86,9 +93,7 @@ class ClientScript extends CClientScript
 	public function addPackage($name,$definition)
 	{
 		$existingPackage = @$this->packages[$name] ?: array();
-		$definition = CMap::mergeArray($definition, $existingPackage);
-		$this->packages[$name]=$definition;
-		return $this;
+		return parent::addPackage($name, CMap::mergeArray($existingPackage, $definition));
 	}
 
 	/**
