@@ -17,39 +17,8 @@
 * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
 */
 
-/**
- * TODO: Is caching necessary? Note that file_exists() will NOT cache the result
- * for files that do not exist. See: http://php.net/manual/en/function.clearstatcache.php
- */
-
 class ClientScript extends CClientScript
 {
-	const CACHE_KEY = 'clientscript_file_existance';
-
-	protected $cache;
-	protected $canCache = false;
-	protected $cacheData = array();
-
-	public function init()
-	{
-		parent::init();
-		$this->setupCache();
-	}
-
-	/**
-	 * Setup cache related properties. We're using file cache to prevent disk reads
-	 * when checking if files exist.
-	 */
-	protected function setupCache()
-	{
-		$this->canCache = (!defined('YII_DEBUG') || !YII_DEBUG);
-
-		if ($this->canCache) {
-			$this->cache = Yii::app()->cache;
-			$this->cacheData = $this->cache->get(self::CACHE_KEY) ?: array();
-		}
-	}
-
 	/**
 	 * Remove package scripts. Read through all scripts (and dependant scripts) defined
 	 * in a package, and add them to the scriptMap to prevent outputting them in a response.
@@ -134,40 +103,12 @@ class ClientScript extends CClientScript
 
 		foreach(array('css','js') as $type) {
 			foreach($definition[$type] as $i => $file) {
-				$filePath = $path.DIRECTORY_SEPARATOR.$file;
-				if (!$this->checkExists($filePath)) {
+				if (!file_exists($path.DIRECTORY_SEPARATOR.$file)) {
 					unset($definition[$type][$i]);
 				}
 			}
 		}
 
 		return $definition;
-	}
-
-	/**
-	 * Check if a file exists on the filesystem. Will check the cache first.
-	 * @param  string $filePath The full path to the file.
-	 * @return boolean
-	 */
-	protected function checkExists($filePath)
-	{
-		if (!array_key_exists($filePath, $this->cacheData)) {
-			$exists = file_exists($filePath);
-			$this->cacheData[$filePath] = $exists;
-			$this->saveCache();
-		} else {
-			$exists = $this->cacheData[$filePath];
-		}
-		return $exists;
-	}
-
-	/**
-	 * Save the fileCache array to cache.
-	 */
-	protected function saveCache()
-	{
-		if ($this->canCache) {
-			$this->cache->set(self::CACHE_KEY, $this->cacheData);
-		}
 	}
 }

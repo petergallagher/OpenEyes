@@ -18,7 +18,7 @@
  */
 
 // ensure no css files are loaded
-Yii::app()->assetManager->reset();
+Yii::app()->clientScript->reset();
 ?>
 <!doctype html>
 <html lang="en">
