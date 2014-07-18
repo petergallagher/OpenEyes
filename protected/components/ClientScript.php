@@ -80,9 +80,11 @@ class ClientScript extends CClientScript
 		$path = Yii::getPathOfAlias($definition['basePath']);
 
 		foreach(array('css','js') as $type) {
-			foreach($definition[$type] as $i => $file) {
-				if (!file_exists($path.DIRECTORY_SEPARATOR.$file)) {
-					unset($definition[$type][$i]);
+			if (isset($definition[$type])) {
+				foreach($definition[$type] as $i => $file) {
+					if (!file_exists($path.DIRECTORY_SEPARATOR.$file)) {
+						unset($definition[$type][$i]);
+					}
 				}
 			}
 		}

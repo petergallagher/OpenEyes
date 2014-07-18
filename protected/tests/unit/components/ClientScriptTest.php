@@ -55,10 +55,10 @@ class ClientScriptTest extends CTestCase
 			'script2.js should be cache-busted');
 
 		$this->assertTrue(strpos($output, "style1.css?{$this->time}") !== false,
-			'style.css should be cache-busted');
+			'style1.css should be cache-busted');
 
 		$this->assertTrue(strpos($output, "style2.css?{$this->time}") !== false,
-			'style.css should be cache-busted');
+			'style2.css should be cache-busted');
 	}
 
 	public function testAddPackage()
@@ -136,13 +136,17 @@ class ClientScriptTest extends CTestCase
 		$this->assertEquals($package, $expected,
 			'The package returned from cleanPackage should only contain files that exist on the filesystem');
 
+		unset($definition['css']);
+		unset($definition['js']);
+		unset($expected['css']);
+		unset($expected['js']);
+
+		$package = $this->clientScript->cleanPackage($definition);
+
+		$this->assertEquals($package, $expected,
+			'cleanPackage should allow package definitions without specifying css or js files');
+
 		unlink($stylePath);
 		unlink($scriptPath);
 	}
-
-	public function resetRemovePackageScripts()
-	{
-		$this->markTestIncomplete('Tests not implemented yet');
-	}
 }
-

@@ -23,13 +23,14 @@ class BaseCWidget extends CWidget
 	public $label = true;
 	public $field;
 	public $value;
+	public $assetBasePath = 'application.widgets';
 	public $assetFolder;
 	public $hidden = false;
 	public $htmlOptions = array();
 
-	public function init()
+	public function init(ClientScript $clientScript = null)
 	{
-		$this->registerAssets();
+		$this->registerAssets($clientScript ?: Yii::app()->clientScript);
 
 		if (is_object($this->element) && $this->field) {
 			$this->value = $this->element->{$this->field};
@@ -67,18 +68,16 @@ class BaseCWidget extends CWidget
 		$this->render(get_class($this));
 	}
 
-	protected function registerAssets()
+	protected function registerAssets(ClientScript $clientScript)
 	{
 		$packageName = get_class($this);
 
-		$package = Yii::app()->clientScript->cleanPackage(array(
+		$package = $clientScript->cleanPackage(array(
 			'js' => array("js/{$packageName}.js"),
-			'css' => array(),
-			'basePath' => 'application.widgets',
-			'depends' => array()
+			'basePath' => $this->assetBasePath,
 		));
 
-		Yii::app()->clientScript
+		$clientScript
 			->addPackage($packageName, $package)
 			->registerPackage($packageName);
 	}

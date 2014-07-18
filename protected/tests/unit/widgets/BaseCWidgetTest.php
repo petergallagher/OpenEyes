@@ -18,10 +18,11 @@ class MyWidget extends BaseCWidget {
 	protected $prop1;
 	protected $prop2;
 
-	public function init()
+	public function init(ClientScript $clientScript = null)
 	{
 		$this->prop1 = 'prop1';
 		$this->prop2 = 'prop2';
+		parent::init($clientScript);
 	}
 }
 
@@ -29,13 +30,16 @@ class BaseCWidgetTest extends CTestCase
 {
 	public function setUp()
 	{
-		$this->widget = $this->getMockBuilder('MyWidget')
-				->setMethods(array('getViewFile','renderFile'))
-				->getMock();
 
-		$this->widget->expects($this->once())
-			->method('getViewFile')
-			->will($this->returnValue('view.php'));
+	}
+
+	private function getMockWidget()
+	{
+		return $this->getMockBuilder('MyWidget')
+			->setMethods(array('getViewFile','renderFile'))
+			->getMock();
+
+		return $widget;
 	}
 
 	// View contents should be returned
@@ -43,11 +47,18 @@ class BaseCWidgetTest extends CTestCase
 	{
 		$returnValue = '<h1>rich</h1>';
 
-		$this->widget->expects($this->once())
+		$widget = $this->getMockWidget();
+
+		$widget->expects($this->once())
+			->method('getViewFile')
+			->will($this->returnValue('view.php'));
+
+		$widget->expects($this->once())
 			->method('renderFile')
 			->will($this->returnValue($returnValue));
 
-		$output = $this->widget->render('view_name', null, true);
+		$widget->init();
+		$output = $widget->render('view_name', null, true);
 
 		$this->assertEquals($output, $returnValue,
 			'If the return param is set to true, content should be returned from the method call');
@@ -62,7 +73,13 @@ class BaseCWidgetTest extends CTestCase
 		);
 		$returnValue = '<h1>rich</h1>';
 
-		$this->widget->expects($this->once())
+		$widget = $this->getMockWidget();
+
+		$widget->expects($this->once())
+			->method('getViewFile')
+			->will($this->returnValue('view.php'));
+
+		$widget->expects($this->once())
 			->method('renderFile')
 			->with(
 				$this->equalTo('view.php'),
@@ -86,7 +103,33 @@ class BaseCWidgetTest extends CTestCase
 				$this->equalTo(false)
 			);
 
-		$this->widget->init();
-		$this->widget->render('view_name', $data);
+		$widget->init();
+		$widget->render('view_name', $data);
 	}
+
+	// public function testRegisterAssets()
+	// {
+	// 	$widget = new MyWidget();
+
+	// 	$clientScript = $this->getMockBuilder('ClientScript')
+	// 		->setMethods(array(
+	// 			'addPackage',
+	// 			'registerPackage'
+	// 		))
+	// 		->getMock();
+
+	// 	$clientScript->expects($this->once())
+	// 		->method('addPackage');
+
+	// 	$clientScript->expects($this->once())
+	// 		->method('cleanPackage')
+	// 		->with(
+	// 			$this->equalTo(array(
+	// 				'js' => array('js/MyWidget.js'),
+	// 				'basePath' => $widget->assetBasePath
+	// 			))
+	// 		);
+
+	// 	$widget->init($clientScript);
+	// }
 }
