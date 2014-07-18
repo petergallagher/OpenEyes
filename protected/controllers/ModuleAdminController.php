@@ -36,7 +36,7 @@ class ModuleAdminController extends BaseAdminController
 
 		$packageName = $this->getModule()->name.'_admin';
 
-		$package = Yii::app()->clientScript->createPackage($packageName, array(
+		$package = Yii::app()->clientScript->cleanPackage(array(
 			'js' => array('js/admin.js'),
 			'css' => array(
 				'css/admin.css',

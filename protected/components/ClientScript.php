@@ -27,33 +27,6 @@ class ClientScript extends CClientScript
 	}
 
 	/**
-	 * Remove package scripts. Read through all files (and dependant scripts) defined
-	 * in a package, and add them to the scriptMap to prevent outputting them in a response.
-	 * @param  string $packageName Name of the package.
-	 */
-	public function removePackageScripts($packageName=null)
-	{
-		if (!$packageName) return;
-		$package = $this->packages[$packageName];
-
-		// Process dependencies first.
-		if (isset($package['depends']) && $package['depends']) {
-			foreach($package['depends'] as $dependantPackage) {
-				$this->removePackageScripts($dependantPackage);
-			}
-		}
-
-		// Now remove all css and js files defined in this package.
-		foreach(array('js','css') as $type) {
-			if (isset($package[$type])) {
-				foreach($package[$type] as $file) {
-					$this->scriptMap[basename($file)] = false;
-				}
-			}
-		}
-	}
-
-	/**
 	 * Extending unifyScripts in order to hook the cache buster in at the right
 	 * point in the render method
 	 */
@@ -97,12 +70,12 @@ class ClientScript extends CClientScript
 	}
 
 	/**
-	 * Creates a package. Will not add referenced asset files that do not exist on the filesystem.
+	 * Removes invalid files (that do not exist on the filesystem) from a package definition.
 	 * @param  string $name the name of the package
 	 * @param  array $definition the definition array of the package.
 	 * @return array The formatted package array definition
 	 */
-	public function createPackage($name,$definition)
+	public function cleanPackage($definition)
 	{
 		$path = Yii::getPathOfAlias($definition['basePath']);
 

@@ -140,7 +140,7 @@ class BaseModuleController extends BaseController {
 			$package['js'][] = 'js/'.Helper::getNSShortname($this).'.js';
 		}
 
-		return Yii::app()->clientScript->createPackage($moduleName, $package);
+		return Yii::app()->clientScript->cleanPackage($package);
 	}
 
 	/**

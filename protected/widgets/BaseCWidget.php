@@ -71,7 +71,7 @@ class BaseCWidget extends CWidget
 	{
 		$packageName = get_class($this);
 
-		$package = Yii::app()->clientScript->createPackage($packageName, array(
+		$package = Yii::app()->clientScript->cleanPackage(array(
 			'js' => array("js/{$packageName}.js"),
 			'css' => array(),
 			'basePath' => 'application.widgets',

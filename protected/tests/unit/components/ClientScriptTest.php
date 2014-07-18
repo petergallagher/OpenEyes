@@ -37,7 +37,7 @@ class ClientScriptTest extends PHPUnit_Framework_TestCase
 
 	public function testCacheBustedUrls()
 	{
-		// We're testiong that the unifyScripts() methods correctly adds cache-busted urls to
+		// We're testing that the unifyScripts() methods correctly adds cache-busted urls to
 		// script and css files.
 
 		$this->clientScript->registerScriptFile('script1.js');
@@ -95,9 +95,49 @@ class ClientScriptTest extends PHPUnit_Framework_TestCase
 			'When adding a package, it should be merged with the existing package (if it exists)');
 	}
 
-	public function testCreatePackage()
+	// The main purpose of cleanPackage() is to accept a package definition, and
+	// return a new package definition with file references that actually exist on the filesytem.
+	public function testCleanPackage()
 	{
-		$this->markTestIncomplete('Tests not implemented yet');
+		$pathAlias = 'application.tests.fixtures.assets';
+		$path = Yii::getPathOfAlias($pathAlias);
+
+		$time = time();
+
+		$styleName = "css/style{$time}.css";
+		$stylePath = "{$path}/{$styleName}";
+
+		$scriptName = "js/script{$time}.js";
+		$scriptPath = "{$path}/{$scriptName}";
+
+		file_put_contents($stylePath, '');
+		file_put_contents($scriptPath, '');
+
+		$definition = array(
+			'css' => array(
+				$styleName,
+				'css/style'.($time+1).'.css'
+			),
+			'js' => array(
+				$scriptName,
+				'js/script'.($time+1).'.js'
+			),
+			'basePath' => $pathAlias
+		);
+
+		$expected = array(
+			'css' => array($styleName),
+			'js' => array($scriptName),
+			'basePath' => $pathAlias
+		);
+
+		$package = $this->clientScript->cleanPackage($definition);
+
+		$this->assertEquals($package, $expected,
+			'The package returned from cleanPackage should only contain files that exist on the filesystem');
+
+		unlink($stylePath);
+		unlink($scriptPath);
 	}
 
 	public function resetRemovePackageScripts()
@@ -105,3 +145,4 @@ class ClientScriptTest extends PHPUnit_Framework_TestCase
 		$this->markTestIncomplete('Tests not implemented yet');
 	}
 }
+
