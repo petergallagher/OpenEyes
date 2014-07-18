@@ -59,7 +59,7 @@ class BaseCWidget extends CWidget
 		} else {
 			$data = get_object_vars($this);
 		}
-		parent::render($view, $data, $return);
+		return parent::render($view, $data, $return);
 	}
 
 	public function run()

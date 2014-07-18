@@ -13,7 +13,7 @@
  * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
  */
 
-class ClientScriptTest extends PHPUnit_Framework_TestCase
+class ClientScriptTest extends CTestCase
 {
 	private $time;
 	private $clientScript;
