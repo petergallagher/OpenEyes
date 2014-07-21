@@ -59,6 +59,15 @@ class Patient extends BaseActiveRecordVersioned
 	private $_orderedepisodes;
 	private $metadata_keys = array();
 
+	public function __construct($scenario='insert')
+	{
+		foreach (PatientMetadataKey::model()->findAll() as $metadata_key) {
+			$this->metadata_keys[$metadata_key->key_name] = $metadata_key;
+		}
+
+		return parent::__construct($scenario);
+	}
+
 	/**
 		* Returns the static model of the specified AR class.
 		* @return Patient the static model class
