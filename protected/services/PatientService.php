@@ -90,12 +90,13 @@ class PatientService extends DeclarativeModelService
 	{
 		$model = $this->getSearchModel();
 		if (isset($params['id'])) $model->id = $params['id'];
-
-		$searchParams = array('pageSize' => null);
 		if (isset($params['identifier'])) {
-			$searchParams['hos_num'] = $params['identifier'];
-			$searchParams['nhs_num'] = $params['identifier'];
+			$model->hos_num = sprintf('%07s', $params['identifier']);
+			$model->nhs_num = $params['identifier'];
 		}
+
+		$searchParams = array('pageSize' => 5);
+
 		if (isset($params['family'])) $searchParams['last_name'] = $params['family'];
 		if (isset($params['given'])) $searchParams['first_name'] = $params['given'];
 
