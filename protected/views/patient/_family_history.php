@@ -46,7 +46,7 @@
 				</button>
 			</div>
 			<div id="add_family_history" style="display: none;">
-
+				<?php $this->displayErrors($errors)?>
 				<?php
 				$form = $this->beginWidget('FormLayout', array(
 					'id'=>'add-family_history',
