@@ -20,7 +20,9 @@
 
 <?php if (@$htmlOptions['nowrapper']) {?>
 	<?php echo CHtml::textField($name, $value, $htmlOptions)?>
-	<button type="button" class="secondary small time-now" data-target="<?php echo $field;?>">Now</button>
+	<?php if ($options['showTimeNowButton']) {?>
+		<button type="button" class="secondary small time-now" data-target="<?php echo $field;?>">Now</button>
+	<?php }?>
 	<div class="time-picker-error validaton-error error hide">
 		Invalid time!
 	</div>
@@ -35,7 +37,9 @@
 		</div>
 		<div class="large-<?php echo $layoutColumns['field'];?> column<?php if(empty($htmlOptions['append-text']) || empty($layoutColumns['append-text'])){?> end<?php }?>">
 			<?php echo CHtml::textField($name, $value, $htmlOptions)?>
-			<button type="button" class="secondary small time-now" data-target="<?php echo $field;?>">Now</button>
+			<?php if ($options['showTimeNowButton']) {?>
+				<button type="button" class="secondary small time-now" data-target="<?php echo $field;?>">Now</button>
+			<?php }?>
 			<div class="time-picker-error validaton-error error hide">
 				Invalid time!
 			</div>

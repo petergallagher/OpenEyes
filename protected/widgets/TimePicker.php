@@ -19,8 +19,31 @@
 
 class TimePicker extends BaseFieldWidget
 {
+	/**
+	 * Name of the widget.
+	 * @var [type]
+	 */
 	public $name;
-	public $cssClass = 'time-picker-field';
+
+	/**
+	 * Widget options
+	 * @var array
+	 */
+	public $options = array();
+
+	/**
+	 * CSS class to added to the text field.
+	 * @var string
+	 */
+	private $cssClass = 'time-picker-field';
+
+	/**
+	 * Default widget options. Will be merged into options.
+	 * @var array
+	 */
+	private $defaultOptions = array(
+		'showTimeNowButton' => false
+	);
 
 	/**
 	 * We prevent including the script file automatically because we're using a
@@ -30,6 +53,8 @@ class TimePicker extends BaseFieldWidget
 
 	public function init()
 	{
+		$this->options = array_merge($this->defaultOptions, $this->options);
+
 		Yii::app()->clientScript->registerPackage('TimePicker');
 
 		if (!isset($this->htmlOptions['placeholder'])) {
