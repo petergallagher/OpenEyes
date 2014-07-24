@@ -30,17 +30,23 @@ $(function() {
 		return time;
 	}
 
-	function formatTime(time) {
-		var parts = time.split(':').map(function(part) {
-			return !/^\d\d$/.test(part) ? '00' : part;
-		});
+	function isValidTime(time) {
+
+		var parts = time.split(':');
+
+		if (!$.trim(time).length) {
+			return true;
+		}
+		if (!/^\d\d:\d\d$/.test(time)) {
+			return false;
+		}
 		if (parseInt(parts[0], 10) > 23) {
-			parts[0] = '00';
+			return false;
 		}
 		if (parseInt(parts[1], 10) > 59) {
-			parts[1] = '00';
+			return false;
 		}
-		return parts.join(':');
+		return true;
 	}
 
 	function makeTime(time) {
@@ -58,18 +64,31 @@ $(function() {
 				time = padTime(time);
 			}
 		}
-		return formatTime(time);
+
+		return time;
 	}
 
-	$('.time-picker-field').mask('Hh:Mm', {
-		translation: {
-			'H': { pattern: /[0-2]/ },
-			'h': { pattern: /\d/ },
-			'M': { pattern: /\d/ },
-			'm': { pattern: /\d/ }
-		}
-	}).on('blur', function() {
-		this.value = makeTime(this.value);
+	$('.time-picker-field').each(function() {
+
+		var field = $(this);
+		var errorMsg = field.siblings('.time-picker-error');
+
+		field.mask('Hh:Mm', {
+			translation: {
+				'H': { pattern: /[0-2]/ },
+				'h': { pattern: /\d/ },
+				'M': { pattern: /\d/ },
+				'm': { pattern: /\d/ }
+			}
+		}).on('blur', function() {
+			this.value = makeTime(this.value);
+			if (!isValidTime(this.value)) {
+				errorMsg.hide().fadeIn(400);
+				this.focus();
+			} else {
+				errorMsg.hide();
+			}
+		});
 	});
 
 	$(this).on('click', '.time-now', function(e) {
@@ -89,6 +108,6 @@ $(function() {
 
 		var element = $(this).closest('section').data('element-type-class');
 
-		$('#'+element+'_'+$(this).data('target')).val(h+':'+m);
+		$('#'+element+'_'+$(this).data('target')).val(h+':'+m).trigger('blur');
 	});
 });

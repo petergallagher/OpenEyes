@@ -5755,6 +5755,13 @@ input[type=text].time-picker-field {
   display: inline-block;
 }
 
+/* line 24, ../sass/openeyes/components/_time-picker.scss */
+.time-picker-error {
+  color: red;
+  font-size: .8rem;
+  padding-top: 5px;
+}
+
 /* Add print CSS for specific components to the relevant component files.*/
 /* line 19, ../sass/openeyes/components/_print.scss */
 .printable {
