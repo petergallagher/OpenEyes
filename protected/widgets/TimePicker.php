@@ -16,7 +16,30 @@
  * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
  * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
  */
-?>
-<?php if ($assetFolder && $includeScriptFile) {?>
-	<script type="text/javascript" src="<?php echo $assetFolder?>/<?php echo get_class($this)?>.js"></script>
-<?php }?>
+
+class TimePicker extends BaseFieldWidget
+{
+	public $name;
+	public $cssClass = 'time-picker-field';
+
+	/**
+	 * We prevent including the script file automatically because we're using a
+	 * package instead.
+	 */
+	public $includeScriptFile = false;
+
+	public function init()
+	{
+		Yii::app()->clientScript->registerPackage('TimePicker');
+
+		if (!isset($this->htmlOptions['placeholder'])) {
+			$this->htmlOptions['placeholder'] = '00:00';
+		}
+
+		$cssClass = isset($this->htmlOptions['class']) ? $this->htmlOptions['class'] : '';
+		$cssClass .= " {$this->cssClass}";
+		$this->htmlOptions['class'] = trim($cssClass);
+
+		return parent::init();
+	}
+}

@@ -17,6 +17,22 @@
  * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
  */
 ?>
-<?php if ($assetFolder && $includeScriptFile) {?>
-	<script type="text/javascript" src="<?php echo $assetFolder?>/<?php echo get_class($this)?>.js"></script>
+
+<?php if (@$htmlOptions['nowrapper']) {?>
+	<?php echo CHtml::textField($name, $value, $htmlOptions)?>
+	<button type="button" class="secondary small time-now" data-target="<?php echo $field;?>">Now</button>
+<?php } else {?>
+	<div id="div_<?php echo CHtml::modelName($element)?>_<?php echo $field?>" class="row field-row"<?php if (@$htmlOptions['hide']) {?> style="display: none;"<?php }?>>
+		<div class="large-<?php echo $layoutColumns['label'];?> column">
+			<?php
+			$labelText = empty($htmlOptions['label']) ? CHtml::encode($element->getAttributeLabel($field)) : $htmlOptions['label'];
+			$labelText .= ':';
+			echo Chtml::label($labelText, Chtml::getIdByName($name));
+			?>
+		</div>
+		<div class="large-<?php echo $layoutColumns['field'];?> column<?php if(empty($htmlOptions['append-text']) || empty($layoutColumns['append-text'])){?> end<?php }?>">
+			<?php echo CHtml::textField($name, $value, $htmlOptions)?>
+			<button type="button" class="secondary small time-now" data-target="<?php echo $field;?>">Now</button>
+		</div>
+	</div>
 <?php }?>

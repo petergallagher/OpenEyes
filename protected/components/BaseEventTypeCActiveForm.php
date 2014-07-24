@@ -101,6 +101,17 @@ class BaseEventTypeCActiveForm extends FormLayout
 		));
 	}
 
+	public function timePicker($element, $field, $htmlOptions, $layoutColumns)
+	{
+		$this->widget('application.widgets.TimePicker', array(
+			'element' => $element,
+			'name' => CHtml::modelName($element)."[$field]",
+			'field' => $field,
+			'htmlOptions' => $htmlOptions,
+			'layoutColumns' => $layoutColumns
+		));
+	}
+
 	public function textArea($element, $field, $options=array(), $hidden=false, $htmlOptions=array(), $layoutColumns=array())
 	{
 		$this->widget('application.widgets.TextArea', array_merge(array(
