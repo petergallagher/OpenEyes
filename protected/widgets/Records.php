@@ -27,6 +27,9 @@ class Records extends BaseFieldWidget
 	public $columns;
 	public $no_items_text = 'No items have been entered.';
 	public $add_button_text = 'Add item';
+	public $validate_method;
+	public $row_view;
+	public $use_last_button_text = 'Use last item';
 
 	public function run()
 	{

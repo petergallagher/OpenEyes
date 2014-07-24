@@ -17,86 +17,137 @@
  * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
  */
 ?>
-<div class="row field-row">
-	<div class="large-3 column">
-		<label><?php echo $element->getAttributeLabel($field)?>:</label>
-	</div>
-	<div class="large-9 column end">
-		<table>
-			<thead>
-				<tr>
-					<th>Date/time</th>
-					<th>Description</th>
-					<th>Actions</th>
-				</tr>
-			</thead>
-			<tbody>
-				<?php if (empty($element->$field)) {?>
+<div class="recordsWidget">
+	<div class="row field-row">
+		<div class="large-3 column">
+			<label><?php echo $element->getAttributeLabel($field)?>:</label>
+		</div>
+		<div class="large-9 column end">
+			<table class="recordsTable">
+				<thead>
 					<tr>
+						<th>Date/time</th>
+						<th>Description</th>
+						<?php if ($edit) {?>
+							<th>Actions</th>
+						<?php }?>
+					</tr>
+				</thead>
+				<tbody>
+					<tr<?php if (!empty($element->$field)) {?> style="display: none"<?php }?>>
 						<td colspan="3">
 							<?php echo $no_items_text?>
 						</td>
 					</tr>
-				<?php }else{?>
-					<?php foreach ($element->$field as $item) {?>
-						<tr>
-							<td><?php echo $item->NHSDate('timestamp')?></td>
-							<td><?php echo $item->description?></td>
-							<td>
-								<a class="editRecordItem">edit</a>
-								<a class="deleteRecordItem">delete</a>
-							</td>
-						</tr>
+					<?php foreach ($element->$field as $i => $item) {?>
+						<?php echo $this->renderFile($row_view,array('item' => $item,'i' => $i,'edit' => $edit))?>
 					<?php }?>
-				<?php }?>
-			</tbody>
-		</table>
-	</div>
-</div>
-<div class="addRecordItemDiv" style="display: none">
-	<div class="row field-row">
-		<div class="large-3 column">
-			<label></label>
+				</tbody>
+			</table>
 		</div>
-		<div class="large-9 column end">
+	</div>
+	<?php if ($edit) {?>
+		<div class="addRecordItemDiv" style="display: none">
+			<input type="hidden" class="recordEditItem" value="" />
 			<div class="row field-row">
-				<div class="large-2 column">
-					<label>Date/time:</label>
+				<div class="large-3 column">
+					<label></label>
 				</div>
-				<div class="large-7 column end">
-					<?php echo $form->datePicker($model,'timestamp',array(),array('nowrapper'=>true),array())?>
+				<div class="large-9 column end">
+					<div class="row field-row">
+						<div class="large-6 column end">
+							<div class="row field-row">
+								<div class="large-4 column recordDateLabel">
+									<label>Date/time:</label>
+								</div>
+								<div class="large-8 column end">
+									<?php
+									$this->widget('zii.widgets.jui.CJuiDatePicker',array(
+										'name' => 'timestamp',
+										'options' => array(
+											'showAnim' => 'fold',
+										),
+										'htmlOptions' => array(
+											'class' => 'recordTimestamp',
+										),
+									))?>
+									<?php echo CHtml::textField('time','',array('class' => 'recordTime'))?>
+									<?php echo EventAction::button('Now', 'now', array('level' => 'save'),array('class' => 'recordsTimeNow'))->toHtml()?>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="row field-row recordsUseLastItemRow"<?php if (empty($element->$field)) {?> style="display: none"<?php }?>>
+						<div class="large-12 column end">
+							<div class="recordsUseLastItemDiv">
+								<?php echo EventAction::button($use_last_button_text, 'use_last_item', array('level' => 'save'),array('class' => 'recordsUseLastItem'))->toHtml()?>
+							</div>
+						</div>
+					</div>
+					<?php foreach ($columns[0]['fields'] as $j => $field) {?>
+						<div class="row field-row">
+							<div class="large-<?php echo $columns[0]['width']?> column end">
+								<div class="row field-row">
+									<div class="large-4 column">
+										<label><?php echo $model->getAttributeLabel($field)?>:</label>
+									</div>
+									<div class="large-4 column">
+										<?php echo CHtml::textField($field,'',array('class' => 'recordInput'))?>
+									</div>
+									<div class="large-2 column end">
+										<span class="field-info"><?php echo $model->getAttributeSuffix($field)?></span>
+									</div>
+								</div>
+							</div>
+							<?php $i=0; while (isset($columns[$i+1])) {?>
+								<div class="large-<?php echo $columns[$i+1]['width']?> column end">
+									<div class="row field-row">
+										<div class="large-4 column">
+											<label><?php echo $model->getAttributeLabel($columns[$i+1]['fields'][$j])?>:</label>
+										</div>
+										<div class="large-4 column">
+											<?php echo CHtml::textField($columns[$i+1]['fields'][$j],'',array('class' => 'recordInput'))?>
+										</div>
+										<div class="large-2 column end">
+											<span class="field-info"><?php echo $model->getAttributeSuffix($columns[$i+1]['fields'][$j])?></span>
+										</div>
+									</div>
+								</div>
+								<?php $i++;?>
+							<?php }?>
+						</div>
+					<?php }?>
 				</div>
 			</div>
-			<?php foreach ($columns[0]['fields'] as $j => $field) {?>
-				<div class="row field-row">
-					<div class="large-<?php echo $columns[0]['width']?> column end">
-						<?php echo $form->textField($model,$field,array('append-text' => $model->getAttributeSuffix($field)),array(),array('label' => 4, 'field' => 4, 'append-text' => 2))?>
-					</div>
-					<?php $i=0; while (isset($columns[$i+1])) {?>
-						<div class="large-<?php echo $columns[$i+1]['width']?> column end">
-							<?php echo $form->textField($model,$columns[$i+1]['fields'][$j],array('append-text' => $model->getAttributeSuffix($columns[$i+1]['fields'][$j])),array(),array('label' => 4, 'field' => 4, 'append-text' => 2))?>
-						</div>
-						<?php $i++;?>
-					<?php }?>
+			<div class="row field-row recordItemErrorsDiv" style="display: none">
+				<div class="large-3 column">
+					<label></label>
 				</div>
-			<?php }?>
+				<div class="large-9 column end">
+					<div class="alert-box alert with-icon">
+						<p>Please fix the following input errors:</p>
+						<ul class="recordItemErrors">
+						</ul>
+					</div>
+				</div>
+			</div>
+			<div class="row field-row">
+				<div class="large-3 column">
+					<label></label>
+				</div>
+				<div class="large-9 column end">
+					<?php echo EventAction::button('Save', 'save', array('level' => 'save'),array('class' => 'saveRecordItem', 'data-validate-method' => $validate_method))->toHtml()?>
+					<?php echo EventAction::button('Cancel', 'cancel', array(),array('class' => 'small warning primary cancelRecordItem'))->toHtml()?>
+				</div>
+			</div>
 		</div>
-	</div>
-	<div class="row field-row">
-		<div class="large-3 column">
-			<label></label>
+		<div class="row field-row addItemButton">
+			<div class="large-3 column">
+				<label></label>
+			</div>
+			<div class="large-9 column end">
+				<?php echo EventAction::button($add_button_text, 'add', array('level' => 'save'),array('class' => 'addRecordItem'))->toHtml()?>
+			</div>
 		</div>
-		<div class="large-9 column end">
-			<?php echo EventAction::button('Save', 'save', array('level' => 'save'),array('class' => 'saveRecordItem'))->toHtml()?>
-			<?php echo EventAction::button('Cancel', 'cancel', array(),array('class' => 'small warning primary cancelRecordItem'))->toHtml()?>
-		</div>
-	</div>
-</div>
-<div class="row field-row addItemButton">
-	<div class="large-3 column">
-		<label></label>
-	</div>
-	<div class="large-9 column end">
-		<?php echo EventAction::button($add_button_text, 'add', array('level' => 'save'),array('class' => 'addRecordItem'))->toHtml()?>
-	</div>
+	<?php }?>
 </div>
