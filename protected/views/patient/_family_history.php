@@ -46,8 +46,11 @@
 				</button>
 			</div>
 			<div id="add_family_history" style="display: none;">
-
 				<?php
+				if(Yii::app()->user->hasFlash('patient.family_history')){
+					echo Yii::app()->user->getFlash('patient.family_history');
+				}
+
 				$form = $this->beginWidget('FormLayout', array(
 					'id'=>'add-family_history',
 					'enableAjaxValidation'=>false,
@@ -154,6 +157,8 @@
 		return false;
 	});
 	$('button.btn_save_family_history').click(function() {
+		var relText = $('#relative_id option:selected').text();
+		var sideText = $('#side_id option:selected').text();
 		if ($('#relative_id').val() == '') {
 			new OpenEyes.UI.Dialog.Alert({
 				content: "Please select a relative."
@@ -172,6 +177,13 @@
 			}).open();
 			return false;
 		}
+		if( (relText == 'Mother' && sideText == 'Paternal') || (relText == 'Father' && sideText == 'Maternal')){
+			new OpenEyes.UI.Dialog.Alert({
+				content: "Cannot select Maternal relation with Father or Paternal relation with Mother."
+			}).open();
+			return false;
+		}
+
 		$('img.add_family_history_loader').show();
 		return true;
 	});
@@ -248,4 +260,6 @@
 		$("#confirm_remove_family_history_dialog").dialog("close");
 		return false;
 	});
+
+
 </script>

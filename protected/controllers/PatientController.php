@@ -1027,13 +1027,21 @@ class PatientController extends BaseController
 			$fh->condition_id = $condition->id;
 			$fh->comments = @$_POST['comments'];
 
+			if(!$fh->validRelativeSideRelationship()){
+				Yii::app()->user->setFlash('patient.family_history', $fh->relative->name . ' and ' . $fh->side->name . " cannot be selected at the same time in Family History.");
+				$this->redirect(array('patient/view/'.$patient->id ));
+			}
+
 			if (!$fh->save()) {
 				throw new Exception("Unable to save family history: ".print_r($fh->getErrors(),true));
 			}
 		} else {
-			$patient->addFamilyHistory($relative->id,$side->id,$condition->id,@$_POST['comments']);
+			$result = $patient->addFamilyHistory($relative->id,$side->id,$condition->id,@$_POST['comments']);
+			if(!$result){
+				Yii::app()->user->setFlash('patient.family_history', 'Cannot select Maternal relation with Father or Paternal relation with Mother.');
+				$this->redirect(array('patient/view/'.$patient->id ));
+			}
 		}
-
 		$this->redirect(array('patient/view/'.$patient->id));
 	}
 

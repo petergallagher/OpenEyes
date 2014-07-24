@@ -103,4 +103,13 @@ class FamilyHistory extends BaseActiveRecordVersioned
 			'criteria'=>$criteria,
 		));
 	}
+
+	public function validRelativeSideRelationship(){
+		if(($this->relative->name == 'Mother' && $this->side->name == 'Paternal') ||
+			($this->relative->name == 'Father' && $this->side->name == 'Maternal')
+		){
+			return false;
+		}
+		return true;
+	}
 }

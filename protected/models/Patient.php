@@ -1176,9 +1176,14 @@ class Patient extends BaseActiveRecordVersioned
 
 		$fh->comments = $comments;
 
+		if(!$fh->validRelativeSideRelationship()){
+			return false;
+		}
+
 		if (!$fh->save()) {
 			throw new Exception("Unable to save family history: ".print_r($fh->getErrors(),true));
 		}
+		return true;
 	}
 
 	public function currentContactIDS()
