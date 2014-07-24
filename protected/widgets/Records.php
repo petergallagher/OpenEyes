@@ -30,6 +30,7 @@ class Records extends BaseFieldWidget
 	public $validate_method;
 	public $row_view;
 	public $use_last_button_text = 'Use last item';
+	public $headings = array('Date/time','Description');
 
 	public function run()
 	{

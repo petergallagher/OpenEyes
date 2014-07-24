@@ -26,8 +26,9 @@
 			<table class="recordsTable">
 				<thead>
 					<tr>
-						<th>Date/time</th>
-						<th>Description</th>
+						<?php foreach ($headings as $heading) {?>
+							<th><?php echo $heading?></th>
+						<?php }?>
 						<?php if ($edit) {?>
 							<th>Actions</th>
 						<?php }?>
@@ -55,7 +56,7 @@
 				</div>
 				<div class="large-9 column end">
 					<div class="row field-row">
-						<div class="large-6 column end">
+						<div class="large-9 column end">
 							<div class="row field-row">
 								<div class="large-4 column recordDateLabel">
 									<label>Date/time:</label>
@@ -78,25 +79,37 @@
 							</div>
 						</div>
 					</div>
-					<div class="row field-row recordsUseLastItemRow"<?php if (empty($element->$field)) {?> style="display: none"<?php }?>>
-						<div class="large-12 column end">
-							<div class="recordsUseLastItemDiv">
-								<?php echo EventAction::button($use_last_button_text, 'use_last_item', array('level' => 'save'),array('class' => 'recordsUseLastItem'))->toHtml()?>
+					<?php if ($use_last_button_text) {?>
+						<div class="row field-row recordsUseLastItemRow"<?php if (empty($element->$field)) {?> style="display: none"<?php }?>>
+							<div class="large-12 column end">
+								<div class="recordsUseLastItemDiv">
+									<?php echo EventAction::button($use_last_button_text, 'use_last_item', array('level' => 'save'),array('class' => 'recordsUseLastItem'))->toHtml()?>
+								</div>
 							</div>
 						</div>
-					</div>
+					<?php }?>
 					<?php foreach ($columns[0]['fields'] as $j => $field) {?>
 						<div class="row field-row">
 							<div class="large-<?php echo $columns[0]['width']?> column end">
 								<div class="row field-row">
 									<div class="large-4 column">
-										<label><?php echo $model->getAttributeLabel($field)?>:</label>
+										<label><?php echo $model->getAttributeLabel($field['field'])?>:</label>
 									</div>
 									<div class="large-4 column">
-										<?php echo CHtml::textField($field,'',array('class' => 'recordInput'))?>
+										<?php switch($field['type']) {
+											case 'text':
+												echo CHtml::textField($field['field'],'',array('class' => 'recordInput'));
+												break;
+											case 'textarea':
+												echo CHtml::textArea($field['field'],'',array('class' => 'recordInput'));
+												break;
+											case 'dropdown':
+												echo CHtml::dropDownList($field['field'],'',$field['options'],array('class' => 'recordInput'));
+												break;
+										}?>
 									</div>
 									<div class="large-2 column end">
-										<span class="field-info"><?php echo $model->getAttributeSuffix($field)?></span>
+										<span class="field-info"><?php echo $model->getAttributeSuffix($field['field'])?></span>
 									</div>
 								</div>
 							</div>
@@ -104,13 +117,23 @@
 								<div class="large-<?php echo $columns[$i+1]['width']?> column end">
 									<div class="row field-row">
 										<div class="large-4 column">
-											<label><?php echo $model->getAttributeLabel($columns[$i+1]['fields'][$j])?>:</label>
+											<label><?php echo $model->getAttributeLabel($columns[$i+1]['fields'][$j]['field'])?>:</label>
 										</div>
 										<div class="large-4 column">
-											<?php echo CHtml::textField($columns[$i+1]['fields'][$j],'',array('class' => 'recordInput'))?>
+											<?php switch($field['type']) {
+												case 'text':
+													echo CHtml::textField($columns[$i+1]['fields'][$j]['field'],'',array('class' => 'recordInput'));
+													break;
+												case 'textarea':
+													echo CHtml::textArea($columns[$i+1]['fields'][$j]['field'],'',array('class' => 'recordInput'));
+													break;
+												case 'dropdown':
+													echo CHtml::dropDownList($columns[$i+1]['fields'][$j]['field'],'',$columns[$i+1]['fields'][$j]['options'],array('class' => 'recordInput'));
+													break;
+											}?>
 										</div>
 										<div class="large-2 column end">
-											<span class="field-info"><?php echo $model->getAttributeSuffix($columns[$i+1]['fields'][$j])?></span>
+											<span class="field-info"><?php echo $model->getAttributeSuffix($columns[$i+1]['fields'][$j]['field'])?></span>
 										</div>
 									</div>
 								</div>
