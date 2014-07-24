@@ -73,12 +73,12 @@ $(function() {
 		var field = $(this);
 		var errorMsg = field.siblings('.time-picker-error');
 
-		field.mask('Hh:Mm', {
+		field.mask('Hh:ms', {
 			translation: {
 				'H': { pattern: /[0-2]/ },
 				'h': { pattern: /\d/ },
-				'M': { pattern: /\d/ },
-				'm': { pattern: /\d/ }
+				'm': { pattern: /[0-5]/ },
+				's': { pattern: /\d/ }
 			}
 		}).on('blur', function() {
 			this.value = makeTime(this.value);
