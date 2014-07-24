@@ -66,6 +66,7 @@
 										'name' => 'timestamp',
 										'options' => array(
 											'showAnim' => 'fold',
+											'dateFormat' => Helper::NHS_DATE_FORMAT_JS,
 										),
 										'htmlOptions' => array(
 											'class' => 'recordTimestamp',
