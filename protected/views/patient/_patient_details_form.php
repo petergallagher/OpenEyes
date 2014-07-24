@@ -68,7 +68,7 @@
 			<?php echo $this->renderPartial('_patient_metadata_edit',array('patient'=>$patient,'before'=>'last_name'))?>
 			<div class="row data-row">
 				<div class="large-4 column">
-					<div class="data-label">Last name:</div>
+					<div class="data-label"><?php echo Contact::model()->getAttributeLabel('last_name')?>:</div>
 				</div>
 				<div class="large-8 column">
 					<div class="data-value">

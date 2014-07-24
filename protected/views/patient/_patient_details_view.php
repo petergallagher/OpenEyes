@@ -42,7 +42,7 @@
 			<?php if (!Yii::app()->params['patient_summary_hide_blank_fields'] || $patient->first_name) {?>
 				<div class="row data-row">
 					<div class="large-4 column">
-						<div class="data-label"><?php echo $patient->getAttributeLabel('first_name')?>:</div>
+						<div class="data-label"><?php echo $patient->contact->getAttributeLabel('first_name')?>:</div>
 					</div>
 					<div class="large-8 column">
 						<div class="data-value"><?php echo $patient->first_name?></div>
@@ -54,7 +54,7 @@
 			<?php if (!Yii::app()->params['patient_summary_hide_blank_fields'] || $patient->last_name) {?>
 				<div class="row data-row">
 					<div class="large-4 column">
-						<div class="data-label"><?php echo $patient->getAttributeLabel('last_name')?>:</div>
+						<div class="data-label"><?php echo $patient->contact->getAttributeLabel('last_name')?>:</div>
 					</div>
 					<div class="large-8 column">
 						<div class="data-value"><?php echo $patient->last_name?></div>
