@@ -25,6 +25,7 @@ class BaseCWidget extends CWidget
 	public $value;
 	public $assetFolder;
 	public $hidden = false;
+	public $includeScriptFile = true;
 	public $htmlOptions = array();
 
 	public function init()
