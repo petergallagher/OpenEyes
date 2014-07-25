@@ -22,9 +22,14 @@ class OESession extends CDbHttpSession
 	public function writeSession($id,$data)
 	{
 		if($id==''){
-			//silently log missing id exception
+			//silently log exception, headers and data
 			$exp = new Exception('Blank Session ID');
+			$log = "\n[headers] ".print_r(getallheaders(), true);
+			$log .= "\n[cookie] ".print_r($_COOKIE ,true);
+			$log .= "\n[data] ".$data;
 			OELog::logException($exp);
+			OELog::log($log);
+
 			//prevent the saving of blank ids into the user session table
 			return false;
 		}
@@ -32,5 +37,4 @@ class OESession extends CDbHttpSession
 			parent::writeSession($id,$data);
 		}
 	}
-
 }
