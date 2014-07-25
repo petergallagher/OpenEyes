@@ -171,6 +171,8 @@ class SiteController extends BaseController
 			// validate user input and redirect to the previous page if valid
 			if ($model->validate() && $model->login()) {
 
+				OELog::log($model->username.' '.print_r($_COOKIE,true));
+
 				// Flag site for confirmation
 				Yii::app()->session['confirm_site_and_firm'] = true;
 
