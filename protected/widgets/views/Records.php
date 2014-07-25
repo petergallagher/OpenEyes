@@ -73,7 +73,11 @@
 											'class' => 'recordTimestamp',
 										),
 									))?>
-									<?php echo CHtml::textField('time','',array('class' => 'recordTime'))?>
+									<?php
+									$this->widget('application.widgets.TimePicker', array(
+										'name' => 'time',
+										'htmlOptions' => array('nowrapper' => true, 'class' => 'recordTime'),
+									))?>
 									<?php echo EventAction::button('Now', 'now', array('level' => 'save'),array('class' => 'recordsTimeNow'))->toHtml()?>
 								</div>
 							</div>

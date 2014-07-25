@@ -163,7 +163,7 @@ $(document).ready(function() {
 			m = '0'+m;
 		}
 
-		$(this).prev('.recordTime').val(h+':'+m);
+		$(this).closest('div').find('.recordTime').val(h+':'+m);
 	});
 
 	$('.recordsUseLastItemRow').unbind('click').click(function(e) {
