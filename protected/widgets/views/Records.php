@@ -99,7 +99,7 @@
 									<div class="large-4 column">
 										<label><?php echo $model->getAttributeLabel($field['field'])?>:</label>
 									</div>
-									<div class="large-4 column">
+									<div class="large-4 column end">
 										<?php switch($field['type']) {
 											case 'text':
 												echo CHtml::textField($field['field'],'',array('class' => 'recordInput'));
@@ -112,9 +112,11 @@
 												break;
 										}?>
 									</div>
-									<div class="large-2 column end">
-										<span class="field-info"><?php echo $model->getAttributeSuffix($field['field'])?></span>
-									</div>
+									<?php if ($model->getAttributeSuffix($field['field'])) {?>
+										<div class="large-2 column end">
+											<span class="field-info"><?php echo $model->getAttributeSuffix($field['field'])?></span>
+										</div>
+									<?php }?>
 								</div>
 							</div>
 							<?php $i=0; while (isset($columns[$i+1])) {?>
@@ -123,7 +125,7 @@
 										<div class="large-4 column">
 											<label><?php echo $model->getAttributeLabel($columns[$i+1]['fields'][$j]['field'])?>:</label>
 										</div>
-										<div class="large-4 column">
+										<div class="large-4 column end">
 											<?php switch($field['type']) {
 												case 'text':
 													echo CHtml::textField($columns[$i+1]['fields'][$j]['field'],'',array('class' => 'recordInput'));
@@ -136,9 +138,11 @@
 													break;
 											}?>
 										</div>
-										<div class="large-2 column end">
-											<span class="field-info"><?php echo $model->getAttributeSuffix($columns[$i+1]['fields'][$j]['field'])?></span>
-										</div>
+										<?php if ($model->getAttributeSuffix($columns[$i+1]['fields'][$j]['field'])) {?>
+											<div class="large-2 column end">
+												<span class="field-info"><?php echo $model->getAttributeSuffix($columns[$i+1]['fields'][$j]['field'])?></span>
+											</div>
+										<?php }?>
 									</div>
 								</div>
 								<?php $i++;?>
