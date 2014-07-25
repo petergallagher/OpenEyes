@@ -117,12 +117,19 @@ $(document).ready(function() {
 
 		var tbody = $(this).closest('tbody');
 		var form_div = $(this).closest('.recordsWidget').find('.addRecordItemDiv');
+		var i = $(this).closest('tr').data('i');
 
 		$(this).closest('tr').remove();
 
 		if (tbody.children('tr').length == 1) {
 			tbody.children('tr:first').show();
 			form_div.find('.recordsUseLastItemRow').hide();
+		}
+
+		if (form_div.is(':visible') && i == form_div.children('.recordEditItem').val() && form_div.children('.recordEditItem').val() != '') {
+			form_div.slideUp('fast',function() {
+				$('.addItemButton').slideDown('fast');
+			});
 		}
 	});
 
