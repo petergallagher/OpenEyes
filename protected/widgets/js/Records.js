@@ -32,7 +32,29 @@ $(document).ready(function() {
 
 		addRecordItemDiv.find('.recordTime').val(h+':'+m);
 		addRecordItemDiv.find('.recordTimestamp').val(d.getDate()+' '+month+' '+d.getFullYear());
-		addRecordItemDiv.find('.recordInput').val('');
+		addRecordItemDiv.find('input.recordInput').val('');
+		addRecordItemDiv.find('select.recordInput').val('');
+		addRecordItemDiv.find('.multi-select-selections').children('li').children('.MultiSelectRemove').click();
+
+		addRecordItemDiv.find('select.recordInput[data-cycle-on-add="1"]').map(function() {
+			var name = $(this).attr('name');
+			var values = [];
+			$(this).closest('.recordsWidget').find('.recordsTable').children('tbody').children('tr').map(function() {
+				values.push($(this).attr('data-' + name));
+			});
+
+			var all_values = [];
+			$(this).children('option').map(function() {
+				all_values.push($(this).val());
+			});
+
+			for (var i in all_values) {
+				if ($.inArray(all_values[i],values) == -1) {
+					$(this).val(all_values[i]);
+					break;
+				}
+			}
+		});
 
 		addRecordItemDiv.children('.recordEditItem').val('');
 
@@ -99,6 +121,10 @@ $(document).ready(function() {
 						table.children('tbody').children('tr[data-i="'+form_div.children('.recordEditItem').val()+'"]').replaceWith(errors['row']);
 					}
 
+					form_div.find('.multi-select-selections').children('li').children('.MultiSelectRemove').map(function() {
+						$(this).click();
+					});
+
 					$('.addRecordItemDiv').slideUp('fast',function() {
 						$('.addItemButton').slideDown('fast');
 					});
@@ -118,6 +144,7 @@ $(document).ready(function() {
 		var tbody = $(this).closest('tbody');
 		var form_div = $(this).closest('.recordsWidget').find('.addRecordItemDiv');
 		var i = $(this).closest('tr').data('i');
+		var button = form_div.find('.addItemButton');
 
 		$(this).closest('tr').remove();
 
@@ -128,7 +155,7 @@ $(document).ready(function() {
 
 		if (form_div.is(':visible') && i == form_div.children('.recordEditItem').val() && form_div.children('.recordEditItem').val() != '') {
 			form_div.slideUp('fast',function() {
-				$('.addItemButton').slideDown('fast');
+				button.slideDown('fast');
 			});
 		}
 	});
@@ -138,14 +165,16 @@ $(document).ready(function() {
 
 		var data = $(this).closest('tr').data();
 		var addRecordItemDiv = $(this).closest('.recordsWidget').find('.addRecordItemDiv');
+		var button = addRecordItemDiv.find('.additemButton');
+		addRecordItemDiv.find('.multi-select-selections').children('li').children('.MultiSelectRemove').click();
 
 		RecordsWidget_PopulateAddFormFromData(data, addRecordItemDiv);
 
 		addRecordItemDiv.children('.recordEditItem').val(data['i']);
 
-		$('.addRecordItemDiv').slideDown('fast',function() {
-			$(this).closest('.addRecordItemDiv').find('input.recordInput:first').focus();
-			$('.addItemButton').slideUp('fast');
+		addRecordItemDiv.slideDown('fast',function() {
+			addRecordItemDiv.find('input.recordInput:first').focus();
+			button.slideUp('fast');
 		});
 	});
 
@@ -186,4 +215,22 @@ function RecordsWidget_PopulateAddFormFromData(data, addRecordItemDiv)
 
 	addRecordItemDiv.find('.recordTimestamp').val(data['timestamp']);
 	addRecordItemDiv.find('.recordTime').val(data['time']);
+
+	if (typeof(data['multiselectFields']) != 'undefined') {
+		var multiselect_fields = data['multiselectFields'].split(',');
+
+		for (var i in multiselect_fields) {
+			var values = data[multiselect_fields[i]].toString().split(',');
+
+			for (var j in values) {
+				if (typeof(data['multiselectExtrafields_' + multiselect_fields[i]]) != 'undefined') {
+					var extra_values = data[data['multiselectExtrafields_' + multiselect_fields[i]]].toString().split(',');
+
+					MultiSelect_SelectItem($('#'+multiselect_fields[i]),$('#'+multiselect_fields[i]).children('option[value="' + values[j] + '"]'),[extra_values[j]]);
+				} else {
+					MultiSelect_SelectItem($('#'+multiselect_fields[i]),$('#'+multiselect_fields[i]).children('option[value="' + values[j] + '"]'));
+				}
+			}
+		}
+	}
 }
