@@ -57,15 +57,17 @@ $widgetOptionsJson = json_encode(array(
 	<div id="<?php echo $div_id ?>" class="<?php echo $div_class ?> row field-row widget"<?php if ($hidden) {?> style="display: none;"<?php }?>>
 		<div class="large-<?php echo $layoutColumns['label'];?> column">
 			<label for="<?php echo $field?>">
-				<?php echo @$htmlOptions['label']?>:
+				<?php if (@$htmlOptions['label']) {?>
+					<?php echo @$htmlOptions['label']?>:
+				<?php }?>
 			</label>
 		</div>
 		<div class="large-<?php echo $layoutColumns['field'];?> column end">
 	<?php }?>
 		<div class="multi-select<?php if (!$inline) echo ' multi-select-list';?>" data-options='<?php echo $widgetOptionsJson;?>' data-show-none-placeholder="<?php echo $showNonePlaceholder ? 'yes' : 'no'?>">
-			<input type="hidden" name="<?php echo CHtml::modelName($element)?>[<?php echo $field?>]" class="multi-select-list-name" />
+			<input type="hidden" name="<?php echo $element ? CHtml::modelName($element).'['.$field.']' : $field?>" class="multi-select-list-name" />
 			<div class="multi-select-dropdown-container">
-				<select id="<?php echo CHtml::getIdByName($field)?>" class="MultiSelectList<?php if ($showRemoveAllLink) {?> inline<?php }?><?php if (isset($htmlOptions['class'])) {?> <?php echo $htmlOptions['class']?><?php }?>" name=""<?php if (isset($htmlOptions['data-linked-fields'])) {?> data-linked-fields="<?php echo $htmlOptions['data-linked-fields']?>"<?php }?><?php if (isset($htmlOptions['data-linked-values'])) {?> data-linked-values="<?php echo $htmlOptions['data-linked-values']?>"<?php }?>>
+				<select id="<?php echo CHtml::getIdByName($field)?>" class="MultiSelectList<?php if ($showRemoveAllLink) {?> inline<?php }?><?php if (isset($htmlOptions['class'])) {?> <?php echo $htmlOptions['class']?><?php }?>" name=""<?php if (isset($htmlOptions['data-linked-fields'])) {?> data-linked-fields="<?php echo $htmlOptions['data-linked-fields']?>"<?php }?><?php if (isset($htmlOptions['data-linked-values'])) {?> data-linked-values="<?php echo $htmlOptions['data-linked-values']?>"<?php }?><?php if (!empty($extra_fields)) {?> data-extra-fields="<?php echo implode(',',$extra_fields)?>"<?php }?><?php if ($input_class) {?> data-input-class="<?php echo $input_class?>"<?php }?>>
 					<option value=""><?php echo $htmlOptions['empty']?></option>
 					<?php foreach ($filtered_options as $value => $option) {
 						$attributes = array('value' => $value);
@@ -93,9 +95,14 @@ $widgetOptionsJson = json_encode(array(
 						<li>
 							<span class="text">
 								<?php echo CHtml::encode($options[$id])?>
+								<?php if ($extra_fields) {?>
+									<?php foreach ($extra_fields as $field) {?>
+										<?php echo CHtml::textField($field.'[]','',$input_class ? array('class' => $input_class) : array())?>
+									<?php }?>
+								<?php }?>
 							</span>
 							<a href="#" data-name="<?php echo CHtml::modelName($element)?>[<?php echo $field?>][]" data-text="<?php echo $options[$id] ?>" class="MultiSelectRemove remove-one<?php if (isset($htmlOptions['class'])) {?> <?php echo $htmlOptions['class']?><?php }?>"<?php if (isset($htmlOptions['data-linked-fields'])) {?> data-linked-fields="<?php echo $htmlOptions['data-linked-fields']?>"<?php }?><?php if (isset($htmlOptions['data-linked-values'])) {?> data-linked-values="<?php echo $htmlOptions['data-linked-values']?>"<?php }?>>Remove</a>
-							<input type="hidden" name="<?php echo CHtml::modelName($element)?>[<?php echo $field?>][]" value="<?php echo $id?>"
+							<input<?php if ($input_class) {?> class="<?php echo $input_class?>"<?php }?> type="hidden" name="<?php echo $element ? CHtml::modelName($element).'['.$field.'][]' : $field.'[]'?>" value="<?php echo $id?>"
 							<?php if (isset($opts[$id])) {
 								foreach ($opts[$id] as $key => $val) {
 									echo " " . $key . "=\"" . $val . "\"";

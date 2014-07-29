@@ -23,13 +23,9 @@ class InstitutionTest extends CDbTestCase
 		Institution::model()->getCurrent();
 	}
 
-	/**
-	 * @expectedException Exception
-	 * @expectedExceptionMessage Institution with code 'bar' not found
-	 */
 	public function testGetCurrent_NotFound()
 	{
 		Yii::app()->params['institution_code'] = 'bar';
-		Institution::model()->getCurrent();
+		$this->assertEquals($this->institutions('moorfields'), Institution::model()->getCurrent());
 	}
 }

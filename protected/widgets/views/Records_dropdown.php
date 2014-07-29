@@ -16,7 +16,9 @@
  * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
  * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
  */
-?>
-<?php if ($assetFolder && $includeScriptFile) {?>
-	<script type="text/javascript" src="<?php echo $assetFolder?>/<?php echo get_class($this)?>.js"></script>
-<?php }?>
+
+$htmlOptions = array('class' => 'recordInput');
+if (@$column_field['cycle_on_add']) {
+	$htmlOptions['data-cycle-on-add'] = true;
+}
+echo CHtml::dropDownList($column_field['field'],'',$column_field['options'],$htmlOptions);

@@ -16,7 +16,24 @@
  * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
  * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
  */
-?>
-<?php if ($assetFolder && $includeScriptFile) {?>
-	<script type="text/javascript" src="<?php echo $assetFolder?>/<?php echo get_class($this)?>.js"></script>
-<?php }?>
+
+class Records extends BaseFieldWidget
+{
+	public $form;
+	public $element;
+	public $edit = true;
+	public $model;
+	public $field;
+	public $columns;
+	public $no_items_text = 'No items have been entered.';
+	public $add_button_text = 'Add item';
+	public $validate_method;
+	public $row_view;
+	public $use_last_button_text = 'Use last item';
+	public $headings = array('Date/time','Description');
+
+	public function run()
+	{
+		$this->render(get_class($this));
+	}
+}

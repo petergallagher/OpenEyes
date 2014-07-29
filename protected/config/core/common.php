@@ -88,6 +88,11 @@ return array(
 					'basePath' => 'application.assets.components',
 					'depends'=>array('jquery'),
 				),
+				'jquery.mask' => array(
+					'js' => array('jQuery-Mask-Plugin/jquery.mask.min.js'),
+					'basePath' => 'application.assets.components',
+					'depends' => array('jquery')
+				),
 				'mustache' => array(
 					'js' => array('mustache/mustache.js'),
 					'basePath' => 'application.assets.components'
@@ -105,6 +110,11 @@ return array(
 					),
 					'basePath' => 'application.assets',
 					'depends' => array('jquery'),
+				),
+				'TimePicker' => array(
+					'js' => array('js/TimePicker.js'),
+					'basePath' => 'application.widgets',
+					'depends' => array('jquery.mask')
 				)
 			),
 		),
