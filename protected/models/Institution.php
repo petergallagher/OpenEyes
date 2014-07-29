@@ -136,7 +136,7 @@ class Institution extends BaseActiveRecordVersioned
 
 		$institution = $this->find('source_id=? and remote_id=?', array(1, Yii::app()->params['institution_code']));
 		if (!$institution) {
-			return Institution::model()->find();
+			return Institution::model()->find(array('order' => 'id asc'));
 		}
 
 		return $institution;
