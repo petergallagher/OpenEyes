@@ -48,7 +48,7 @@ Feature: Create New Examination Regression Tests
     And I enter left cylinder details of of Cylinder "-1" integer "7" fraction "0.75"
 
     Then I enter left Axis degrees of "145"
-    Then I enter left Axis degrees of "145"
+#    Then I enter left Axis degrees of "145"
 
     And I enter a left type of "5"
 
@@ -56,10 +56,22 @@ Feature: Create New Examination Regression Tests
     And I enter right cylinder details of of Cylinder "1" integer "5" fraction "0"
 
     Then I enter right Axis degrees of "38"
-    Then I enter right Axis degrees of "38"
+#    Then I enter right Axis degrees of "38"
     And I enter a right type of "3"
 
     Then I choose to expand the Visual Function section
+
+    Then I select a Left RAPD
+    And I add Left RAPD comments of "Left RAPD Automation test comments"
+
+    Then I select a Right RAPD
+    And I add Right RAPD comments of "Left RAPD Automation test comments"
+
+    Then I choose to expand the Colour Vision section
+    And I choose a Left Colour Vision of "1"
+    And I choose A Left Colour Vision Value of "8"
+    And I choose a Right Colour Vision of "2"
+    And I choose A Right Colour Vision Value of "4"
 
     Then I choose to expand the Visual Acuity section
     And I select a Visual Acuity of "2"
@@ -105,6 +117,18 @@ Feature: Create New Examination Regression Tests
     Then I Add a Comorbiditiy of "4"
 
     Then I choose to expand the Visual Function section
+
+    Then I select a Left RAPD
+    And I add Left RAPD comments of "Left RAPD Automation test comments"
+
+    Then I select a Right RAPD
+    And I add Right RAPD comments of "Left RAPD Automation test comments"
+
+    Then I choose to expand the Colour Vision section
+    And I choose a Left Colour Vision of "1"
+    And I choose A Left Colour Vision Value of "8"
+    And I choose a Right Colour Vision of "2"
+    And I choose A Right Colour Vision Value of "4"
 
     Then I choose to expand the Visual Acuity section
     And I select a Visual Acuity of "1"
@@ -161,6 +185,18 @@ Feature: Create New Examination Regression Tests
 
     Then I choose to expand the Visual Function section
 
+    Then I select a Left RAPD
+    And I add Left RAPD comments of "Left RAPD Automation test comments"
+
+    Then I select a Right RAPD
+    And I add Right RAPD comments of "Left RAPD Automation test comments"
+
+    Then I choose to expand the Colour Vision section
+    And I choose a Left Colour Vision of "1"
+    And I choose A Left Colour Vision Value of "8"
+    And I choose a Right Colour Vision of "2"
+    And I choose A Right Colour Vision Value of "4"
+
     Then I choose to expand the Visual Acuity section
     And I select a Visual Acuity of "1"
     Then I choose a left Visual Acuity ETDRS Letters Snellen Metre "119" and a reading method of "2"
@@ -215,6 +251,18 @@ Feature: Create New Examination Regression Tests
     Then I Add a Comorbiditiy of "8"
 
     Then I choose to expand the Visual Function section
+
+    Then I select a Left RAPD
+    And I add Left RAPD comments of "Left RAPD Automation test comments"
+
+    Then I select a Right RAPD
+    And I add Right RAPD comments of "Left RAPD Automation test comments"
+
+    Then I choose to expand the Colour Vision section
+    And I choose a Left Colour Vision of "1"
+    And I choose A Left Colour Vision Value of "8"
+    And I choose a Right Colour Vision of "2"
+    And I choose A Right Colour Vision Value of "4"
 
     Then I choose to expand the Visual Acuity section
     And I select a Visual Acuity of "1"
@@ -345,6 +393,18 @@ Feature: Create New Examination Regression Tests
 
     Then I choose to expand the Visual Function section
 
+    Then I select a Left RAPD
+    And I add Left RAPD comments of "Left RAPD Automation test comments"
+
+    Then I select a Right RAPD
+    And I add Right RAPD comments of "Left RAPD Automation test comments"
+
+    Then I choose to expand the Colour Vision section
+    And I choose a Left Colour Vision of "1"
+    And I choose A Left Colour Vision Value of "8"
+    And I choose a Right Colour Vision of "2"
+    And I choose A Right Colour Vision Value of "4"
+
     Then I choose to expand the Visual Acuity section
     And I select a Visual Acuity of "1"
     Then I choose a left Visual Acuity ETDRS Letters Snellen Metre "119" and a reading method of "2"
@@ -473,6 +533,18 @@ Feature: Create New Examination Regression Tests
     Then I Add a Comorbiditiy of "8"
 
     Then I choose to expand the Visual Function section
+
+    Then I select a Left RAPD
+    And I add Left RAPD comments of "Left RAPD Automation test comments"
+
+    Then I select a Right RAPD
+    And I add Right RAPD comments of "Left RAPD Automation test comments"
+
+    Then I choose to expand the Colour Vision section
+    And I choose a Left Colour Vision of "1"
+    And I choose A Left Colour Vision Value of "8"
+    And I choose a Right Colour Vision of "2"
+    And I choose A Right Colour Vision Value of "4"
 
     Then I choose to expand the Visual Acuity section
     And I select a Visual Acuity of "1"
@@ -879,6 +951,18 @@ Feature: Create New Examination Regression Tests
 
     Then I choose to expand the Visual Function section
 
+    Then I select a Left RAPD
+    And I add Left RAPD comments of "Left RAPD Automation test comments"
+
+    Then I select a Right RAPD
+    And I add Right RAPD comments of "Left RAPD Automation test comments"
+
+    Then I choose to expand the Colour Vision section
+    And I choose a Left Colour Vision of "1"
+    And I choose A Left Colour Vision Value of "8"
+    And I choose a Right Colour Vision of "2"
+    And I choose A Right Colour Vision Value of "4"
+
     Then I choose to expand the Visual Acuity section
 
     And I select Left Unable to assess checkbox
@@ -910,6 +994,18 @@ Feature: Create New Examination Regression Tests
     Then I Add a Comorbiditiy of "8"
 
     Then I choose to expand the Visual Function section
+
+    Then I select a Left RAPD
+    And I add Left RAPD comments of "Left RAPD Automation test comments"
+
+    Then I select a Right RAPD
+    And I add Right RAPD comments of "Left RAPD Automation test comments"
+
+    Then I choose to expand the Colour Vision section
+    And I choose a Left Colour Vision of "1"
+    And I choose A Left Colour Vision Value of "8"
+    And I choose a Right Colour Vision of "2"
+    And I choose A Right Colour Vision Value of "4"
 
     Then I choose to expand the Visual Acuity section
     And I select a Visual Acuity of "2"
@@ -994,6 +1090,8 @@ Feature: Create New Examination Regression Tests
     Then I choose a Right Previous Ozurdex Yes
     Then I choose a Right Previous Ozurdex No
 
+    And I choose a Right Risks of "1"
+    Then I choose Right Injection Management Comments of "Automation Test Comments"
 
     And I select a Left Diagnosis of Macular retinal oedema
     Then I select Left Secondary of Diabetic macular oedema
@@ -1010,6 +1108,9 @@ Feature: Create New Examination Regression Tests
     Then I choose a Left Previous Anti VEGF of Yes
     Then I choose a Left Previous Anti VEGF of No
 
+    And I choose a Left Risks of "1"
+    Then I choose Left Injection Management Comments of "Automation Test Comments"
+
     Then I choose to expand the Overall Management section
     And I choose a Clinical Interval of "1"
     And I choose a Photo of "1"
@@ -1018,25 +1119,25 @@ Feature: Create New Examination Regression Tests
     And I choose Overall Management Section Comments of "Automation Test Comments"
     And I choose a Gonio of "2"
     And I choose a Right Target IOP of "15"
-#    And I choose a Right Gonio of "2"
+  #    And I choose a Right Gonio of "2"
     And I choose a Left Target IOP of "15"
-#    And I choose a Left Gonio of "3"
+  #    And I choose a Left Gonio of "3"
 
     Then I choose to expand the Current Management section
 
-#    And I choose a Referral of Other Service
-#    And I choose a Referral of Refraction
-#    And I choose a Referral of LVA
-#    And I choose a Referral of Orthopics
-#    And I choose a Referral of CL clinic
-#
-#    Then I choose Investigations of VF
-#    Then I choose Investigations of US
-#    Then I choose Investigations of Biometry
-#    Then I choose Investigations of OCT
-#    Then I choose Investigations of HRT
-#    Then I choose Investigations of Disc Photos
-#    Then I choose Investigations of EDT
+  #    And I choose a Referral of Other Service
+  #    And I choose a Referral of Refraction
+  #    And I choose a Referral of LVA
+  #    And I choose a Referral of Orthopics
+  #    And I choose a Referral of CL clinic
+  #
+  #    Then I choose Investigations of VF
+  #    Then I choose Investigations of US
+  #    Then I choose Investigations of Biometry
+  #    Then I choose Investigations of OCT
+  #    Then I choose Investigations of HRT
+  #    Then I choose Investigations of Disc Photos
+  #    Then I choose Investigations of EDT
 
     And I select a Left Glaucoma Status of "1"
     And I select a Left Drop related problem of "2"

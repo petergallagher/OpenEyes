@@ -31,7 +31,7 @@ class MedicationController extends BaseController
 		if($medication_id == 'adherence')
 		{
 			$this->renderPartial(
-				'adherence',
+				'adherence_form',
 				array(
 					"patient" => $this->fetchModel('Patient', $patient_id),
 				),
@@ -57,8 +57,8 @@ class MedicationController extends BaseController
 
 		if (isset($_GET['term']) && $term = $_GET['term']) {
 			$criteria = new CDbCriteria();
-			$criteria->compare('name', $term, true, 'OR');
-			$criteria->compare('aliases', $term, true, 'OR');
+			$criteria->compare('LOWER(name)', strtolower($term), true, 'OR');
+			$criteria->compare('LOWER(aliases)', strtolower($term), true, 'OR');
 
 			foreach (Drug::model()->active()->findAll($criteria) as $drug) {
 				$return[] = array(

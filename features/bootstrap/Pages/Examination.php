@@ -154,10 +154,10 @@ class Examination extends OpenEyesPage
         'OverallOCT' => array('xpath' => "//*[@id='OEModule_OphCiExamination_models_Element_OphCiExamination_OverallManagementPlan_oct_id']"),
         'OverallVisualFields' => array('xpath' => "//*[@id='OEModule_OphCiExamination_models_Element_OphCiExamination_OverallManagementPlan_hfa_id']"),
         'OverallComments' => array('xpath' => "//*[@id='OEModule_OphCiExamination_models_Element_OphCiExamination_OverallManagementPlan_comments']"),
-        'OverallLeftTargetIOP'=> array('xpath' => "//*[@id='OEModule_OphCiExamination_models_Element_OphCiExamination_OverallManagementPlan_right_target_iop']"),
+        'OverallLeftTargetIOP'=> array('xpath' => "//*[@id='OEModule_OphCiExamination_models_Element_OphCiExamination_OverallManagementPlan_right_target_iop_id']"),
         'gonioDropdown' => array('xpath' => "//*[@id='OEModule_OphCiExamination_models_Element_OphCiExamination_OverallManagementPlan_gonio_id']"),
         'OverallLeftGonio' => array('xpath' => "//*[@id='OEModule_OphCiExamination_models_Element_OphCiExamination_OverallManagementPlan_right_gonio_id']"),
-        'OverallRightTargetIOP'=> array('xpath' => "//*[@id='OEModule_OphCiExamination_models_Element_OphCiExamination_OverallManagementPlan_left_target_iop']"),
+        'OverallRightTargetIOP'=> array('xpath' => "//*[@id='OEModule_OphCiExamination_models_Element_OphCiExamination_OverallManagementPlan_left_target_iop_id']"),
         'OverallRightGonio' => array('xpath' => "//*[@id='OEModule_OphCiExamination_models_Element_OphCiExamination_OverallManagementPlan_left_gonio_id']"),
 
 
@@ -277,6 +277,23 @@ class Examination extends OpenEyesPage
         'rightUnableToAssess' => array('xpath' => "//*[@id='OEModule_OphCiExamination_models_Element_OphCiExamination_VisualAcuity_right_unable_to_assess']"),
         'leftEyeMissing' => array('xpath' => "//*[@id='OEModule_OphCiExamination_models_Element_OphCiExamination_VisualAcuity_left_eye_missing']"),
         'rightEyeMissing' => array('xpath' => "//*[@id='OEModule_OphCiExamination_models_Element_OphCiExamination_VisualAcuity_right_eye_missing']"),
+        'rightRisks' => array('xpath' => "//*[@id='OEModule_OphCiExamination_models_Element_OphCiExamination_InjectionManagementComplex_right_risks']"),
+        'leftRisks' => array('xpath' => "//*[@id='OEModule_OphCiExamination_models_Element_OphCiExamination_InjectionManagementComplex_left_risks']"),
+        'rightInjectionComments' => array('xpath' => "//*[@id='OEModule_OphCiExamination_models_Element_OphCiExamination_InjectionManagementComplex_right_comments']"),
+        'leftInjectionComments' => array('xpath' => "//*[@id='OEModule_OphCiExamination_models_Element_OphCiExamination_InjectionManagementComplex_left_comments']"),
+
+        'leftRAPD' => array('xpath' => "//*[@id='OEModule_OphCiExamination_models_Element_OphCiExamination_VisualFunction_left_rapd']"),
+        'rightRAPD' => array('xpath' => "//*[@id='OEModule_OphCiExamination_models_Element_OphCiExamination_VisualFunction_right_rapd']"),
+        'leftRAPDComments' => array('xpath' => "//*[@id='OEModule_OphCiExamination_models_Element_OphCiExamination_VisualFunction_left_comments']"),
+        'rightRAPDComments' => array('xpath' => "//*[@id='OEModule_OphCiExamination_models_Element_OphCiExamination_VisualFunction_right_comments']"),
+
+        'expandColourVision' => array('xpath' => "//*[@class='sub-elements-list']//*[contains(text(),'Colour Vision')]"),
+        'leftColourVision' => array('xpath' => "//*[@id='colourvision_method_left']"),
+        'rightColourVision' => array('xpath' => "//*[@id='colourvision_method_right']"),
+        'leftColourVisionValue' => array('xpath' => "//select[@name='OEModule_OphCiExamination_models_Element_OphCiExamination_ColourVision[left_readings][0][value_id]']"),
+        'rightColourVisionValue' => array('xpath' => "//select[@name='OEModule_OphCiExamination_models_Element_OphCiExamination_ColourVision[right_readings][0][value_id]']"),
+
+
 
 
     );
@@ -1407,7 +1424,7 @@ class Examination extends OpenEyesPage
     public function expandOverallManagement ()
     {
         $this->getElement('expandOverallManagement')->click();
-        $this->getSession()->wait(5000, 'window.$ && $.active == 0');
+        $this->getSession()->wait(8000, 'window.$ && $.active == 0');
     }
 
     public function clinicalInterval ($interval)
@@ -1568,8 +1585,73 @@ class Examination extends OpenEyesPage
         $this->getElement('leftSurgery')->selectOption($surgery);
     }
 
+    public function rightRisks ($risks)
+    {
+        $this->getElement('leftRisks')->selectOption($risks);
+    }
 
+    public function leftRisks ($risks)
+    {
+        $this->getElement('rightRisks')->selectOption($risks);
+    }
 
+    public function rightInjectionComments ($comments)
+    {
+        $this->getElement('leftInjectionComments')->setValue($comments);
+    }
 
+    public function leftInjectionComments ($comments)
+    {
+        $this->getElement('rightInjectionComments')->setValue($comments);
+    }
+
+    public function leftRAPD ()
+    {
+        $this->getElement('leftRAPD')->check();
+    }
+
+    public function rightRAPD ()
+    {
+        $this->getElement('rightRAPD')->check();
+    }
+
+    public function leftRAPDComments ($comments)
+    {
+        $this->getElement('leftRAPDComments')->setValue($comments);
+    }
+
+    public function rightRAPDComments ($comments)
+    {
+        $this->getElement('rightRAPDComments')->setValue($comments);
+    }
+
+    public function openColourVision ()
+    {
+        $element = $this->getElement('expandColourVision');
+        $this->scrollWindowToElement($element);
+//        $this->getSession()->wait(2000);
+        $element->click();
+        $this->getSession()->wait(5000, 'window.$ && $.active == 0');
+    }
+
+    public function leftColourVision ($vision)
+    {
+        $this->getElement('leftColourVision')->selectOption($vision);
+    }
+
+    public function rightColourVision ($vision)
+    {
+        $this->getElement('rightColourVision')->selectOption($vision);
+    }
+
+    public function leftColourVisionValue ($value)
+    {
+        $this->getElement('leftColourVisionValue')->selectOption($value);
+    }
+
+    public function rightColourVisionValue ($value)
+    {
+        $this->getElement('rightColourVisionValue')->selectOption($value);
+    }
 
 }

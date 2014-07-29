@@ -2,7 +2,7 @@
 /**
  * OpenEyes
  *
- * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2011
+ * (C) Moorfields Eye Hospital NHS Foundation Trust, 2008-2013
  * (C) OpenEyes Foundation, 2011-2013
  * This file is part of OpenEyes.
  * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
@@ -16,24 +16,23 @@
  * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
  * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
  */
-?>
-<section
-	class="<?php if (@$child) {?>sub-<?php }?>element <?php echo get_class($element)?>"
-	data-element-type-id="<?php echo $element->elementType->id?>"
-	data-element-type-class="<?php echo $element->elementType->class_name?>"
-	data-element-type-name="<?php echo $element->elementType->name?>"
-	data-element-display-order="<?php echo $element->elementType->display_order?>">
-	<div class="details">
-		<!-- Element title -->
-		<?php if (!@$child) {?>
-			<h3 class="element-title"><?php echo $element->elementType->name?></h3>
-		<?php }else{?>
-			<h4 class="sub-element-title"><?php echo $element->elementType->name?></h4>
-		<?php }?>
 
-		<?php echo $content ;?>
-		<div class="sub-elements">
-			<?php $this->renderChildOpenElements($element, 'print', @$form, @$data)?>
-		</div>
-	</div>
-</section>
+$form = $this->beginWidget('BaseEventTypeCActiveForm', array(
+  'id'=>'referenceTable',
+  'enableAjaxValidation'=>false,
+  'layoutColumns' => array(
+    'label' => 2,
+    'field' => 5
+  )
+))?>
+<?php $this->renderPartial('//base/_messages')?>
+<input type="hidden" name="GenericAdminModel" value="<?php echo $model?>" />
+<div class="box admin">
+	<h2><?php echo $title?></h2>
+	<?php $this->widget('GenericAdmin', array(
+		'model' => $model,
+		'errors' => $this->form_errors,
+		'extra_fields' => @$extra_fields,
+	))?>
+</div>
+<?php $this->endWidget(); ?>

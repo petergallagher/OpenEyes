@@ -27,6 +27,14 @@ class AdminController extends BaseAdminController
 		$this->redirect(array('/admin/users'));
 	}
 
+	public function actionEditMedicationStopReason()
+	{
+		$this->render('//admin/generic_admin',array(
+			'title' => 'Edit Medication Stop Reason',
+			'model' => 'MedicationStopReason',
+		));
+	}
+
 	public function actionDrugs()
 	{
 		$criteria = new CDbCriteria;
@@ -40,6 +48,7 @@ class AdminController extends BaseAdminController
 
 	public function actionAddDrug()
 	{
+		return; //disabled OE-4474
 		$drug=new Drug('create');
 
 		if (!empty($_POST)) {
@@ -78,6 +87,7 @@ class AdminController extends BaseAdminController
 
 	public function actionEditDrug($id)
 	{
+		return; //disabled OE-4474
 		if (!$drug = Drug::model()->findByPk($id)) {
 			throw new Exception("Drug not found: $id");
 		}

@@ -177,6 +177,10 @@ $(document).ready(function(){
 		formHasChanged = true;
 	});
 
+	$('#patient-summary-form-container').on("change", function (e) {
+		formHasChanged = true;
+	});
+
 	//if the save button is on page
 	if($('#et_save').length){
 		$(".EyeDrawWidget").on("click", function (e) {
@@ -184,7 +188,7 @@ $(document).ready(function(){
 		});
 	}
 
-	$(window).bind('beforeunload', function (e) {
+	$(window).on('beforeunload', function (e) {
 		if (formHasChanged && !submitted) {
 			var message = "You have not saved your changes.", e = e || window.event;
 			if (e) {
@@ -194,7 +198,7 @@ $(document).ready(function(){
 		}
 	});
 
-	$("form").submit(function() {
+	$(document).on('submit', 'form', function() {
 		submitted = true;
 	});
 
@@ -234,6 +238,10 @@ $(document).ready(function(){
 	$('#checkall').click(function() {
 		$('input.'+$(this).attr('class')).attr('checked',$(this).is(':checked') ? 'checked' : false);
 	});
+
+    $(this).on('click', '.alert-box .close' , function(e) {
+        $(e.srcElement).closest('.alert-box').fadeOut(500);
+    });
 });
 
 function changeState(wb,sp) {

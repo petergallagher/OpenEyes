@@ -16,24 +16,30 @@
  * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
  * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
  */
-?>
-<section
-	class="<?php if (@$child) {?>sub-<?php }?>element <?php echo get_class($element)?>"
-	data-element-type-id="<?php echo $element->elementType->id?>"
-	data-element-type-class="<?php echo $element->elementType->class_name?>"
-	data-element-type-name="<?php echo $element->elementType->name?>"
-	data-element-display-order="<?php echo $element->elementType->display_order?>">
-	<div class="details">
-		<!-- Element title -->
-		<?php if (!@$child) {?>
-			<h3 class="element-title"><?php echo $element->elementType->name?></h3>
-		<?php }else{?>
-			<h4 class="sub-element-title"><?php echo $element->elementType->name?></h4>
-		<?php }?>
 
-		<?php echo $content ;?>
-		<div class="sub-elements">
-			<?php $this->renderChildOpenElements($element, 'print', @$form, @$data)?>
-		</div>
-	</div>
-</section>
+
+class OEDateValidator extends CValidator
+{
+	public function validateAttribute($object, $attribute)
+	{
+		if(isset($object->{$attribute}) && !empty($object->{$attribute})){
+			$check_date = null;
+
+			if ($m = preg_match('/^\d\d\d\d-\d\d{0,1}-\d\d{0,1}( \d\d:\d\d:\d\d){0,1}$/', $object->$attribute)) {
+				$check_date = date_parse_from_format('Y-m-d',$object->{$attribute});
+			}
+
+			if (!$check_date || !checkdate($check_date['month'], $check_date['day'], $check_date['year'])) {
+				if(strtotime($object->{$attribute})!=false){
+					$this->addError($object, $attribute,$object->getAttributeLabel($attribute).' is not in valid format: ' . $object->$attribute);
+				}
+				else {
+					$this->addError($object, $attribute,$object->getAttributeLabel($attribute).' is not a valid date: ' . $object->$attribute);
+				}
+				return false;
+			}
+
+			return true;
+		}
+	}
+}

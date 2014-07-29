@@ -1,4 +1,3 @@
-<?php
 /**
  * OpenEyes
  *
@@ -16,24 +15,27 @@
  * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
  * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
  */
-?>
-<section
-	class="<?php if (@$child) {?>sub-<?php }?>element <?php echo get_class($element)?>"
-	data-element-type-id="<?php echo $element->elementType->id?>"
-	data-element-type-class="<?php echo $element->elementType->class_name?>"
-	data-element-type-name="<?php echo $element->elementType->name?>"
-	data-element-display-order="<?php echo $element->elementType->display_order?>">
-	<div class="details">
-		<!-- Element title -->
-		<?php if (!@$child) {?>
-			<h3 class="element-title"><?php echo $element->elementType->name?></h3>
-		<?php }else{?>
-			<h4 class="sub-element-title"><?php echo $element->elementType->name?></h4>
-		<?php }?>
 
-		<?php echo $content ;?>
-		<div class="sub-elements">
-			<?php $this->renderChildOpenElements($element, 'print', @$form, @$data)?>
-		</div>
-	</div>
-</section>
+$(document).ready(function() {
+	$('.editRow').die('click').live('click',function(e) {
+		e.preventDefault();
+
+		$(this).closest('tr').children('td:first').children('span').hide();
+		$(this).closest('tr').children('td:first').children('input').show();
+	});
+
+	$('.deleteRow').die('click').live('click',function(e) {
+		e.preventDefault();
+
+		$(this).closest('tr').remove();
+	});
+
+	$('.generic-admin tbody').sortable({helper:'clone'});
+
+	$('.generic-admin-add').unbind('click').click(function(e) {
+		e.preventDefault();
+
+		$('.generic-admin tbody').append('<tr>' + $('.generic-admin .newRow').html().replace(/ disabled="disabled"/g,'') + '</tr>');
+		$('.generic-admin tbody').children('tr:last').children('td:nth-child(2)').children('input').focus();
+	});
+});

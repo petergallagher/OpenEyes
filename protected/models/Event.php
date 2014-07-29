@@ -83,12 +83,12 @@ class Event extends BaseActiveRecordVersioned
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('event_type_id', 'required'),
+			array('event_type_id, event_date', 'required'),
 			array('episode_id, event_type_id', 'length', 'max'=>10),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
 			array('id, episode_id, event_type_id, created_date, event_date', 'safe', 'on'=>'search'),
-			array('event_date', 'checkEventDate'),
+			array('event_date', 'OEDateValidatorNotFuture'),
 		);
 	}
 
@@ -112,36 +112,12 @@ class Event extends BaseActiveRecordVersioned
 
 	/**
 	 * Make sure event date is set
-	 * @return boolean
 	 */
-	protected function beforeSave()
+	protected function afterConstruct()
 	{
-		if ( $this->event_date == "1900-01-01 00:00:00" || $this->event_date == "0000-00-00 00:00:00") {
-			$this->event_date = date('Y-m-d H:i:s');
-		}
-
-		return parent::beforeSave();
+		$this->event_date = date('Y-m-d H:i:s');
+		parent::afterConstruct();
 	}
-
-	public function checkEventDate($attribute,$params)
-	{
-		if(isset($attribute)){
-
-			$date_from_picker = date_parse_from_format('j M Y',$this->{$attribute});
-			$date_for_db = date_parse_from_format('Y-m-d',$this->{$attribute});
-
-			if (!checkdate($date_from_picker['month'], $date_from_picker['day'],$date_from_picker['year'])){
-				if (!checkdate($date_for_db['month'], $date_for_db['day'], $date_for_db['year']))
-				{
-					$this->addError($attribute,'Event date is not valid.');
-				}
-			}
-			if(strtotime($this->{$attribute}) > strtotime(date('Y-m-d  H:i:s'))) {
-				$this->addError($attribute,'Event date cannot be in the future.');
-			}
-		}
-	}
-
 
 	public function moduleAllowsEditing()
 	{

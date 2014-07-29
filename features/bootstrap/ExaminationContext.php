@@ -2410,4 +2410,161 @@ class ExaminationContext extends PageObjectContext
         $examination->rightSurgery($surgery);
     }
 
+    /**
+     * @Given /^I choose a Right Risks of "([^"]*)"$/
+     */
+    public function iChooseARightRisksOf($risks)
+    {
+        /**
+         * @var Examination $examination
+         */
+        $examination= $this->getPage('Examination');
+        $examination->rightRisks($risks);
+    }
+
+    /**
+     * @Then /^I choose Right Injection Management Comments of "([^"]*)"$/
+     */
+    public function iChooseRightInjectionManagementCommentsOf($comments)
+    {
+        /**
+         * @var Examination $examination
+         */
+        $examination= $this->getPage('Examination');
+        $examination->rightInjectionComments($comments);
+    }
+
+    /**
+     * @Given /^I choose a Left Risks of "([^"]*)"$/
+     */
+    public function iChooseALeftRisksOf($risks)
+    {
+        /**
+         * @var Examination $examination
+         */
+        $examination= $this->getPage('Examination');
+        $examination->leftRisks($risks);
+    }
+
+    /**
+     * @Then /^I choose Left Injection Management Comments of "([^"]*)"$/
+     */
+    public function iChooseLeftInjectionManagementCommentsOf($comments)
+    {
+        /**
+         * @var Examination $examination
+         */
+        $examination= $this->getPage('Examination');
+        $examination->leftInjectionComments($comments);
+    }
+
+    /**
+     * @Then /^I select a Left RAPD$/
+     */
+    public function iSelectALeftRapd()
+    {
+        /**
+         * @var Examination $examination
+         */
+        $examination= $this->getPage('Examination');
+        $examination->leftRAPD();
+    }
+
+    /**
+     * @Given /^I add Left RAPD comments of "([^"]*)"$/
+     */
+    public function iAddLeftRapdCommentsOf($comments)
+    {
+        /**
+         * @var Examination $examination
+         */
+        $examination= $this->getPage('Examination');
+        $examination->leftRAPDComments($comments);
+    }
+
+    /**
+     * @Then /^I select a Right RAPD$/
+     */
+    public function iSelectARightRapd()
+    {
+        /**
+         * @var Examination $examination
+         */
+        $examination= $this->getPage('Examination');
+        $examination->rightRAPD();
+    }
+
+    /**
+     * @Given /^I add Right RAPD comments of "([^"]*)"$/
+     */
+    public function iAddRightRapdCommentsOf($comments)
+    {
+        /**
+         * @var Examination $examination
+         */
+        $examination= $this->getPage('Examination');
+        $examination->rightRAPDComments($comments);
+    }
+
+    /**
+     * @Then /^I choose to expand the Colour Vision section$/
+     */
+    public function iChooseToExpandTheColourVisionSection()
+    {
+        /**
+         * @var Examination $examination
+         */
+        $examination= $this->getPage('Examination');
+        $examination->openColourVision();
+    }
+
+    /**
+     * @Given /^I choose a Left Colour Vision of "([^"]*)"$/
+     */
+    public function iChooseALeftColourVisionOf($vision)
+    {
+        /**
+         * @var Examination $examination
+         */
+        $examination= $this->getPage('Examination');
+        $examination->leftColourVision($vision);
+    }
+
+    /**
+     * @Given /^I choose A Left Colour Vision Value of "([^"]*)"$/
+     */
+    public function iChooseALeftColourVisionValueOf($value)
+    {
+        /**
+         * @var Examination $examination
+         */
+        $examination= $this->getPage('Examination');
+        $examination->leftColourVisionValue($value);
+
+    }
+
+    /**
+     * @Given /^I choose a Right Colour Vision of "([^"]*)"$/
+     */
+    public function iChooseARightColourVisionOf($vision)
+    {
+        /**
+         * @var Examination $examination
+         */
+        $examination= $this->getPage('Examination');
+        $examination->rightColourVision($vision);
+    }
+
+    /**
+     * @Given /^I choose A Right Colour Vision Value of "([^"]*)"$/
+     */
+    public function iChooseARightColourVisionValueOf($value)
+    {
+        /**
+         * @var Examination $examination
+         */
+        $examination= $this->getPage('Examination');
+        $examination->rightColourVisionValue($value);
+    }
+
 }
