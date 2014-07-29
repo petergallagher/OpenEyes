@@ -145,7 +145,7 @@ class m140516_145619_social_history extends CDbMigration
 
 				'accommodation_id' => 'int(10) unsigned',
 
-				'comments' => 'text COLLATE utf8_bin DEFAULT \'\'',
+				'comments' => 'text COLLATE utf8_bin',
 
 				'type_of_job' => 'varchar(255) COLLATE utf8_bin DEFAULT \'\'',
 
