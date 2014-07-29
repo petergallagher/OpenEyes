@@ -55,34 +55,36 @@
 					<label></label>
 				</div>
 				<div class="large-9 column end">
-					<div class="row field-row">
-						<div class="large-9 column end">
-							<div class="row field-row">
-								<div class="large-4 column recordDateLabel">
-									<label>Date/time:</label>
-								</div>
-								<div class="large-8 column end">
-									<?php
-									$this->widget('zii.widgets.jui.CJuiDatePicker',array(
-										'name' => 'timestamp',
-										'options' => array(
-											'showAnim' => 'fold',
-											'dateFormat' => Helper::NHS_DATE_FORMAT_JS,
-										),
-										'htmlOptions' => array(
-											'class' => 'recordTimestamp',
-										),
-									))?>
-									<?php
-									$this->widget('application.widgets.TimePicker', array(
-										'name' => 'time',
-										'htmlOptions' => array('nowrapper' => true, 'class' => 'recordTime'),
-									))?>
-									<?php echo EventAction::button('Now', 'now', array('level' => 'save'),array('class' => 'recordsTimeNow'))->toHtml()?>
+					<?php if ($include_timestamp) {?>
+						<div class="row field-row">
+							<div class="large-9 column end">
+								<div class="row field-row">
+									<div class="large-4 column recordDateLabel">
+										<label>Date/time:</label>
+									</div>
+									<div class="large-8 column end">
+										<?php
+										$this->widget('zii.widgets.jui.CJuiDatePicker',array(
+											'name' => 'timestamp',
+											'options' => array(
+												'showAnim' => 'fold',
+												'dateFormat' => Helper::NHS_DATE_FORMAT_JS,
+											),
+											'htmlOptions' => array(
+												'class' => 'recordTimestamp',
+											),
+										))?>
+										<?php
+										$this->widget('application.widgets.TimePicker', array(
+											'name' => 'time',
+											'htmlOptions' => array('nowrapper' => true, 'class' => 'recordTime'),
+										))?>
+										<?php echo EventAction::button('Now', 'now', array('level' => 'save'),array('class' => 'recordsTimeNow'))->toHtml()?>
+									</div>
 								</div>
 							</div>
 						</div>
-					</div>
+					<?php }?>
 					<?php if ($use_last_button_text) {?>
 						<div class="row field-row recordsUseLastItemRow"<?php if (empty($element->$field)) {?> style="display: none"<?php }?>>
 							<div class="large-12 column end">

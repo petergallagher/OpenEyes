@@ -34,6 +34,7 @@ $(document).ready(function() {
 		addRecordItemDiv.find('.recordTimestamp').val(d.getDate()+' '+month+' '+d.getFullYear());
 		addRecordItemDiv.find('input.recordInput').val('');
 		addRecordItemDiv.find('select.recordInput').val('');
+		addRecordItemDiv.find('textarea.recordInput').val('');
 		addRecordItemDiv.find('.multi-select-selections').children('li').children('.MultiSelectRemove').click();
 
 		addRecordItemDiv.find('select.recordInput[data-cycle-on-add="1"]').map(function() {
@@ -59,7 +60,12 @@ $(document).ready(function() {
 		addRecordItemDiv.children('.recordEditItem').val('');
 
 		addRecordItemDiv.slideDown('fast',function() {
-			$(this).closest('.addRecordItemDiv').find('input.recordInput:first').focus();
+			var input = $(this).closest('.addRecordItemDiv').find('input.recordInput:first');
+			if (input.length >0) {
+				input.focus();
+			} else {
+				$(this).closest('.addRecordItemDiv').find('textarea.recordInput:first').focus();
+			}
 			$('.addItemButton').slideUp('fast');
 		});
 	});
@@ -165,7 +171,7 @@ $(document).ready(function() {
 
 		var data = $(this).closest('tr').data();
 		var addRecordItemDiv = $(this).closest('.recordsWidget').find('.addRecordItemDiv');
-		var button = addRecordItemDiv.find('.additemButton');
+		var button = $(this).closest('.recordsWidget').find('.addItemButton');
 		addRecordItemDiv.find('.multi-select-selections').children('li').children('.MultiSelectRemove').click();
 
 		RecordsWidget_PopulateAddFormFromData(data, addRecordItemDiv);
