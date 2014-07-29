@@ -1,4 +1,7 @@
 #!/bin/bash
+CSDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+. "$CSDIR/ciFunctions.sh"
+
 # Find yiic
 while [ "$PWD" != "/" ];
 do
@@ -11,8 +14,17 @@ if [ ! -f ./protected/yiic ]; then
 fi
 echo "Found OpenEyes root"
 
+interactiveVal=1
+interactiveArg=$(argValue --interactive)
+echo Interactive arg : "$interactiveArg"
+if [ "$interactiveArg" == "0" ]
+then
+    interactiveVal=0
+    echo "Running in --interactive=0"
+fi
+
 cd protected
 echo "Migrating OpenEyes..."
-./yiic migrate
+./yiic migrate --interactive=$interactiveVal
 echo "Migrating Modules..."
-./yiic migratemodules
+./yiic migratemodules --interactive=$interactiveVal
