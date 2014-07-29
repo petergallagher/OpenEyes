@@ -17,7 +17,7 @@
  * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
  */
 ?>
-<div class="recordsWidget">
+<div id="div_<?php echo $element ? CHtml::modelName($element).'_'.$field : $field?>" class="recordsWidget"<?php if ($hidden) {?> style="display: none"<?php }?>>
 	<div class="row field-row">
 		<div class="large-3 column">
 			<label><?php echo $element->getAttributeLabel($field)?>:</label>
