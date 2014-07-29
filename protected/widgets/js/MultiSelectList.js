@@ -103,7 +103,12 @@ function MultiSelect_SelectItem(select, selected, extra_values)
 		var noSelectionsMsg = container.find('.no-selections-msg');
 		var removeAll = container.find('.remove-all');
 		var options = container.data('options');
-		var extra_fields = select.data('extra-fields').split(',');
+		if (typeof(select.data('extra-fields')) != 'undefined') {
+			var extra_fields = select.data('extra-fields').split(',');
+		} else {
+			var extra_fields = [];
+		}
+
 		var input_class = select.data('input-class');
 
 		if (selections.children('li').length >= parseInt(options['maxItems'])) {
