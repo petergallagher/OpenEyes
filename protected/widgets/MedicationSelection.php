@@ -28,6 +28,7 @@ class MedicationSelection extends BaseFieldWidget
 	public $i;
 	public $edit = true;
 	public $label = 'Medications History';
+	public $extra_fields = array();
 	public $layoutColumns = array(
 		'label' => 2,
 		'field' => 4,
