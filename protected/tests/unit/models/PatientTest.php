@@ -1103,4 +1103,28 @@ class PatientTest extends CDbTestCase
 		$event = $this->patients('patient1')->getLatestEvent();
 		$this->assertEquals('someinfo3', $event->info);
 	}
+
+	public function testAddDuplicateAllowed(){
+		$patientAtt= $this->patients('patient1')->getAttributes();
+		unset($patientAtt['id']);
+		Yii::app()->params['allow_duplicate_identifiers'] = 1;
+
+		$patient = $this->model;
+		$patient->setAttributes($patientAtt);
+		$patient->save();
+		$this->assertNull( $patient->getError('hos_num') ) ;
+	}
+
+
+	public function testAddDuplicateNotAllowed(){
+		$patientAtt= $this->patients('patient1')->getAttributes();
+		unset($patientAtt['id']);
+		Yii::app()->params['allow_duplicate_identifiers'] = 0;
+
+		$patient = $this->model;
+		$patient->setAttributes($patientAtt);
+		$patient->save();
+		$this->assertInternalType('string', $patient->getError('hos_num') ) ;
+		$this->assertEquals( 'Hospital number "12345" has already been taken.',$patient->getError('hos_num') ) ;
+	}
 }

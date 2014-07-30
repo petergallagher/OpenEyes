@@ -29,7 +29,7 @@ return array(
 		'gender_id' => 1,
 		'hos_num' => 12345,
 		'nhs_num' => 54321,
-		'practice_id' => 1,
+		'practice_id' => null,
 		'address_id' => 1,
 		'contact_id' => 1
 	),
