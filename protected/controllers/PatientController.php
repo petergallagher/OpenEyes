@@ -1417,6 +1417,7 @@ class PatientController extends BaseController
 		$errors = array();
 
 		$patient->attributes = Helper::convertNHS2MySQL($_POST);
+		$patient->populateDateFields();
 
 		if (!$patient->validate()) {
 			$errors = $patient->getErrors();
@@ -1467,6 +1468,7 @@ class PatientController extends BaseController
 		empty($_POST['dob']) && $_POST['dob'] = null;
 
 		$patient->attributes = Helper::convertNHS2MySQL($_POST);
+		$patient->populateDateFields();
 
 		if (!$patient->save()) {
 			throw new Exception("Unable to save patient: ".print_r($patient->getErrors(),true));
@@ -1620,6 +1622,7 @@ class PatientController extends BaseController
 			!empty($_POST['practice_id']) && $practice = Practice::model()->findByPk($_POST['practice_id']);
 
 			$patient->attributes = Helper::convertNHS2MySQL($_POST);
+			$patient->populateDateFields();
 
 			if (!$patient->save()) {
 				$errors = $patient->getErrors();

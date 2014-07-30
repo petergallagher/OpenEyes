@@ -138,7 +138,7 @@ class Helper
 	 *
 	 * @return string $age
 	 */
-	public static function getAge($dob, $date_of_death = null, $check_date = null, $year_of_birth = null)
+	public static function getAge($dob, $date_of_death = null, $check_date = null, $year_of_birth = null, $month_of_birth = null)
 	{
 		if (!$dob) {
 			if (!$year_of_birth) {
@@ -147,6 +147,14 @@ class Helper
 
 			if ($date_of_death) {
 				return date('Y',strtotime($date_of_death)) - $year_of_birth;
+			}
+
+			if ($month_of_birth) {
+				$dob = new DateTime($year_of_birth.'-'.$month_of_birth.'-00');
+				$now = new DateTime;
+				$diff = $dob->diff($now);
+
+				return $diff->format('%y');
 			}
 
 			return date('Y') - $year_of_birth;

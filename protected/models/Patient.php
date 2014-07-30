@@ -58,6 +58,14 @@ class Patient extends BaseActiveRecordVersioned
 	public $use_pas = TRUE;
 	private $_orderedepisodes;
 	private $metadata_keys = array();
+	public $dob_day;
+	public $dob_month;
+	public $dob_year;
+	public $dod_day;
+	public $dod_month;
+	public $dod_year;
+	public $age_years;
+	public $age_months;
 
 	public function __construct($scenario='insert')
 	{
@@ -122,8 +130,16 @@ class Patient extends BaseActiveRecordVersioned
 			array('hos_num', 'required'),
 			array('pas_key', 'length', 'max' => 10),
 			array('hos_num, nhs_num', 'length', 'max' => 40),
-			array('dob, gender_id, date_of_death, ethnic_group_id, yob, gp_id, practice_id', 'safe'),
+			array('dob, gender_id, date_of_death, ethnic_group_id, yob, gp_id, practice_id, dob_day, dob_month, dob_year, dod_day, dod_month, dod_year, age_years, age_months', 'safe'),
 			array('dob, hos_num, nhs_num, date_of_death', 'safe', 'on' => 'search'),
+			array('age_years', 'numerical', 'integerOnly' => true, 'min' => 0, 'max' => 150),
+			array('age_months', 'numerical', 'integerOnly' => true, 'min' => 0, 'max' => 11),
+			array('dob_day', 'numerical', 'integerOnly' => true, 'min' => 1, 'max' => 31),
+			array('dob_month', 'numerical', 'integerOnly' => true, 'min' => 1, 'max' => 12),
+			array('dob_year', 'numerical', 'integerOnly' => true, 'min' => date('Y')-200, 'max' => date('Y')),
+			array('dod_day', 'numerical', 'integerOnly' => true, 'min' => 1, 'max' => 31),
+			array('dod_month', 'numerical', 'integerOnly' => true, 'min' => 1, 'max' => 12),
+			array('dod_year', 'numerical', 'integerOnly' => true, 'min' => date('Y')-200, 'max' => date('Y')),
 		);
 		if(isset(Yii::app()->params['allow_duplicate_identifiers']) && Yii::app()->params['allow_duplicate_identifiers'] == false){
 			$rules[]=array('hos_num', 'unique');
@@ -198,6 +214,8 @@ class Patient extends BaseActiveRecordVersioned
 			'last_name' => 'Last name',
 			'consent_last_name' => "Patient's surname/family name",
 			'consent_first_name' => "Patient's first names",
+			'age_years' => 'Years',
+			'age_months' => 'Months',
 		);
 	}
 
@@ -373,7 +391,7 @@ class Patient extends BaseActiveRecordVersioned
 	 */
 	public function getAge()
 	{
-		return Helper::getAge($this->dob, $this->date_of_death, null, $this->yob);
+		return Helper::getAge($this->dob, $this->date_of_death, null, $this->yob, $this->mob);
 	}
 
 	/**
@@ -567,6 +585,18 @@ class Patient extends BaseActiveRecordVersioned
 
 		foreach (PatientMetadataKey::model()->findAll() as $metadata_key) {
 			$this->metadata_keys[$metadata_key->key_name] = $metadata_key;
+		}
+
+		if ($this->dob) {
+			$this->dob_day = date('d',strtotime($this->dob));
+			$this->dob_month = date('m',strtotime($this->dob));
+			$this->dob_year = date('Y',strtotime($this->dob));
+		}
+
+		if ($this->date_of_death) {
+			$this->dod_day = date('d',strtotime($this->date_of_death));
+			$this->dod_month = date('m',strtotime($this->date_of_death));
+			$this->dod_year = date('Y',strtotime($this->date_of_death));
 		}
 	}
 
@@ -1501,6 +1531,76 @@ class Patient extends BaseActiveRecordVersioned
 			}
 		}
 
+		if (!$this->dob && strlen($this->age_years) <1 && strlen($this->age_months) <1) {
+			$this->addError('dob','Please enter a valid date of birth or at least the patient approximate age in years');
+		}
+
 		return parent::afterValidate();
+	}
+
+	public function getYears()
+	{
+		if ($this->ageIsApproximate) {
+			if ($this->mob) {
+				$dob = new DateTime($this->yob.'-'.$this->mob.'-01');
+				$now = new DateTime;
+
+				$diff = $dob->diff($now);
+
+				return $diff->format('%y');
+			}
+
+			return date('Y') - $this->yob;
+		}
+	}
+
+	public function getMonths()
+	{
+		if ($this->ageIsApproximate) {
+			if ($this->mob) {
+				$dob = new DateTime($this->yob.'-'.$this->mob.'-01');
+				$now = new DateTime;
+				
+				$diff = $dob->diff($now);
+
+				return $diff->format('%m');
+			}
+		}
+	}
+
+	public function getAgeIsApproximate()
+	{
+		return (strlen($this->yob) >0 || strlen($this->mob) >0);
+	}
+
+	public function populateDateFields()
+	{
+		if (checkdate((integer)$this->dob_month,(integer)$this->dob_day,(integer)$this->dob_year)) {
+			$this->dob = date('Y-m-d',mktime(0,0,0,$this->dob_month,$this->dob_day,$this->dob_year));
+		} else {
+			$this->dob = null;
+		}
+
+		if (checkdate((integer)$this->dod_month,(integer)$this->dod_day,(integer)$this->dod_year)) {
+			$this->date_of_death = date('Y-m-d',mktime(0,0,0,$this->dod_month,$this->dod_day,$this->dod_year));
+		} else {
+			$this->date_of_death = null;
+		}
+
+		if (strlen($this->age_years) >0 && strlen($this->age_months) >0) {
+			$this->yob = date('Y',strtotime('-'.$this->age_years.' years -'.$this->age_months.' months'));
+			$this->mob = date('m',strtotime('-'.$this->age_years.' years -'.$this->age_months.' months'));
+			$this->dob = null;
+		} else if ($this->age_years) {
+			$this->yob = date('Y') - $this->age_years;
+			$this->mob = '';
+			$this->dob = null;
+		} else if ($this->age_months) {
+			$this->yob = date('Y',strtotime('-'.$this->age_months.' months'));
+			$this->mob = date('m',strtotime('-'.$this->age_months.' months'));
+			$this->dob = null;
+		} else {
+			$this->yob = $this->mob = '';
+		}
 	}
 }

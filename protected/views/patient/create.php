@@ -37,6 +37,7 @@ $clinical = $clinical = $this->checkAccess('OprnEditPatientDetails');
 		),
 		'htmlOptions' => array(
 			'style' => 'margin: 0',
+			'class' => 'patient-details-edit',
 		)
 	))?>
 		<div class="row">
