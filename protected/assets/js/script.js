@@ -306,6 +306,11 @@ $(document).ready(function(){
 	$(this).on('click', '.alert-box .close' , function(e) {
 		$(e.srcElement).closest('.alert-box').fadeOut(500);
 	});
+
+	$(this).on('click', '#btn-create-patient-cancel' , function(e) {
+		e.preventDefault();
+		window.history.back();
+	});
 });
 
 function update_patient_age(dob,dod,yob)

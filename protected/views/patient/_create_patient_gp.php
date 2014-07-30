@@ -32,6 +32,9 @@
 			<button id="btn-create-patient" class="secondary small">
 				Save
 			</button>
+			<button id="btn-create-patient-cancel" class="warning small">
+				Cancel
+			</button>
 		</div>
 	</div>
 </section>
