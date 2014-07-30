@@ -50,7 +50,10 @@
 			'layoutColumns' => array(
 				'label' => 2,
 				'field' => 5
-			)
+			),
+			'htmlOptions' => array(
+				'class' => 'patient-details-edit',
+			),
 		))?>
 			<div class="edit-mode" style="display: none;">
 				<?php echo $this->renderPartial('_patient_details_form',array(

@@ -144,61 +144,55 @@
 				</div>
 				<div class="large-8 column">
 					<div class="data-value">
-						<?php $this->widget('zii.widgets.jui.CJuiDatePicker',array(
-							'name' => 'dob',
-							'id' => 'dob',
-							'options' => array(
-								'showAnim' => 'fold',
-								'dateFormat'=>Helper::NHS_DATE_FORMAT_JS
-							),
-							'value' => preg_match('/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/',$patient->dob) ? $patient->NHSDate('dob') : $patient->dob,
-							'htmlOptions' => array(
-								'style' => 'width: 80px;',
-							)
-						))?>
+						<div class="patient-dob">
+							<?php echo CHtml::textField('dob_day',$patient->dob_day,array('placeholder' => 'DD','disabled' => $patient->ageIsApproximate ? 'disabled' : ''))?>
+							<?php echo CHtml::textField('dob_month',$patient->dob_month,array('placeholder' => 'MM','disabled' => $patient->ageIsApproximate ? 'disabled' : ''))?>
+							<?php echo CHtml::textField('dob_year',$patient->dob_year,array('placeholder' => 'YYYY','disabled' => $patient->ageIsApproximate ? 'disabled' : ''))?>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row data-row">
+				<div class="large-4 column">
+					<div class="data-label"></div>
+				</div>
+				<div class="large-8 column">
+					<div class="data-value">
+						<?php echo CHtml::checkBox('dob_dn',$patient->ageIsApproximate)?>
+						<label for="dob_dn">
+							I don't know
+						</label>
+					</div>
+				</div>
+			</div>
+			<div class="row data-row approximateAge"<?php if (!$patient->ageIsApproximate) {?> style="display: none"<?php }?>>
+				<div class="large-4 column">
+					<div class="data-label">Approximate age:</div>
+				</div>
+				<div class="large-8 column">
+					<div class="data-value">
+						<?php echo CHtml::textField('age_years',$patient->years)?>
+						<label for="age_years">
+							years
+						</label>
+						<?php echo CHtml::textField('age_months',$patient->months)?>
+						<label for="age_months">
+							months
+						</label>
 					</div>
 				</div>
 			</div>
 			<?php echo $this->renderPartial('_patient_metadata_edit',array('patient'=>$patient,'after'=>'dob'))?>
-			<?php echo $this->renderPartial('_patient_metadata_edit',array('patient'=>$patient,'before'=>'yob'))?>
-			<div class="row data-row">
-				<div class="large-4 column">
-					<div class="data-label"><?php echo $patient->getAttributeLabel('yob')?>:</div>
-				</div>
-				<div class="large-2 column">
-					<div class="data-value">
-						<?php echo CHtml::textField('yob',$patient->yob,array('style'=>'width: 40px'))?>
-					</div>
-				</div>
-				<div class="large-1 column">
-					<div class="data-label">Age:</div>
-				</div>
-				<div class="large-2 column end">
-					<div class="data-value">
-						<?php echo CHtml::textField('age',$patient->age == 'Unknown' ? '' : $patient->age,array('style'=>'width: 40px'))?>
-					</div>
-				</div>
-			</div>
-			<?php echo $this->renderPartial('_patient_metadata_edit',array('patient'=>$patient,'after'=>'yob'))?>
 			<?php echo $this->renderPartial('_patient_metadata_edit',array('patient'=>$patient,'before'=>'date_of_death'))?>
 			<div class="row data-row">
 				<div class="large-4 column">
 					<div class="data-label"><?php echo $patient->getAttributeLabel('date_of_death')?>:</div>
 				</div>
 				<div class="large-8 column">
-					<div class="data-value">
-						<?php $this->widget('zii.widgets.jui.CJuiDatePicker',array(
-							'name' => 'date_of_death',
-							'id' => 'date_of_death',
-							'options' => array(
-								'showAnim' => 'fold',
-								'dateFormat'=>Helper::NHS_DATE_FORMAT_JS
-							),
-							'value' => preg_match('/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/',$patient->date_of_death) ? $patient->NHSDate('date_of_death') : $patient->date_of_death,
-							'htmlOptions' => array(
-								'style' => 'width: 80px;',
-							)
-						))?>
+					<div class="data-value patient-dod">
+						<?php echo CHtml::textField('dod_day',$patient->dod_day,array('placeholder' => 'DD'))?>
+						<?php echo CHtml::textField('dod_month',$patient->dod_month,array('placeholder' => 'MM'))?>
+						<?php echo CHtml::textField('dod_year',$patient->dod_year,array('placeholder' => 'YYYY'))?>
 					</div>
 				</div>
 			</div>

@@ -223,7 +223,7 @@ label {
 // Markup:
 // <input type="text" class="{$modifiers}" />
 //
-// .small             - A small form field
+// .small							- A small form field
 // .small.fixed-width - A small form field with a fixed width
 //
 // Styleguide 9.2
@@ -291,5 +291,50 @@ label {
 .generic-admin {
 	.reorder {
 		width: 2em;
+	}
+}
+
+.patient-details-edit {
+	label {
+		display: inline-block;
+	}
+	.patient-dob {
+		input {
+			display: inline-block;
+		}
+		input[name="dob_day"] {
+			width: 3em;
+		}
+		input[name="dob_month"] {
+			width: 3em;
+		}
+		input[name="dob_year"] {
+			width: 4em;
+		}
+	}
+	.patient-dod {
+		input {
+			display: inline-block;
+		}
+		input[name="dod_day"] {
+			width: 3em;
+		}
+		input[name="dod_month"] {
+			width: 3em;
+		}
+		input[name="dod_year"] {
+			width: 4em;
+		}
+	}
+	#dob_dn {
+		display: inline-block;
+	}
+	#age_years {
+		width: 3em;
+		display: inline-block;
+	}
+	#age_months {
+		width: 3em;
+		display: inline-block;
 	}
 }

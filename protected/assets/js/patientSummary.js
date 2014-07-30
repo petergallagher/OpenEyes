@@ -326,6 +326,23 @@ $(document).ready(function() {
 
 		return true;
 	});
+
+	$('#dob_dn').click(function(e) {
+		if ($(this).is(':checked')) {
+			$(this).closest('.patient-details-edit').find('.approximateAge').show();
+			$(this).closest('.patient-details-edit').find('.approximateAge').find('#age_years').select().focus();
+			$('#dob_day').val('').attr('disabled','disabled');
+			$('#dob_month').val('').attr('disabled','disabled');
+			$('#dob_year').val('').attr('disabled','disabled');
+		} else {
+			$(this).closest('.patient-details-edit').find('.approximateAge').hide();
+			$('#age_years').val('');
+			$('#age_months').val('');
+			$('#dob_day').removeAttr('disabled');
+			$('#dob_month').removeAttr('disabled');
+			$('#dob_year').removeAttr('disabled');
+		}
+	});
 });
 
 function resetPatientDetailsForm()

@@ -120,13 +120,21 @@
 					<?php echo $this->renderPartial('_patient_metadata_view',array('patient'=>$patient,'after'=>'date_of_death'))?>
 				<?php } else {?>
 					<?php echo $this->renderPartial('_patient_metadata_view',array('patient'=>$patient,'before'=>'age'))?>
-					<?php if (!Yii::app()->params['patient_summary_hide_blank_fields'] || $patient->age) {?>
+					<?php if (!Yii::app()->params['patient_summary_hide_blank_fields'] || $patient->age || $patient->months) {?>
 						<div class="large-4 column">
-							<div class="data-label"><?php echo $patient->getAttributeLabel('age')?>:</div>
+							<div class="data-label"><?php echo $patient->ageIsApproximate ? 'Approximate age' : $patient->getAttributeLabel('age')?>:</div>
 						</div>
 						<div class="large-8 column">
 							<div class="data-value">
-								<?php echo $patient->getAge()?>
+								<?php if ($patient->age) {?>
+									<?php echo $patient->getAge()?>
+								<?php }?>
+								<?php if ($patient->ageIsApproximate && $patient->months) {?>
+									<?php if ($patient->age) {?>
+										year<?php if ($patient->years != 1) {?>s<?php }?>
+									<?php }?>
+									<?php echo $patient->months?> month<?php if ($patient->months != 1) {?>s<?php }?>
+								<?php }?>
 							</div>
 						</div>
 					<?php }?>
