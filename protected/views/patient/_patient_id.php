@@ -42,7 +42,7 @@
 			<!-- NHS number -->
 			<div class="nhs-number">
 				<span class="hide-text print-only">
-					NHS number:
+					<?php echo $this->patient->getAttributeLabel('nhs_num')?>:
 				</span>
 				<?php echo $this->patient->nhsnum?>
 			</div>
