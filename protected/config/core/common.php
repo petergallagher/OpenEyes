@@ -344,5 +344,6 @@ return array(
 		'nhs_num_fixed_length' => 10,
 		'patient_summary_show_nhs_num' => false,
 		'nhs_logo' => false,
+		'allow_duplicate_identifiers' => false
 	),
 );
