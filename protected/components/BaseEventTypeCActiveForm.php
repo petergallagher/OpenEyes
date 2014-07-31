@@ -73,7 +73,7 @@ class BaseEventTypeCActiveForm extends FormLayout
 		));
 	}
 
-	public function radioBoolean($element, $field, $htmlOptions=array(), $layoutColumns=array())
+	public function radioBoolean($element, $field, $htmlOptions=array(), $layoutColumns=array(), $hidden=false)
 	{
 		$this->widget('application.widgets.RadioButtonList', array(
 			'element' => $element,
@@ -85,7 +85,8 @@ class BaseEventTypeCActiveForm extends FormLayout
 			),
 			'selected_item' => $element->$field,
 			'htmlOptions' => $htmlOptions,
-			'layoutColumns' => $layoutColumns
+			'layoutColumns' => $layoutColumns,
+			'hidden' => $hidden,
 		));
 	}
 
