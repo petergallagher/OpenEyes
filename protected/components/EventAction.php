@@ -25,8 +25,9 @@ class EventAction
 	public $href;
 	public $htmlOptions;
 	public $options = array(
-			'level' => 'primary',
-			'disabled' => false
+		'level' => 'primary',
+		'disabled' => false,
+		'display_order' => null
 	);
 
 	public static function button($label, $name, $options = null, $htmlOptions = null)

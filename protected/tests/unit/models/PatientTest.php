@@ -101,6 +101,8 @@ class PatientTest extends CDbTestCase
 			'last_name' => 'Last name',
 			'consent_last_name' => "Patient's surname/family name",
 			'consent_first_name' => "Patient's first names",
+			'age_years' => 'Years',
+			'age_months' => 'Months'
 		);
 
 		$this->assertEquals($expected, $this->model->attributeLabels());

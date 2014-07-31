@@ -733,11 +733,10 @@ class BaseEventTypeController extends BaseModuleController
 		);
 
 		$cancel_url = ($this->episode) ? '/patient/episode/'.$this->episode->id : '/patient/episodes/'.$this->patient->id;
-		$this->event_actions = array(
-				EventAction::link('Cancel',
-						Yii::app()->createUrl($cancel_url),
-						array('level' => 'cancel')
-				)
+
+		$this->event_actions[] = EventAction::link('Cancel',
+			Yii::app()->createUrl($cancel_url),
+			array('level' => 'cancel')
 		);
 
 		$this->render('create', array(
@@ -777,18 +776,14 @@ class BaseEventTypeController extends BaseModuleController
 		}
 
 		if ($this->checkDeleteAccess()) {
-			$this->event_actions = array(
-				EventAction::link('Delete',
-					Yii::app()->createUrl($this->event->eventType->class_name.'/default/delete/'.$this->event->id),
-					array('level' => 'delete')
-				)
+			$this->event_actions[] = EventAction::link('Delete',
+				Yii::app()->createUrl($this->event->eventType->class_name.'/default/delete/'.$this->event->id),
+				array('level' => 'delete')
 			);
 		} elseif ($this->checkRequestDeleteAccess()) {
-			$this->event_actions = array(
-				EventAction::link('Delete',
-					Yii::app()->createUrl($this->event->eventType->class_name.'/default/requestDeletion/'.$this->event->id),
-					array('level' => 'delete')
-				)
+			$this->event_actions[] = EventAction::link('Delete',
+				Yii::app()->createUrl($this->event->eventType->class_name.'/default/requestDeletion/'.$this->event->id),
+				array('level' => 'delete')
 			);
 		}
 
@@ -871,11 +866,9 @@ class BaseEventTypeController extends BaseModuleController
 				),
 		);
 
-		$this->event_actions = array(
-				EventAction::link('Cancel',
-						Yii::app()->createUrl($this->event->eventType->class_name.'/default/view/'.$this->event->id),
-						array('level' => 'cancel')
-				)
+		$this->event_actions[] = EventAction::link('Cancel',
+			Yii::app()->createUrl($this->event->eventType->class_name.'/default/view/'.$this->event->id),
+			array('level' => 'cancel')
 		);
 
 		$this->render($this->action->id, array(
