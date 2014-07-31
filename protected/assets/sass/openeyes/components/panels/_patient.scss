@@ -20,34 +20,34 @@
 //
 // Markup:
 // <div class="panel patient warning">
-// 	<div class="patient-details">
-// 		<a href="#">
-// 			<span class="patient-surname">SMITH,</span>
-// 			<span class="patient-name">John</span>
-// 			<span class="patient-age">(48)</span>
-// 		</a>
-// 	</div>
-// 	<div class="hospital-number">
-// 		No. 1001982
-// 	</div>
-// 	<div class="row">
-// 		<div class="large-6 column">
-// 			<div class="nhs-number">
-// 				<span class="hide-text">
-// 					NHS number:
-// 				</span>
-// 				451 380 5322
-// 			</div>
-// 			<span class="icon icon-alert icon-alert-female_trans">Female</span>
-// 			<span class="warning">
-// 				<span class="icon icon-alert icon-alert-warning"></span>
-// 				<span class="messages">Diabetes</span>
-// 			</span>
-// 		</div>
-// 		<div class="large-6 column text-right patient-summary-anchor">
-// 			<a href="#">Patient Summary</a>
-// 		</div>
-// 	</div>
+//	<div class="patient-details">
+//		<a href="#">
+//			<span class="patient-surname">SMITH,</span>
+//			<span class="patient-name">John</span>
+//			<span class="patient-age">(48)</span>
+//		</a>
+//	</div>
+//	<div class="hospital-number">
+//		No. 1001982
+//	</div>
+//	<div class="row">
+//		<div class="large-6 column">
+//			<div class="nhs-number">
+//				<span class="hide-text">
+//					NHS number:
+//				</span>
+//				451 380 5322
+//			</div>
+//			<span class="icon icon-alert icon-alert-female_trans">Female</span>
+//			<span class="warning">
+//				<span class="icon icon-alert icon-alert-warning"></span>
+//				<span class="messages">Diabetes</span>
+//			</span>
+//		</div>
+//		<div class="large-6 column text-right patient-summary-anchor">
+//			<a href="#">Patient Summary</a>
+//		</div>
+//	</div>
 // </div>
 //
 // Styleguide 13.3
@@ -105,7 +105,7 @@
 		.patient-name, .patient-age {
 			font-size: rem-calc(13px);
 		}
-		.hospital-number, .nhs-number {
+		.hospital-number, .nhs-number, .generic-number {
 			font-size: rem-calc(12px);
 		}
 		.patient-summary-anchor  {
@@ -139,6 +139,20 @@
 			color: white;
 			display: inline-block;
 			padding: 2px 3px 1px 33px;
+			@media print {
+				padding-left: 0;
+			}
+		}
+		.generic-number {
+			@include border-radius(3px);
+			background: {
+				color: #107ebd;
+				position: center left;
+				repeat: no-repeat;
+			};
+			color: white;
+			display: inline-block;
+			padding: 2px 3px 1px 4px;
 			@media print {
 				padding-left: 0;
 			}

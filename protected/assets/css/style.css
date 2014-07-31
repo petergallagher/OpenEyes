@@ -4105,7 +4105,7 @@ tfoot.pagination-container .pagination li {
   font-size: 0.8125rem;
 }
 /* line 108, ../sass/openeyes/components/panels/_patient.scss */
-.panel.patient .hospital-number, .panel.patient .nhs-number {
+.panel.patient .hospital-number, .panel.patient .nhs-number, .panel.patient .generic-number {
   font-size: 0.75rem;
 }
 /* line 111, ../sass/openeyes/components/panels/_patient.scss */
@@ -4153,19 +4153,39 @@ tfoot.pagination-container .pagination li {
     padding-left: 0;
   }
 }
+/* line 146, ../sass/openeyes/components/panels/_patient.scss */
+.panel.patient .generic-number {
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  -ms-border-radius: 3px;
+  -o-border-radius: 3px;
+  border-radius: 3px;
+  background-color: #107ebd;
+  background-position: center left;
+  background-repeat: no-repeat;
+  color: white;
+  display: inline-block;
+  padding: 2px 3px 1px 4px;
+}
 @media print {
   /* line 146, ../sass/openeyes/components/panels/_patient.scss */
+  .panel.patient .generic-number {
+    padding-left: 0;
+  }
+}
+@media print {
+  /* line 160, ../sass/openeyes/components/panels/_patient.scss */
   .panel.patient .patient-summary-anchor {
     display: none;
   }
 }
 @media print {
-  /* line 151, ../sass/openeyes/components/panels/_patient.scss */
+  /* line 165, ../sass/openeyes/components/panels/_patient.scss */
   .panel.patient .column, .panel.patient .columns {
     width: 100%;
   }
 }
-/* line 156, ../sass/openeyes/components/panels/_patient.scss */
+/* line 170, ../sass/openeyes/components/panels/_patient.scss */
 .panel.patient.warning {
   background-image: url('../img/_elements/icons/patient/patient-id_small-warning.png?1406619596'), -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #fff2d8), color-stop(100%, #ffe6b3));
   background-image: url('../img/_elements/icons/patient/patient-id_small-warning.png?1406619596'), -webkit-linear-gradient(top, #fff2d8 0%, #ffe6b3 100%);
@@ -4173,7 +4193,7 @@ tfoot.pagination-container .pagination li {
   background-image: url('../img/_elements/icons/patient/patient-id_small-warning.png?1406619596'), -o-linear-gradient(top, #fff2d8 0%, #ffe6b3 100%);
   background-image: url('../img/_elements/icons/patient/patient-id_small-warning.png?1406619596'), linear-gradient(top, #fff2d8 0%, #ffe6b3 100%);
 }
-/* line 159, ../sass/openeyes/components/panels/_patient.scss */
+/* line 173, ../sass/openeyes/components/panels/_patient.scss */
 .panel.patient.warning .warning .messages {
   display: none;
 }

@@ -343,5 +343,6 @@ return array(
 		'patient_summary_show_hos_num' => false,
 		'nhs_num_fixed_length' => 10,
 		'patient_summary_show_nhs_num' => false,
+		'nhs_logo' => false,
 	),
 );

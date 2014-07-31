@@ -40,7 +40,7 @@
 		<div class="large-6 column">
 
 			<!-- NHS number -->
-			<div class="nhs-number">
+			<div class="<?php if (Yii::app()->params['nhs_logo']) {?>nhs<?php }else{?>generic<?php }?>-number">
 				<span class="hide-text print-only">
 					<?php echo $this->patient->getAttributeLabel('nhs_num')?>:
 				</span>
