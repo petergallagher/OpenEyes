@@ -19,7 +19,21 @@
 ?>
 <div class="button-bar right">
 	<img class="loader" style="display: none;" src="<?php echo Yii::app()->assetManager->createUrl('img/ajax-loader.gif')?>" alt="loading..." />
-	<?php foreach ($this->event_actions as $action) { ?>
-		<?php echo $action->toHtml();?>
-	<?php } ?>
+	<?php
+		// First we set the display orders to match the order in which
+		// actions were added.
+		foreach($this->event_actions as $i => $action) {
+			if ($action->options['display_order'] === null) {
+				$action->options['display_order'] = $i;
+			}
+		}
+		// Now we can sort
+		usort($this->event_actions, function($a, $b) {
+			return $a->options['display_order'] - $b->options['display_order'];
+		});
+		// ..and output the action buttons.
+		foreach ($this->event_actions as $action) {
+			echo $action->toHtml().' ';
+		}
+	?>
 </div>
