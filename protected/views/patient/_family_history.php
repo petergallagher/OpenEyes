@@ -83,7 +83,7 @@
 								<label for="side_id">Side:</label>
 							</div>
 							<div class="<?php echo $form->columns('field');?>">
-								<?php echo CHtml::dropDownList('side_id','',CHtml::listData(FamilyHistorySide::model()->findAll(array('order'=>'display_order')),'id','name'))?>
+								<?php echo CHtml::dropDownList('side_id','',CHtml::listData(FamilyHistorySide::model()->getList(),'id','name'), array('empty' => '- Select -'))?>
 							</div>
 						</div>
 
@@ -104,6 +104,8 @@
 								<?php echo CHtml::textField('comments','')?>
 							</div>
 						</div>
+
+						<div class="family_history_form_errors alert-box alert hide"></div>
 
 						<div class="buttons">
 							<img src="<?php echo Yii::app()->assetManager->createUrl('img/ajax-loader.gif')?>" class="add_family_history_loader" style="display: none;" />
@@ -149,6 +151,7 @@
 		$('#add_family_history').slideToggle('fast');
 		$('#btn-add_family_history').attr('disabled',true);
 		$('#btn-add_family_history').addClass('disabled');
+		$('#edit_family_history_id').val('');
 	});
 	$('button.btn_cancel_family_history').click(function() {
 		$('#add_family_history').slideToggle('fast');
@@ -156,39 +159,31 @@
 		$('#btn-add_family_history').removeClass('disabled');
 		return false;
 	});
-	$('button.btn_save_family_history').click(function() {
-		var relText = $('#relative_id option:selected').text();
-		var sideText = $('#side_id option:selected').text();
-		if ($('#relative_id').val() == '') {
-			new OpenEyes.UI.Dialog.Alert({
-				content: "Please select a relative."
-			}).open();
-			return false;
-		}
-		if ($('#side_id').val() == '') {
-			new OpenEyes.UI.Dialog.Alert({
-				content: "Please select a side."
-			}).open();
-			return false;
-		}
-		if ($('#condition_id').val() == '') {
-			new OpenEyes.UI.Dialog.Alert({
-				content: "Please select a condition."
-			}).open();
-			return false;
-		}
-		if( (relText == 'Mother' && sideText == 'Paternal') || (relText == 'Father' && sideText == 'Maternal')){
-			new OpenEyes.UI.Dialog.Alert({
-				content: "Cannot select Maternal relation with Father or Paternal relation with Mother."
-			}).open();
-			return false;
-		}
+	$('button.btn_save_family_history').click(function(e) {
+		e.preventDefault();
 
-		$('img.add_family_history_loader').show();
-		return true;
+		$('.family_history_form_errors').html('');
+		$('.family_history_form_errors').hide();
+
+		$.ajax({
+			'type': 'POST',
+			'url': baseUrl+'/patient/validateFamilyHistory',
+			'data': 'YII_CSRF_TOKEN=' + YII_CSRF_TOKEN + '&patient_id=' + OE_patient_id + '&family_history_id=' + $('#edit_family_history_id').val() + '&relative_id=' + $('#relative_id').val() + '&side_id=' + $('#side_id').val() + '&condition_id=' + $('#condition_id').val() + '&comments=' + $('#comments').val(),
+			'dataType': 'json',
+			'success': function(errors) {
+				if (errors.length == 0) {
+					$('#add-family_history').submit();
+				} else {
+					for (var i in errors) {
+						$('.family_history_form_errors').append('<div>' + errors[i] + '</div>');
+					}
+					$('.family_history_form_errors').show();
+				}
+			}
+		});
 	});
-	$('a.editFamilyHistory').click(function(e) {
 
+	$('a.editFamilyHistory').click(function(e) {
 		var tr = $(this).closest('tr');
 		var history_id = $(this).attr('rel');
 
@@ -197,24 +192,26 @@
 		$('#relative_id').children('option').map(function() {
 			if ($(this).text() == relative) {
 				$(this).attr('selected','selected');
+				updateSidesByRelative($(this).val(),function() {
+					var side = tr.find('.side').text();
+					$('#side_id').children('option').map(function() {
+						if ($(this).text() == side) {
+							$(this).attr('selected','selected');
+						}
+					});
+					var condition = tr.find('.condition').text();
+					$('#condition_id').children('option').map(function() {
+						if ($(this).text() == condition) {
+							$(this).attr('selected','selected');
+						}
+					});
+					$('#add_family_history #comments').val(tr.find('.comments').text());
+					$('#add_family_history').slideDown('fast');
+					$('#btn-add_family_history').attr('disabled',true);
+					$('#btn-add_family_history').addClass('disabled');
+				});
 			}
 		});
-		var side = tr.find('.side').text();
-		$('#side_id').children('option').map(function() {
-			if ($(this).text() == side) {
-				$(this).attr('selected','selected');
-			}
-		});
-		var condition = tr.find('.condition').text();
-		$('#condition_id').children('option').map(function() {
-			if ($(this).text() == condition) {
-				$(this).attr('selected','selected');
-			}
-		});
-		$('#add_family_history #comments').val(tr.find('.comments').text());
-		$('#add_family_history').slideToggle('fast');
-		$('#btn-add_family_history').attr('disabled',true);
-		$('#btn-add_family_history').addClass('disabled');
 
 		e.preventDefault();
 	});
@@ -261,5 +258,24 @@
 		return false;
 	});
 
+	$('#relative_id').change(function(e) {
+		updateSidesByRelative($(this).val(),false);
+	});
 
+	function updateSidesByRelative(relative_id,callback)
+	{
+		var side_id = $('#side_id').val();
+		var relative = $(this).children('option:selected').text();
+
+		$.ajax({
+			'type': 'GET',
+			'url': baseUrl + '/patient/getSidesForRelative?relative_id=' + relative_id,
+			'success': function(html) {
+				$('#side_id').html(html);
+				if (callback) {
+					callback();
+				}
+			}
+		});
+	}
 </script>

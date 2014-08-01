@@ -81,7 +81,9 @@ class FamilyHistory extends BaseActiveRecordVersioned
 	{
 		return array(
 			'id' => 'ID',
-			'name' => 'Name',
+			'relative_id' => 'Relative',
+			'side_id' => 'Side',
+			'condition_id' => 'Condition',
 		);
 	}
 
@@ -104,12 +106,14 @@ class FamilyHistory extends BaseActiveRecordVersioned
 		));
 	}
 
-	public function validRelativeSideRelationship(){
-		if(($this->relative->name == 'Mother' && $this->side->name == 'Paternal') ||
-			($this->relative->name == 'Father' && $this->side->name == 'Maternal')
-		){
-			return false;
+	public function afterValidate()
+	{
+		if ($this->relative && $this->side) {
+			if (!$this->side->always_show && !FamilyHistoryRelativeSide::model()->find('relative_id=? and side_id=?',array($this->relative_id,$this->side_id))) {
+				$this->addError('side_id','Side cannot be '.$this->side->name.' when relative is '.$this->relative->name);
+			}
 		}
-		return true;
+
+		return parent::afterValidate();
 	}
 }

@@ -18,17 +18,17 @@
  */
 
 /**
- * This is the model class for table "family_history_side".
+ * This is the model class for table "family_history_relative_side".
  *
- * The followings are the available columns in table 'family_history_side':
+ * The followings are the available columns in table 'family_history_relative_side':
  * @property integer $id
  * @property string $name
  */
-class FamilyHistorySide extends BaseActiveRecordVersioned
+class FamilyHistoryRelativeSide extends BaseActiveRecordVersioned
 {
 	/**
 	 * Returns the static model of the specified AR class.
-	 * @return FamilyHistorySide the static model class
+	 * @return FamilyHistoryRelativeSide the static model class
 	 */
 	public static function model($className=__CLASS__)
 	{
@@ -40,7 +40,7 @@ class FamilyHistorySide extends BaseActiveRecordVersioned
 	 */
 	public function tableName()
 	{
-		return 'family_history_side';
+		return 'family_history_relative_side';
 	}
 
 	/**
@@ -51,7 +51,7 @@ class FamilyHistorySide extends BaseActiveRecordVersioned
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('name, display_order', 'safe'),
+			array('relative_id, side_id', 'safe'),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
 			array('id, name', 'safe', 'on'=>'search'),
@@ -66,6 +66,8 @@ class FamilyHistorySide extends BaseActiveRecordVersioned
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return array(
+			'relative' => array(self::BELONGS_TO, 'FamilyHistoryRelative', 'relative_id'),
+			'side' => array(self::BELONGS_TO, 'FamilyHistorySide', 'side_id'),
 		);
 	}
 
@@ -76,7 +78,6 @@ class FamilyHistorySide extends BaseActiveRecordVersioned
 	{
 		return array(
 			'id' => 'ID',
-			'name' => 'Name',
 		);
 	}
 
@@ -97,20 +98,5 @@ class FamilyHistorySide extends BaseActiveRecordVersioned
 		return new CActiveDataProvider(get_class($this), array(
 			'criteria'=>$criteria,
 		));
-	}
-
-	public function getList($relative=false)
-	{
-		$criteria = new CDbCriteria;
-		$criteria->order = 'display_order asc';
-
-		if ($relative) {
-			$criteria->join = "left join family_history_relative_side on side_id = t.id and relative_id = $relative->id";
-			$criteria->addCondition('always_show = 1 or family_history_relative_side.id is not null');
-		} else {
-			$criteria->addCondition('always_show = 1');
-		}
-
-		return FamilyHistorySide::model()->findAll($criteria);
 	}
 }

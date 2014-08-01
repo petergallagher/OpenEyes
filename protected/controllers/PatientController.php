@@ -82,11 +82,11 @@ class PatientController extends BaseController
 				'roles' => array('OprnEditMedication'),
 			),
 			array('allow',
-				'actions' => array('addFamilyHistory', 'removeFamilyHistory'),
+				'actions' => array('validateFamilyHistory', 'addFamilyHistory', 'removeFamilyHistory'),
 				'roles' => array('OprnEditFamilyHistory')
 			),
 			array('allow',
-				'actions' => array('validatePatientDetails', 'updatePatientDetails', 'create', 'validatePatientContactDetails', 'updatePatientContactDetails', 'GPSearch', 'getGPDetails', 'practiceSearch', 'getPracticeDetails', 'updatePatientGPAndPracticeDetails', 'getAge', 'getYearOfBirth'),
+				'actions' => array('validatePatientDetails', 'updatePatientDetails', 'create', 'validatePatientContactDetails', 'updatePatientContactDetails', 'GPSearch', 'getGPDetails', 'practiceSearch', 'getPracticeDetails', 'updatePatientGPAndPracticeDetails', 'getAge', 'getYearOfBirth', 'getSidesForRelative'),
 				'roles' => array('OprnEditPatientDetails')
 			),
 			array('allow',
@@ -1000,49 +1000,64 @@ class PatientController extends BaseController
 
 	}
 
-	public function actionAddFamilyHistory()
+	public function actionValidateFamilyHistory()
 	{
-		if (!$patient = Patient::model()->findByPk(@$_POST['patient_id'])) {
-			throw new Exception("Patient not found:".@$_POST['patient_id']);
-		}
-
-		if (!$relative = FamilyHistoryRelative::model()->findByPk(@$_POST['relative_id'])) {
-			throw new Exception("Unknown relative: ".@$_POST['relative_id']);
-		}
-
-		if (!$side = FamilyHistorySide::model()->findByPk(@$_POST['side_id'])) {
-			throw new Exception("Unknown side: ".@$_POST['side_id']);
-		}
-
-		if (!$condition = FamilyHistoryCondition::model()->findByPk(@$_POST['condition_id'])) {
-			throw new Exception("Unknown condition: ".@$_POST['condition_id']);
-		}
-
-		if (@$_POST['edit_family_history_id']) {
-			if (!$fh = FamilyHistory::model()->findByPk(@$_POST['edit_family_history_id'])) {
-				throw new Exception("Family history not found: ".@$_POST['edit_family_history_id']);
-			}
-			$fh->relative_id = $relative->id;
-			$fh->side_id = $side->id;
-			$fh->condition_id = $condition->id;
-			$fh->comments = @$_POST['comments'];
-
-			if(!$fh->validRelativeSideRelationship()){
-				Yii::app()->user->setFlash('patient.family_history', $fh->relative->name . ' and ' . $fh->side->name . " cannot be selected at the same time in Family History.");
-				$this->redirect(array('patient/view/'.$patient->id ));
-			}
-
-			if (!$fh->save()) {
-				throw new Exception("Unable to save family history: ".print_r($fh->getErrors(),true));
+		if (@$_POST['family_history_id']) {
+			if (!$fh = FamilyHistory::model()->findByPk($_POST['family_history_id'])) {
+				throw new Exception("FamilyHistory not found: ".$_POST['family_history_id']);
 			}
 		} else {
-			$result = $patient->addFamilyHistory($relative->id,$side->id,$condition->id,@$_POST['comments']);
-			if(!$result){
-				Yii::app()->user->setFlash('patient.family_history', 'Cannot select Maternal relation with Father or Paternal relation with Mother.');
-				$this->redirect(array('patient/view/'.$patient->id ));
+			$fh = new FamilyHistory;
+		}
+
+		if (!$patient = Patient::model()->findByPk($_POST['patient_id'])) {
+			throw new Exception("Patient not found: ".$_POST['patient_id']);
+		}
+		
+		$fh->patient_id = $_POST['patient_id'];
+		$fh->relative_id = $_POST['relative_id'];
+		$fh->side_id = $_POST['side_id'];
+		$fh->condition_id = $_POST['condition_id'];
+		$fh->comments = $_POST['comments'];
+
+		$errors = array();
+
+		if (!$fh->validate()) {
+			foreach ($fh->errors as $error) { 
+				$errors[] = $error[0];
 			}
 		}
-		$this->redirect(array('patient/view/'.$patient->id));
+		
+		echo json_encode($errors);
+	}
+
+	public function actionAddFamilyHistory()
+	{
+		if (@$_POST['family_history_id']) {
+			if (!$fh = FamilyHistory::model()->findByPk($_POST['family_history_id'])) {
+				throw new Exception("FamilyHistory not found: ".$_POST['family_history_id']);
+			}
+		} else {
+			$fh = new FamilyHistory;
+		}
+
+		if (!$patient = Patient::model()->findByPk($_POST['patient_id'])) {
+			throw new Exception("Patient not found: ".$_POST['patient_id']);
+		}
+
+		$fh->patient_id = $_POST['patient_id'];
+		$fh->relative_id = $_POST['relative_id'];
+		$fh->side_id = $_POST['side_id'];
+		$fh->condition_id = $_POST['condition_id'];
+		$fh->comments = $_POST['comments'];
+
+		if (!$fh->validate()) {
+			throw new Exception("Unable to save FamilyHistory item: ".print_r($fh->errors,true));
+		} else {
+			$patient->addFamilyHistory($_POST['relative_id'],$_POST['side_id'],$_POST['condition_id'],$_POST['comments']);
+		}
+
+		$this->redirect(array('/patient/view/'.$patient->id));
 	}
 
 	public function actionRemovePreviousOperation()
@@ -1933,5 +1948,12 @@ class PatientController extends BaseController
 		} else {
 			echo date('Y') - $_GET['age'];
 		}
+	}
+
+	public function actionGetSidesForRelative()
+	{
+		$relative = FamilyHistoryRelative::model()->findByPk(@$_GET['relative_id']);
+
+		echo CHtml::dropDownList('side_id','',CHtml::listData(FamilyHistorySide::model()->getList($relative),'id','name'),array('empty' => '- Select -'));
 	}
 }
