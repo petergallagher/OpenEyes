@@ -152,7 +152,7 @@
 					</div>
 				</div>
 			</div>
-			<div class="row data-row">
+			<div class="row field-row">
 				<div class="large-4 column">
 					<div class="data-label"></div>
 				</div>
@@ -165,7 +165,7 @@
 					</div>
 				</div>
 			</div>
-			<div class="row data-row approximateAge"<?php if (!$patient->ageIsApproximate) {?> style="display: none"<?php }?>>
+			<div class="row field-row approximateAge"<?php if (!$patient->ageIsApproximate) {?> style="display: none"<?php }?>>
 				<div class="large-4 column">
 					<div class="data-label">Approximate age:</div>
 				</div>
