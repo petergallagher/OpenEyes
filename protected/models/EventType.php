@@ -308,6 +308,7 @@ class EventType extends BaseActiveRecordVersioned
 			$ids[] = $parent->id;
 		}
 		$criteria->addInCondition('event_type_id',$ids);
+		$criteria->compare('active',1);
 		$criteria->order = 'display_order asc';
 
 		return ElementType::model()->findAll($criteria);

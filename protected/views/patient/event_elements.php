@@ -21,7 +21,7 @@
 	<?php $this->renderOpenElements($this->action->id, $form)?>
 </div>
 
-<?php if (count($this->getOptionalElements())) {?>
+<?php if (count($this->getAllOptionalElements())) {?>
 	<section class="optional-elements">
 		<header class="optional-elements-header">
 			<h3 class="optional-elements-title">Optional Elements</h3>

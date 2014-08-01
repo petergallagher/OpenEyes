@@ -273,6 +273,23 @@ class BaseEventTypeController extends BaseModuleController
 	}
 
 	/**
+	 * Get all the optional elements for the current module's event type (that are not children)
+	 * regardless of whether open or not
+	 *
+	 * @return BaseEventTypeElement[] $elements
+	 */
+	public function getAllOptionalElements()
+	{
+		$optional = array();
+		foreach ($this->event_type->getAllElementTypes() as $element_type) {
+			if (!$element_type->default && !$element_type->isChild()) {
+				$optional[] = $element_type->getInstance();
+			}
+		}
+		return $optional;
+	}
+
+	/**
 	 * Get the child optional elements for the given element type
 	 *
 	 * @param ElementType $parent_type
@@ -1635,7 +1652,7 @@ class BaseEventTypeController extends BaseModuleController
 
 	/**
 	 * set base js vars for use in the standard scripts for the controller
- 	 */
+	 */
 	public function processJsVars()
 	{
 		if ($this->patient) {
