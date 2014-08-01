@@ -100,6 +100,8 @@ $(document).ready(function() {
 			data += '&' + $(this).attr('name') + '=' + $(this).val();
 		});
 
+		data += '&patient_id=' + OE_patient_id;
+
 		var i = table.children('tbody').children('tr:last').data('i');
 
 		if (typeof(i) == 'undefined') {
