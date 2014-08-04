@@ -36,107 +36,83 @@ class FamilyHistoryTest extends CDbTestCase
 		'family_history_relative' => 'FamilyHistoryRelative'
 	);
 
-    /**
-     * Tears down the fixture, for example, closes a network connection.
-     * This method is called after a test is executed.
-     */
-    protected function tearDown()
-    {
-    }
+	/**
+	 * Tears down the fixture, for example, closes a network connection.
+	 * This method is called after a test is executed.
+	 */
+	protected function tearDown()
+	{
+	}
 
-    /**
-     * @covers FamilyHistory::model
-     * @todo   Implement testModel().
-     */
-    public function testModel()
-    {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-          'This test has not been implemented yet.'
-        );
-    }
+	/**
+	 * @covers FamilyHistory::model
+	 * @todo   Implement testModel().
+	 */
+	public function testModel()
+	{
+		// Remove the following lines when you implement this test.
+		$this->markTestIncomplete(
+			'This test has not been implemented yet.'
+		);
+	}
 
-    /**
-     * @covers FamilyHistory::tableName
-     * @todo   Implement testTableName().
-     */
-    public function testTableName()
-    {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-          'This test has not been implemented yet.'
-        );
-    }
+	/**
+	 * @covers FamilyHistory::tableName
+	 * @todo   Implement testTableName().
+	 */
+	public function testTableName()
+	{
+		// Remove the following lines when you implement this test.
+		$this->markTestIncomplete(
+			'This test has not been implemented yet.'
+		);
+	}
 
-    /**
-     * @covers FamilyHistory::rules
-     * @todo   Implement testRules().
-     */
-    public function testRules()
-    {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-          'This test has not been implemented yet.'
-        );
-    }
+	/**
+	 * @covers FamilyHistory::rules
+	 * @todo   Implement testRules().
+	 */
+	public function testRules()
+	{
+		// Remove the following lines when you implement this test.
+		$this->markTestIncomplete(
+			'This test has not been implemented yet.'
+		);
+	}
 
-    /**
-     * @covers FamilyHistory::relations
-     * @todo   Implement testRelations().
-     */
-    public function testRelations()
-    {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-          'This test has not been implemented yet.'
-        );
-    }
+	/**
+	 * @covers FamilyHistory::relations
+	 * @todo   Implement testRelations().
+	 */
+	public function testRelations()
+	{
+		// Remove the following lines when you implement this test.
+		$this->markTestIncomplete(
+			'This test has not been implemented yet.'
+		);
+	}
 
-    /**
-     * @covers FamilyHistory::attributeLabels
-     * @todo   Implement testAttributeLabels().
-     */
-    public function testAttributeLabels()
-    {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-          'This test has not been implemented yet.'
-        );
-    }
+	/**
+	 * @covers FamilyHistory::attributeLabels
+	 * @todo   Implement testAttributeLabels().
+	 */
+	public function testAttributeLabels()
+	{
+		// Remove the following lines when you implement this test.
+		$this->markTestIncomplete(
+			'This test has not been implemented yet.'
+		);
+	}
 
-    /**
-     * @covers FamilyHistory::search
-     * @todo   Implement testSearch().
-     */
-    public function testSearch()
-    {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-          'This test has not been implemented yet.'
-        );
-    }
-
-	public function testValidRelativeSideRelationship(){
-		$fatherRel = $this->family_history_relative('fhr2');
-		$motherRel = $this->family_history_relative('fhr1');
-		$paternalSide =  $this->family_history_side('fhs3');
-		$maternalSide =  $this->family_history_side('fhs2');
-
-
-		$this->object->relative = $fatherRel;
-		$this->object->side = $paternalSide;
-		$this->assertTrue($this->object->validRelativeSideRelationship());
-
-		$this->object->relative = $motherRel;
-		$this->object->side = $maternalSide;
-		$this->assertTrue($this->object->validRelativeSideRelationship());
-
-		$this->object->relative = $fatherRel;
-		$this->object->side = $maternalSide;
-		$this->assertFalse($this->object->validRelativeSideRelationship());
-
-		$this->object->relative = $motherRel;
-		$this->object->side = $paternalSide;
-		$this->assertFalse($this->object->validRelativeSideRelationship());
+	/**
+	 * @covers FamilyHistory::search
+	 * @todo   Implement testSearch().
+	 */
+	public function testSearch()
+	{
+		// Remove the following lines when you implement this test.
+		$this->markTestIncomplete(
+			'This test has not been implemented yet.'
+		);
 	}
 }
