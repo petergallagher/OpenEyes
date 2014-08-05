@@ -27,24 +27,21 @@ $currentAction = $this->action->getId();
 				</div>
 				<div class="large-8 column">
 					<div class="data-value">
-						<?php echo CHtml::textField('hos_num',$patient->hos_num, ( ( $auto_hos_num && $currentAction == 'create')? array('disabled' =>'disabled'): array()));
-						if($currentAction == 'create'){
-						?>
-
-						<div class="row data-row">
-							<div class="large-3 column">
-								<div class="data-label">Automatic :</div>
-							</div>
-
-							<div class="large-9 column"><?php
-							echo CHtml::checkBox('auto_hos_num',$auto_hos_num);
-						?> </div>
-						</div>
-						<?php
-						} ?>
+						<?php echo CHtml::textField('hos_num',$patient->hos_num, ( ( $auto_hos_num && $currentAction == 'create')? array('disabled' =>'disabled'): array()));?>
 					</div>
 				</div>
 			</div>
+			<?php if($currentAction == 'create'){?>
+			<div class="row field-row">
+				<div class="large-4 column">&nbsp;</div>
+				<div class="large-8 column">
+					<?php
+					echo CHtml::checkBox('auto_hos_num',$auto_hos_num);
+					?>
+					<label for="auto_hos_num">Auto generate record</label>
+				</div>
+			</div>
+			<?php } ?>
 			<?php echo $this->renderPartial('_patient_metadata_edit',array('patient'=>$patient,'after'=>'hos_num'))?>
 			<?php echo $this->renderPartial('_patient_metadata_edit',array('patient'=>$patient,'before'=>'nhs_num'))?>
 			<div class="row data-row">
