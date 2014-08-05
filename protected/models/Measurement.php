@@ -77,4 +77,20 @@ abstract class Measurement extends BaseActiveRecordVersioned
 		$this->patient_measurement_id = $this->getPatientMeasurement()->id;
 		return true;
 	}
+
+	static public function isMeasurementClass($class_name)
+	{
+		$a = new $class_name;
+		return ($a instanceof self);
+	}
+
+	public function __toString()
+	{
+		return $this->{$this->valueField} ? $this->{$this->valueField} : '';
+	}
+
+	public function setValue($value)
+	{
+		$this->{$this->valueField} = $value;
+	}
 }
