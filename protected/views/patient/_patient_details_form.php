@@ -16,6 +16,9 @@
  * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
  * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
  */
+
+$auto_hos_num = $this->isAutoHosNum();
+$currentAction = $this->action->getId();
 ?>
 			<?php echo $this->renderPartial('_patient_metadata_edit',array('patient'=>$patient,'before'=>'hos_num'))?>
 			<div class="row data-row">
@@ -24,10 +27,21 @@
 				</div>
 				<div class="large-8 column">
 					<div class="data-value">
-						<?php echo CHtml::textField('hos_num',$patient->hos_num)?>
+						<?php echo CHtml::textField('hos_num',$patient->hos_num, ( ( $auto_hos_num && $currentAction == 'create')? array('disabled' =>'disabled'): array()));?>
 					</div>
 				</div>
 			</div>
+			<?php if($currentAction == 'create'){?>
+			<div class="row field-row">
+				<div class="large-4 column">&nbsp;</div>
+				<div class="large-8 column">
+					<?php
+					echo CHtml::checkBox('auto_hos_num',$auto_hos_num);
+					?>
+					<label for="auto_hos_num">Auto generate record</label>
+				</div>
+			</div>
+			<?php } ?>
 			<?php echo $this->renderPartial('_patient_metadata_edit',array('patient'=>$patient,'after'=>'hos_num'))?>
 			<?php echo $this->renderPartial('_patient_metadata_edit',array('patient'=>$patient,'before'=>'nhs_num'))?>
 			<div class="row data-row">
