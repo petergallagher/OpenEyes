@@ -1129,4 +1129,10 @@ class PatientTest extends CDbTestCase
 		$this->assertInternalType('string', $patient->getError('hos_num') ) ;
 		$this->assertEquals( 'Hospital number "12345" has already been taken.',$patient->getError('hos_num') ) ;
 	}
+
+	public function testGetNextHosNum(){
+		// fixtures max hos_num 34567
+		$nextHosNum = $this->model->getNextHosNum();
+		$this->assertEquals(34568,$nextHosNum);
+	}
 }

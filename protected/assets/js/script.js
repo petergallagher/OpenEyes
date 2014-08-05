@@ -311,6 +311,17 @@ $(document).ready(function(){
 		e.preventDefault();
 		window.history.back();
 	});
+
+	$(this).on('click', '#auto_hos_num' , function(e) {
+		console.log('Element burdel ' + e.srcElement)
+		if($(e.srcElement).attr('checked')){
+			$('#hos_num').val();
+			$('#hos_num').attr('disabled', 'disabled');
+		}
+		else{
+			$('#hos_num').removeAttr('disabled');
+		}
+	});
 });
 
 function update_patient_age(dob,dod,yob)

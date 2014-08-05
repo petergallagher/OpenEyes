@@ -1598,4 +1598,12 @@ class Patient extends BaseActiveRecordVersioned
 			$this->yob = $this->mob = '';
 		}
 	}
+	/*
+	 * @return integer
+	 */
+	public function getNextHosNum(){
+		return Yii::app()->db->createCommand(
+			'select (MAX(CAST(hos_num AS UNSIGNED)) +1) as nextHosNum    from ' . $this->tableName()
+		)->queryScalar();
+	}
 }

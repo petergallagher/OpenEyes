@@ -1623,7 +1623,6 @@ class PatientController extends BaseController
 		$gp = new Gp;
 		$practice = new Practice;
 		$address->country_id = Country::model()->find('name=?',array(Yii::app()->params['default_country']))->id;
-
 		$errors = array();
 
 		if (!empty($_POST)) {
@@ -1638,6 +1637,11 @@ class PatientController extends BaseController
 
 			$patient->attributes = Helper::convertNHS2MySQL($_POST);
 			$patient->populateDateFields();
+
+			if(Yii::app()->request->getPost('auto_hos_num') == true ){
+				$patient->hos_num = $patient->getNextHosNum();
+				unset($patient->auto_hos_num);
+			}
 
 			if (!$patient->save()) {
 				$errors = $patient->getErrors();
@@ -1701,7 +1705,7 @@ class PatientController extends BaseController
 			'address' => $address,
 			'gp' => $gp,
 			'practice' => $practice,
-			'errors' => $errors,
+			'errors' => $errors
 		));
 	}
 
@@ -1955,5 +1959,11 @@ class PatientController extends BaseController
 		$relative = FamilyHistoryRelative::model()->findByPk(@$_GET['relative_id']);
 
 		echo CHtml::dropDownList('side_id','',CHtml::listData(FamilyHistorySide::model()->getList($relative),'id','name'),array('empty' => '- Select -'));
+	}
+
+	public function isAutoHosNum(){
+		return (
+			( isset(Yii::app()->params['add_patient_autogenerate_identifier']) && Yii::app()->params['add_patient_autogenerate_identifier'] == true)
+			|| Yii::app()->request->getPost('auto_hos_num') == true ) ? true :false;
 	}
 }
