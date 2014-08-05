@@ -18,6 +18,7 @@
  */
 
 $auto_hos_num = $this->isAutoHosNum();
+$currentAction = $this->action->getId();
 ?>
 			<?php echo $this->renderPartial('_patient_metadata_edit',array('patient'=>$patient,'before'=>'hos_num'))?>
 			<div class="row data-row">
@@ -26,7 +27,10 @@ $auto_hos_num = $this->isAutoHosNum();
 				</div>
 				<div class="large-8 column">
 					<div class="data-value">
-						<?php echo CHtml::textField('hos_num',$patient->hos_num, ($auto_hos_num? array('disabled' =>'disabled'): array()))?>
+						<?php echo CHtml::textField('hos_num',$patient->hos_num, ( ( $auto_hos_num && $currentAction == 'create')? array('disabled' =>'disabled'): array()));
+						if($currentAction == 'create'){
+						?>
+
 						<div class="row data-row">
 							<div class="large-3 column">
 								<div class="data-label">Automatic :</div>
@@ -36,6 +40,8 @@ $auto_hos_num = $this->isAutoHosNum();
 							echo CHtml::checkBox('auto_hos_num',$auto_hos_num);
 						?> </div>
 						</div>
+						<?php
+						} ?>
 					</div>
 				</div>
 			</div>
