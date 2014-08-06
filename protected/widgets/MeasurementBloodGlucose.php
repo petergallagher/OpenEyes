@@ -22,7 +22,11 @@ class MeasurementBloodGlucose extends BaseFieldWidget
 	public function init()
 	{
 		if (is_object($this->element) && $this->field) {
-			$this->value = $this->element->{$this->field}->getValue();
+			if ($this->element->{$this->field}) {
+				$this->value = $this->element->{$this->field}->getValue();
+			} else {
+				$this->value = '';
+			}
 		}
 
 		// if the widget has javascript, load it in
