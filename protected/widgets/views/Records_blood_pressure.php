@@ -17,40 +17,5 @@
  * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
  */
 
-class Records extends BaseFieldWidget
-{
-	public $form;
-	public $element;
-	public $edit = true;
-	public $model;
-	public $field;
-	public $columns;
-	public $no_items_text = 'No items have been entered.';
-	public $add_button_text = 'Add item';
-	public $validate_method;
-	public $row_view;
-	public $use_last_button_text = 'Use last item';
-	public $headings = array('Date/time','Description');
-	public $include_timestamp = true;
-
-	public function init()
-	{
-		if (is_object($this->element) && $this->field) {
-			if (is_object($this->element->{$this->field}) && $this->element->{$this->field} instanceof Measurement) {
-				$this->value = $this->element->{$this->field}->getValue();
-			} else {
-				$this->value = $this->element->{$this->field};
-			}
-		}
-
-		// if the widget has javascript, load it in
-		if (file_exists("protected/widgets/js/".get_class($this).".js")) {
-			$this->assetFolder = Yii::app()->getAssetManager()->publish('protected/widgets/js');
-		}
-	}
-
-	public function run()
-	{
-		$this->render(get_class($this));
-	}
-}
+echo CHtml::textField($column_field['field'].'_systolic','',array('class' => 'recordInput bpSystolic')).' / ';
+echo CHtml::textField($column_field['field'].'_diastolic','',array('class' => 'recordInput bpDiastolic'));

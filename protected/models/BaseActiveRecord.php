@@ -28,6 +28,7 @@ class BaseActiveRecord extends CActiveRecord
 	// flag to automatically update related objects on the record
 	// (whilst developing this feature, will allow other elements to continue to work)
 	protected $auto_update_relations = false;
+	protected $auto_update_measurements = false;
 
 	/**
 	 * If an array of arrays is passed for a HAS_MANY relation attribute, will create appropriate objects
@@ -84,6 +85,31 @@ class BaseActiveRecord extends CActiveRecord
 				}
 			}
 		}
+
+		if ($this->auto_update_measurements) {
+			if (isset($this->getMetaData()->relations[$name])) {
+				$relations = $this->relations();
+				$relation = $relations[$name];
+
+				if ($relation[0] == 'CBelongsToRelation') {
+					if (Measurement::isMeasurementClass($relation[1])) {
+						$class = $relation[1];
+
+						if (!is_object($value) && $value !== null && $value !== '') {
+							if ($measurement = $this->$name) {
+								$measurement->setValue($value);
+							} else {
+								$measurement = new $class;
+								$measurement->setValue($value);
+							}
+
+							$value = $measurement;
+						}
+					}
+				}
+			}
+		}
+
 		parent::__set($name, $value);
 	}
 
@@ -126,6 +152,10 @@ class BaseActiveRecord extends CActiveRecord
 			if ($this->tableSchema->columns[$field]->allowNull && !$this->{$field}) {
 				$this->{$field} = null;
 			}
+		}
+
+		if ($this->auto_update_measurements) {
+			$this->updateMeasurements();
 		}
 
 		return parent::beforeSave();
@@ -376,6 +406,7 @@ class BaseActiveRecord extends CActiveRecord
 				}
 			}
 		}
+
 		parent::afterSave();
 	}
 
@@ -484,5 +515,40 @@ class BaseActiveRecord extends CActiveRecord
 
 	public function textWithLineBreaks($field) {
 		return str_replace("\n",'<br/>',CHtml::encode($this->$field));
+	}
+
+	public function updateMeasurements()
+	{
+		foreach ($this->relations() as $relation => $def) {
+			if ($def[0] == 'CBelongsToRelation') {
+				if (Measurement::isMeasurementClass($def[1])) {
+					$class = $def[1];
+
+					if ($this->{$def[2]} && $measurement = $class::model()->findByPk($this->{$def[2]})) {
+						if ($this->$relation) {
+							$measurement->setValue($this->$relation ? $this->$relation->getValue() : null);
+
+							if (!$measurement->save()) {
+								throw new Exception("Unable to save Measurement: ".print_r($measurement->errors,true));
+							}
+
+							$this->$relation = $measurement;
+						}
+					} else {
+						$measurement = new $class;
+						$measurement->setPatient_id($this->event->episode->patient_id);
+						$measurement->setValue($this->$relation ? $this->$relation->getValue() : null);
+
+						if (!$measurement->save()) {
+							throw new Exception("Unable to save Measurement: ".print_r($measurement->errors,true));
+						}
+
+						$measurement->attach($this->event, true);
+
+						$this->{$def[2]} = $measurement->id;
+					}
+				}
+			}
+		}
 	}
 }

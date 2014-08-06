@@ -34,22 +34,6 @@ class BaseCWidget extends CWidget
 			$this->value = $this->element->{$this->field};
 		}
 
-		/*
-		if (is_object($this->element)) {
-			if (empty($_POST)) {
-				if (isset($this->element->{$this->field})) {
-					$this->value = $this->element->{$this->field};
-				}
-			} else {
-				$this->value = @$_POST[get_class($this->element)][$this->field];
-			}
-
-			if ($this->field && $this->element->hasAttribute($this->field)) {
-				$this->element->{$this->field} = $this->value;
-			}
-		}
-		*/
-
 		// if the widget has javascript, load it in
 		if (file_exists("protected/widgets/js/".get_class($this).".js")) {
 			$this->assetFolder = Yii::app()->getAssetManager()->publish('protected/widgets/js');

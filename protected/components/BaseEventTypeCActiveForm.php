@@ -137,6 +137,17 @@ class BaseEventTypeCActiveForm extends FormLayout
 		));
 	}
 
+	public function bloodGlucoseMeasurement($element, $htmlOptions, $layoutColumns)
+	{
+		$this->widget('application.widgets.MeasurementBloodGlucose', array(
+			'element' => $element,
+			'name' => CHtml::modelName($element).'[blood_glucose_m]',
+			'field' => 'blood_glucose_m',
+			'htmlOptions' => $htmlOptions,
+			'layoutColumns' => $layoutColumns
+		));
+	}
+
 	public function passwordField($element, $field, $htmlOptions=array(), $layoutColumns=array())
 	{
 		$htmlOptions['password'] = 1;
