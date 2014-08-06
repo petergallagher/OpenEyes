@@ -22,7 +22,7 @@
 		<div class="large-4 column">
 			<label><?php echo $model->getAttributeLabel($column_field['field'])?>:</label>
 		</div>
-		<div class="large-<?php if (@$column_field['width']) { echo $column_field['width']; } else { echo '4'; }?> column end">
+		<div class="large-<?php if (@$column_field['width']) { echo $column_field['width']; } else if ($field_width) { echo $field_width; } else { echo '4'; }?> column end">
 			<?php echo $this->render('Records_'.$column_field['type'],array('column_field' => $column_field))?>
 		</div>
 		<?php if ($model->getAttributeSuffix($column_field['field'])) {?>

@@ -11,9 +11,17 @@ class MeasurementBloodPressure extends Measurement
 		return array('bp_systolic','bp_diastolic');
 	}
 
-	public function __toString()
+	public function getValueText()
 	{
-		return $this->bp_systolic.'/'.$this->bp_diastolic;
+		return $this->bp_systolic.'/'.$this->bp_diastolic.' mmHg';
+	}
+
+	public function getValue()
+	{
+		return array(
+			'bp_systolic' => $this->bp_systolic,
+			'bp_diastolic' => $this->bp_diastolic,
+		);
 	}
 
 	public function setValue($params, $second=false)
@@ -22,8 +30,8 @@ class MeasurementBloodPressure extends Measurement
 			$this->bp_systolic = $params;
 			$this->bp_diastolic = $second;
 		} else {
-			$this->bp_systolic = $params[0];
-			$this->bp_diastolic = $params[0];
+			$this->bp_systolic = $params['bp_systolic'];
+			$this->bp_diastolic = $params['bp_diastolic'];
 		}
 	}
 }

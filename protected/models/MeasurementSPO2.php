@@ -10,4 +10,9 @@ class MeasurementSPO2 extends Measurement
 	{
 		return 'spo2';
 	}
+
+	public function getValueText()
+	{
+		return $this->getValue().'%';
+	}
 }

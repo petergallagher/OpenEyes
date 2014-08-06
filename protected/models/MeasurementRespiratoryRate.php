@@ -10,4 +10,9 @@ class MeasurementRespiratoryRate extends Measurement
 	{
 		return 'rr';
 	}
+
+	public function getValueText()
+	{
+		return $this->getValue().' insp/min';
+	}
 }

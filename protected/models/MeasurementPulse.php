@@ -10,4 +10,9 @@ class MeasurementPulse extends Measurement
 	{
 		return 'pulse';
 	}
+
+	public function getValueText()
+	{
+		return $this->getValue().' bpm';
+	}
 }

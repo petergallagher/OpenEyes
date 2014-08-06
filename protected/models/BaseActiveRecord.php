@@ -526,7 +526,7 @@ class BaseActiveRecord extends CActiveRecord
 
 					if ($this->{$def[2]} && $measurement = $class::model()->findByPk($this->{$def[2]})) {
 						if ($this->$relation) {
-							$measurement->setValue((string)$this->$relation);
+							$measurement->setValue($this->$relation ? $this->$relation->getValue() : null);
 
 							if (!$measurement->save()) {
 								throw new Exception("Unable to save Measurement: ".print_r($measurement->errors,true));
@@ -537,7 +537,7 @@ class BaseActiveRecord extends CActiveRecord
 					} else {
 						$measurement = new $class;
 						$measurement->setPatient_id($this->event->episode->patient_id);
-						$measurement->setValue((string)$this->$relation);
+						$measurement->setValue($this->$relation ? $this->$relation->getValue() : null);
 
 						if (!$measurement->save()) {
 							throw new Exception("Unable to save Measurement: ".print_r($measurement->errors,true));

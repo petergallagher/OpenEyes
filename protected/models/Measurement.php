@@ -84,9 +84,14 @@ abstract class Measurement extends BaseActiveRecordVersioned
 		return ($a instanceof self);
 	}
 
-	public function __toString()
+	public function getValue()
 	{
-		return $this->{$this->valueField} ? $this->{$this->valueField} : '';
+		return $this->{$this->valueField};
+	}
+
+	public function getValueText()
+	{
+		return $this->getValue();
 	}
 
 	public function setValue($value)

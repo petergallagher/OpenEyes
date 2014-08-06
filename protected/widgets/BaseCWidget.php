@@ -31,7 +31,7 @@ class BaseCWidget extends CWidget
 	public function init()
 	{
 		if (is_object($this->element) && $this->field) {
-			$this->value = (string)$this->element->{$this->field};
+			$this->value = $this->element->{$this->field};
 		}
 
 		// if the widget has javascript, load it in

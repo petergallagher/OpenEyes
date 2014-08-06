@@ -96,10 +96,10 @@
 					<?php }?>
 					<?php foreach ($columns[0]['fields'] as $j => $field) {?>
 						<div class="row field-row">
-							<?php echo $this->render('Records_field',array('column_field' => $field, 'column_width' => $columns[0]['width']));
+							<?php echo $this->render('Records_field',array('column_field' => $field, 'column_width' => $columns[0]['width'], 'field_width' => @$columns[0]['field_width']));
 
 							$i=0; while (isset($columns[$i+1])) {
-								echo $this->render('Records_field',array('column_field' => $columns[$i+1]['fields'][$j], 'column_width' => $columns[$i+1]['width']));
+								echo $this->render('Records_field',array('column_field' => $columns[$i+1]['fields'][$j], 'column_width' => $columns[$i+1]['width'], 'field_width' => @$columns[0]['field_width']));
 								$i++;
 							}?>
 						</div>
