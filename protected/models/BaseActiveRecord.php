@@ -95,7 +95,7 @@ class BaseActiveRecord extends CActiveRecord
 					if (Measurement::isMeasurementClass($relation[1])) {
 						$class = $relation[1];
 
-						if (!is_object($value)) {
+						if (!is_object($value) && $value !== null && $value !== '') {
 							if ($measurement = $this->$name) {
 								$measurement->setValue($value);
 							} else {
