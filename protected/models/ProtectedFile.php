@@ -433,8 +433,8 @@ class ProtectedFile extends BaseActiveRecordVersioned
 			$im->setIteratorIndex(0);
 			$im->chopimage($width,$height,$offset_x,$offset_y);
 			$im->setImageColorspace(255);
-			$im->setCompression(imagick::COMPRESSION_LOSSLESSJPEG);
-			$im->setCompressionQuality(100);
+			$im->setCompression(imagick::COMPRESSION_JPEG);
+			$im->setCompressionQuality(75);
 			$im->setImageFormat('jpeg');
 			try{
 				$im->writeImage($thumbnail_path);
