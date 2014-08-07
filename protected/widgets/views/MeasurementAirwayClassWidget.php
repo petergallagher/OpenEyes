@@ -18,7 +18,7 @@
  */
 ?>
 <?php if (@$htmlOptions['nowrapper']) {?>
-	<?php echo CHtml::activeDropDownList($element,$field,$data,$htmlOptions)?>
+	<?php echo CHtml::dropDownList(CHtml::modelName($element).'['.$field.']',$value,$data,$htmlOptions)?>
 <?php } else {?>
 	<div id="div_<?php echo CHtml::modelName($element)?>_<?php echo $field?>" class="row field-row"<?php if (@$hidden) {?> style="display: none;"<?php }?>>
 		<?php if (@$htmlOptions['layout'] == 'vertical') {?>
@@ -57,7 +57,7 @@
 					}
 					$htmlOptions['options'] = $html_options;
 				}
-				echo CHtml::activeDropDownList($element,$field,$data,$htmlOptions)?>
+				echo CHtml::dropDownList(CHtml::modelName($element).'['.$field.']',$value,$data,$htmlOptions)?>
 			<?php }?>
 		</div>
 	</div>

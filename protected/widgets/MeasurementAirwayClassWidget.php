@@ -25,6 +25,8 @@ class MeasurementAirwayClassWidget extends BaseMeasurementWidget
 	public function init()
 	{
 		$this->data = array(1=>1,2=>2,3=>3,4=>4);
+
+		parent::init();
 	}
 
 	public function run()
