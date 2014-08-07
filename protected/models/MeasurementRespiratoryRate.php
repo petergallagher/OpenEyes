@@ -6,6 +6,13 @@ class MeasurementRespiratoryRate extends Measurement
 		return 'measurement_respiratory_rate';
 	}
 
+	public function rules()
+	{
+		return array(
+			array('rr','numerical','integerOnly'=>true),
+		);
+	}
+
 	public function getValueField()
 	{
 		return 'rr';

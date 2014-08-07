@@ -6,6 +6,13 @@ class MeasurementWeight extends Measurement
 		return 'measurement_weight';
 	}
 
+	public function rules()
+	{
+		return array(
+			array('weight','numerical','integerOnly'=>false,'min'=>0.5,'max'=>500),
+		);
+	}
+
 	public function getValueField()
 	{
 		return 'weight';

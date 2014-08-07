@@ -6,9 +6,16 @@ class MeasurementSPO2 extends Measurement
 		return 'measurement_spo2';
 	}
 
+	public function rules()
+	{
+		return array(
+			array('sao2','numerical','integerOnly'=>true,'min'=>0,'max'=>100),
+		);
+	}
+
 	public function getValueField()
 	{
-		return 'spo2';
+		return 'sao2';
 	}
 
 	public function getSuffix()

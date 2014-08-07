@@ -6,6 +6,13 @@ class MeasurementTemperature extends Measurement
 		return 'measurement_temperature';
 	}
 
+	public function rules()
+	{
+		return array(
+			array('temperature','numerical','integerOnly' => true),
+		);
+	}
+
 	public function getValueField()
 	{
 		return 'temperature';

@@ -6,6 +6,13 @@ class MeasurementPulse extends Measurement
 		return 'measurement_pulse';
 	}
 
+	public function rules()
+	{
+		return array(
+			array('pulse','numerical','integerOnly'=>true,'min'=>30,'max'=>200),
+		);
+	}
+
 	public function getValueField()
 	{
 		return 'pulse';

@@ -6,6 +6,14 @@ class MeasurementBloodPressure extends Measurement
 		return 'measurement_blood_pressure';
 	}
 
+	public function rules()
+	{
+		return array(
+			array('bp_systolic','numerical','integerOnly'=>true,'min' => 50,'max'=>350),
+			array('bp_diastolic','numerical','integerOnly'=>true,'min' => 30,'max' => 200),
+		);
+	}
+
 	public function getValueField()
 	{
 		return array('bp_systolic','bp_diastolic');

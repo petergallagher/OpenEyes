@@ -6,6 +6,13 @@ class MeasurementHeight extends Measurement
 		return 'measurement_height';
 	}
 
+	public function rules()
+	{
+		return array(
+			array('height','numerical','integerOnly'=>true,'min'=>10,'max'=>280),
+		);
+	}
+
 	public function getValueField()
 	{
 		return 'height';

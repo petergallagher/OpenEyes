@@ -582,4 +582,48 @@ class BaseActiveRecord extends CActiveRecord
 			}
 		}
 	}
+
+	public function validateMeasurements()
+	{
+		foreach ($this->relations() as $relation => $def) {
+			if ($def[0] == 'CBelongsToRelation') {
+				if (Measurement::isMeasurementClass($def[1])) {
+					$class = $def[1];
+
+					$_measurement = null;
+
+					if ($this->{$def[2]} && $measurement = $class::model()->findByPk($this->{$def[2]})) {
+						if (is_object($this->$relation)) {
+							$_measurement = $this->$relation;
+						}
+					} else {
+						if (is_object($this->$relation)) {
+							$_measurement = new $class;
+							$_measurement->setPatient_id($this->event->episode->patient_id);
+							$_measurement->setValue($this->$relation ? $this->$relation->getValue() : null);
+						}
+					}
+
+					if ($_measurement) {
+						if (!$_measurement->validate()) {
+							foreach ($_measurement->errors as $errors) {
+								foreach ($errors as $error) {
+									$this->addError($def[2],$error);
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	protected function beforeValidate()
+	{
+		if ($this->auto_update_measurements) {
+			$this->validateMeasurements();
+		}
+
+		return parent::beforeValidate();
+	}
 }
