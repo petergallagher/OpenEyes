@@ -428,23 +428,13 @@ class ProtectedFile extends BaseActiveRecordVersioned
 				mkdir(dirname($thumbnail_path), 0777, true);
 			}
 
-			$im = new Imagick();
-			$im->readimage($this->getPath());
-			$im->setIteratorIndex(0);
-			$im->chopimage($width,$height,$offset_x,$offset_y);
-			$im->setImageColorspace(255);
-			$im->setCompression(imagick::COMPRESSION_LOSSLESSJPEG);
-			$im->setCompressionQuality(100);
-			$im->setImageFormat('jpeg');
-			try{
-				$im->writeImage($thumbnail_path);
-			}catch(ImagickException $e){//working around false exception thrown by ImageMagick
-				if(!file_exists($thumbnail_path)){
-					Yii::log("Saving pdf thumbnail exception code: ". $e->getCode() .
-						' message: ' . $e->getMessage() . ' trace: ' . $e->getTraceAsString() , 'error');
-					throw $e;
-				}
-			}
+			$im = NewMagickWand();
+			MagickReadImage($im,$this->getPath());
+			MagickCropImage($im,$width,$height,$offset_x,$offset_y);
+			MagickSetCompressionQuality($im,80);
+			MagickSetImageFormat($im,'JPEG');
+			MagickWriteImage($im,$thumbnail_path.'.jpg');
+			@rename($thumbnail_path.'.jpg',$thumbnail_path); // don't ask
 		}
 
 		return true;
