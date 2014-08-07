@@ -535,17 +535,19 @@ class BaseActiveRecord extends CActiveRecord
 							$this->$relation = $measurement;
 						}
 					} else {
-						$measurement = new $class;
-						$measurement->setPatient_id($this->event->episode->patient_id);
-						$measurement->setValue($this->$relation ? $this->$relation->getValue() : null);
+						if (is_object($this->$relation)) {
+							$measurement = new $class;
+							$measurement->setPatient_id($this->event->episode->patient_id);
+							$measurement->setValue($this->$relation ? $this->$relation->getValue() : null);
 
-						if (!$measurement->save()) {
-							throw new Exception("Unable to save Measurement: ".print_r($measurement->errors,true));
+							if (!$measurement->save()) {
+								throw new Exception("Unable to save Measurement: ".print_r($measurement->errors,true));
+							}
+
+							$measurement->attach($this->event, true);
+
+							$this->{$def[2]} = $measurement->id;
 						}
-
-						$measurement->attach($this->event, true);
-
-						$this->{$def[2]} = $measurement->id;
 					}
 				}
 			}
