@@ -9,7 +9,7 @@ class MeasurementSAO2 extends Measurement
 	public function rules()
 	{
 		return array(
-			array('sao2','numerical','integerOnly'=>true,'min'=>0,'max'=>100),
+			array('sao2','numerical','integerOnly'=>true,'min'=>60,'max'=>100),
 		);
 	}
 

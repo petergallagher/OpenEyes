@@ -9,7 +9,7 @@ class MeasurementPulse extends Measurement
 	public function rules()
 	{
 		return array(
-			array('pulse','numerical','integerOnly'=>true,'min'=>30,'max'=>200),
+			array('pulse','numerical','integerOnly'=>true,'min'=>10,'max'=>200),
 		);
 	}
 

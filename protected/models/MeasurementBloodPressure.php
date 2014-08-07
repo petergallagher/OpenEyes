@@ -9,8 +9,8 @@ class MeasurementBloodPressure extends Measurement
 	public function rules()
 	{
 		return array(
-			array('bp_systolic','numerical','integerOnly'=>true,'min' => 50,'max'=>350),
-			array('bp_diastolic','numerical','integerOnly'=>true,'min' => 30,'max' => 200),
+			array('bp_systolic','numerical','integerOnly'=>true,'min' => 0,'max'=>240),
+			array('bp_diastolic','numerical','integerOnly'=>true,'min' => 0,'max' => 150),
 		);
 	}
 

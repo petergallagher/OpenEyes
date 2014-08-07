@@ -9,7 +9,7 @@ class MeasurementTemperature extends Measurement
 	public function rules()
 	{
 		return array(
-			array('temperature','numerical','integerOnly' => true),
+			array('temperature','numerical','integerOnly' => true, 'min' => 32, 'max' => 44),
 		);
 	}
 

@@ -9,7 +9,7 @@ class MeasurementRespiratoryRate extends Measurement
 	public function rules()
 	{
 		return array(
-			array('rr','numerical','integerOnly'=>true),
+			array('rr','numerical','integerOnly'=>true,'min' => 5, 'max' => 60),
 		);
 	}
 
