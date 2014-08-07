@@ -57,6 +57,73 @@ abstract class Measurement extends BaseActiveRecordVersioned
 		return $ref;
 	}
 
+	/**
+	 * Return true if the entity is the origin of the measurement
+	 *
+	 * @param Episode|Event $entity
+	 * @return boolean
+	 */
+	public function isOrigin($entity)
+	{
+		$criteria = new CDbCriteria;
+		$criteria->addCondition('patient_measurement_id = :pid');
+		$criteria->params[':pid'] = $this->getPatientMeasurement()->id;
+		$criteria->addCondition('origin = 1');
+
+		if ($entity instanceof Episode) {
+			$criteria->addCondition('episode_id = :eid');
+			$criteria->params[':eid'] = $entity->id;
+		} elseif ($entity instanceof Event) {
+			$criteria->addCondition('event_id = :eid');
+			$criteria->params[':eid'] = $entity->id;
+		} else {
+			throw new Exception("Unsupported entity type: ".get_class($entity));
+		}
+
+		return (boolean)MeasurementReference::model()->find($criteria);
+	}
+
+	public function afterDelete()
+	{
+		$pm = $this->getPatientMeasurement();
+
+		$criteria = new CDbCriteria;
+		$criteria->addCondition('patient_measurement_id = :pid');
+		$criteria->params[':pid'] = $pm->id;
+
+		MeasurementReference::model()->deleteAll($criteria);
+
+		if (!$pm->delete()) {
+			return false;
+		}
+
+		return parent::afterDelete();
+	}
+
+	/**
+	 * Dissociative the entity from the measurement
+	 *
+	 * @param Episode|Event $entity
+	 */
+	public function dissociate($entity)
+	{
+		$criteria = new CDbCriteria;
+		$criteria->addCondition('patient_measurement_id = :pid');
+		$criteria->params[':pid'] = $this->getPatientMeasurement()->id;
+
+		if ($entity instanceof Episode) {
+			$criteria->addCondition('episode_id = :eid');
+			$criteria->params[':eid'] = $entity->id;
+		} elseif ($entity instanceof Event) {
+			$criteria->addCondition('event_id = :eid');
+			$criteria->params[':eid'] = $entity->id;
+		} else {
+			throw new Exception("Unsupported entity type: ".get_class($entity));
+		}
+		
+		MeasurementReference::model()->delete($criteria);
+	}
+
 	protected function afterValidate()
 	{
 		$this->getPatientMeasurement()->validate();

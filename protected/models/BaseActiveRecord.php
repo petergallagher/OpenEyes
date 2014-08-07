@@ -407,6 +407,10 @@ class BaseActiveRecord extends CActiveRecord
 			}
 		}
 
+		if ($this->auto_update_measurements) {
+			$this->deleteMeasurements();
+		}
+
 		parent::afterSave();
 	}
 
@@ -525,7 +529,7 @@ class BaseActiveRecord extends CActiveRecord
 					$class = $def[1];
 
 					if ($this->{$def[2]} && $measurement = $class::model()->findByPk($this->{$def[2]})) {
-						if ($this->$relation) {
+						if (is_object($this->$relation)) {
 							$measurement->setValue($this->$relation ? $this->$relation->getValue() : null);
 
 							if (!$measurement->save()) {
@@ -533,6 +537,8 @@ class BaseActiveRecord extends CActiveRecord
 							}
 
 							$this->$relation = $measurement;
+						} else {
+							$this->{$def[2]} = null;
 						}
 					} else {
 						if (is_object($this->$relation)) {
@@ -547,6 +553,29 @@ class BaseActiveRecord extends CActiveRecord
 							$measurement->attach($this->event, true);
 
 							$this->{$def[2]} = $measurement->id;
+						}
+					}
+				}
+			}
+		}
+	}
+
+	public function deleteMeasurements()
+	{
+		foreach ($this->relations() as $relation => $def) {
+			if ($def[0] == 'CBelongsToRelation') {
+				if (Measurement::isMeasurementClass($def[1])) {
+					$class = $def[1];
+
+					if ($this->{$def[2]} && $measurement = $class::model()->findByPk($this->{$def[2]})) {
+						if (!is_object($this->$relation)) {
+							if ($measurement->isOrigin($this->event)) {
+								if (!$measurement->delete()) {
+									throw new Exception("Unable to delete measurement: ".print_r($measurement->errors,true));
+								}
+							} else {
+								$measurement->dissociate($this->event);
+							}
 						}
 					}
 				}
