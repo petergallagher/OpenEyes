@@ -1,9 +1,9 @@
 <?php
-class MeasurementSPO2 extends Measurement
+class MeasurementSAO2 extends Measurement
 {
 	public function tableName()
 	{
-		return 'measurement_spo2';
+		return 'measurement_sao2';
 	}
 
 	public function rules()
