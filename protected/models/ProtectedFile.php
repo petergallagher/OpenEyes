@@ -428,10 +428,6 @@ class ProtectedFile extends BaseActiveRecordVersioned
 				mkdir(dirname($thumbnail_path), 0777, true);
 			}
 
-			if(!class_exists('NewMagickWand')){
-				Yii::log("Magic wand does not exist", 'error');
-			}
-
 			$im = NewMagickWand();
 			MagickReadImage($im,$this->getPath());
 			MagickCropImage($im,$width,$height,$offset_x,$offset_y);
