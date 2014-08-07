@@ -11,8 +11,8 @@ class MeasurementRespiratoryRate extends Measurement
 		return 'rr';
 	}
 
-	public function getValueText()
+	public function getSuffix()
 	{
-		return $this->getValue().' insp/min';
+		return 'insp/min';
 	}
 }

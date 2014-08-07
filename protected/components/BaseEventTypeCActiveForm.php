@@ -139,10 +139,110 @@ class BaseEventTypeCActiveForm extends FormLayout
 
 	public function bloodGlucoseMeasurement($element, $htmlOptions, $layoutColumns)
 	{
-		$this->widget('application.widgets.MeasurementBloodGlucose', array(
+		$this->widget('application.widgets.MeasurementBloodGlucoseWidget', array(
 			'element' => $element,
-			'name' => CHtml::modelName($element).'[blood_glucose_m]',
-			'field' => 'blood_glucose_m',
+			'htmlOptions' => $htmlOptions,
+			'layoutColumns' => $layoutColumns
+		));
+	}
+
+	public function weightMeasurement($element, $htmlOptions, $layoutColumns)
+	{
+		$htmlOptions['append-text'] = 'kg';
+		$layoutColumns['append-text'] = 2;
+
+		$this->widget('application.widgets.MeasurementWeightWidget', array(
+			'element' => $element,
+			'htmlOptions' => $htmlOptions,
+			'layoutColumns' => $layoutColumns
+		));
+	}
+
+	public function heightMeasurement($element, $htmlOptions, $layoutColumns)
+	{
+		$htmlOptions['append-text'] = 'cm';
+		$layoutColumns['append-text'] = 2;
+
+		$this->widget('application.widgets.MeasurementHeightWidget', array(
+			'element' => $element,
+			'htmlOptions' => $htmlOptions,
+			'layoutColumns' => $layoutColumns
+		));
+	}
+
+	public function bmiMeasurement($element, $htmlOptions, $layoutColumns)
+	{
+		$htmlOptions['append-text'] = 'kg/m^2';
+		$htmlOptions['class'] = 'measurementInput';
+
+		$this->widget('application.widgets.MeasurementBMIWidget', array(
+			'element' => $element,
+			'htmlOptions' => $htmlOptions,
+			'layoutColumns' => $layoutColumns
+		));
+	}
+
+	public function bloodPressureMeasurement($element, $htmlOptions, $layoutColumns)
+	{
+		$this->widget('application.widgets.MeasurementBloodPressureWidget', array(
+			'element' => $element,
+			'htmlOptions' => $htmlOptions,
+			'layoutColumns' => $layoutColumns
+		));
+	}
+
+	public function pulseMeasurement($element, $htmlOptions, $layoutColumns)
+	{
+		$htmlOptions['append-text'] = 'bpm';
+		$htmlOptions['class'] = 'measurementInput';
+
+		$this->widget('application.widgets.MeasurementPulseWidget', array(
+			'element' => $element,
+			'htmlOptions' => $htmlOptions,
+			'layoutColumns' => $layoutColumns
+		));
+	}
+
+	public function temperatureMeasurement($element, $htmlOptions, $layoutColumns)
+	{
+		$htmlOptions['append-text'] = 'C';
+		$htmlOptions['class'] = 'measurementInput';
+
+		$this->widget('application.widgets.MeasurementTemperatureWidget', array(
+			'element' => $element,
+			'htmlOptions' => $htmlOptions,
+			'layoutColumns' => $layoutColumns
+		));
+	}
+
+	public function respiratoryRateMeasurement($element, $htmlOptions, $layoutColumns)
+	{
+		$htmlOptions['append-text'] = 'insp/min';
+		$htmlOptions['class'] = 'measurementInput';
+
+		$this->widget('application.widgets.MeasurementRespiratoryRateWidget', array(
+			'element' => $element,
+			'htmlOptions' => $htmlOptions,
+			'layoutColumns' => $layoutColumns
+		));
+	}
+
+	public function sao2Measurement($element, $htmlOptions, $layoutColumns)
+	{
+		$htmlOptions['append-text'] = '%';
+		$htmlOptions['class'] = 'measurementInput';
+
+		$this->widget('application.widgets.MeasurementSAO2Widget', array(
+			'element' => $element,
+			'htmlOptions' => $htmlOptions,
+			'layoutColumns' => $layoutColumns
+		));
+	}
+
+	public function airwayClassMeasurement($element, $htmlOptions, $layoutColumns)
+	{
+		$this->widget('application.widgets.MeasurementAirwayClassWidget', array(
+			'element' => $element,
 			'htmlOptions' => $htmlOptions,
 			'layoutColumns' => $layoutColumns
 		));

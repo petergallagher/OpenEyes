@@ -10,4 +10,19 @@ class MeasurementWeight extends Measurement
 	{
 		return 'weight';
 	}
+
+	public function getSuffix()
+	{
+		return 'kg';
+	}
+
+	public function toLb()
+	{
+		return $this->weight * 2.20462;
+	}
+
+	public function getLbText()
+	{
+		return number_format($this->toLb(),1).' lbs';
+	}
 }

@@ -10,4 +10,9 @@ class MeasurementBMI extends Measurement
 	{
 		return 'bmi';
 	}
+
+	public function getSuffix()
+	{
+		return 'kg/m^2';
+	}
 }

@@ -89,9 +89,14 @@ abstract class Measurement extends BaseActiveRecordVersioned
 		return $this->{$this->valueField};
 	}
 
+	public function getSuffix()
+	{
+		return false;
+	}
+
 	public function getValueText()
 	{
-		return $this->getValue();
+		return $this->suffix ? $this->value.' '.$this->suffix : $this->value;
 	}
 
 	public function setValue($value)

@@ -10,4 +10,9 @@ class MeasurementTemperature extends Measurement
 	{
 		return 'temperature';
 	}
+
+	public function getSuffix()
+	{
+		return '°C';
+	}
 }

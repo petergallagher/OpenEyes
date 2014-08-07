@@ -343,11 +343,16 @@ label {
   margin-top:8px !important;
 }
 
-.recordInput.bpSystolic {
-	width: 3em !important;
-	display: inline-block;
+.measurementInput {
+	width: 5em !important;
+	display: inline-block !important;
 }
-.recordInput.bpDiastolic {
-	width: 2em !important;
-	display: inline-block;
+
+.bpSystolic {
+	width: 3em !important;
+	display: inline-block !important;
+}
+.bpDiastolic {
+	width: 2.2em !important;
+	display: inline-block !important;
 }

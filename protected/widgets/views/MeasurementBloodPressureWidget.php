@@ -18,38 +18,24 @@
  */
 ?>
 <?php if (@$htmlOptions['nowrapper']) {?>
-	<?php echo CHtml::textField($name, $value, $htmlOptions)?>
-	<?php if (!empty($htmlOptions['append-text'])) {?>
-		<span class="field-info"><?php echo $htmlOptions['append-text']?></span>
-	<?php }?>
+	<?php echo CHtml::textField($name_systolic, $value_systolic, array_merge($htmlOptions,array('class' => 'bpSystolic')))?>
+	/
+	<?php echo CHtml::textField($name_diastolic, $value_diastolic, array_merge($htmlOptions,array('class' => 'bpDiastolic')))?>
+	<span class="field-info">mmHg</span>
 <?php } else {?>
-	<div id="div_<?php echo CHtml::modelName($element)?>_<?php echo $field?>" class="row field-row"<?php if (@$htmlOptions['hide']) {?> style="display: none;"<?php }?>>
+	<div id="div_<?php echo CHtml::modelName($element)?>_<?php echo $field_systolic?>" class="row field-row"<?php if (@$htmlOptions['hide']) {?> style="display: none;"<?php }?>>
 		<div class="large-<?php echo $layoutColumns['label'];?> column">
 			<?php
-			$labelText = empty($htmlOptions['label']) ? CHtml::encode($element->getAttributeLabel($field)) : $htmlOptions['label'];
+			$labelText = empty($htmlOptions['label']) ? CHtml::encode($element->getAttributeLabel($field_systolic)) : $htmlOptions['label'];
 			$labelText .= ':';
-			echo Chtml::label($labelText, Chtml::getIdByName($name));
+			echo Chtml::label($labelText, Chtml::getIdByName($name_systolic));
 			?>
 		</div>
 		<div class="large-<?php echo $layoutColumns['field'];?> column<?php if(empty($htmlOptions['append-text']) || empty($layoutColumns['append-text'])){?> end<?php }?>">
-			<?php if (@$htmlOptions['password']) { ?>
-				<?php echo CHtml::passwordField($name, $value, $htmlOptions)?>
-			<?php } else {?>
-				<?php echo CHtml::textField($name, $value, $htmlOptions)?>
-			<?php } ?>
-			<?php if (!empty($links)) {
-				foreach ($links as $link) {
-					echo '<span class="field-info">'.CHtml::link($link['title'],$link['href'],array('id'=>$link['id'])).'</span>';
-				}
-			}?>
-			<?php if (!empty($htmlOptions['append-text']) && empty($layoutColumns['append-text'])) {?>
-				<span class="field-info"><?php echo $htmlOptions['append-text'];?></span>
-			<?php }?>
+			<?php echo CHtml::textField($name_systolic, $value_systolic, array_merge($htmlOptions,array('class' => 'bpSystolic')))?>
+			/
+			<?php echo CHtml::textField($name_diastolic, $value_diastolic, array_merge($htmlOptions,array('class' => 'bpDiastolic')))?>
+			<span class="field-info">mmHg</span>
 		</div>
-	<?php if(!empty($htmlOptions['append-text']) && !empty($layoutColumns['append-text'])){?>
-		<div class="large-<?php echo $layoutColumns['append-text'];?> column end">
-			<span class="field-info"><?php echo $htmlOptions['append-text'];?></span>
-		</div>
-	<?php }?>
 	</div>
 <?php }?>

@@ -10,4 +10,26 @@ class MeasurementHeight extends Measurement
 	{
 		return 'height';
 	}
+
+	public function getSuffix()
+	{
+		return 'cm';
+	}
+
+	public function toFtIn()
+	{
+		$ft = floor($this->height * 0.032808399);
+
+		return array(
+			'ft' => $ft,
+			'in' => round(($this->height - ($ft / 0.032808399)) * 0.393700787),
+		);
+	}
+
+	public function getFtInText()
+	{
+		$ft_in = $this->toFtIn();
+
+		return $ft_in['ft']."'".$ft_in['in'].'"';
+	}
 }

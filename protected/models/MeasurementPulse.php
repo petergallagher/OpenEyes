@@ -11,8 +11,8 @@ class MeasurementPulse extends Measurement
 		return 'pulse';
 	}
 
-	public function getValueText()
+	public function getSuffix()
 	{
-		return $this->getValue().' bpm';
+		return 'bpm';
 	}
 }

@@ -2587,15 +2587,21 @@ input[type="text"].large, input[type="password"].large, input[type="date"].large
 }
 
 /* line 346, ../sass/openeyes/components/_forms.scss */
-.recordInput.bpSystolic {
-  width: 3em !important;
-  display: inline-block;
+.measurementInput {
+  width: 5em !important;
+  display: inline-block !important;
 }
 
-/* line 350, ../sass/openeyes/components/_forms.scss */
-.recordInput.bpDiastolic {
-  width: 2em !important;
-  display: inline-block;
+/* line 351, ../sass/openeyes/components/_forms.scss */
+.bpSystolic {
+  width: 3em !important;
+  display: inline-block !important;
+}
+
+/* line 355, ../sass/openeyes/components/_forms.scss */
+.bpDiastolic {
+  width: 2.2em !important;
+  display: inline-block !important;
 }
 
 /* line 96, ../sass/openeyes/_mixins.scss */

@@ -17,16 +17,16 @@
  * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
  */
 
-class MeasurementBloodGlucose extends BaseFieldWidget
+class BaseMeasurementWidget extends BaseFieldWidget
 {
+	public $value = '';
+
 	public function init()
 	{
-		if (is_object($this->element) && $this->field) {
-			if ($this->element->{$this->field}) {
-				$this->value = $this->element->{$this->field}->getValue();
-			} else {
-				$this->value = '';
-			}
+		$this->name = CHtml::modelName($this->element).'['.$this->field.']';
+
+		if ($this->element->{$this->field}) {
+			$this->value = $this->element->{$this->field}->getValue();
 		}
 
 		// if the widget has javascript, load it in
