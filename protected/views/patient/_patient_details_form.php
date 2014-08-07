@@ -38,7 +38,7 @@ $currentAction = $this->action->getId();
 					<?php
 					echo CHtml::checkBox('auto_hos_num',$auto_hos_num);
 					?>
-					<label for="auto_hos_num">Auto generate record</label>
+					<label for="auto_hos_num">Auto generate record number</label>
 				</div>
 			</div>
 			<?php } ?>
