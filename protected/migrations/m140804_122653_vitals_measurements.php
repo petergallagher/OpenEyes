@@ -62,24 +62,24 @@ class m140804_122653_vitals_measurements extends OEMigration
 
 		$this->versionExistingTable('measurement_respiratory_rate');
 
-		$this->createTable('measurement_spo2', array(
+		$this->createTable('measurement_sao2', array(
 				'id' => 'int(10) unsigned NOT NULL AUTO_INCREMENT',
 				'patient_measurement_id' => 'int(11) not null',
-				'spo2' => 'tinyint(1) unsigned not null',
+				'sao2' => 'tinyint(1) unsigned not null',
 				'last_modified_user_id' => 'int(10) unsigned NOT NULL DEFAULT 1',
 				'last_modified_date' => 'datetime NOT NULL DEFAULT \'1901-01-01 00:00:00\'',
 				'created_user_id' => 'int(10) unsigned NOT NULL DEFAULT 1',
 				'created_date' => 'datetime NOT NULL DEFAULT \'1901-01-01 00:00:00\'',
 				'PRIMARY KEY (`id`)',
-				'KEY `measurement_spo2_lmui_fk` (`last_modified_user_id`)',
-				'KEY `measurement_spo2_cui_fk` (`created_user_id`)',
-				'KEY `measurement_spo2_pmi_fk` (`patient_measurement_id`)',
-				'CONSTRAINT `measurement_spo2_lmui_fk` FOREIGN KEY (`last_modified_user_id`) REFERENCES `user` (`id`)',
-				'CONSTRAINT `measurement_spo2_cui_fk` FOREIGN KEY (`created_user_id`) REFERENCES `user` (`id`)',
-				'CONSTRAINT `measurement_spo2_pmi_fk` FOREIGN KEY (`patient_measurement_id`) REFERENCES `patient_measurement` (`id`)',
+				'KEY `measurement_sao2_lmui_fk` (`last_modified_user_id`)',
+				'KEY `measurement_sao2_cui_fk` (`created_user_id`)',
+				'KEY `measurement_sao2_pmi_fk` (`patient_measurement_id`)',
+				'CONSTRAINT `measurement_sao2_lmui_fk` FOREIGN KEY (`last_modified_user_id`) REFERENCES `user` (`id`)',
+				'CONSTRAINT `measurement_sao2_cui_fk` FOREIGN KEY (`created_user_id`) REFERENCES `user` (`id`)',
+				'CONSTRAINT `measurement_sao2_pmi_fk` FOREIGN KEY (`patient_measurement_id`) REFERENCES `patient_measurement` (`id`)',
 			), 'ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci');
 
-		$this->versionExistingTable('measurement_spo2');
+		$this->versionExistingTable('measurement_sao2');
 
 		$this->createTable('measurement_pain_score', array(
 				'id' => 'int(10) unsigned NOT NULL AUTO_INCREMENT',
@@ -215,8 +215,8 @@ class m140804_122653_vitals_measurements extends OEMigration
 		$this->dropTable('measurement_pain_score_version');
 		$this->dropTable('measurement_pain_score');
 
-		$this->dropTable('measurement_spo2_version');
-		$this->dropTable('measurement_spo2');
+		$this->dropTable('measurement_sao2_version');
+		$this->dropTable('measurement_sao2');
 
 		$this->dropTable('measurement_pulse_version');
 		$this->dropTable('measurement_pulse');
