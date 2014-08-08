@@ -18,23 +18,23 @@
  */
 ?>
 <?php if (@$htmlOptions['nowrapper']) {?>
-	<?php echo CHtml::textField($name_systolic, $value_systolic, array_merge($htmlOptions,array('class' => 'bpSystolic')))?>
+	<?php echo CHtml::textField(CHtml::modelName($element).'['.$field.'][bp_systolic]', $bp_systolic, array_merge($htmlOptions,array('class' => 'bpSystolic')))?>
 	/
-	<?php echo CHtml::textField($name_diastolic, $value_diastolic, array_merge($htmlOptions,array('class' => 'bpDiastolic')))?>
+	<?php echo CHtml::textField(CHtml::modelName($element).'['.$field.'][bp_diastolic]', $bp_diastolic, array_merge($htmlOptions,array('class' => 'bpDiastolic')))?>
 	<span class="field-info">mmHg</span>
 <?php } else {?>
-	<div id="div_<?php echo CHtml::modelName($element)?>_<?php echo $field_systolic?>" class="row field-row"<?php if (@$htmlOptions['hide']) {?> style="display: none;"<?php }?>>
+	<div id="div_<?php echo CHtml::modelName($element)?>_<?php echo $field?>" class="row field-row"<?php if (@$htmlOptions['hide']) {?> style="display: none;"<?php }?>>
 		<div class="large-<?php echo $layoutColumns['label'];?> column">
 			<?php
-			$labelText = empty($htmlOptions['label']) ? CHtml::encode($element->getAttributeLabel($field_systolic)) : $htmlOptions['label'];
+			$labelText = empty($htmlOptions['label']) ? CHtml::encode($element->getAttributeLabel($field)) : $htmlOptions['label'];
 			$labelText .= ':';
-			echo Chtml::label($labelText, Chtml::getIdByName($name_systolic));
+			echo Chtml::label($labelText, Chtml::getIdByName(CHtml::modelName($element).'['.$field.']'));
 			?>
 		</div>
 		<div class="large-<?php echo $layoutColumns['field'];?> column<?php if(empty($htmlOptions['append-text']) || empty($layoutColumns['append-text'])){?> end<?php }?>">
-			<?php echo CHtml::textField($name_systolic, $value_systolic, array_merge($htmlOptions,array('class' => 'bpSystolic')))?>
+			<?php echo CHtml::textField(CHtml::modelName($element).'['.$field.'][bp_systolic]', $bp_systolic, array_merge($htmlOptions,array('class' => 'bpSystolic')))?>
 			/
-			<?php echo CHtml::textField($name_diastolic, $value_diastolic, array_merge($htmlOptions,array('class' => 'bpDiastolic')))?>
+			<?php echo CHtml::textField(CHtml::modelName($element).'['.$field.'][bp_diastolic]', $bp_diastolic, array_merge($htmlOptions,array('class' => 'bpDiastolic')))?>
 			<span class="field-info">mmHg</span>
 		</div>
 	</div>
