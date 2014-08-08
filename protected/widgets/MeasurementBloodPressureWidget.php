@@ -22,15 +22,29 @@ class MeasurementBloodPressureWidget extends BaseMeasurementWidget
 	public $field = 'blood_pressure_m';
 	public $bp_systolic;
 	public $bp_diastolic;
+	public $class_systolic;
+	public $class_diastolic;
 
 	public function init()
 	{
-		if ($this->element->{$this->field}) {
-			$this->bp_systolic = $this->element->{$this->field}->bp_systolic;
+		$this->suffix = MeasurementBloodPressure::model()->suffix;
+
+		if ($this->element) {
+			if ($this->element->{$this->field}) {
+				$this->bp_systolic = $this->element->{$this->field}->bp_systolic;
+			}
+
+			if ($this->element->{$this->field}) {
+				$this->bp_diastolic = $this->element->{$this->field}->bp_diastolic;
+			}
 		}
 
-		if ($this->element->{$this->field}) {
-			$this->bp_diastolic = $this->element->{$this->field}->bp_diastolic;
+		if (@$this->htmlOptions['class']) {
+			$this->class_systolic = $this->htmlOptions['class'].' bpSystolic';
+			$this->class_diastolic = $this->htmlOptions['class'].' bpDiastolic';
+		} else {
+			$this->class_systolic = 'bpSystolic';
+			$this->class_diastolic = 'bpDiastolic';
 		}
 
 		// if the widget has javascript, load it in

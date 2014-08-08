@@ -58,9 +58,10 @@ $(document).ready(function() {
 		});
 
 		addRecordItemDiv.children('.recordEditItem').val('');
+		addRecordItemDiv.children('.recordEditItemID').val('');
 
 		addRecordItemDiv.slideDown('fast',function() {
-			var input = $(this).closest('.addRecordItemDiv').find('input.recordInput:first');
+			var input = $(this).closest('.addRecordItemDiv').find('input.recordInput[type="text"]:first');
 			if (input.length >0) {
 				input.focus();
 			} else {
@@ -179,6 +180,7 @@ $(document).ready(function() {
 		RecordsWidget_PopulateAddFormFromData(data, addRecordItemDiv);
 
 		addRecordItemDiv.children('.recordEditItem').val(data['i']);
+		addRecordItemDiv.children('.recordEditItemID').val(data['id']);
 
 		addRecordItemDiv.slideDown('fast',function() {
 			addRecordItemDiv.find('input.recordInput:first').focus();
@@ -218,7 +220,13 @@ $(document).ready(function() {
 function RecordsWidget_PopulateAddFormFromData(data, addRecordItemDiv)
 {
 	for (var field in data) {
-		addRecordItemDiv.find('.recordInput[name="'+field+'"]').val(data[field]);
+		if (typeof(data[field]) == 'object') {
+			for (var object_field in data[field]) {
+				addRecordItemDiv.find('.recordInput[name="'+field+'['+object_field+']"]').val(data[field][object_field]);
+			}
+		} else {
+			addRecordItemDiv.find('.recordInput[name="'+field+'"]').val(data[field]);
+		}
 	}
 
 	addRecordItemDiv.find('.recordTimestamp').val(data['timestamp']);

@@ -19,5 +19,4 @@
 
 class MeasurementTemperatureWidget extends BaseMeasurementWidget
 {
-	public $field = 'temperature_m';
 }

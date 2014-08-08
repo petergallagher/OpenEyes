@@ -19,5 +19,4 @@
 
 class MeasurementBMIWidget extends BaseMeasurementWidget
 {
-	public $field = 'bmi_m';
 }

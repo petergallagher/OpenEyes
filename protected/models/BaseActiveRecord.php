@@ -29,6 +29,7 @@ class BaseActiveRecord extends CActiveRecord
 	// (whilst developing this feature, will allow other elements to continue to work)
 	protected $auto_update_relations = false;
 	protected $auto_update_measurements = false;
+	protected $dropped_measurements = array();
 
 	/**
 	 * If an array of arrays is passed for a HAS_MANY relation attribute, will create appropriate objects
@@ -95,7 +96,7 @@ class BaseActiveRecord extends CActiveRecord
 					if (Measurement::isMeasurementClass($relation[1])) {
 						$class = $relation[1];
 
-						if (!is_object($value) && $value !== null && $value !== '') {
+						if (!is_object($value) && !$this->array_is_empty($value)) {
 							if ($measurement = $this->$name) {
 								$measurement->setValue($value);
 							} else {
@@ -104,6 +105,8 @@ class BaseActiveRecord extends CActiveRecord
 							}
 
 							$value = $measurement;
+						} else {
+							$value = '';
 						}
 					}
 				}
@@ -111,6 +114,21 @@ class BaseActiveRecord extends CActiveRecord
 		}
 
 		parent::__set($name, $value);
+	}
+
+	public function array_is_empty($value)
+	{
+		if (empty($value)) return true;
+
+		if (is_array($value)) {
+			foreach ($value as $item) {
+				if (!empty($item)) return false;
+			}
+
+			return true;
+		}
+
+		return false;
 	}
 
 	// relation defaults are properties that need to be set on related models to define the records completely within the database
@@ -535,9 +553,8 @@ class BaseActiveRecord extends CActiveRecord
 							if (!$measurement->save()) {
 								throw new Exception("Unable to save Measurement: ".print_r($measurement->errors,true));
 							}
-
-							$this->$relation = $measurement;
 						} else {
+							$this->dropped_measurements[] = $measurement;
 							$this->{$def[2]} = null;
 						}
 					} else {
@@ -562,23 +579,13 @@ class BaseActiveRecord extends CActiveRecord
 
 	public function deleteMeasurements()
 	{
-		foreach ($this->relations() as $relation => $def) {
-			if ($def[0] == 'CBelongsToRelation') {
-				if (Measurement::isMeasurementClass($def[1])) {
-					$class = $def[1];
-
-					if ($this->{$def[2]} && $measurement = $class::model()->findByPk($this->{$def[2]})) {
-						if (!is_object($this->$relation)) {
-							if ($measurement->isOrigin($this->event)) {
-								if (!$measurement->delete()) {
-									throw new Exception("Unable to delete measurement: ".print_r($measurement->errors,true));
-								}
-							} else {
-								$measurement->dissociate($this->event);
-							}
-						}
-					}
+		foreach ($this->dropped_measurements as $measurement) {
+			if ($measurement->isOrigin($this->event)) {
+				if (!$measurement->delete()) {
+					throw new Exception("Unable to delete measurement: ".print_r($measurement->errors,true));
 				}
+			} else {
+				$measurement->dissociate($this->event);
 			}
 		}
 	}
@@ -599,16 +606,16 @@ class BaseActiveRecord extends CActiveRecord
 					} else {
 						if (is_object($this->$relation)) {
 							$_measurement = new $class;
-							$_measurement->setPatient_id($this->event->episode->patient_id);
+							$_measurement->setPatient_id($this->event ? $this->event->episode->patient_id : null);
 							$_measurement->setValue($this->$relation ? $this->$relation->getValue() : null);
 						}
 					}
 
 					if ($_measurement) {
 						if (!$_measurement->validate()) {
-							foreach ($_measurement->errors as $errors) {
+							foreach ($_measurement->errors as $field => $errors) {
 								foreach ($errors as $error) {
-									$this->addError($def[2],$error);
+									$this->addError($field,$error);
 								}
 							}
 						}

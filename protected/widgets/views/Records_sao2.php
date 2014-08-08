@@ -17,21 +17,6 @@
  * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
  */
 
-class MeasurementAirwayClassWidget extends BaseMeasurementWidget
-{
-	public $data;
-
-	public function init()
-	{
-		$this->data = array(1=>1,2=>2,3=>3,4=>4);
-
-		parent::init();
-
-		$this->htmlOptions['class'] = '';
-	}
-
-	public function run()
-	{
-		$this->render(get_class($this));
-	}
-}
+$this->widget('application.widgets.MeasurementSAO2Widget', array(
+	'htmlOptions' => array('nowrapper' => true, 'class' => 'recordInput'),
+));

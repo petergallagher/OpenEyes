@@ -9,6 +9,7 @@ class MeasurementBloodPressure extends Measurement
 	public function rules()
 	{
 		return array(
+			array('bp_systolic, bp_diastolic','required'),
 			array('bp_systolic','numerical','integerOnly'=>true,'min' => 0,'max'=>240),
 			array('bp_diastolic','numerical','integerOnly'=>true,'min' => 0,'max' => 150),
 		);
@@ -19,9 +20,22 @@ class MeasurementBloodPressure extends Measurement
 		return array('bp_systolic','bp_diastolic');
 	}
 
+	public function getSuffix()
+	{
+		return 'mmHg';
+	}
+
 	public function getValueText()
 	{
-		return $this->bp_systolic.'/'.$this->bp_diastolic.' mmHg';
+		return $this->bp_systolic.'/'.$this->bp_diastolic.' '.$this->suffix;
+	}
+
+	public function attributeLabels()
+	{
+		return array(
+			'bp_systolic' => 'Blood pressure (systolic)',
+			'bp_diastolic' => 'Blood pressure (diastolic)',
+		);
 	}
 
 	public function getValue()
@@ -30,6 +44,11 @@ class MeasurementBloodPressure extends Measurement
 			'bp_systolic' => $this->bp_systolic,
 			'bp_diastolic' => $this->bp_diastolic,
 		);
+	}
+
+	public function afterValidate()
+	{
+		return parent::afterValidate();
 	}
 
 	public function setValue($params, $second=false)

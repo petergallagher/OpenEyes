@@ -19,5 +19,4 @@
 
 class MeasurementBloodGlucoseWidget extends BaseMeasurementWidget
 {
-	public $field = 'blood_glucose_m';
 }

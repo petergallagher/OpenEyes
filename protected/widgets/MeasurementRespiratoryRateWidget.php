@@ -19,5 +19,4 @@
 
 class MeasurementRespiratoryRateWidget extends BaseMeasurementWidget
 {
-	public $field = 'rr_m';
 }

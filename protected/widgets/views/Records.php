@@ -49,7 +49,8 @@
 	</div>
 	<?php if ($edit) {?>
 		<div class="addRecordItemDiv" style="display: none">
-			<input type="hidden" class="recordEditItem" value="" />
+			<input name="<?php echo CHtml::modelName($element)?>_<?php echo $field?>_editItem" type="hidden" class="recordInput recordEditItem" value="" />
+			<input name="<?php echo CHtml::modelName($element)?>_<?php echo $field?>_editItem_id" type="hidden" class="recordInput recordEditItemID" value="" />
 			<div class="row field-row">
 				<div class="large-3 column">
 					<label></label>

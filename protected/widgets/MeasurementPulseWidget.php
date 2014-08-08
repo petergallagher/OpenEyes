@@ -19,5 +19,4 @@
 
 class MeasurementPulseWidget extends BaseMeasurementWidget
 {
-	public $field = 'pulse_m';
 }

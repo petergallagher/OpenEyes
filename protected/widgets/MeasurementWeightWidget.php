@@ -19,5 +19,4 @@
 
 class MeasurementWeightWidget extends BaseMeasurementWidget
 {
-	public $field = 'weight_m';
 }

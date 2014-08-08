@@ -17,5 +17,6 @@
  * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
  */
 
-echo CHtml::textField($column_field['field'].'_systolic','',array('class' => 'recordInput bpSystolic')).' / ';
-echo CHtml::textField($column_field['field'].'_diastolic','',array('class' => 'recordInput bpDiastolic'));
+$this->widget('application.widgets.MeasurementBloodPressureWidget', array(
+	'htmlOptions' => array('nowrapper' => true, 'class' => 'recordInput'),
+));

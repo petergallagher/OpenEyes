@@ -19,5 +19,4 @@
 
 class MeasurementHeightWidget extends BaseMeasurementWidget
 {
-	public $field = 'height_m';
 }

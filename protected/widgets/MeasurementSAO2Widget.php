@@ -19,5 +19,4 @@
 
 class MeasurementSAO2Widget extends BaseMeasurementWidget
 {
-	public $field = 'sao2_m';
 }

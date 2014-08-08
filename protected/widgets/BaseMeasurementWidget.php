@@ -20,18 +20,35 @@
 class BaseMeasurementWidget extends BaseFieldWidget
 {
 	public $value = '';
+	public $suffix = '';
 
 	public function init()
 	{
-		$this->name = CHtml::modelName($this->element).'['.$this->field.']';
+		$widget_model = preg_replace('/Widget$/','',get_class($this));
+		$this->field = $widget_model::model()->valueField.'_m';
+		$this->suffix = $widget_model::model()->suffix;
 
-		if ($this->element->{$this->field}) {
-			$this->value = $this->element->{$this->field}->getValue();
+		$this->name = $this->element ? CHtml::modelName($this->element).'['.$this->field.']' : $this->field;
+
+		if ($this->element) {
+			if ($this->element->{$this->field}) {
+				$this->value = $this->element->{$this->field}->getValue();
+			}
 		}
 
 		// if the widget has javascript, load it in
 		if (file_exists("protected/widgets/js/".get_class($this).".js")) {
 			$this->assetFolder = Yii::app()->getAssetManager()->publish('protected/widgets/js');
+		}
+
+		if ($this->suffix && !@$this->htmlOptions['append-text']) {
+			$this->htmlOptions['append-text'] = $this->suffix;
+		}
+
+		if (@$this->htmlOptions['class']) {
+			$this->htmlOptions['class'] .= ' measurementInput';
+		} else {
+			$this->htmlOptions['class'] = 'measurementInput';
 		}
 	}
 
