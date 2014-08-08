@@ -135,6 +135,11 @@ $oe-element-edit-title-font-style: italic;
 			.alert-box {
 				margin: 12px 0;
 			}
+			// If alert-box is not contained within any grid columns, then give it gutters.
+			> .alert-box {
+				margin-left: 10px;
+				margin-right: 10px;
+			}
 		}
 		.alert-box {
 			margin: 12px 0;
