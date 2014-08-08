@@ -180,7 +180,7 @@ class m140804_122653_vitals_measurements extends OEMigration
 		$this->insert('measurement_type',array('class_name' => 'MeasurementPainScore'));
 		$this->insert('measurement_type',array('class_name' => 'MeasurementPulse'));
 		$this->insert('measurement_type',array('class_name' => 'MeasurementRespiratoryRate'));
-		$this->insert('measurement_type',array('class_name' => 'MeasurementSPO2'));
+		$this->insert('measurement_type',array('class_name' => 'MeasurementSAO2'));
 		$this->insert('measurement_type',array('class_name' => 'MeasurementGlucoseLevel'));
 		$this->insert('measurement_type',array('class_name' => 'MeasurementWeight'));
 		$this->insert('measurement_type',array('class_name' => 'MeasurementHeight'));
@@ -198,7 +198,7 @@ class m140804_122653_vitals_measurements extends OEMigration
 		$this->dropColumn('patient_measurement_version','timestamp');
 		$this->dropColumn('patient_measurement','timestamp');
 
-		$this->delete('measurement_type',"class_name in ('MeasurementBloodPressure','MeasurementPainScore','MeasurementPulse','MeasurementRespiratoryRate','MeasurementSPO2','MeasurementGlucoseLevel','MeasurementAVPUScore','MeasurementWeight','MeasurementHeight','MeasurementTemperature')");
+		$this->delete('measurement_type',"class_name in ('MeasurementBloodPressure','MeasurementPainScore','MeasurementPulse','MeasurementRespiratoryRate','MeasurementSAO2','MeasurementGlucoseLevel','MeasurementAVPUScore','MeasurementWeight','MeasurementHeight','MeasurementTemperature')");
 
 		$this->dropTable('measurement_temperature_version');
 		$this->dropTable('measurement_temperature');
