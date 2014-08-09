@@ -67,7 +67,7 @@ $(document).ready(function() {
 			} else {
 				$(this).closest('.addRecordItemDiv').find('textarea.recordInput:first').focus();
 			}
-			$('.addItemButton').slideUp('fast');
+			addRecordItemDiv.next('.addItemButton').slideUp('fast');
 		});
 	});
 
@@ -78,8 +78,8 @@ $(document).ready(function() {
 		var error_div = form_div.find('.recordItemErrorsDiv');
 		var error_list = error_div.find('.recordItemErrors');
 
-		$('.addRecordItemDiv').slideUp('fast',function() {
-			$('.addItemButton').slideDown('fast',function() {
+		form_div.slideUp('fast',function() {
+			form_div.next('.addItemButton').slideDown('fast',function() {
 				error_list.html('');
 				error_div.hide();
 			});
