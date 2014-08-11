@@ -71,8 +71,8 @@ class TherapyApplication extends OpenEyesPage
         'saveTherapyApplication' => array('xpath' => "//button[@id='et_save']"),
         'saveTherapyOK'=> array('xpath' => "//*[@id='flash-success']"),
 
-        'removeRightEye' => array('xpath' => "//*[@class='icon-remove-side remove-side']"),
         'addRightEye' => array ('xpath' => "//*[@class='inactive-form']//*[contains(text(),'Add right side')]"),
+        'addLeftEye' => array('xpath' => "//*[@class='inactive-form']//*[contains(text(),'Add left side')]"),
 
         #Scenario 2
         'leftPatientHasCnvYes' => array('xpath' => "//select[@id='Element_OphCoTherapyapplication_PatientSuitability_left_DecisionTreeResponse_2']//*[@value=1]"),
@@ -103,12 +103,16 @@ class TherapyApplication extends OpenEyesPage
         'rightPatientSignificantlyDifferent' => array('xpath' => "//*[@id='Element_OphCoTherapyapplication_ExceptionalCircumstances_right_patient_different']"),
         'rightPatientLikelyToGain' => array('xpath' => "//*[@id='Element_OphCoTherapyapplication_ExceptionalCircumstances_right_patient_gain']"),
 
+        'closeLeftSide' => array ('xpath' => "//*[@class='element-eye left-eye column side right eventDetail']//*[@class='icon-remove-side remove-side']"),
+        'closeRightSide' => array ('xpath' => "//*[@class='element-eye right-eye column side left eventDetail']//*[@class='icon-remove-side remove-side']"),
+
+
 
     );
 
     public function removeRightEye ()
     {
-        $this->getElement('removeRightEye')->click();
+        $this->getElement('closeRightSide')->click();
     }
 
     public function addRightEye ()
@@ -495,6 +499,21 @@ class TherapyApplication extends OpenEyesPage
     public function rightPatientLikelyToGainBenefit ($comments)
     {
         $this->getElement('rightPatientLikelyToGain')->setValue($comments);
+    }
+
+    public function closeLeftSide ()
+    {
+        $this->getElement('closeLeftSide')->click();
+    }
+
+    public function closeRightide ()
+    {
+        $this->getElement('closeRightSide')->click();
+    }
+
+    public function addLeftEye ()
+    {
+        $this->getElement('addLeftEye')->click();
     }
 
 

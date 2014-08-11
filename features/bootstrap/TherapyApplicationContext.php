@@ -776,6 +776,30 @@ class TherapyApplicationContext extends PageObjectContext
         $TherapyApplication->rightPatientLikelyToGainBenefit($comments);
     }
 
+    /**
+     * @Then /^I remove the Diagnosis left eye$/
+     */
+    public function iRemoveTheDiagnosisLeftEye()
+    {
+        /**
+         * @var TherapyApplication $TherapyApplication
+         */
+        $TherapyApplication = $this->getPage("TherapyApplication");
+        $TherapyApplication->closeLeftSide();
+    }
+
+    /**
+     * @Given /^I add the Diagnosis left eye$/
+     */
+    public function iAddTheDiagnosisLeftEye()
+    {
+        /**
+         * @var TherapyApplication $TherapyApplication
+         */
+        $TherapyApplication = $this->getPage("TherapyApplication");
+        $TherapyApplication->addLeftEye();
+    }
+
 
 
 }

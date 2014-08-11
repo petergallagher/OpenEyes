@@ -22,6 +22,9 @@ Feature: Create New Therapy Application Event
     Then I remove the Diagnosis right eye
     And I add the Diagnosis right eye
 
+    Then I remove the Diagnosis left eye
+    And I add the Diagnosis left eye
+
     And I select a Right Side Diagnosis of "75971007"
     Then I select a Right Secondary To of "267718000"
 
