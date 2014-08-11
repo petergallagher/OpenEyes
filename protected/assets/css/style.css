@@ -2529,76 +2529,81 @@ input[type="text"].large, input[type="password"].large, input[type="date"].large
 .generic-admin .reorder {
   width: 2em;
 }
+/* line 294, ../sass/openeyes/components/_forms.scss */
+.generic-admin .reorder input {
+  display: inline-block;
+  width: 40px;
+}
 
-/* line 298, ../sass/openeyes/components/_forms.scss */
+/* line 302, ../sass/openeyes/components/_forms.scss */
 .patient-details-edit label {
   display: inline-block;
 }
-/* line 302, ../sass/openeyes/components/_forms.scss */
+/* line 306, ../sass/openeyes/components/_forms.scss */
 .patient-details-edit .patient-dob input {
   display: inline-block;
 }
-/* line 305, ../sass/openeyes/components/_forms.scss */
+/* line 309, ../sass/openeyes/components/_forms.scss */
 .patient-details-edit .patient-dob input[name="dob_day"] {
   width: 3em;
 }
-/* line 308, ../sass/openeyes/components/_forms.scss */
+/* line 312, ../sass/openeyes/components/_forms.scss */
 .patient-details-edit .patient-dob input[name="dob_month"] {
   width: 3em;
 }
-/* line 311, ../sass/openeyes/components/_forms.scss */
+/* line 315, ../sass/openeyes/components/_forms.scss */
 .patient-details-edit .patient-dob input[name="dob_year"] {
   width: 4em;
 }
-/* line 316, ../sass/openeyes/components/_forms.scss */
+/* line 320, ../sass/openeyes/components/_forms.scss */
 .patient-details-edit .patient-dod input {
   display: inline-block;
 }
-/* line 319, ../sass/openeyes/components/_forms.scss */
+/* line 323, ../sass/openeyes/components/_forms.scss */
 .patient-details-edit .patient-dod input[name="dod_day"] {
   width: 3em;
 }
-/* line 322, ../sass/openeyes/components/_forms.scss */
+/* line 326, ../sass/openeyes/components/_forms.scss */
 .patient-details-edit .patient-dod input[name="dod_month"] {
   width: 3em;
 }
-/* line 325, ../sass/openeyes/components/_forms.scss */
+/* line 329, ../sass/openeyes/components/_forms.scss */
 .patient-details-edit .patient-dod input[name="dod_year"] {
   width: 4em;
 }
-/* line 329, ../sass/openeyes/components/_forms.scss */
+/* line 333, ../sass/openeyes/components/_forms.scss */
 .patient-details-edit #dob_dn {
   display: inline-block;
 }
-/* line 332, ../sass/openeyes/components/_forms.scss */
+/* line 336, ../sass/openeyes/components/_forms.scss */
 .patient-details-edit #age_years {
   width: 3em;
   display: inline-block;
 }
-/* line 336, ../sass/openeyes/components/_forms.scss */
+/* line 340, ../sass/openeyes/components/_forms.scss */
 .patient-details-edit #age_months {
   width: 3em;
   display: inline-block;
 }
 
-/* line 342, ../sass/openeyes/components/_forms.scss */
+/* line 346, ../sass/openeyes/components/_forms.scss */
 .autocomplete-top {
   margin-top: 8px !important;
 }
 
-/* line 346, ../sass/openeyes/components/_forms.scss */
+/* line 350, ../sass/openeyes/components/_forms.scss */
 .measurementInput {
   width: 5em !important;
   display: inline-block !important;
 }
 
-/* line 351, ../sass/openeyes/components/_forms.scss */
+/* line 355, ../sass/openeyes/components/_forms.scss */
 .bpSystolic {
   width: 3em !important;
   display: inline-block !important;
 }
 
-/* line 355, ../sass/openeyes/components/_forms.scss */
+/* line 359, ../sass/openeyes/components/_forms.scss */
 .bpDiastolic {
   width: 2.2em !important;
   display: inline-block !important;
@@ -3077,9 +3082,17 @@ tfoot.pagination-container .pagination li {
   font-weight: normal;
   font-size: 0.75rem;
 }
+/* line 122, ../sass/openeyes/components/_pagination.scss */
+tfoot.pagination-container .pagination-view-all {
+  float: right;
+  margin-left: 12px;
+  line-height: 1.8;
+  font-size: 0.75rem;
+  font-weight: normal;
+}
 
 /* Pagination centered wrapper */
-/* line 125, ../sass/openeyes/components/_pagination.scss */
+/* line 132, ../sass/openeyes/components/_pagination.scss */
 .pagination-centered {
   text-align: center;
 }
