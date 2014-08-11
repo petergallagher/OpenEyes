@@ -726,5 +726,29 @@ class IntravitrealContext extends PageObjectContext
         $Intravitreal->intravitrealMandatoryFieldsErrorValidation();
     }
 
+    /**
+     * @Then /^I select Close Left Side$/
+     */
+    public function iSelectCloseLeftSide()
+    {
+        /**
+         * @var Intravitreal $Intravitreal
+         */
+        $Intravitreal  = $this->getPage('Intravitreal');
+        $Intravitreal->closeLeftSide();
+    }
+
+    /**
+     * @Given /^I select Close Right Side$/
+     */
+    public function iSelectCloseRightSide()
+    {
+        /**
+         * @var Intravitreal $Intravitreal
+         */
+        $Intravitreal  = $this->getPage('Intravitreal');
+        $Intravitreal->closeRightSide();
+    }
+
 
 }

@@ -111,6 +111,8 @@ class Intravitreal extends OpenEyesPage
         'anteriorSegmentRightLensBlank' => array('xpath' => "//*[@class='alert-box alert with-icon']//*[contains(text(),'Anterior Segment: Right Lens Status cannot be blank.')]"),
         'postInjectionExamLeftPostDropsBlank' => array('xpath' => "//*[@class='alert-box alert with-icon']//*[contains(text(),'Post Injection Examination: Left Post Injection Drops cannot be blank.')]"),
         'postInjectionExamRightPostDropsBlank' => array('xpath' => "//*[@class='alert-box alert with-icon']//*[contains(text(),'Post Injection Examination: Right Post Injection Drops cannot be blank.')]"),
+        'closeLeftSide' => array('xpath' => "//*[@class='element-eye left-eye right side column']//*[contains(text(),'Remove')]"),
+        'closeRightSide' => array('xpath' => "//*[@class='element-eye right-eye left side column']//*[contains(text(),'Remove')]"),
     );
 
         protected function isRightSideOpen()
@@ -499,5 +501,19 @@ class Intravitreal extends OpenEyesPage
             else {
                 throw new BehaviorException("WARNING!!!  Intravitreal Mandatory fields validation errors NOT displayed WARNING!!!");
             }
+        }
+
+        public function closeLeftSide ()
+        {
+            $element = $this->getElement('closeLeftSide');
+            $this->scrollWindowToElement($element);
+            $element->click();
+        }
+
+        public function closeRightSide ()
+        {
+            $element = $this->getElement('closeRightSide');
+            $this->scrollWindowToElement($element);
+            $element->click();
         }
 }
