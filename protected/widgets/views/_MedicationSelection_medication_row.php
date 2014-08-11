@@ -44,7 +44,7 @@
 		<?php }?>
 	</td>
 	<td>
-		<?php echo $_medication->NHSDate('start_date')?>
+		<?php echo Helper::formatFuzzyDate($_medication->start_date)?>
 		<?php if ($_edit) {?>
 			<input type="hidden" name="<?php echo $_input_name?>_start_dates[]" value="<?php echo $_medication->start_date?>" />
 		<?php }?>
