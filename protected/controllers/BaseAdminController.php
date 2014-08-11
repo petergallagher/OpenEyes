@@ -164,6 +164,13 @@ class BaseAdminController extends BaseController
 
 			$criteria = new CDbCriteria;
 
+			if ($compareCriteria = @$_POST['GenericAdminModelCriteriaCompare']) {
+				foreach(explode(',', $compareCriteria) as $compare) {
+					list($column, $val) = explode('=', $compare);
+					$criteria->compare($column, $val);
+				}
+			}
+
 			!empty($ids) && $criteria->addNotInCondition('id',$ids);
 
 			$model::model()->deleteAll($criteria);
