@@ -38,6 +38,12 @@ if (isset($htmlOptions['div_class'])) {
 	$div_class = "eventDetail";
 }
 
+if (isset($htmlOptions['field_id'])) {
+	$field_id = $htmlOptions['field_id'];
+} else {
+	$field_id = CHtml::getIdByName($field);
+}
+
 $found = false;
 foreach($selected_ids as $id) {
 	if (isset($options[$id])) {
@@ -56,7 +62,7 @@ $widgetOptionsJson = json_encode(array(
 <?php if (!@$htmlOptions['nowrapper']) {?>
 	<div id="<?php echo $div_id ?>" class="<?php echo $div_class ?> row field-row widget"<?php if ($hidden) {?> style="display: none;"<?php }?>>
 		<div class="large-<?php echo $layoutColumns['label'];?> column">
-			<label for="<?php echo $field?>">
+			<label for="<?php echo $field_id?>">
 				<?php if (@$htmlOptions['label']) {?>
 					<?php echo @$htmlOptions['label']?>:
 				<?php }?>
@@ -67,7 +73,7 @@ $widgetOptionsJson = json_encode(array(
 		<div class="multi-select<?php if (!$inline) echo ' multi-select-list';?>" data-options='<?php echo $widgetOptionsJson;?>' data-show-none-placeholder="<?php echo $showNonePlaceholder ? 'yes' : 'no'?>">
 			<input type="hidden" name="<?php echo $element ? CHtml::modelName($element).'['.$field.']' : $field?>" class="multi-select-list-name" />
 			<div class="multi-select-dropdown-container">
-				<select id="<?php echo CHtml::getIdByName($field)?>" class="MultiSelectList<?php if ($showRemoveAllLink) {?> inline<?php }?><?php if (isset($htmlOptions['class'])) {?> <?php echo $htmlOptions['class']?><?php }?>" name=""<?php if (isset($htmlOptions['data-linked-fields'])) {?> data-linked-fields="<?php echo $htmlOptions['data-linked-fields']?>"<?php }?><?php if (isset($htmlOptions['data-linked-values'])) {?> data-linked-values="<?php echo $htmlOptions['data-linked-values']?>"<?php }?><?php if (!empty($extra_fields)) {?> data-extra-fields="<?php echo implode(',',$extra_fields)?>"<?php }?><?php if ($input_class) {?> data-input-class="<?php echo $input_class?>"<?php }?>>
+				<select id="<?php echo $field_id;?>" class="MultiSelectList<?php if ($showRemoveAllLink) {?> inline<?php }?><?php if (isset($htmlOptions['class'])) {?> <?php echo $htmlOptions['class']?><?php }?>" name=""<?php if (isset($htmlOptions['data-linked-fields'])) {?> data-linked-fields="<?php echo $htmlOptions['data-linked-fields']?>"<?php }?><?php if (isset($htmlOptions['data-linked-values'])) {?> data-linked-values="<?php echo $htmlOptions['data-linked-values']?>"<?php }?><?php if (!empty($extra_fields)) {?> data-extra-fields="<?php echo implode(',',$extra_fields)?>"<?php }?><?php if ($input_class) {?> data-input-class="<?php echo $input_class?>"<?php }?>>
 					<option value=""><?php echo $htmlOptions['empty']?></option>
 					<?php foreach ($filtered_options as $value => $option) {
 						$attributes = array('value' => $value);
