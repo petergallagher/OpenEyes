@@ -106,7 +106,8 @@ class Event extends BaseActiveRecordVersioned
 			'usermodified' => array(self::BELONGS_TO, 'User', 'last_modified_user_id'),
 			'eventType' => array(self::BELONGS_TO, 'EventType', 'event_type_id'),
 			'issues' => array(self::HAS_MANY, 'EventIssue', 'event_id'),
-			'children' => array(self::HAS_MANY, 'EventChildAssignment', 'parent_event_id'),
+			'parent' => array(self::HAS_ONE, 'EventRelation', 'child_event_id'),
+			'children' => array(self::HAS_MANY, 'EventRelation', 'parent_event_id'),
 		);
 	}
 
