@@ -641,18 +641,14 @@ class PatientController extends BaseController
 
 			if (@$_POST['no_allergies']) {
 				$patient->setNoAllergies();
-			} else  {
-				$allergy = $this->fetchModel('Allergy', @$_POST['allergy_id']);
-				$patient->addAllergy($allergy, @$_POST['other']);
-			}
-			else	{
+			} else {
 				if (!isset($_POST['allergy_id']) || !$allergy_id = $_POST['allergy_id']) {
 					throw new Exception('Allergy ID required');
 				}
 				if (!$allergy = Allergy::model()->findByPk($allergy_id)) {
 					throw new Exception('Allergy not found: '.$allergy_id);
 				}
-				$patient->addAllergy($allergy_id);
+				$patient->addAllergy($allergy);
 			}
 		}
 
