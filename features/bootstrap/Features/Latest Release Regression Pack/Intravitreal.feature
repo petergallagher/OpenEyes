@@ -19,10 +19,7 @@ Feature: Create New Intravitreal Event
     Then I expand the Cataract sidebar
     And I add a New Event "Intravitreal"
 
-#    Then I select Add Left Side
-
-    Then I select Close Left Side
-    And I select Close Right Side
+    Then I select Add Left Side
 
     Then I Save the Intravitreal injection
 
