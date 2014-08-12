@@ -50,6 +50,8 @@ class BaseMeasurementWidget extends BaseFieldWidget
 		} else {
 			$this->htmlOptions['class'] = 'measurementInput';
 		}
+
+		$this->htmlOptions['autocomplete'] = Yii::app()->params['html_autocomplete'];
 	}
 
 	public function run()

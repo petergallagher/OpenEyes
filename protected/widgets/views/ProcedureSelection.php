@@ -138,7 +138,7 @@
 							Estimated Total Duration:
 						</td>
 						<td>
-							<?php echo CHtml::textField(CHtml::modelName($element).'[total_duration]',$element->total_duration,array('class' => 'ProcedureSelectionEstimatedDuration', 'data-element' => CHtml::modelName($element), 'data-field' => $field))?>
+							<?php echo CHtml::textField(CHtml::modelName($element).'[total_duration]',$element->total_duration,array('autocomplete' => Yii::app()->params['html_autocomplete'], 'class' => 'ProcedureSelectionEstimatedDuration', 'data-element' => CHtml::modelName($element), 'data-field' => $field))?>
 						</td>
 					</tr>
 					</tfoot>

@@ -18,4 +18,4 @@
  */
 
 $value = $row ? $row->{$params['field']} : '';
-echo CHtml::textField($params['field'].'[]',$value);
+echo CHtml::textField($params['field'].'[]',$value,array('autocomplete' => Yii::app()->params['html_autocomplete']));

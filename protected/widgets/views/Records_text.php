@@ -17,4 +17,4 @@
  * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
  */
 
-echo CHtml::textField($column_field['field'],'',array('class' => 'recordInput'));
+echo CHtml::textField($column_field['field'],'',array('autocomplete' => Yii::app()->params['html_autocomplete'], 'class' => 'recordInput'));

@@ -24,7 +24,7 @@
 			</div>
 			<div class="large-8 column">
 				<div class="data-value">
-					<?php echo CHtml::textField('primary_phone',$contact->primary_phone)?>
+					<?php echo CHtml::textField('primary_phone',$contact->primary_phone,array('autocomplete' => Yii::app()->params['html_autocomplete']))?>
 				</div>
 			</div>
 		</div>
@@ -36,7 +36,7 @@
 			</div>
 			<div class="large-8 column">
 				<div class="data-value">
-					<?php echo CHtml::textField('email',$address->email)?>
+					<?php echo CHtml::textField('email',$address->email,array('autocomplete' => Yii::app()->params['html_autocomplete']))?>
 				</div>
 			</div>
 		</div>

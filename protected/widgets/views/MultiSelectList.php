@@ -97,7 +97,7 @@ $widgetOptionsJson = json_encode(array(
 								<?php echo CHtml::encode($options[$id])?>
 								<?php if ($extra_fields) {?>
 									<?php foreach ($extra_fields as $field) {?>
-										<?php echo CHtml::textField($field.'[]','',$input_class ? array('class' => $input_class) : array())?>
+										<?php echo CHtml::textField($field.'[]','',$input_class ? array('autocomplete' => Yii::app()->params['html_autocomplete'], 'class' => $input_class) : array('autocomplete' => Yii::app()->params['html_autocomplete']))?>
 									<?php }?>
 								<?php }?>
 							</span>

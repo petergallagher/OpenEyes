@@ -43,7 +43,7 @@ if (@$before) {
 						<div class="data-value">
 							<?php switch($metadata_key->fieldType->name) {
 								case 'Text':
-									$htmlOptions = array();
+									$htmlOptions = array('autocomplete' => Yii::app()->params['html_autocomplete']);
 
 									if ($metadata_key->getDisabled($patient)) {
 										$htmlOptions['disabled'] = 'disabled';

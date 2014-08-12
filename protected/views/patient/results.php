@@ -53,7 +53,7 @@
 										<?php if ($metadata_key = PatientMetadataKey::model()->find('key_name=?',array($patient_search_field->name))) {
 											switch($metadata_key->fieldType->name) {
 												case 'Text':
-													echo CHtml::textField($metadata_key->key_name,@$_GET[$metadata_key->key_name]);
+													echo CHtml::textField($metadata_key->key_name,@$_GET[$metadata_key->key_name],array('autocomplete' => Yii::app()->params['html_autocomplete']));
 													break;
 												case 'Select':
 													$class_name = $metadata_key->field_option2;
@@ -71,7 +71,7 @@
 													break;
 											}
 										} else {
-											echo CHtml::textField($patient_search_field->name,@$_GET[$patient_search_field->name]);
+											echo CHtml::textField($patient_search_field->name,@$_GET[$patient_search_field->name],array('autocomplete' => Yii::app()->params['html_autocomplete']));
 										}?>
 									</td>
 								<?php }?>

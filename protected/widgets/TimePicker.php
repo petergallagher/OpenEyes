@@ -64,6 +64,7 @@ class TimePicker extends BaseFieldWidget
 		$cssClass = isset($this->htmlOptions['class']) ? $this->htmlOptions['class'] : '';
 		$cssClass .= " {$this->cssClass}";
 		$this->htmlOptions['class'] = trim($cssClass);
+		$this->htmlOptions['autocomplete'] = Yii::app()->params['html_autocomplete'];
 
 		return parent::init();
 	}

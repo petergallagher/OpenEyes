@@ -18,9 +18,9 @@
  */
 ?>
 <?php if (@$htmlOptions['nowrapper']) {?>
-	<?php echo CHtml::textField($element ? CHtml::modelName($element).'['.$field.'][bp_systolic]' : $field.'[bp_systolic]', $bp_systolic, array('class' => $class_systolic))?>
+	<?php echo CHtml::textField($element ? CHtml::modelName($element).'['.$field.'][bp_systolic]' : $field.'[bp_systolic]', $bp_systolic, array('autocomplete' => Yii::app()->params['html_autocomplete'], 'class' => $class_systolic))?>
 	/
-	<?php echo CHtml::textField($element ? CHtml::modelName($element).'['.$field.'][bp_diastolic]' : $field.'[bp_diastolic]', $bp_diastolic, array('class' => $class_diastolic))?>
+	<?php echo CHtml::textField($element ? CHtml::modelName($element).'['.$field.'][bp_diastolic]' : $field.'[bp_diastolic]', $bp_diastolic, array('autocomplete' => Yii::app()->params['html_autocomplete'], 'class' => $class_diastolic))?>
 	<span class="field-info">mmHg</span>
 <?php } else {?>
 	<div id="div_<?php echo CHtml::modelName($element)?>_<?php echo $field?>" class="row field-row"<?php if (@$htmlOptions['hide']) {?> style="display: none;"<?php }?>>
@@ -32,9 +32,9 @@
 			?>
 		</div>
 		<div class="large-<?php echo $layoutColumns['field'];?> column<?php if(empty($htmlOptions['append-text']) || empty($layoutColumns['append-text'])){?> end<?php }?>">
-			<?php echo CHtml::textField(CHtml::modelName($element).'['.$field.'][bp_systolic]', $bp_systolic, array('class' => $class_systolic))?>
+			<?php echo CHtml::textField(CHtml::modelName($element).'['.$field.'][bp_systolic]', $bp_systolic, array('autocomplete' => Yii::app()->params['html_autocomplete'], 'class' => $class_systolic))?>
 			/
-			<?php echo CHtml::textField(CHtml::modelName($element).'['.$field.'][bp_diastolic]', $bp_diastolic, array('class' => $class_diastolic))?>
+			<?php echo CHtml::textField(CHtml::modelName($element).'['.$field.'][bp_diastolic]', $bp_diastolic, array('autocomplete' => Yii::app()->params['html_autocomplete'], 'class' => $class_diastolic))?>
 			<span class="field-info">mmHg</span>
 		</div>
 	</div>

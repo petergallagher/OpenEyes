@@ -27,7 +27,7 @@ $currentAction = $this->action->getId();
 				</div>
 				<div class="large-8 column">
 					<div class="data-value">
-						<?php echo CHtml::textField('hos_num',$patient->hos_num, ( ( $auto_hos_num && $currentAction == 'create')? array('disabled' =>'disabled'): array()));?>
+						<?php echo CHtml::textField('hos_num',$patient->hos_num, array('autocomplete' => Yii::app()->params['html_autocomplete'], 'disabled' => ($auto_hos_num && $currentAction == 'create') ? 'disabled' : ''))?>
 					</div>
 				</div>
 			</div>
@@ -50,7 +50,7 @@ $currentAction = $this->action->getId();
 				</div>
 				<div class="large-8 column">
 					<div class="data-value">
-						<?php echo CHtml::textField('nhs_num',$patient->nhs_num)?>
+						<?php echo CHtml::textField('nhs_num',$patient->nhs_num,array('autocomplete' => Yii::app()->params['html_autocomplete']))?>
 					</div>
 				</div>
 			</div>
@@ -62,7 +62,7 @@ $currentAction = $this->action->getId();
 				</div>
 				<div class="large-8 column">
 					<div class="data-value">
-						<?php echo CHtml::textField('title',$contact->title)?>
+						<?php echo CHtml::textField('title',$contact->title,array('autocomplete' => Yii::app()->params['html_autocomplete']))?>
 					</div>
 				</div>
 			</div>
@@ -74,7 +74,7 @@ $currentAction = $this->action->getId();
 				</div>
 				<div class="large-8 column">
 					<div class="data-value">
-						<?php echo CHtml::textField('first_name',$contact->first_name)?>
+						<?php echo CHtml::textField('first_name',$contact->first_name,array('autocomplete' => Yii::app()->params['html_autocomplete']))?>
 					</div>
 				</div>
 			</div>
@@ -86,7 +86,7 @@ $currentAction = $this->action->getId();
 				</div>
 				<div class="large-8 column">
 					<div class="data-value">
-						<?php echo CHtml::textField('last_name',$contact->last_name)?>
+						<?php echo CHtml::textField('last_name',$contact->last_name,array('autocomplete' => Yii::app()->params['html_autocomplete']))?>
 					</div>
 				</div>
 			</div>
@@ -97,7 +97,7 @@ $currentAction = $this->action->getId();
 					<div class="data-label"><?php echo Address::model()->getAttributeLabel('address1')?>:</div>
 				</div>
 				<div class="large-8 column">
-					<?php echo CHtml::textField('address1',$address->address1)?>
+					<?php echo CHtml::textField('address1',$address->address1,array('autocomplete' => Yii::app()->params['html_autocomplete']))?>
 				</div>
 			</div>
 			<?php echo $this->renderPartial('_patient_metadata_edit',array('patient'=>$patient,'after'=>'address1'))?>
@@ -107,7 +107,7 @@ $currentAction = $this->action->getId();
 					<div class="data-label"><?php echo Address::model()->getAttributeLabel('address2')?>:</div>
 				</div>
 				<div class="large-8 column">
-					<?php echo CHtml::textField('address2',$address->address2)?>
+					<?php echo CHtml::textField('address2',$address->address2,array('autocomplete' => Yii::app()->params['html_autocomplete']))?>
 				</div>
 			</div>
 			<?php echo $this->renderPartial('_patient_metadata_edit',array('patient'=>$patient,'after'=>'address2'))?>
@@ -117,7 +117,7 @@ $currentAction = $this->action->getId();
 					<div class="data-label"><?php echo Address::model()->getAttributeLabel('city')?>:</div>
 				</div>
 				<div class="large-8 column">
-					<?php echo CHtml::textField('city',$address->city)?>
+					<?php echo CHtml::textField('city',$address->city,array('autocomplete' => Yii::app()->params['html_autocomplete']))?>
 				</div>
 			</div>
 			<?php echo $this->renderPartial('_patient_metadata_edit',array('patient'=>$patient,'after'=>'city'))?>
@@ -127,7 +127,7 @@ $currentAction = $this->action->getId();
 					<div class="data-label"><?php echo Address::model()->getAttributeLabel('county')?>:</div>
 				</div>
 				<div class="large-8 column">
-					<?php echo CHtml::textField('county',$address->county)?>
+					<?php echo CHtml::textField('county',$address->county,array('autocomplete' => Yii::app()->params['html_autocomplete']))?>
 				</div>
 			</div>
 			<?php echo $this->renderPartial('_patient_metadata_edit',array('patient'=>$patient,'after'=>'county'))?>
@@ -137,7 +137,7 @@ $currentAction = $this->action->getId();
 					<div class="data-label"><?php echo Address::model()->getAttributeLabel('postcode')?>:</div>
 				</div>
 				<div class="large-8 column">
-					<?php echo CHtml::textField('postcode',$address->postcode)?>
+					<?php echo CHtml::textField('postcode',$address->postcode,array('autocomplete' => Yii::app()->params['html_autocomplete']))?>
 				</div>
 			</div>
 			<?php echo $this->renderPartial('_patient_metadata_edit',array('patient'=>$patient,'after'=>'postcode'))?>
@@ -159,9 +159,9 @@ $currentAction = $this->action->getId();
 				<div class="large-8 column">
 					<div class="data-value">
 						<div class="patient-dob">
-							<?php echo CHtml::textField('dob_day',$patient->dob_day,array('placeholder' => 'DD','disabled' => $patient->ageIsApproximate ? 'disabled' : ''))?>
-							<?php echo CHtml::textField('dob_month',$patient->dob_month,array('placeholder' => 'MM','disabled' => $patient->ageIsApproximate ? 'disabled' : ''))?>
-							<?php echo CHtml::textField('dob_year',$patient->dob_year,array('placeholder' => 'YYYY','disabled' => $patient->ageIsApproximate ? 'disabled' : ''))?>
+							<?php echo CHtml::textField('dob_day',$patient->dob_day,array('autocomplete' => Yii::app()->params['html_autocomplete'], 'placeholder' => 'DD','disabled' => $patient->ageIsApproximate ? 'disabled' : ''))?>
+							<?php echo CHtml::textField('dob_month',$patient->dob_month,array('autocomplete' => Yii::app()->params['html_autocomplete'], 'placeholder' => 'MM','disabled' => $patient->ageIsApproximate ? 'disabled' : ''))?>
+							<?php echo CHtml::textField('dob_year',$patient->dob_year,array('autocomplete' => Yii::app()->params['html_autocomplete'], 'placeholder' => 'YYYY','disabled' => $patient->ageIsApproximate ? 'disabled' : ''))?>
 						</div>
 					</div>
 				</div>
@@ -185,11 +185,11 @@ $currentAction = $this->action->getId();
 				</div>
 				<div class="large-8 column">
 					<div class="data-value">
-						<?php echo CHtml::textField('age_years',$patient->years)?>
+						<?php echo CHtml::textField('age_years',$patient->years,array('autocomplete' => Yii::app()->params['html_autocomplete']))?>
 						<label for="age_years">
 							years
 						</label>
-						<?php echo CHtml::textField('age_months',$patient->months)?>
+						<?php echo CHtml::textField('age_months',$patient->months,array('autocomplete' => Yii::app()->params['html_autocomplete']))?>
 						<label for="age_months">
 							months
 						</label>
@@ -204,9 +204,9 @@ $currentAction = $this->action->getId();
 				</div>
 				<div class="large-8 column">
 					<div class="data-value patient-dod">
-						<?php echo CHtml::textField('dod_day',$patient->dod_day,array('placeholder' => 'DD'))?>
-						<?php echo CHtml::textField('dod_month',$patient->dod_month,array('placeholder' => 'MM'))?>
-						<?php echo CHtml::textField('dod_year',$patient->dod_year,array('placeholder' => 'YYYY'))?>
+						<?php echo CHtml::textField('dod_day',$patient->dod_day,array('autocomplete' => Yii::app()->params['html_autocomplete'], 'placeholder' => 'DD'))?>
+						<?php echo CHtml::textField('dod_month',$patient->dod_month,array('autocomplete' => Yii::app()->params['html_autocomplete'], 'placeholder' => 'MM'))?>
+						<?php echo CHtml::textField('dod_year',$patient->dod_year,array('autocomplete' => Yii::app()->params['html_autocomplete'], 'placeholder' => 'YYYY'))?>
 					</div>
 				</div>
 			</div>
