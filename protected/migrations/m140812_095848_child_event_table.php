@@ -20,6 +20,7 @@ class m140812_095848_child_event_table extends OEMigration
 	public function down()
 	{
 		$this->dropTable("child_event");
+		$this->dropTable("child_event_version");
 	}
 
 }
