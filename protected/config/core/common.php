@@ -346,7 +346,7 @@ return array(
 		'patient_summary_show_nhs_num' => false,
 		'nhs_logo' => false,
 		'allow_duplicate_identifiers' => false,
-		'add_patient_autogenerate_identifier' => false
+		'add_patient_autogenerate_identifier' => false,
 		'html_autocomplete' => 'off',
 	),
 );
