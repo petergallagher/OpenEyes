@@ -113,8 +113,6 @@ class SiteController extends BaseController
 			}
 		}
 
-		Audit::add('search','search-error',$query);
-
 		if (isset($query)) {
 			if (strlen($query) == 0) {
 				Yii::app()->user->setFlash('warning.search_error', "Please enter either a ".Patient::model()->getAttributeLabel('hos_num')." or a firstname and lastname.");

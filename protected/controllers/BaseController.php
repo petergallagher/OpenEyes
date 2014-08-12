@@ -92,6 +92,12 @@ class BaseController extends Controller
 	{
 		$app = Yii::app();
 
+		foreach (SettingMetadata::model()->findAll() as $metadata) {
+			if (!$metadata->element_type) {
+				Yii::app()->params[$metadata->key] = $metadata->getSetting($metadata->key);
+			}
+		}
+
 		$this->setupAssetManager();
 
 		if ($app->params['ab_testing']) {
@@ -161,6 +167,7 @@ class BaseController extends Controller
 	{
 		$this->jsVars['YII_CSRF_TOKEN'] = Yii::app()->request->csrfToken;
 		$this->jsVars['OE_core_asset_path'] = Yii::app()->assetManager->getPublishedPathOfAlias('application.assets');
+		$this->jsVars['OE_html_autocomplete'] = Yii::app()->params['html_autocomplete'];
 
 		foreach ($this->jsVars as $key => $value) {
 			$value = CJavaScript::encode($value);

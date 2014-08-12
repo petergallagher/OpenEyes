@@ -637,14 +637,13 @@ class PatientController extends BaseController
 	public function actionAddAllergy()
 	{
 		if (!empty($_POST)) {
-			if (!isset($_POST['patient_id']) || !$patient_id = $_POST['patient_id']) {
-				throw new Exception('Patient ID required');
-			}
-			if (!$patient = Patient::model()->findByPk($patient_id)) {
-				throw new Exception('Patient not found: '.$patient_id);
-			}
+			$patient = $this->fetchModel('Patient', @$_POST['patient_id']);
+
 			if (@$_POST['no_allergies']) {
 				$patient->setNoAllergies();
+			} else  {
+				$allergy = $this->fetchModel('Allergy', @$_POST['allergy_id']);
+				$patient->addAllergy($allergy, @$_POST['other']);
 			}
 			else	{
 				if (!isset($_POST['allergy_id']) || !$allergy_id = $_POST['allergy_id']) {
@@ -655,7 +654,6 @@ class PatientController extends BaseController
 				}
 				$patient->addAllergy($allergy_id);
 			}
-
 		}
 
 		$this->redirect(array('patient/view/'.$patient->id));
@@ -668,20 +666,7 @@ class PatientController extends BaseController
 	 */
 	public function actionRemoveAllergy()
 	{
-		if (!isset($_GET['patient_id']) || !$patient_id = $_GET['patient_id']) {
-			throw new Exception('Patient ID required');
-		}
-		if (!$patient = Patient::model()->findByPk($patient_id)) {
-			throw new Exception('Patient not found: '.$patient_id);
-		}
-		if (!isset($_GET['allergy_id']) || !$allergy_id = $_GET['allergy_id']) {
-			throw new Exception('Allergy ID required');
-		}
-		if (!$allergy = Allergy::model()->findByPk($allergy_id)) {
-			throw new Exception('Allergy not found: '.$allergy_id);
-		}
-		$patient->removeAllergy($allergy_id);
-
+		PatientAllergyAssignment::model()->deleteByPk(@$_GET['assignment_id']);
 		echo 'success';
 	}
 
@@ -692,7 +677,7 @@ class PatientController extends BaseController
 	{
 		$allergy_ids = array();
 		foreach ($this->patient->allergies as $allergy) {
-			$allergy_ids[] = $allergy->id;
+			if ($allergy->name != 'Other') $allergy_ids[] = $allergy->id;
 		}
 		$criteria = new CDbCriteria;
 		!empty($allergy_ids) && $criteria->addNotInCondition('id',$allergy_ids);
@@ -1054,7 +1039,7 @@ class PatientController extends BaseController
 		if (!$fh->validate()) {
 			throw new Exception("Unable to save FamilyHistory item: ".print_r($fh->errors,true));
 		} else {
-			$patient->addFamilyHistory($_POST['relative_id'],$_POST['side_id'],$_POST['condition_id'],$_POST['comments']);
+			$patient->addFamilyHistory($relative->id,@$_POST['other_relative'],$side->id,$condition->id,@$_POST['other_condition'], @$_POST['comments']);
 		}
 
 		$this->redirect(array('/patient/view/'.$patient->id));

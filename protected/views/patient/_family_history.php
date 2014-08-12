@@ -24,9 +24,9 @@
 			<tbody>
 				<?php foreach ($this->patient->familyHistory as $history) {?>
 					<tr>
-						<td class="relative"><?php echo $history->relative->name?></td>
+						<td class="relative" data-relativeId="<?= $history->relative_id ?>"><?php echo $history->getRelativeName(); ?></td>
 						<td class="side"><?php echo $history->side->name?></td>
-						<td class="condition"><?php echo $history->condition->name?></td>
+						<td class="condition" data-conditionId="<?= $history->condition_id ?>"><?php echo $history->getConditionName(); ?></td>
 						<td class="comments"><?php echo CHtml::encode($history->comments)?></td>
 						<?php if ($this->checkAccess('OprnEditFamilyHistory')): ?>
 							<td>
@@ -74,7 +74,26 @@
 								<label for="relative_id">Relative:</label>
 							</div>
 							<div class="<?php echo $form->columns('field');?>">
-								<?php echo CHtml::dropDownList('relative_id','',CHtml::listData(FamilyHistoryRelative::model()->findAll(array('order'=>'display_order')),'id','name'),array('empty'=>'- Select -'))?>
+								<?php
+								$relatives = FamilyHistoryRelative::model()->findAll(array('order'=>'display_order'));
+								$relatives_opts = array(
+										'options' => array(),
+										'empty'=>'- select -',
+								);
+								foreach ($relatives as $rel) {
+									$relatives_opts['options'][$rel->id] = array('data-other' => $rel->is_other ? '1' : '0');
+								}
+								echo CHtml::dropDownList('relative_id','',CHtml::listData($relatives,'id','name'),$relatives_opts)
+								?>
+							</div>
+						</div>
+
+						<div class="field-row row hidden" id="family-history-o-rel-wrapper">
+							<div class="<?php echo $form->columns('label');?>">
+								<label for="comments">Other Relative:</label>
+							</div>
+							<div class="<?php echo $form->columns('field');?>">
+								<?php echo CHtml::textField('other_relative','',array('autocomplete'=>Yii::app()->params['html_autocomplete']))?>
 							</div>
 						</div>
 
@@ -92,7 +111,26 @@
 								<label for="condition_id">Condition:</label>
 							</div>
 							<div class="<?php echo $form->columns('field');?>">
-								<?php echo CHtml::dropDownList('condition_id','',CHtml::listData(FamilyHistoryCondition::model()->findAll(array('order'=>'display_order')),'id','name'),array('empty'=>'- Select -'))?>
+								<?php
+								$conditions = FamilyHistoryCondition::model()->findAll(array('order'=>'display_order'));
+								$conditions_opts = array(
+										'options' => array(),
+										'empty'=>'- select -',
+								);
+								foreach ($conditions as $con) {
+									$conditions_opts['options'][$con->id] = array('data-other' => $con->is_other ? '1' : '0');
+								}
+								echo CHtml::dropDownList('condition_id','',CHtml::listData($conditions,'id','name'),$conditions_opts);
+								?>
+							</div>
+						</div>
+
+						<div class="field-row row hidden" id="family-history-o-con-wrapper">
+							<div class="<?php echo $form->columns('label');?>">
+								<label for="comments">Other Condition:</label>
+							</div>
+							<div class="<?php echo $form->columns('field');?>">
+								<?php echo CHtml::textField('other_condition','',array('autocomplete'=>Yii::app()->params['html_autocomplete']))?>
 							</div>
 						</div>
 
@@ -101,7 +139,7 @@
 								<label for="comments">Comments:</label>
 							</div>
 							<div class="<?php echo $form->columns('field');?>">
-								<?php echo CHtml::textField('comments','')?>
+								<?php echo CHtml::textField('comments','',array('autocomplete'=>Yii::app()->params['html_autocomplete']))?>
 							</div>
 						</div>
 
@@ -159,6 +197,7 @@
 		$('#btn-add_family_history').removeClass('disabled');
 		return false;
 	});
+
 	$('button.btn_save_family_history').click(function(e) {
 		e.preventDefault();
 
@@ -189,6 +228,7 @@
 
 		$('#edit_family_history_id').val(history_id);
 		var relative = tr.find('.relative').text();
+
 		$('#relative_id').children('option').map(function() {
 			if ($(this).text() == relative) {
 				$(this).attr('selected','selected');
