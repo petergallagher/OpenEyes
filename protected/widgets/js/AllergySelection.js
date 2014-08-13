@@ -20,62 +20,261 @@ $(document).ready(function() {
 	$('.addAllergy').unbind('click').click(function(e) {
 		e.preventDefault();
 
-		var input_name = $(this).data('input-name');
+		var div = $(this).closest('div');
 
-		$('.addAllergyFields[data-input-name="'+input_name+'"]').slideDown('fast');
-
-		$(this).slideUp('fast');
-	});
-
-	$('.allergySelection').unbind('change').change(function(e) {
-		var input_name = $(this).data('input-name');
-		var no_allergies_field = $(this).data('no-allergies-field');
-
-		if ($(this).val() != '') {
-			$('.allergies[data-input-name="'+input_name+'"] tbody').append('<tr><td>'+$(this).children('option:selected').text()+'<input type="hidden" name="'+input_name+'_allergies[]" value="'+$(this).val()+'" /></td><td><a href="#" class="removeAllergy" data-input-name="'+input_name+'" data-no-allergies-field="'+no_allergies_field+'">remove</a></td></tr>');
-			$('.allergies[data-input-name="'+input_name+'"] tbody tr.no_allergies').hide();
-
-			if (no_allergies_field.length >0) {
-				$('#'+no_allergies_field).removeAttr('checked');
-				$('#'+no_allergies_field).attr('disabled','disabled');
-			}
-
-			$(this).children('option:selected').remove();
-
-			$('.addAllergyFields[data-input-name="'+input_name+'"]').slideUp('fast');
-			$('.addAllergy[data-input-name="'+input_name+'"]').slideDown('fast');
-		}
-	});
-
-	$('.removeAllergy').die('click').live('click',function(e) {
-		e.preventDefault();
-
-		var input_name = $(this).data('input-name');
-		var name = $(this).closest('tr').children('td:first').text().trim();
-		var id = $(this).closest('tr').children('td:first').children('input').val();
-		var no_allergies_field = $(this).data('no-allergies-field');
-
-		$(this).closest('tr').remove();
-
-		$('.allergySelection[data-input-name="'+input_name+'"]').append('<option value="'+id+'">'+name+'</option>');
-
-		sort_selectbox($('.allergySelection[data-input-name="'+input_name+'"]'));
-
-		if ($('.allergies[data-input-name="'+input_name+'"] tbody tr').length == 1) {
-			$('.allergies[data-input-name="'+input_name+'"] tbody tr.no_allergies').show();
-
-			if (no_allergies_field.length >0) {
-				$('#'+no_allergies_field).removeAttr('disabled');
-			}
-		}
+		$('.add-allergy').slideDown('fast',function() {
+			div.slideUp('fast');
+		});
 	});
 
 	$('.cancelAllergy').unbind('click').click(function(e) {
 		e.preventDefault();
 
-		var input_name = $(this).data('input-name');
+		$('.add-allergy').slideUp('fast',function() {
+			$('.add-allergy').prev('.box-actions').slideDown('fast');
+			$('#allergy_id').val('');
+		});
+	});
 
-		$('.addAllergyFields[data-input-name="'+input_name+'"]').slideUp('fast');
-		$('.addAllergy[data-input-name="'+input_name+'"]').slideDown('fast');
+	$('.saveAllergy').unbind('click').click(function(e) {
+		e.preventDefault();
+
+		if (OE_allergies_post) {
+			$('#add-allergy').submit();
+		} else {
+			if ($('#no_allergies').is(':checked')) {
+				Allergies_confirm_none();
+			} else {
+				if ($('#allergy_id').val() != '') {
+					Allergies_add();
+				} else {
+					Allergies_unconfirm_none();
+				}
+			}
+		}
+	});
+
+	$('#no_allergies').click(function(e) {
+		if ($(this).is(':checked')) {
+			$('#allergy_field').slideUp('fast');
+		} else {
+			$('#allergy_field').slideDown('fast');
+		}
+	});
+
+	$('button.btn_cancel_remove_allergy').unbind('click').click(function(e) {
+		e.preventDefault();
+		$("#confirm_remove_allergy_dialog").dialog("close");
+	});
+
+	$('.removeAllergy').die('click').live('click',function(e) {
+		e.preventDefault();
+
+		if (OE_allergies_post) {
+			$('#remove_allergy_id').val($(this).attr('rel'));
+
+			$('#confirm_remove_allergy_dialog').dialog({
+				resizable: false,
+				modal: true,
+				width: 560
+			});
+		} else {
+			Allergies_remove_row($(this).closest('tr'));
+		}
+	});
+
+	$('button.btn_remove_allergy').click(function() {
+		$("#confirm_remove_allergy_dialog").dialog("close");
+
+		var aa_id = $('#remove_allergy_id').val();
+
+		$.ajax({
+			'type': 'GET',
+			'url': baseUrl+'/patient/removeAllergy?patient_id=' + OE_patient_id + '&assignment_id=' + aa_id,
+			'success': function(html) {
+				if (html == 'success') {
+					var row = $('.currentAllergies tr[data-assignment-id="' + aa_id + '"]');
+					var allergy_id = row.data('allergy-id');
+					var allergy_name = row.data('allergy-name');
+
+					Allergies_remove_row(row);
+				} else {
+					new OpenEyes.UI.Dialog.Alert({
+						content: "Sorry, an internal error occurred and we were unable to remove the allergy.\n\nPlease contact support for assistance."
+					}).open();
+				}
+			},
+			'error': function() {
+				new OpenEyes.UI.Dialog.Alert({
+					content: "Sorry, an internal error occurred and we were unable to remove the allergy.\n\nPlease contact support for assistance."
+				}).open();
+			}
+		});
+
+		return false;
+	});
+
+	$('#allergy_id').unbind('change').change(function(e) {
+		if ($(this).children('option:selected').text() == 'Other') {
+			$('.allergyOther').show();
+			if (!OE_allergies_post) {
+				$('.allergyOtherButton').show();
+			}
+			$('#allergy_other').val('');
+			$('#allergy_other').focus();
+		} else {
+			$('.allergyOther').hide();
+			$('.allergyOtherButton').hide();
+
+			if ($(this).val() != '' && !OE_allergies_post) {
+				$('#no_allergies').removeAttr('checked');
+				Allergies_add();
+			}
+		}
+	});
+
+	$('#no_allergies').unbind('click').click(function(e) {
+		if (!OE_allergies_post) {
+			if ($(this).is(':checked')) {
+				Allergies_confirm_none();
+			} else {
+				Allergies_unconfirm_none();
+			}
+		}
 	});
 });
+
+function Allergies_add_old()
+{
+	if ($('#no_allergies').is(':checked')) {
+		$('#allergies_none').val(1);
+
+		$('.currentAllergies').children('tbody').children('tr').map(function() {
+			$(this).find('a').click();
+		});
+
+		$('.allergy-status-unknown').hide();
+		$('.allergy-status-none').show();
+
+		if (OE_allergies_post) {
+			$('.add-allergy').slideUp('fast',function() {
+				$('.add-allergy').prev('.box-actions').slideDown('fast');
+			});
+		}
+	} else {
+		$('#allergies_none').val(0);
+		$('.allergy-status-none').hide();
+
+		if ($('#allergy_id').val() != '') {
+			$('.allergy-status-unknown').hide();
+
+			var other = $('#allergy_id').children('option:selected').text() == 'Other'
+				? $('#allergy_other').val()
+					.replace(/&/g, "&amp;")
+					.replace(/</g, "&lt;")
+					.replace(/>/g, "&gt;")
+					.replace(/"/g, "&quot;")
+					.replace(/'/g, "&#039;")
+				: '';
+
+			var text = $('#allergy_id').children('option:selected').text() == 'Other'
+				? other
+				: $('#allergy_id').children('option:selected').text();
+
+			$('.currentAllergies').children('tbody').append('<tr data-assignment-id="" data-allergy-id="' + $('#allergy_id').val() + '" data-allergy-name="' + $('#allergy_id').children('option:selected').text() + '" data-allergy-other="' + other + '"><td>' + text + '</td><td><a href="#" class="small removeAllergy">Remove</a><input type="hidden" name="Allergies[]" value="' + $('#allergy_id').val() + '" /><input type="hidden" name="AllergiesOther[]" value="' + other + '" /></td></tr>');
+
+			$('.currentAllergies').show();
+
+			$('#allergy_id').children('option:selected').remove();
+			$('#allergy_other').val('');
+			$('.allergyOther').hide();
+		} else {
+			$('.allergy-status-unknown').show();
+
+			if (OE_allergies_post) {
+				$('.add-allergy').slideUp('fast',function() {
+					$('.add-allergy').prev('.box-actions').slideDown('fast');
+				});
+			}
+		}
+	}
+}
+
+function Allergies_add()
+{
+	$('#allergies_none').val(0);
+	$('.allergy-status-none').hide();
+
+	$('.allergy-status-unknown').hide();
+
+	var other = $('#allergy_id').children('option:selected').text() == 'Other'
+		? $('#allergy_other').val()
+			.replace(/&/g, "&amp;")
+			.replace(/</g, "&lt;")
+			.replace(/>/g, "&gt;")
+			.replace(/"/g, "&quot;")
+			.replace(/'/g, "&#039;")
+		: '';
+
+	var text = $('#allergy_id').children('option:selected').text() == 'Other'
+		? other
+		: $('#allergy_id').children('option:selected').text();
+
+	$('.currentAllergies').children('tbody').append('<tr data-assignment-id="" data-allergy-id="' + $('#allergy_id').val() + '" data-allergy-name="' + $('#allergy_id').children('option:selected').text() + '" data-allergy-other="' + other + '"><td>' + text + '</td><td><a href="#" class="small removeAllergy">Remove</a><input type="hidden" name="Allergies[]" value="' + $('#allergy_id').val() + '" /><input type="hidden" name="AllergiesOther[]" value="' + other + '" /></td></tr>');
+
+	$('.currentAllergies').show();
+
+	$('#allergy_id').children('option:selected').remove();
+	$('#allergy_other').val('');
+	$('.allergyOther').hide();
+}
+
+function Allergies_confirm_none()
+{
+	$('#allergies_none').val(1);
+
+	$('.currentAllergies').children('tbody').children('tr').map(function() {
+		$(this).find('a').click();
+	});
+
+	$('.allergy-status-unknown').hide();
+	$('.allergy-status-none').show();
+
+	if (OE_allergies_post) {
+		$('.add-allergy').slideUp('fast',function() {
+			$('.add-allergy').prev('.box-actions').slideDown('fast');
+		});
+	}
+}
+
+function Allergies_unconfirm_none()
+{
+	$('#allergies_none').val(0);
+	$('.allergy-status-none').hide();
+
+	$('.allergy-status-unknown').show();
+
+	if (OE_allergies_post) {
+		$('.add-allergy').slideUp('fast',function() {
+			$('.add-allergy').prev('.box-actions').slideDown('fast');
+		});
+	}
+}
+
+function Allergies_remove_row(row)
+{
+	var tbody = $('.currentAllergies').children('tbody');
+
+	$('#allergy_id').append('<option value="' + row.data('allergy-id') + '">' + row.data('allergy-name') + '</option>');
+	sort_selectbox($('#allergy_id'));
+	row.remove();
+
+	if (tbody.children('tr').length == 0) {
+		tbody.closest('table').hide();
+		if ($('#allergies_none').val() == 1) {
+			$('.allergy-status-none').show();
+		} else {
+			$('.allergy-status-unknown').show();
+		}
+	}
+}

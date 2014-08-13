@@ -648,7 +648,7 @@ class PatientController extends BaseController
 				if (!$allergy = Allergy::model()->findByPk($allergy_id)) {
 					throw new Exception('Allergy not found: '.$allergy_id);
 				}
-				$patient->addAllergy($allergy);
+				$patient->addAllergy($allergy,@$_POST['allergy_other']);
 			}
 		}
 

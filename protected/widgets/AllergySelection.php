@@ -20,20 +20,24 @@
 class AllergySelection extends BaseFieldWidget
 {
 	public $form;
-	public $element;
-	public $no_allergies_text = 'No allergies have been entered for this patient.';
-	public $relation = 'allergies';
-	public $input_name = 'allergies';
 	public $edit = true;
 	public $layoutColumns = array(
 		'label' => 2,
 		'field' => 4,
 	);
 	public $label = 'Allergies';
-	public $no_allergies_field = null;
+	public $patient;
+	public $allow_collapse = true;
+	public $button_align = 'center';
+	public $selected;
+	public $post = false;
 
 	public function run()
 	{
+		if (!Yii::app()->getController()->checkAccess('OprnEditAllergy')) {
+			$this->edit = false;
+		}
+
 		$this->render(get_class($this));
 	}
 }

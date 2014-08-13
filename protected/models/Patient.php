@@ -818,7 +818,10 @@ class Patient extends BaseActiveRecordVersioned
 	 */
 	public function setNoAllergies()
 	{
-		$transaction = Yii::app()->db->beginTransaction();
+		$transaction = Yii::app()->db->getCurrentTransaction() === null
+			? Yii::app()->db->beginTransaction()
+			: false;
+
 		try {
 			foreach (PatientAllergyAssignment::model()->findAll('patient_id = ?', array($this->id)) as $paa) {
 				if (!$paa->delete()) {
@@ -831,10 +834,15 @@ class Patient extends BaseActiveRecordVersioned
 				throw new Exception('Unable to set no allergy date:' .	print_r($this->getErrors(), true));
 			}
 			$this->audit('patient', 'set-noallergydate');
-			$transaction->commit();
+
+			if ($transaction) {
+				$transaction->commit();
+			}
 		}
 		catch (Exception $e) {
-			$transaction->rollback();
+			if ($transaction) {
+				$transaction->rollback();
+			}
 			throw $e;
 		}
 	}
@@ -1583,5 +1591,23 @@ class Patient extends BaseActiveRecordVersioned
 		return Yii::app()->db->createCommand(
 			'select (MAX(CAST(hos_num AS UNSIGNED)) +1) as nextHosNum    from ' . $this->tableName()
 		)->queryScalar();
+	}
+
+	public function getAvailableAllergies()
+	{
+		$allergy_ids = array();
+
+		foreach ($this->allergies as $allergy) {
+			$allergy_ids[] = $allergy->id;
+		}
+
+		$criteria = new CDbCriteria;
+		$criteria->order = 'name asc';
+
+		if (!empty($allergy_ids)) {
+			$criteria->addNotInCondition('id',$allergy_ids);
+		}
+
+		return Allergy::model()->findAll($criteria);
 	}
 }

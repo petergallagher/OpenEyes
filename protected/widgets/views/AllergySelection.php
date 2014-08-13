@@ -17,83 +17,130 @@
  * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
  */
 ?>
-		<div class="row field-row">
-			<div class="large-3 column"><label><?php if ($label) { echo $label.':';} ?></label></div>
-			<div class="large-9 column end">
-				<?php if (!$edit) {?>
-					<div class="data-value">
-						<?php if (empty($element->$relation)) {?>
-							<?php if ($no_allergies_field && $element->$no_allergies_field) {?>
-								It was confirmed that the patient has no allergies.
-							<?php }else{?>
-								<?php echo $no_allergies_text?>
-							<?php }?>
-						<?php }else{?>
-							<?php foreach ($element->$relation as $allergy) {?>
-								<?php echo $allergy->allergy->name?><br/>
-							<?php }?>
-						<?php }?>
-					</div>
-				<?php }else{?>
-					<table class="grid allergies" data-input-name="<?php echo $input_name?>">
-						<thead>
-							<tr>
-								<th>Allergy</th>
+<?php if ($label) {?>
+<div class="row field-row">
+		<div class="large-3 column"><label><?php if ($label) { echo $label.':';} ?></label></div>
+		<div class="large-9 column end">
+<?php }?>
+		<section class="box patient-info associated-data js-toggle-container allergies">
+			<header class="box-header">
+				<h3 class="box-title">
+					<span class="icon-patient-clinician-hd_flag"></span>
+					Allergies
+				</h3>
+				<?php if ($allow_collapse) {?>
+					<a href="#" class="toggle-trigger toggle-hide js-toggle">
+						<span class="icon-showhide">
+							Show/hide this section
+						</span>
+					</a>
+				<?php }?>
+			</header>
+			<div class="js-toggle-body">
+				<p class="allergy-status-unknown"<?php if ($patient->hasAllergyStatus()) {?> style="display: none"<?php }?>>Patient allergy status is unknown</p>
+				<p class="allergy-status-none"<?php if (!$patient->no_allergies_date || !empty($patient->allergies)) {?> style="display: none"<?php }?>>Patient has no known allergies</p>
+				<input type="hidden" id="allergies_none" name="Allergies_none" value="<?php echo $patient->no_allergies_date ? '1' : '0'?>" />
+				<table class="plain patient-data currentAllergies"<?php if ($patient->no_allergies_date || empty($patient->allergies)) {?> style="display: none"<?php }?>>
+					<thead>
+						<tr>
+							<th>Allergies</th>
+							<?php if ($edit) {?><th>Actions</th><?php } ?>
+						</tr>
+					</thead>
+					<tbody>
+						<?php foreach ($patient->allergyAssignments as $aa) {?>
+							<tr data-assignment-id="<?php echo $aa->id?>" data-allergy-id="<?php echo $aa->allergy->id?>" data-allergy-name="<?php echo $aa->allergy->name?>" data-allergy-other="<?php echo $aa->other?>">
+								<td><?php echo CHtml::encode($aa->allergy->name == 'Other' ? $aa->other : $aa->name)?></td>
 								<?php if ($edit) {?>
-									<th>Actions</th>
-								<?php }?>
+									<td>
+										<a href="#" rel="<?php echo $aa->id?>" class="small removeAllergy">
+											Remove
+										</a>
+										<input type="hidden" name="Allergies[]" value="<?php echo $aa->allergy->id?>" />
+										<input type="hidden" name="AllergiesOther[]" value="<?php echo $aa->other?>" />
+									</td>
+								<?php } ?>
 							</tr>
-						</thead>
-						<tbody>
-							<tr class="no_allergies"<?php if (!empty($element->$relation)) {?> style="display: none"<?php }?> data-input-name="<?php echo $input_name?>">
-								<td colspan="7">
-									<?php echo $no_allergies_text?>
-								</td>
-							</tr>
-							<?php if (!empty($element->$relation)) {?>
-								<?php foreach ($element->$relation as $i => $allergy) {?>
-									<tr>
-										<td>
-											<?php echo $allergy->allergy->name?>
-											<input type="hidden" name="<?php echo $input_name?>_allergies[]" value="<?php echo $allergy->allergy_id?>" />
-										</td>
-										<?php if ($edit) {?>
-											<td>
-												<a href="#" class="removeAllergy" data-input-name="<?php echo $input_name?>" data-no-allergies-field="<?php echo get_class($element).'_'.$no_allergies_field?>">remove</a>
-											</td>
-										<?php }?>
-									</tr>
-								<?php }?>
-							<?php }?>
-						</tbody>
-					</table>
+						<?php }?>
+					</tbody>
+				</table>
+				<?php if ($edit) {?>
+					<div class="box-actions" style="<?php if ($button_align == 'left') {?>text-align: left;<?php }?><?php if (!$post) {?>display: none<?php }?>">
+						<button class="secondary small addAllergy">
+							Edit
+						</button>
+					</div>
+
+					<div class="add-allergy"<?php if ($post) {?> style="display: none;"<?php }?>>
+						<div class="row field-row">
+							<div class="<?php echo $form->columns('label');?>">
+								<label></label>
+							</div>
+							<div class="<?php echo $form->columns('field');?>">
+								<?php echo CHtml::checkBox('no_allergies', $patient->no_allergies_date ? true : false); ?>
+								<label for="no_allergies">Confirm patient has no allergies:</label>
+							</div>
+						</div>
+
+						<input type="hidden" name="patient_id" value="<?php echo $patient->id?>" />
+
+						<div class="row field-row" id="allergy_field" <?php if ($patient->no_allergies_date) { echo 'style="display: none;"'; }?>>
+							<div class="<?php echo $form->columns('label')?>">
+								<label for="allergy_id">Add allergy:</label>
+							</div>
+							<div class="<?php echo $form->columns('field');?>">
+								<?php echo CHtml::dropDownList('allergy_id', null, CHtml::listData($patient->availableAllergies, 'id', 'name'), array('empty' => '-- Select --'))?>
+							</div>
+						</div>
+						<div class="allergyOther row field-row hidden">
+							<div class="<?php echo $form->columns('label')?>">
+								<label for="other">Other allergy:</label>
+							</div>
+							<div class="<?php echo $form->columns('field');?>">
+								<?php echo CHtml::textField('allergy_other','',array('autocomplete'=>Yii::app()->params['html_autocomplete'])); ?>
+							</div>
+						</div>
+						<div class="allergyOtherButton row field-row hidden">
+							<div class="<?php echo $form->columns('label')?>">
+								<label for="other_button"></label>
+							</div>
+							<div class="<?php echo $form->columns('field');?>">
+								<button class="secondary small addOtherAllergy">
+									Add other allergy
+								</button>
+							</div>
+						</div>
+						<div class="buttons"<?php if (!$post) {?> style="display: none"<?php }?>>
+							<img src="<?php echo Yii::app()->assetManager->createUrl('img/ajax-loader.gif')?>" class="add_allergy_loader" style="display: none;" />
+							<button class="secondary small saveAllergy" type="submit">Save</button>
+							<button class="warning small cancelAllergy" type="submit">Cancel</button>
+						</div>
+					</div>
 				<?php }?>
 			</div>
+		</section>
+<?php if ($label) {?>
+	</div>
+</div>
+<?php }?>
+<?php if ($post) {?>
+	<div id="confirm_remove_allergy_dialog" title="Confirm remove allergy" style="display: none;">
+		<div id="delete_allergy">
+			<div class="alert-box alert with-icon">
+				<strong>WARNING: This will remove the allergy from the patient record.</strong>
+			</div>
+			<p>
+				<strong>Are you sure you want to proceed?</strong>
+			</p>
+			<div class="buttons">
+				<input type="hidden" id="remove_allergy_id" value="" />
+				<button type="submit" class="warning small btn_remove_allergy">Remove allergy</button>
+				<button type="submit" class="secondary small btn_cancel_remove_allergy">Cancel</button>
+				<img class="loader" src="<?php echo Yii::app()->assetManager->createUrl('img/ajax-loader.gif')?>" alt="loading..." style="display: none;" />
+			</div>
 		</div>
-		<?php if ($edit) {?>
-			<?php if ($no_allergies_field) {
-				echo $form->checkBox($element, $no_allergies_field, array('text-align' => 'right', 'disabled' => empty($element->allergies) ? '' : 'disabled'), array('label' => 3, 'field' => 4));
-			}?>
-			<div class="addAllergyFields" style="display: none" data-input-name="<?php echo $input_name?>">
-				<div class="row field-row">
-					<div class="large-3 column">
-						<label>Allergy:</label>
-					</div>
-					<div class="large-4 column end">
-						<?php echo CHtml::dropDownList($input_name.'_allergy_id','',$element->availableAllergyList,array('empty' => '- Select -','class' => 'allergySelection', 'data-input-name' => $input_name, 'data-no-allergies-field' => get_class($element).'_'.$no_allergies_field))?>
-					</div>
-				</div>
-				<div class="row field-row">
-					<div class="large-3 column"><label></label></div>
-					<div class="large-9 column end">
-						<button class="cancelAllergy warning small" data-input-name="<?php echo $input_name?>">Cancel</button>
-					</div>
-				</div>
-			</div>
-			<div class="row field-row">
-				<div class="large-3 column"><label></label></div>
-				<div class="large-9 column end">
-					<button class="addAllergy secondary small" data-input-name="<?php echo $input_name?>">Add allergy</button>
-				</div>
-			</div>
-		<?php }?>
+	</div>
+<?php }?>
+<script type="text/javascript">
+	OE_allergies_post = <?php echo CJavaScript::encode($post)?>;
+</script>

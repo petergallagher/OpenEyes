@@ -2609,6 +2609,11 @@ input[type="text"].large, input[type="password"].large, input[type="date"].large
   display: inline-block !important;
 }
 
+/* line 365, ../sass/openeyes/components/_forms.scss */
+.allergies label {
+  display: inline-block;
+}
+
 /* line 96, ../sass/openeyes/_mixins.scss */
 button, .button, input[type="submit"] {
   border-style: solid;

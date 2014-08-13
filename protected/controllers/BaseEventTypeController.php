@@ -178,6 +178,37 @@ class BaseEventTypeController extends BaseModuleController
 		if (!$this->patient = Patient::model()->findByPk($patient_id)) {
 			throw new CHttpException(404, 'Invalid patient_id.');
 		}
+
+		if (isset($_POST['Allergies_none'])) {
+			$assignments = array();
+			$allergies = array();
+
+			if (!empty($_POST['Allergies'])) {
+				foreach ($_POST['Allergies'] as $i => $allergy_id) {
+					$allergy = Allergy::model()->findByPk($allergy_id);
+
+					$assignment = new PatientAllergyAssignment;
+					$assignment->patient_id = $this->patient->id;
+					$assignment->allergy_id = $allergy_id;
+
+					if ($allergy->name == 'Other') {
+						$assignment->other = $_POST['AllergiesOther'][$i];
+					}
+
+					$assignments[] = $assignment;
+					$allergies[] = $allergy;
+				}
+
+				$this->patient->no_allergies_date = null;
+			} elseif ($_POST['Allergies_none']) {
+				$this->patient->no_allergies_date = date('Y-m-d');
+			} else {
+				$this->patient->no_allergies_date = null;
+			}
+
+			$this->patient->allergyAssignments = $assignments;
+			$this->patient->allergies = $allergies;
+		}
 	}
 
 	/**
@@ -722,6 +753,10 @@ class BaseEventTypeController extends BaseModuleController
 
 						Yii::app()->user->setFlash('success', "{$this->event_type->name} created.");
 
+						if (isset($_POST['Allergies_none'])) {
+							$this->updatePatientAllergies($_POST['Allergies_none'], @$_POST['Allergies'], @$_POST['AllergiesOther']);
+						}
+
 						$transaction->commit();
 
 						$this->redirect(array($this->successUri.$this->event->id));
@@ -853,6 +888,11 @@ class BaseEventTypeController extends BaseModuleController
 						}
 
 						OELog::log("Updated event {$this->event->id}");
+
+						if (isset($_POST['Allergies_none'])) {
+							$this->updatePatientAllergies($_POST['Allergies_none'], @$_POST['Allergies'], @$_POST['AllergiesOther']);
+						}
+
 						$transaction->commit();
 						$this->redirect(array('default/view/'.$this->event->id));
 					}
@@ -1727,5 +1767,36 @@ class BaseEventTypeController extends BaseModuleController
 		$this->render('request_delete', array(
 			'errors' => $errors,
 		));
+	}
+
+	public function updatePatientAllergies($no_allergies, $allergy_ids, $allergies_other)
+	{
+		if ($no_allergies && !empty($allergy_ids)) {
+			throw new Exception("No allergies was specified for the patient but a list of allergies was also passed. This should not happen.");
+		}
+
+		if ($no_allergies) {
+			if (!Patient::model()->noPas()->findByPk($this->patient->id)->no_allergies_date) {
+				$this->patient->setNoAllergies();
+			}
+		} else {
+			if (!empty($allergy_ids)) {
+				foreach ($allergy_ids as $i => $allergy_id) {
+					if (!PatientAllergyAssignment::model()->find('patient_id=? and allergy_id=?',array($this->patient->id,$allergy_id))) {
+						$this->patient->addAllergy(Allergy::model()->findByPk($allergy_id), $allergies_other[$i]);
+					}
+				}
+			}
+
+			$criteria = new CDbCriteria;
+			$criteria->addCondition('patient_id = :pid');
+			$criteria->params[':pid'] = $this->patient->id;
+
+			if (!empty($allergy_ids)) {
+				$criteria->addNotInCondition('allergy_id',$allergy_ids);
+			}
+
+			PatientAllergyAssignment::model()->deleteAll($criteria);
+		}
 	}
 }
