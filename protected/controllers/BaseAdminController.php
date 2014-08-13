@@ -21,7 +21,6 @@ class BaseAdminController extends BaseController
 {
 	public $layout = '//layouts/admin';
 	public $items_per_page = 30;
-	public $form_errors;
 
 	public function accessRules()
 	{
@@ -33,10 +32,6 @@ class BaseAdminController extends BaseController
 		Yii::app()->assetManager->registerCssFile('css/admin.css', null, 10);
 		Yii::app()->assetManager->registerScriptFile('js/admin.js', null, 10);
 		$this->jsVars['items_per_page'] = $this->items_per_page;
-
-		if (!empty($_POST['GenericAdminModel'])) {
-			$this->handleGenericAdmin();
-		}
 
 		return parent::beforeAction($action);
 	}
@@ -108,78 +103,82 @@ class BaseAdminController extends BaseController
 		return $this->renderFile(Yii::app()->basePath.'/widgets/views/_ReferenceTableRow.php',array('name'=>''));
 	}
 
-	public function handleGenericAdmin()
+	/**
+	 * @param string $title
+	 * @param string $model
+	 * @param array $options
+	 */
+	protected function genericAdmin($title, $model, array $options = array())
 	{
-		$model = $_POST['GenericAdminModel'];
+		$options += array(
+			'label_field' => $model::SELECTION_LABEL_FIELD,
+			'extra_fields' => array(),
+		);
 
-		$ids = array();
+		$items = array();
+		$errors = array();
 
-		$to_save = array();
-
-		if (!empty($_POST['id'])) {
-			foreach ($_POST['id'] as $i => $id) {
+		if (Yii::app()->request->isPostRequest) {
+			foreach ((array) @$_POST['id'] as $i => $id) {
 				if ($id) {
 					$item = $model::model()->findByPk($id);
 				} else {
 					$item = new $model;
 				}
 
-				$item->name = $_POST['name'][$i];
-				$item->display_order = $i+1;
+				$item->{$options['label_field']} = $_POST[$options['label_field']][$i];
+				$item->display_order = $_POST['display_order'][$i];
 				//handle models with active flag
 				$attributes = $item->getAttributes();
 				if (array_key_exists('active',$attributes)) {
 					$item->active = (isset($_POST['active'][$i]) || $item->isNewRecord)? 1 : 0;
 				}
 
-				if (!empty($_POST['_extra_fields'])) {
-					foreach ($_POST['_extra_fields'] as $field) {
-						$item->$field = $_POST[$field][$i];
-					}
+				foreach ($options['extra_fields'] as $field) {
+					$name = $field['field'];
+					$item->$name = @$_POST[$name][$i];
 				}
 
 				if (!$item->validate()) {
 					$errors = $item->getErrors();
 					foreach ($errors as $error) {
-						$this->form_errors[$i] = $error[0];
+						$errors[$i] = $error[0];
 					}
-				} else {
-					$to_save[] = $item;
 				}
 
-				if ($item->id) {
+				$items[] = $item;
+			}
+
+			if (empty($errors)) {
+				$ids = array();
+
+				foreach ($items as $item) {
+					if (!$item->save()) {
+						throw new Exception("Unable to save admin list item: ".print_r($item->getErrors(),true));
+					}
 					$ids[] = $item->id;
 				}
+
+				$criteria = new CDbCriteria;
+
+				!empty($ids) && $criteria->addNotInCondition('id',$ids);
+
+				$model::model()->deleteAll($criteria);
+
+				Yii::app()->user->setFlash('success', "List updated.");
+
+				$this->redirect('/' . $this->route);
 			}
+		} else {
+			$items = $model::model()->findAll(array('order' => 'display_order asc'));
 		}
 
-		if (empty($this->form_errors)) {
-
-			foreach ($to_save as $item) {
-				if (!$item->save()) {
-					throw new Exception("Unable to save admin list item: ".print_r($item->getErrors(),true));
-				}
-				$ids[] = $item->id;
-			}
-
-			$criteria = new CDbCriteria;
-
-			if ($compareCriteria = @$_POST['GenericAdminModelCriteriaCompare']) {
-				foreach(explode(',', $compareCriteria) as $compare) {
-					list($column, $val) = explode('=', $compare);
-					$criteria->compare($column, $val);
-				}
-			}
-
-			!empty($ids) && $criteria->addNotInCondition('id',$ids);
-
-			$model::model()->deleteAll($criteria);
-
-			Yii::app()->user->setFlash('success', "List updated.");
-
-			$this->redirect(
-				$this->createUrl('/'.$this->route,$_GET)
-			);
-		}
+		$this->render('//admin/generic_admin', array(
+			'title' => $title,
+			'model' => $model,
+			'items' => $items,
+			'errors' => $errors,
+			'options' => $options,
+		));
 	}
 }

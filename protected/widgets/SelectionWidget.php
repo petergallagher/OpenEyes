@@ -25,24 +25,12 @@ abstract class SelectionWidget extends BaseFieldWidget
 	 */
 	public $data;
 
-	public $lookup_id_field = 'id';
-	public $lookup_name_field = null;
-
 	public function init()
 	{
 		parent::init();
 
 		if (is_string($this->data)) {
-			$class = $this->data;
-			$lookup = $class::model();
-			if ($lookup->asa('LookupTable')) {
-				$lookup->activeOrPk($this->element->{$this->field});
-			}
-			$this->data = CHtml::listData(
-				$lookup->cache(60)->findAll(array('order' => $lookup::SELECTION_ORDER)),
-				$this->lookup_id_field,
-				$this->lookup_name_field ?: $lookup::SELECTION_LABEL_FIELD
-			);
+			$this->data = SelectionHelper::listData($this->data, $this->element->{$this->field});
 		}
 
 		if (@$this->htmlOptions['data-linked-fields']) {

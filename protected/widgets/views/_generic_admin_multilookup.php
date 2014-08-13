@@ -17,7 +17,13 @@
  * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
  */
 
-$model = $params['model'];
 $htmlOptions = @$disabled ? array('disabled' => 'disabled') : array();
-$value = $row ? $row->{$params['field']} : null;
-echo CHtml::dropDownList($params['field']."[{$i}]", $value, SelectionHelper::listData($model, $value), $htmlOptions);
+$this->widget('MultiSelectList', array(
+				'element' => $row,
+				'field' => $params['field'] . "[{$i}]",
+				'relation' => $params['field'],
+				'relation_id_field' => 'id',
+				'htmlOptions' => @$params['htmlOptions'],
+				'options' => @$params['options'],
+				'noSelectionsMessage' => @$params['noSelectionsMessage']
+		));
