@@ -68,9 +68,18 @@ class MultiSelectList extends BaseFieldWidget
 			}
 			// when the field being used contains the appropriate square brackets for defining the associative array, the original (above)
 			// approach for retrieving the posted value does not work. The following (more standard) approach does
-			else if (isset($_POST[CHtml::modelName($this->element)][$this->relation])) {
+			else if ($this->relation && isset($_POST[CHtml::modelName($this->element)][$this->relation])) {
 				if (is_array($_POST[CHtml::modelName($this->element)][$this->relation])) {
 					foreach ($_POST[CHtml::modelName($this->element)][$this->relation] as $id) {
+						$this->selected_ids[] = $id;
+						unset($this->filtered_options[$id]);
+					}
+				}
+			}
+			// If no relation is specified then use the $field.
+			else if (isset($_POST[CHtml::modelName($this->element)][$this->field])) {
+				if (is_array($_POST[CHtml::modelName($this->element)][$this->field])) {
+					foreach ($_POST[CHtml::modelName($this->element)][$this->field] as $id) {
 						$this->selected_ids[] = $id;
 						unset($this->filtered_options[$id]);
 					}
