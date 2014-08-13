@@ -84,7 +84,7 @@
 
 						<input type="hidden" name="patient_id" value="<?php echo $patient->id?>" />
 
-						<div class="row field-row" id="allergy_field" <?php if ($patient->no_allergies_date) { echo 'style="display: none;"'; }?>>
+						<div class="row field-row" id="allergy_field" <?php if ($patient->no_allergies_date && $post) { echo 'style="display: none;"'; }?>>
 							<div class="<?php echo $form->columns('label')?>">
 								<label for="allergy_id">Add allergy:</label>
 							</div>
