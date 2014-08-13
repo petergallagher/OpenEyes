@@ -42,7 +42,11 @@ class MultiSelectList extends BaseFieldWidget
 		$this->filtered_options = $this->options;
 
 		if (empty($_POST)) {
-			if ($this->element && $this->relation && $this->element->{$this->relation}) {
+			if (!empty($this->selected_ids)) {
+				foreach($this->selected_ids as $id) {
+					unset($this->filtered_options[$id]);
+				}
+			} else if ($this->element && $this->relation && $this->element->{$this->relation}) {
 				foreach ($this->element->{$this->relation} as $item) {
 					$this->selected_ids[] = $item->id;
 					unset($this->filtered_options[$item->id]);

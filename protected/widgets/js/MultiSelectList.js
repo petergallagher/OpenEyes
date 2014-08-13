@@ -97,8 +97,9 @@ function MultiSelect_SelectItem(select, selected, extra_values)
 	if (selected.val().length >0) {
 		var container = select.closest('.multi-select');
 		var selections = container.find('.multi-select-selections');
-		var inputField = container.find('.multi-select-list-name');
-		var fieldName = inputField.attr('name');
+
+		var fieldName = container.data('field-name');
+
 		var noSelectionsMsg = container.find('.no-selections-msg');
 		var removeAll = container.find('.remove-all');
 		var options = container.data('options');
