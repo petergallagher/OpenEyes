@@ -58,6 +58,13 @@ $widgetOptionsJson = json_encode(array(
 ));
 ?>
 
+<?php
+// Don't output this input for this field multiple times.
+$fieldName = $element ? CHtml::modelName($element).'['.$field.']' : $field;
+if (!in_array($fieldName, MultiSelectList::$fieldNames)) {?>
+	<input name="<?php echo $element ? CHtml::modelName($element).'['.$field.']' : $field?>" type="hidden" />
+<?php }?>
+
 <?php if (!@$htmlOptions['nowrapper']) {?>
 	<div id="<?php echo $div_id ?>" class="<?php echo $div_class ?> row field-row widget"<?php if ($hidden) {?> style="display: none;"<?php }?>>
 		<div class="large-<?php echo $layoutColumns['label'];?> column">
