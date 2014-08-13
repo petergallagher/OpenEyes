@@ -74,16 +74,15 @@ $(document).ready(function() {
 			selections.children('li.MultiSelectNone').show();
 		}
 
-		if ($(this).hasClass('linked-fields')) {
-			if (inArray($(this).data('text'),$(this).data('linked-values').split(','))) {
-				var fields = $(this).data('linked-fields').split(',');
-				var values = $(this).data('linked-values').split(',');
+		if (select.hasClass('linked-fields')) {
 
-				for (var i in fields) {
-					if (values.length == 1 || i == arrayIndex($(this).data('text'),values)) {
-						hide_linked_field(fields[i]);
-					}
-				}
+			var fields = select.data('linked-fields').split(',');
+			var values = select.data('linked-values').split(',');
+
+			var index = $.inArray(text, values);
+
+			if (index >= 0) {
+				hide_linked_field(fields[index]);
 			}
 		}
 
@@ -98,8 +97,9 @@ function MultiSelect_SelectItem(select, selected, extra_values)
 	if (selected.val().length >0) {
 		var container = select.closest('.multi-select');
 		var selections = container.find('.multi-select-selections');
-		var inputField = container.find('.multi-select-list-name');
-		var fieldName = inputField.attr('name');
+
+		var fieldName = container.data('field-name');
+
 		var noSelectionsMsg = container.find('.no-selections-msg');
 		var removeAll = container.find('.remove-all');
 		var options = container.data('options');
