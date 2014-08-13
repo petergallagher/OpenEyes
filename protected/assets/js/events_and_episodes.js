@@ -298,14 +298,13 @@ function hide_linked_field(field_name)
 	$('#div_'+field).hide();
 	$('fieldset#'+field).hide();
 
-
 	$('input[name="'+field_name+'"][type="radio"]').removeAttr('checked');
 	$('input[name="'+field_name+'"][type="text"]').val('');
 	$('select[name="'+field_name+'"]').val('');
 
-	if ($('select[id="'+field_name+'"]').hasClass('MultiSelectList')) {
-		$('a.MultiSelectRemove[data-name="'+field_name+'[]"]').map(function() {
-			$(this).click();
-		});
+	// Is it a multi-select field widget?
+	if ($('#div_'+field).find('.multi-select').length) {
+		// Remove all previously added options.
+		$('#div_'+field).find('a.MultiSelectRemove').trigger('click');
 	}
 }
