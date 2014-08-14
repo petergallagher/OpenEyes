@@ -31,6 +31,7 @@ class Records extends BaseFieldWidget
 	public $row_view;
 	public $use_last_button_text = 'Use last item';
 	public $headings = array('Date/time','Description');
+	public $sort_table_after_save = false;
 	public $include_timestamp = true;
 
 	public function init()

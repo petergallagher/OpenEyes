@@ -123,8 +123,13 @@
 				<div class="large-3 column">
 					<label></label>
 				</div>
+
 				<div class="large-9 column end">
-					<?php echo EventAction::button('Save', 'save', array('level' => 'save'),array('class' => 'saveRecordItem', 'data-validate-method' => $validate_method))->toHtml()?>
+					<?php echo EventAction::button('Save', 'save', array('level' => 'save'), array(
+						'class' => 'saveRecordItem',
+						'data-validate-method' => $validate_method,
+						'data-sort-after-save' => json_encode($sort_table_after_save)
+					))->toHtml()?>
 					<?php echo EventAction::button('Cancel', 'cancel', array(),array('class' => 'small warning primary cancelRecordItem'))->toHtml()?>
 				</div>
 			</div>
