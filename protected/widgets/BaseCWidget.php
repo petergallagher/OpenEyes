@@ -27,6 +27,7 @@ class BaseCWidget extends CWidget
 	public $hidden = false;
 	public $includeScriptFile = true;
 	public $htmlOptions = array();
+	public $disable_js = false;
 
 	public function init()
 	{
@@ -35,7 +36,7 @@ class BaseCWidget extends CWidget
 		}
 
 		// if the widget has javascript, load it in
-		if (file_exists("protected/widgets/js/".get_class($this).".js")) {
+		if (!$this->disable_js && file_exists("protected/widgets/js/".get_class($this).".js")) {
 			$this->assetFolder = Yii::app()->getAssetManager()->publish('protected/widgets/js');
 		}
 

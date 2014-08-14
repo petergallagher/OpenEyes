@@ -102,4 +102,36 @@ class ProcedureController extends BaseController
 
 		echo json_encode($complications);
 	}
+
+	public function actionGetProcedure()
+	{
+		if (!$procedure = Procedure::model()->findByPk(@$_GET['proc_id'])) {
+			throw new Exception("Procedure not found: ".@$_GET['proc_id']);
+		}
+
+		foreach (array('element_class','field','eye_field') as $field) {
+			if (strlen(@$_GET[$field]) == 0) {
+				throw new Exception("Missing parameter in ajax request: ".$field);
+			}
+
+			if (!preg_match('/^[A-Za-z0-9_]*$/',@$_GET[$field])) {
+				throw new Exception("Disallowed characters in ajax request field: ".@$_GET[$field]);
+			}
+		}
+
+		$durations = @$_GET['durations'] == 'true' ? true : false;
+		$read_only = @$_GET['read_only'] == 'true' ? true : false;
+		$eye_field = @$_GET['eye_field'] != 'false' ? @$_GET['eye_field'] : false;
+
+		$this->widget('application.widgets.ProcedureSelection',array(
+			'row_only' => true,
+			'selected_procedures' => array($procedure->id),
+			'i' => (integer)@$_GET['i'],
+			'element' => @$_GET['element_class'],
+			'field' => @$_GET['field'],
+			'eye_field' => $eye_field,
+			'durations' => (boolean)$durations,
+			'read_only' => (boolean)$read_only,
+		));
+	}
 }

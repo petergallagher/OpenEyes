@@ -366,3 +366,16 @@ label {
 		display: inline-block;
 	}
 }
+
+table.procedureList {
+	td.actions {
+		width: 6em;
+	}
+	td.eye {
+		width: 15em;
+
+		input,label {
+			display: inline;
+		}
+	}
+}

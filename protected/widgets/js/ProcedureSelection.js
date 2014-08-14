@@ -99,28 +99,33 @@ ProcedureSelection.prototype = {
 		this.searchBox.val('');
 		this.removeFromProcedureDropdown(proc);
 
-		this.procedureList.find('.body').append(
-			'<tr class="item" data-proc-id="' + proc.id + '">' +
-			'	<td class="procedure">' +
-			'		<span class="field"><input type="hidden" name="' + this.element + '[' + this.field + '][]" value="' + proc.id + '" /></span>' +
-			'		<span class="value">' + proc.term + '</span>' +
-			'	</td>' + (
-				this.durations ?
-					'<td class="duration">' + proc.default_duration + ' mins</td>'
-					: false
-				) +
-			'<td><a href="#" class="removeProcedure" data-element="' + this.element + '" data-field="' + this.field + '" data-proc-id="' + proc.id + '">Remove</a></td></tr>');
+		var thiz = this;
 
-		this.procedureList.show();
+		var i = 0;
 
-		if (this.durations) {
-			this.updateTotalDuration();
-			this.procedureList.find('.durations').show();
-		}
+		this.procedureList.find('.body').children('tr').map(function() {
+			if (parseInt($(this).data('i')) >= i) {
+				i = parseInt($(this).data('i')) + 1;
+			}
+		});
 
-		if (typeof(window.callbackAddProcedure) == 'function') {
-			callbackAddProcedure(proc.id);
-		}
+		$.ajax({
+			'type': 'GET',
+			'url': baseUrl + '/procedure/getProcedure?proc_id=' + proc.id + '&element_class=' + thiz.element + '&field=' + thiz.field + '&eye_field=' + thiz.eye_field + '&durations=' + thiz.durations + '&read_only=' + thiz.read_only + '&i=' + i,
+			'success': function(html) {
+				thiz.procedureList.find('.body').append(html);
+				thiz.procedureList.show();
+
+				if (thiz.durations) {
+					thiz.updateTotalDuration();
+					thiz.procedureList.find('.durations').show();
+				}
+
+				if (typeof(window.callbackAddProcedure) == 'function') {
+					callbackAddProcedure(proc.id);
+				}
+			}
+		});
 	},
 
 	selectProcedureFromDropdown : function(proc_id, proc_name, default_duration) {

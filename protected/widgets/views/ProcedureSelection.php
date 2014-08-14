@@ -88,12 +88,15 @@
 		<div class="large-<?php echo $layoutColumns['procedures']?> column end">
 			<div class="panel procedures ProcedureSelectionProcedureList" data-element="<?php echo CHtml::modelName($element)?>" data-field="<?php echo $field?>" style="<?php if (empty($selected_procedures)) {?> display: none;<?php }?>">
 				<input type="hidden" name="<?php echo CHtml::modelName($element)?>[<?php echo $field?>]" />
-				<table class="plain">
+				<table class="plain procedureList">
 					<thead>
 					<tr>
 						<th>Procedure</th>
 						<?php if ($durations) {?>
 							<th>Duration</th>
+						<?php }?>
+						<?php if ($eye_field) {?>
+							<th>Eye</th>
 						<?php }?>
 						<?php if (!$read_only) {?>
 							<th>Actions</th>
@@ -103,24 +106,17 @@
 					<tbody class="body">
 					<?php
 					if (!empty($selected_procedures)) {
-						foreach ($selected_procedures as $procedure) {?>
-							<tr class="item" data-proc-id="<?php echo $procedure['id']?>">
-								<td class="procedure">
-									<span class="field"><?= CHtml::hiddenField(CHtml::modelName($element).'['.$field.'][]', $procedure['id']); ?></span>
-									<span class="value"><?= $procedure['term']; ?></span>
-								</td>
-								<?php if ($durations) {?>
-									<td class="duration">
-										<?php echo $procedure['default_duration']?> mins
-									</td>
-								<?php }?>
-								<?php if (!$read_only) {?>
-									<td>
-										<a href="#" class="removeProcedure" data-element="<?php echo CHtml::modelName($element)?>" data-field="<?php echo $field?>" data-proc-id="<?php echo $procedure['id']?>">Remove</a>
-									</td>
-								<?php }?>
-							</tr>
-						<?php	}
+						foreach ($selected_procedures as $j => $procedure) {
+							$this->render('ProcedureSelection_row',array(
+								'j' => $j,
+								'element_class' => CHtml::modelName($element),
+								'procedure' => $procedure,
+								'field' => $field,
+								'eye_field' => $eye_field,
+								'durations' => $durations,
+								'read_only' => $read_only,
+							));
+						}
 					}?>
 					</tbody>
 				</table>
@@ -152,6 +148,8 @@
 		element: '<?php echo CHtml::modelName($element)?>',
 		field: '<?php echo $field?>',
 		durations: <?php echo CJavaScript::encode($durations)?>,
-		selected_procedures: <?php echo CJavaScript::encode($selected_procedures)?>
+		selected_procedures: <?php echo CJavaScript::encode($selected_procedures)?>,
+		eye_field: <?php echo CJavaScript::encode($eye_field)?>,
+		read_only: <?php echo CJavaScript::encode($read_only)?>
 	});
 </script>

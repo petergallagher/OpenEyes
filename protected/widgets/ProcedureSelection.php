@@ -43,9 +43,16 @@ class ProcedureSelection extends BaseFieldWidget
 		'procedures' => 6,
 	);
 	public $procedureListPosition = 'horizontal';
+	public $eye_field = false;
+	public $row_only = false;
+	public $i;
 
 	public function init()
 	{
+		if ($this->row_only) {
+			$this->disable_js = true;
+		}
+
 		parent::init();
 
 		!isset($this->layoutColumns['procedures']) && $this->layoutColumns['procedures'] = 6;
@@ -53,30 +60,73 @@ class ProcedureSelection extends BaseFieldWidget
 
 	public function run()
 	{
+		if ($this->row_only) {
+			if (!$_procedure = Procedure::model()->findByPk($this->selected_procedures[0])) {
+				throw new Exception("Procedure not found: ".$this->selected_procedures[0]);
+			}
+
+			$procedure = array(
+				'assignment_id' => '',
+				'id' => $_procedure->id,
+				'term' => $_procedure->term,
+				'default_duration' => $_procedure->default_duration,
+				'is_common' => false,
+			);
+
+			$this->selected_procedures[] = $procedure;
+
+			$this->render('ProcedureSelection_row',array(
+				'j' => $this->i,
+				'element_class' => $this->element,
+				'procedure' => $procedure,
+				'field' => $this->field,
+				'eye_field' => $this->eye_field,
+				'durations' => $this->durations,
+				'read_only' => $this->read_only,
+			));
+
+			return;
+		}
+
 		if (empty($_POST)) {
 			if (!$this->selected_procedures && $this->element) {
 				$this->selected_procedures = array();
 				
-				foreach ($this->element->{$this->field} as $proc) {
-					$this->selected_procedures[] = array(
-						'id' => $proc->id,
-						'term' => $proc->term,
-						'default_duration' => $proc->default_duration,
+				foreach ($this->element->{$this->field} as $proc_assignment) {
+					$procedure = array(
+						'assignment_id' => $proc_assignment->id,
+						'id' => ($proc_assignment instanceof Procedure) ? $proc_assignment->id : $proc_assignment->procedure->id,
+						'term' => ($proc_assignment instanceof Procedure) ? $proc_assignment->term : $proc_assignment->procedure->term,
+						'default_duration' => ($proc_assignment instanceof Procedure) ? $proc_assignment->default_duration : $proc_assignment->procedure->default_duration,
 						'is_common' => false,
 					);
+
+					if ($this->eye_field) {
+						$procedure['eye_id'] = $proc_assignment->eye_id;
+					}
+
+					$this->selected_procedures[] = $procedure;
 				}
 			}
 		} else {
 			$this->selected_procedures = array();
 			if (isset($_POST[CHtml::modelName($this->element)][$this->field]) && is_array($_POST[CHtml::modelName($this->element)][$this->field])) {
-				foreach ($_POST[CHtml::modelName($this->element)][$this->field] as $proc_id) {
+				foreach ($_POST[CHtml::modelName($this->element)][$this->field] as $i => $proc_id) {
 					$proc = Procedure::model()->findByPk($proc_id);
-					$this->selected_procedures[] = array(
+
+					$procedure = array(
+						'assignment_id' => @$_POST[CHtml::modelName($this->element)][$this->field.'_id'][$i],
 						'id' => $proc->id,
 						'term' => $proc->term,
 						'default_duration' => $proc->default_duration,
 						'is_common' => false,
 					);
+
+					if ($this->eye_field) {
+						$procedure['eye_id'] = @$_POST[CHtml::modelName($this->element)][$this->eye_field][$i];
+					}
+
+					$this->selected_procedures[] = $procedure;
 				}
 			}
 		}
@@ -87,6 +137,14 @@ class ProcedureSelection extends BaseFieldWidget
 			}
 		}
 
+		$this->setIsCommon();
+
+		$this->class = get_class($this->element);
+		$this->render(get_class($this));
+	}
+
+	protected function setIsCommon()
+	{
 		$firm = Firm::model()->findByPk(Yii::app()->session['selected_firm_id']);
 		$subspecialty_id = $firm->serviceSubspecialtyAssignment ? $firm->serviceSubspecialtyAssignment->subspecialty_id : null;
 		if ($this->restrict_common == 'unbooked') {
@@ -121,10 +179,6 @@ class ProcedureSelection extends BaseFieldWidget
 				}
 			}
 		}
-
-		$this->class = get_class($this->element);
-
-		$this->render(get_class($this));
 	}
 
 	public function render($view, $data=null, $return=false)

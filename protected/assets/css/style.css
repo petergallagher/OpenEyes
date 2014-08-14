@@ -2614,6 +2614,19 @@ input[type="text"].large, input[type="password"].large, input[type="date"].large
   display: inline-block;
 }
 
+/* line 371, ../sass/openeyes/components/_forms.scss */
+table.procedureList td.actions {
+  width: 6em;
+}
+/* line 374, ../sass/openeyes/components/_forms.scss */
+table.procedureList td.eye {
+  width: 15em;
+}
+/* line 377, ../sass/openeyes/components/_forms.scss */
+table.procedureList td.eye input, table.procedureList td.eye label {
+  display: inline;
+}
+
 /* line 96, ../sass/openeyes/_mixins.scss */
 button, .button, input[type="submit"] {
   border-style: solid;
