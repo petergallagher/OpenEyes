@@ -34,6 +34,8 @@ class MultiSelectList extends BaseFieldWidget
 	public $extra_fields = false;
 	public $input_class = false;
 
+	public static $fieldNames = array();
+
 	public function init()
 	{
 		!isset($this->layoutColumns['label']) && $this->layoutColumns['label'] = 2;
@@ -104,6 +106,13 @@ class MultiSelectList extends BaseFieldWidget
 			$this->htmlOptions['data-linked-fields'] = implode(',',$linked_fields);
 		}
 
+
 		//NOTE: don't call parent init as the field behaviour doesn't work for the relations attribute with models
+	}
+
+	public function run()
+	{
+		parent::run();
+		MultiSelectList::$fieldNames[] = CHtml::modelName($this->element).'['.$this->field.']';
 	}
 }
