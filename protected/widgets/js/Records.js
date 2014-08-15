@@ -1,5 +1,41 @@
-
 $(document).ready(function() {
+
+	var sortTable = (function() {
+
+		function getColVal(row, col) {
+			return $.trim(
+				$(row).find('td:eq(' + col + ')').text()
+			);
+		}
+
+		function getTime(row, col) {
+			return (new Date(getColVal(row, col))).getTime();
+		}
+
+		function getType(row, col, type) {
+			switch(type) {
+				case 'date':
+					return getTime(row, col);
+				default:
+					return 1;
+			}
+		}
+
+		function sortRows(table, col, type) {
+			var rows = table.find('tbody tr:visible');
+			rows.sort(function(rowA, rowB) {
+				return Number(
+					getType(rowA, col, type) > getType(rowB, col, type)
+				);
+			});
+			rows.each(function(i, row) {
+				table.append(row);
+			});
+		}
+
+		return sortRows;
+	}());
+
 	$('.addRecordItem').click(function(e) {
 		e.preventDefault();
 
@@ -94,7 +130,7 @@ $(document).ready(function() {
 		var form_div = $(this).closest('.recordsWidget').find('.addRecordItemDiv');
 		var error_div = form_div.find('.recordItemErrorsDiv');
 		var error_list = error_div.find('.recordItemErrors');
-
+		var sort = $(this).data('sort-after-save');
 		var data = 'timestamp=' + form_div.find('.recordTimestamp').val() + '&time=' + form_div.find('.recordTime').val();
 
 		form_div.find('.recordInput').map(function() {
@@ -125,6 +161,9 @@ $(document).ready(function() {
 					if (form_div.children('.recordEditItem').val() == '') {
 						table.children('tbody').append(errors['row']);
 						table.children('tbody').find('tr:first').hide();
+						if (sort) {
+							sortTable(table, sort.column, sort.type);
+						}
 						form_div.find('.recordsUseLastItemRow').show();
 					} else {
 						table.children('tbody').children('tr[data-i="'+form_div.children('.recordEditItem').val()+'"]').replaceWith(errors['row']);
