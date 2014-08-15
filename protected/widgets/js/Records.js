@@ -177,7 +177,7 @@ $(document).ready(function() {
 		var button = $(this).closest('.recordsWidget').find('.addItemButton');
 		addRecordItemDiv.find('.multi-select-selections').children('li').children('.MultiSelectRemove').click();
 
-		RecordsWidget_PopulateAddFormFromData(data, addRecordItemDiv);
+		RecordsWidget_PopulateAddFormFromData(data, addRecordItemDiv, true);
 
 		addRecordItemDiv.children('.recordEditItem').val(data['i']);
 		addRecordItemDiv.children('.recordEditItemID').val(data['id']);
@@ -213,11 +213,11 @@ $(document).ready(function() {
 		var data = table.find('tr:last').data();
 		var addRecordItemDiv = $(this).closest('.recordsWidget').find('.addRecordItemDiv');
 
-		RecordsWidget_PopulateAddFormFromData(data, addRecordItemDiv);
+		RecordsWidget_PopulateAddFormFromData(data, addRecordItemDiv, false);
 	});
 });
 
-function RecordsWidget_PopulateAddFormFromData(data, addRecordItemDiv)
+function RecordsWidget_PopulateAddFormFromData(data, addRecordItemDiv, set_timestamp)
 {
 	for (var field in data) {
 		if (typeof(data[field]) == 'object') {
@@ -229,8 +229,10 @@ function RecordsWidget_PopulateAddFormFromData(data, addRecordItemDiv)
 		}
 	}
 
-	addRecordItemDiv.find('.recordTimestamp').val(data['timestamp']);
-	addRecordItemDiv.find('.recordTime').val(data['time']);
+	if (set_timestamp) {
+		addRecordItemDiv.find('.recordTimestamp').val(data['timestamp']);
+		addRecordItemDiv.find('.recordTime').val(data['time']);
+	}
 
 	if (typeof(data['multiselectFields']) != 'undefined') {
 		var multiselect_fields = data['multiselectFields'].split(',');
