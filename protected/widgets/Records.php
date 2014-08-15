@@ -33,9 +33,14 @@ class Records extends BaseFieldWidget
 	public $headings = array('Date/time','Description');
 	public $sort_table_after_save = false;
 	public $include_timestamp = true;
+	public $include_date = true;
 
 	public function init()
 	{
+		if (!$this->include_date) {
+			$this->headings[0] = 'Time';
+		}
+
 		if (is_object($this->element) && $this->field) {
 			if (is_object($this->element->{$this->field}) && $this->element->{$this->field} instanceof Measurement) {
 				$this->value = $this->element->{$this->field}->getValue();

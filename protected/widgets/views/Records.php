@@ -61,21 +61,26 @@
 							<div class="large-9 column end">
 								<div class="row field-row">
 									<div class="large-4 column recordDateLabel">
-										<label>Date/time:</label>
+										<?php if ($include_date) {?>
+											<label>Date/time:</label>
+										<?php }else{?>
+											<label>Time:</label>
+										<?php }?>
 									</div>
 									<div class="large-8 column end">
 										<?php
-										$this->widget('zii.widgets.jui.CJuiDatePicker',array(
-											'name' => 'timestamp',
-											'options' => array(
-												'showAnim' => 'fold',
-												'dateFormat' => Helper::NHS_DATE_FORMAT_JS,
-											),
-											'htmlOptions' => array(
-												'class' => 'recordTimestamp',
-											),
-										))?>
-										<?php
+										if ($include_date) {
+											$this->widget('zii.widgets.jui.CJuiDatePicker',array(
+												'name' => 'timestamp',
+												'options' => array(
+													'showAnim' => 'fold',
+													'dateFormat' => Helper::NHS_DATE_FORMAT_JS,
+												),
+												'htmlOptions' => array(
+													'class' => 'recordTimestamp',
+												),
+											));
+										}
 										$this->widget('application.widgets.TimePicker', array(
 											'name' => 'time',
 											'htmlOptions' => array('nowrapper' => true, 'class' => 'recordTime'),
