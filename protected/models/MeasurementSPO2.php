@@ -9,13 +9,13 @@ class MeasurementSPO2 extends Measurement
 	public function rules()
 	{
 		return array(
-			array('sao2','numerical','integerOnly'=>true,'min'=>60,'max'=>100),
+			array('spo2','numerical','integerOnly'=>true,'min'=>60,'max'=>100),
 		);
 	}
 
 	public function getValueField()
 	{
-		return 'sao2';
+		return 'spo2';
 	}
 
 	public function getSuffix()
