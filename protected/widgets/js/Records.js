@@ -200,7 +200,9 @@ $(document).ready(function() {
 					}
 
 					for (var i in errors) {
-						error_list.append('<li>' + errors[i] + '</li>');
+						if (i != 'row') {
+							error_list.append('<li>' + errors[i] + '</li>');
+						}
 					}
 					error_div.show();
 				}
