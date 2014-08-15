@@ -218,6 +218,15 @@ class BaseEventTypeCActiveForm extends FormLayout
 		));
 	}
 
+	public function spo2Measurement($element, $htmlOptions, $layoutColumns)
+	{
+		$this->widget('application.widgets.MeasurementSPO2Widget', array(
+			'element' => $element,
+			'htmlOptions' => $htmlOptions,
+			'layoutColumns' => $layoutColumns
+		));
+	}
+
 	public function airwayClassMeasurement($element, $htmlOptions, $layoutColumns)
 	{
 		$this->widget('application.widgets.MeasurementAirwayClassWidget', array(
