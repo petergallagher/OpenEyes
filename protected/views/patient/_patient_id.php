@@ -31,20 +31,31 @@
 		<span class="screen-only">
 			No.
 		</span>
+		<?php 
+		$field = Yii::app()->params['highlight_identifier'] == 'nhs_num' ? 'hos_num' : 'nhs_num';
+		?>
 		<span class="print-only">
-			Hosptial No.
+			<?php echo $this->patient->getAttributeLabel($field)?>
 		</span>
-		<?php echo $this->patient->hos_num?>
+		<?php if ($field == 'nhs_num') {
+			$field = 'nhsnum';
+		}?>
+		<?php echo $this->patient->$field?>
 	</div>
 	<div class="row">
 		<div class="large-8 column">
 
 			<!-- NHS number -->
 			<div class="<?php if (Yii::app()->params['nhs_logo']) {?>nhs<?php }else{?>generic<?php }?>-number">
+				<?php
+				$field = Yii::app()->params['highlight_identifier']?>
 				<span class="hide-text print-only">
-					<?php echo $this->patient->getAttributeLabel('nhs_num')?>:
+					<?php echo $this->patient->getAttributeLabel($field)?>:
 				</span>
-				<?php echo $this->patient->nhsnum?>
+				<?php if ($field == 'nhs_num') {
+					$field = 'nhsnum';
+				}?>
+				<?php echo $this->patient->$field?>
 			</div>
 
 			<!-- Gender -->

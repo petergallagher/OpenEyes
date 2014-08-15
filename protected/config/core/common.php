@@ -348,5 +348,6 @@ return array(
 		'allow_duplicate_identifiers' => false,
 		'add_patient_autogenerate_identifier' => false,
 		'html_autocomplete' => 'off',
+		'highlight_identifier' => 'hos_num',
 	),
 );
