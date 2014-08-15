@@ -156,6 +156,7 @@ $(document).ready(function() {
 				error_list.html('');
 
 				var once_per_errors = {};
+				var has_once_per_errors = false;
 
 				form_div.find('.recordInput').map(function() {
 					if ($(this).data('once-per-row')) {
@@ -166,12 +167,13 @@ $(document).ready(function() {
 						form_div.closest('.recordsWidget').find('.recordsTable').children('tbody').children('tr').map(function() {
 							if ($(this).data(name) == new_val) {
 								once_per_errors[name] = "Each " + label.toLowerCase() + " can only be used once";
+								has_once_per_errors = true;
 							}
 						});
 					}
 				});
 
-				if (once_per_errors.length == 0 && typeof(errors['row']) != 'undefined') {
+				if (!has_once_per_errors && typeof(errors['row']) != 'undefined') {
 					error_div.hide();
 
 					if (form_div.children('.recordEditItem').val() == '') {
