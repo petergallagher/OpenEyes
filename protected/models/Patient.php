@@ -1512,7 +1512,7 @@ class Patient extends BaseActiveRecordVersioned
 			}
 		}
 
-		if (!$this->dob && strlen($this->age_years) <1 && strlen($this->age_months) <1) {
+		if (!$this->dob && strlen($this->age_years) <1 && strlen($this->age_months) <1 && strlen($this->yob) <1) {
 			$this->addError('dob','Please enter a valid date of birth or at least the patient approximate age in years');
 		}
 
