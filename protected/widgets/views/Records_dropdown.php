@@ -21,4 +21,7 @@ $htmlOptions = array('class' => 'recordInput');
 if (@$column_field['cycle_on_add']) {
 	$htmlOptions['data-cycle-on-add'] = true;
 }
+if (@$column_field['once_per_row']) {
+	$htmlOptions['data-once-per-row'] = true;
+}
 echo CHtml::dropDownList($column_field['field'],'',$column_field['options'],$htmlOptions);

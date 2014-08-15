@@ -155,7 +155,23 @@ $(document).ready(function() {
 			'success': function(errors) {
 				error_list.html('');
 
-				if (typeof(errors['row']) != 'undefined') {
+				var once_per_errors = {};
+
+				form_div.find('.recordInput').map(function() {
+					if ($(this).data('once-per-row')) {
+						var new_val = $(this).val();
+						var name = $(this).attr('name');
+						var label = $(this).parent().prev('div').children('label').text().replace(/\:$/,'');
+
+						form_div.closest('.recordsWidget').find('.recordsTable').children('tbody').children('tr').map(function() {
+							if ($(this).data(name) == new_val) {
+								once_per_errors[name] = "Each " + label.toLowerCase() + " can only be used once";
+							}
+						});
+					}
+				});
+
+				if (once_per_errors.length == 0 && typeof(errors['row']) != 'undefined') {
 					error_div.hide();
 
 					if (form_div.children('.recordEditItem').val() == '') {
@@ -177,8 +193,12 @@ $(document).ready(function() {
 						$('.addItemButton').slideDown('fast');
 					});
 				} else {
+					for (var i in once_per_errors) {
+						error_list.append('<li>' + once_per_errors[i] + '</li>');
+					}
+
 					for (var i in errors) {
-						error_list.append('<li>'+errors[i]+'</li>');
+						error_list.append('<li>' + errors[i] + '</li>');
 					}
 					error_div.show();
 				}
