@@ -9,7 +9,7 @@ class MeasurementBloodGlucose extends Measurement
 	public function rules()
 	{
 		return array(
-			array('blood_glucose','numerical','integerOnly'=>true, 'min' => 0, 'max' => 20),
+			array('blood_glucose','numerical','integerOnly'=>false, 'min' => 0, 'max' => 20),
 		);
 	}
 
