@@ -24,4 +24,7 @@ if (@$column_field['cycle_on_add']) {
 if (@$column_field['once_per_row']) {
 	$htmlOptions['data-once-per-row'] = true;
 }
-echo CHtml::dropDownList($column_field['field'],'',$column_field['options'],$htmlOptions);
+if (@$column_field['default']) {
+	$htmlOptions['data-default'] = $column_field['default'];
+}
+echo CHtml::dropDownList($column_field['field'],@$column_field['default'],$column_field['options'],$htmlOptions);

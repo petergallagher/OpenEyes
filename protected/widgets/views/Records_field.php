@@ -18,17 +18,21 @@
  */
 ?>
 <div class="large-<?php echo $column_width?> column end">
-	<div class="row field-row">
-		<div class="large-4 column">
-			<label><?php echo $model->getAttributeLabel($column_field['field'])?>:</label>
-		</div>
-		<div class="large-<?php if (@$column_field['width']) { echo $column_field['width']; } else if ($field_width) { echo $field_width; } else { echo '4'; }?> column end">
-			<?php echo $this->render('Records_'.$column_field['type'],array('column_field' => $column_field))?>
-		</div>
-		<?php if ($model->getAttributeSuffix($column_field['field'])) {?>
-			<div class="large-2 column end">
-				<span class="field-info"><?php echo $model->getAttributeSuffix($column_field['field'])?></span>
+	<?php if ($column_field['type'] == 'custom') {
+		echo $column_field['html'];
+	} else {?>
+		<div class="row field-row">
+			<div class="large-<?php if (@$column_field['label_width']) { echo $column_field['label_width']; } else { echo '4'; }?> column">
+				<label><?php echo $model->getAttributeLabel($column_field['field'])?>:</label>
 			</div>
-		<?php }?>
-	</div>
+			<div class="large-<?php if (@$column_field['width']) { echo $column_field['width']; } else if ($field_width) { echo $field_width; } else { echo '4'; }?> column end">
+				<?php echo $this->render('Records_'.$column_field['type'],array('column_field' => $column_field))?>
+			</div>
+			<?php if ($model->getAttributeSuffix($column_field['field'])) {?>
+				<div class="large-2 column end">
+					<span class="field-info"><?php echo $model->getAttributeSuffix($column_field['field'])?></span>
+				</div>
+			<?php }?>
+		</div>
+	<?php }?>
 </div>

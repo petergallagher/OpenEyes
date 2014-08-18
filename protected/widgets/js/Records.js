@@ -68,8 +68,15 @@ $(document).ready(function() {
 
 		addRecordItemDiv.find('.recordTime').val(h+':'+m);
 		addRecordItemDiv.find('.recordTimestamp').val(d.getDate()+' '+month+' '+d.getFullYear());
-		addRecordItemDiv.find('input.recordInput').val('');
-		addRecordItemDiv.find('select.recordInput').val('');
+		addRecordItemDiv.find('input[type="text"].recordInput').val('');
+		addRecordItemDiv.find('input[type="checkbox"].recordInput').removeAttr('checked');
+		addRecordItemDiv.find('select.recordInput').map(function() {
+			if ($(this).data('default')) {
+				$(this).val($(this).data('default'));
+			} else {
+				$(this).val('');
+			}
+		});
 		addRecordItemDiv.find('textarea.recordInput').val('');
 		addRecordItemDiv.find('.multi-select-selections').children('li').children('.MultiSelectRemove').click();
 
@@ -134,7 +141,9 @@ $(document).ready(function() {
 		var data = 'timestamp=' + form_div.find('.recordTimestamp').val() + '&time=' + form_div.find('.recordTime').val();
 
 		form_div.find('.recordInput').map(function() {
-			data += '&' + $(this).attr('name') + '=' + $(this).val();
+			if ($(this).attr('type') != 'checkbox' || $(this).attr('checked') == 'checked') {
+				data += '&' + $(this).attr('name') + '=' + $(this).val();
+			}
 		});
 
 		data += '&patient_id=' + OE_patient_id;
@@ -282,13 +291,28 @@ $(document).ready(function() {
 
 function RecordsWidget_PopulateAddFormFromData(data, addRecordItemDiv, set_timestamp)
 {
+	addRecordItemDiv.find('input[type="checkbox"].recordInput').removeAttr('checked');
+
 	for (var field in data) {
 		if (typeof(data[field]) == 'object') {
+			console.log("object: " + field);
 			for (var object_field in data[field]) {
 				addRecordItemDiv.find('.recordInput[name="'+field+'['+object_field+']"]').val(data[field][object_field]);
 			}
 		} else {
-			addRecordItemDiv.find('.recordInput[name="'+field+'"]').val(data[field]);
+			var input = addRecordItemDiv.find('.recordInput[name="'+field+'[]"]');
+
+			if (input && input.attr('type') == 'checkbox') {
+				var values = data[field].toString().split(',');
+
+				if (input.attr('type') == 'checkbox') {
+					for (var j in values) {
+						addRecordItemDiv.find('.recordInput[name="'+field+'[]"][value="'+values[j]+'"]').attr('checked','checked');
+					}
+				}
+			} else {
+				addRecordItemDiv.find('.recordInput[name="'+field+'"]').val(data[field]);
+			}
 		}
 	}
 
