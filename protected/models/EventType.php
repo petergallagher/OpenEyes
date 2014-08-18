@@ -268,6 +268,7 @@ class EventType extends BaseActiveRecordVersioned
 		$criteria = new CDbCriteria;
 		$criteria->compare('event_type_id',$this->id);
 		$criteria->compare('`default`',1);
+		$criteria->compare('`active`',1);
 		$criteria->order = 'display_order asc';
 
 		$elements = array();
