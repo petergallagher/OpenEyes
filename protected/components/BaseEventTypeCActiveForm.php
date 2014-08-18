@@ -79,10 +79,16 @@ class BaseEventTypeCActiveForm extends FormLayout
 			'element' => $element,
 			'name' => CHtml::modelName($element)."[$field]",
 			'field' => $field,
-			'data' => array(
-				1 => 'Yes',
-				0 => 'No'
-			),
+			'data' => @$htmlOptions['value-order'] == 'reverse' ?
+				array(
+					0 => 'No',
+					1 => 'Yes'
+				)
+				:
+				array(
+					1 => 'Yes',
+					0 => 'No'
+				),
 			'selected_item' => $element->$field,
 			'htmlOptions' => $htmlOptions,
 			'layoutColumns' => $layoutColumns,
