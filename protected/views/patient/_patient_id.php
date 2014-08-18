@@ -37,9 +37,6 @@
 		<span class="print-only">
 			<?php echo $this->patient->getAttributeLabel($field)?>
 		</span>
-		<?php if ($field == 'nhs_num') {
-			$field = 'nhsnum';
-		}?>
 		<?php echo $this->patient->$field?>
 	</div>
 	<div class="row">
