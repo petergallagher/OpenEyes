@@ -786,7 +786,10 @@ class Patient extends BaseActiveRecordVersioned
 			}
 		}
 
-		$transaction = Yii::app()->db->beginTransaction();
+		$transaction = Yii::app()->db->getCurrentTransaction() === null
+			? Yii::app()->db->beginTransaction()
+			: false;
+
 		try {
 			$paa = new PatientAllergyAssignment;
 			$paa->patient_id = $this->id;
@@ -804,9 +807,13 @@ class Patient extends BaseActiveRecordVersioned
 				};
 			}
 			$this->audit('patient','remove-noallergydate');
-			$transaction->commit();
+			if ($transaction) {
+				$transaction->commit();
+			}
 		} catch (Exception $e) {
-			$transaction->rollback();
+			if ($transaction) {
+				$transaction->rollback();
+			}
 			throw $e;
 		}
 	}
