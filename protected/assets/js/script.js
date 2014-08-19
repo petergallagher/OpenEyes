@@ -212,6 +212,12 @@ $(document).ready(function(){
 		submitted = true;
 	});
 
+	// This can be used to reset form changes. For example, after submitting form data
+	// via an AJAX request.
+	$(document).on('form-reset', function() {
+		formHasChanged = false;
+	});
+
 	/**
 	 * Site / firm switcher
 	 */

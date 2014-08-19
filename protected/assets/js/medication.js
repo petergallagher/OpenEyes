@@ -31,6 +31,7 @@ $(document).ready(function () {
 	function closeForms() {
 		$('.medication_form').slideUp('fast');
 		$('#medication_add').attr('disabled',false).removeClass('disabled');
+		$(document).trigger('form-reset'); // prevent warning popup when leaving the page.
 	}
 
 	function selectMedication(id, name, type) {
