@@ -19,10 +19,10 @@
 ?>
 <div id="div_<?php echo $element ? CHtml::modelName($element).'_'.$field : $field?>" class="recordsWidget"<?php if ($hidden) {?> style="display: none"<?php }?>>
 	<div class="row field-row">
-		<div class="large-3 column">
+		<div class="large-<?php echo $label_width?> column">
 			<label><?php echo $element->getAttributeLabel($field)?>:</label>
 		</div>
-		<div class="large-9 column end">
+		<div class="large-<?php echo (12 - $label_width)?> column end">
 			<table class="recordsTable">
 				<thead>
 					<tr>
@@ -52,10 +52,10 @@
 			<input name="<?php echo CHtml::modelName($element)?>_<?php echo $field?>_editItem" type="hidden" class="recordInput recordEditItem" value="" />
 			<input name="<?php echo CHtml::modelName($element)?>_<?php echo $field?>_editItem_id" type="hidden" class="recordInput recordEditItemID" value="" />
 			<div class="row field-row">
-				<div class="large-3 column">
+				<div class="large-<?php echo $label_width?> column">
 					<label></label>
 				</div>
-				<div class="large-9 column end">
+				<div class="large-<?php echo (12-$label_width)?> column end">
 					<?php if ($include_timestamp) {?>
 						<div class="row field-row">
 							<div class="large-9 column end">
@@ -113,10 +113,10 @@
 				</div>
 			</div>
 			<div class="row field-row recordItemErrorsDiv" style="display: none">
-				<div class="large-3 column">
+				<div class="large-<?php echo $label_width?> column">
 					<label></label>
 				</div>
-				<div class="large-9 column end">
+				<div class="large-<?php echo (12-$label_width)?> column end">
 					<div class="alert-box alert with-icon">
 						<p>Please fix the following input errors:</p>
 						<ul class="recordItemErrors">
@@ -125,11 +125,11 @@
 				</div>
 			</div>
 			<div class="row field-row">
-				<div class="large-3 column">
+				<div class="large-<?php echo $label_width?> column">
 					<label></label>
 				</div>
 
-				<div class="large-9 column end">
+				<div class="large-<?php echo (12-$label_width)?> column end">
 					<?php echo EventAction::button('Save', 'save', array('level' => 'save'), array(
 						'class' => 'saveRecordItem',
 						'data-validate-method' => $validate_method,
@@ -140,10 +140,10 @@
 			</div>
 		</div>
 		<div class="row field-row addItemButton">
-			<div class="large-3 column">
+			<div class="large-<?php echo $label_width?> column">
 				<label></label>
 			</div>
-			<div class="large-9 column end">
+			<div class="large-<?php echo (12-$label_width)?> column end">
 				<?php echo EventAction::button($add_button_text, 'add', array('level' => 'save'),array('class' => 'addRecordItem'))->toHtml()?>
 			</div>
 		</div>

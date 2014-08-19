@@ -27,4 +27,7 @@ if (@$column_field['once_per_row']) {
 if (@$column_field['default']) {
 	$htmlOptions['data-default'] = $column_field['default'];
 }
+if (@$column_field['empty']) {
+	$column_field['options'] = array('' => $column_field['empty']) + $column_field['options'];
+}
 echo CHtml::dropDownList($column_field['field'],@$column_field['default'],$column_field['options'],$htmlOptions);
