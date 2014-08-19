@@ -27,7 +27,7 @@ class SiteController extends BaseController
 				'actions'=>array('error', 'login', 'debuginfo'),
 			),
 			array('allow',
-				'actions' => array('index', 'changeSiteAndFirm', 'search', 'logout'),
+				'actions' => array('index', 'advancedSearch', 'changeSiteAndFirm', 'search', 'logout'),
 				'users' => array('@'),
 			),
 		);
@@ -210,6 +210,18 @@ class SiteController extends BaseController
 	public function actionDebuginfo()
 	{
 		$this->renderPartial('/site/debuginfo',array());
+	}
+
+	protected function beforeAction($action)
+	{
+		Yii::app()->assetManager->registerCssFile('css/admin.css', null, 10);
+		return parent::beforeAction($action);
+	}
+
+	public function actionAdvancedSearch()
+	{
+		$this->layout = 'advanced_search';
+		$this->render('advanced_search_core');
 	}
 
 }

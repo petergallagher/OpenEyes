@@ -56,6 +56,11 @@
 					</button>
 				</div>
 			</div>
+			<div class="row">
+				<div class="large-12 column">
+					<br /><?php echo CHtml::link('Advanced search',Yii::app()->createUrl('/site/advancedSearch'))?>
+				</div>
+			</div>
 		<?php $this->endWidget(); ?>
 	</div>
 </div>
