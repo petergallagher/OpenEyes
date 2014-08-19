@@ -150,7 +150,7 @@ $current_episode = @$this->current_episode;
 													$assetpath = '/assets/';
 												}
 												?>
-												<img src="<?php echo $assetpath . 'img/small.png' ?>" alt="op" width="19" height="19" />
+												<img src="<?php echo Yii::app()->cacheBuster->createUrl($assetpath . 'img/small.png'); ?>" alt="op" width="19" height="19" />
 											</span>
 											<span class="event-date <?php echo ($event->isEventDateDifferentFromCreated())?' ev_date':'' ?>"> <?php echo $event->event_date? $event->NHSDateAsHTML('event_date') : $event->NHSDateAsHTML('created_date'); ?></span>
 										</a>
