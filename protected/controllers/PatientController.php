@@ -994,7 +994,7 @@ class PatientController extends BaseController
 		if (!$patient = Patient::model()->findByPk($_POST['patient_id'])) {
 			throw new Exception("Patient not found: ".$_POST['patient_id']);
 		}
-		
+
 		$fh->patient_id = $_POST['patient_id'];
 		$fh->relative_id = $_POST['relative_id'];
 		$fh->side_id = $_POST['side_id'];
@@ -1004,11 +1004,11 @@ class PatientController extends BaseController
 		$errors = array();
 
 		if (!$fh->validate()) {
-			foreach ($fh->errors as $error) { 
+			foreach ($fh->errors as $error) {
 				$errors[] = $error[0];
 			}
 		}
-		
+
 		echo json_encode($errors);
 	}
 
@@ -1035,7 +1035,14 @@ class PatientController extends BaseController
 		if (!$fh->validate()) {
 			throw new Exception("Unable to save FamilyHistory item: ".print_r($fh->errors,true));
 		} else {
-			$patient->addFamilyHistory($relative->id,@$_POST['other_relative'],$side->id,$condition->id,@$_POST['other_condition'], @$_POST['comments']);
+			$patient->addFamilyHistory(
+				$_POST['relative_id'],
+				@$_POST['other_relative'],
+				$_POST['side_id'],
+				$_POST['condition_id'],
+				@$_POST['other_condition'],
+				@$_POST['comments']
+			);
 		}
 
 		$this->redirect(array('/patient/view/'.$patient->id));
