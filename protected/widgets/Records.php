@@ -34,6 +34,7 @@ class Records extends BaseFieldWidget
 	public $sort_table_after_save = false;
 	public $include_timestamp = true;
 	public $include_date = true;
+	public $label = true;
 	public $label_width = 3;
 
 	public function init()

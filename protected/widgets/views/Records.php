@@ -19,10 +19,12 @@
 ?>
 <div id="div_<?php echo $element ? CHtml::modelName($element).'_'.$field : $field?>" class="recordsWidget"<?php if ($hidden) {?> style="display: none"<?php }?>>
 	<div class="row field-row">
-		<div class="large-<?php echo $label_width?> column">
-			<label><?php echo $element->getAttributeLabel($field)?>:</label>
-		</div>
-		<div class="large-<?php echo (12 - $label_width)?> column end">
+		<?php if ($label) {?>
+			<div class="large-<?php echo $label_width?> column">
+				<label><?php echo $element->getAttributeLabel($field)?>:</label>
+			</div>
+		<?php }?>
+		<div class="large-<?php echo ($label ? (12 - $label_width) : 12)?> column end">
 			<table class="recordsTable">
 				<thead>
 					<tr>
