@@ -86,14 +86,14 @@
 						'name' => $input_name.'_drug_id',
 						'id' => $input_name.'_autocomplete_drug_id',
 						'source' => "js:function(request, response) {
-							$.getJSON('".Yii::app()->createUrl('/patient/DrugList')."', {
+							$.getJSON('".Yii::app()->createUrl('/medication/finddrug')."', {
 								term : request.term,
 							}, response);
 						}",
 						'options' => array(
 							'select' => "js:function(event, ui) {
-								$('.medicationName[data-input-name=\"".$input_name."\"] span').html(ui.item.value);
-								$('#_".$input_name."_medication_id').val(ui.item.id);
+								$('.medicationName[data-input-name=\"".$input_name."\"] span').html(ui.item.name);
+								$('#_".$input_name."_medication_id').val(ui.item.value);
 								$(this).val('');
 								return false;
 							}",
