@@ -313,7 +313,7 @@ class BaseEventTypeController extends BaseModuleController
 	{
 		$optional = array();
 		foreach ($this->event_type->getAllElementTypes() as $element_type) {
-			if (!$element_type->default && !$element_type->isChild()) {
+			if (!$element_type->required && !$element_type->isChild()) {
 				$optional[] = $element_type->getInstance();
 			}
 		}
