@@ -18,7 +18,7 @@
  */
 ?>
 <?php if (@$htmlOptions['nowrapper']) {?>
-	<?php echo CHtml::textField($element ? CHtml::modelName($element).'['.$field.'][bp_systolic]' : $field.'[bp_systolic]', $bp_systolic, array('autocomplete' => Yii::app()->params['html_autocomplete'], 'class' => $class_systolic))?>
+	<?php echo CHtml::textField($element ? CHtml::modelName($element).'['.$field.'][bp_systolic]' : $field.'[bp_systolic]', $bp_systolic, array('autocomplete' => Yii::app()->params['html_autocomplete'], 'class' => $class_systolic, 'id' => @$htmlOptions['id']))?>
 	/
 	<?php echo CHtml::textField($element ? CHtml::modelName($element).'['.$field.'][bp_diastolic]' : $field.'[bp_diastolic]', $bp_diastolic, array('autocomplete' => Yii::app()->params['html_autocomplete'], 'class' => $class_diastolic))?>
 	<span class="field-info">mmHg</span>
@@ -32,7 +32,7 @@
 			?>
 		</div>
 		<div class="large-<?php echo $layoutColumns['field'];?> column<?php if(empty($htmlOptions['append-text']) || empty($layoutColumns['append-text'])){?> end<?php }?>">
-			<?php echo CHtml::textField(CHtml::modelName($element).'['.$field.'][bp_systolic]', $bp_systolic, array('autocomplete' => Yii::app()->params['html_autocomplete'], 'class' => $class_systolic))?>
+			<?php echo CHtml::textField(CHtml::modelName($element).'['.$field.'][bp_systolic]', $bp_systolic, array('autocomplete' => Yii::app()->params['html_autocomplete'], 'class' => $class_systolic, 'id' => @$htmlOptions['id']))?>
 			/
 			<?php echo CHtml::textField(CHtml::modelName($element).'['.$field.'][bp_diastolic]', $bp_diastolic, array('autocomplete' => Yii::app()->params['html_autocomplete'], 'class' => $class_diastolic))?>
 			<span class="field-info">mmHg</span>

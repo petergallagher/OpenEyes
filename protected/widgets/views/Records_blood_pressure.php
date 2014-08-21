@@ -18,5 +18,5 @@
  */
 
 $this->widget('application.widgets.MeasurementBloodPressureWidget', array(
-	'htmlOptions' => array('nowrapper' => true, 'class' => 'recordInput'),
+	'htmlOptions' => array('nowrapper' => true, 'class' => 'recordInput', 'id' => @$column_field['id']),
 ));

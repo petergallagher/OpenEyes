@@ -18,5 +18,5 @@
  */
 
 $this->widget('application.widgets.MeasurementO2Widget', array(
-	'htmlOptions' => array('nowrapper' => true, 'class' => 'recordInput'),
+	'htmlOptions' => array('nowrapper' => true, 'class' => 'recordInput', 'id' => @$column_field['id']),
 ));

@@ -27,6 +27,9 @@ if (@$column_field['once_per_row']) {
 if (@$column_field['default']) {
 	$htmlOptions['data-default'] = $column_field['default'];
 }
+if (@$column_field['id']) {
+	$htmlOptions['id'] = $column_field['id'];
+}
 if (@$column_field['empty']) {
 	$column_field['options'] = array('' => $column_field['empty']) + $column_field['options'];
 }

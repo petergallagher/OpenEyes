@@ -55,6 +55,15 @@ class Records extends BaseFieldWidget
 		if (file_exists("protected/widgets/js/".get_class($this).".js")) {
 			$this->assetFolder = Yii::app()->getAssetManager()->publish('protected/widgets/js');
 		}
+
+		// Generate field ids
+		foreach ($this->columns as &$column) {
+			foreach($column['fields'] as &$field) {
+				if (!isset($field['id'])) {
+					$field['id'] = (is_object($this->element) ? CHtml::modelName($this->element).'_' : '').$field['field'];
+				}
+			}
+		}
 	}
 
 	public function run()
