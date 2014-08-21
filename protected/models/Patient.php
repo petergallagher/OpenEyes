@@ -919,6 +919,8 @@ class Patient extends BaseActiveRecordVersioned
 				throw new Exception('Unable to save secondary diagnosis: '.print_r($sd->getErrors(),true));
 			}
 
+			Yii::app()->event->dispatch('patient_add_diagnosis', array('diagnosis' => $sd));
+
 			$this->audit('patient',$action);
 		}
 	}
@@ -942,6 +944,8 @@ class Patient extends BaseActiveRecordVersioned
 		if (!$sd->delete()) {
 			throw new Exception('Unable to delete diagnosis: '.print_r($sd->getErrors(),true));
 		}
+
+		Yii::app()->event->dispatch('patient_remove_diagnosis', array('diagnosis' => $sd));
 
 		$this->audit('patient',"remove-$type-diagnosis");
 	}
