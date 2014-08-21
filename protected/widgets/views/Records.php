@@ -58,22 +58,27 @@
 					<label></label>
 				</div>
 				<div class="large-<?php echo (12-$label_width)?> column end">
-					<?php if ($include_timestamp) {?>
+					<?php if ($include_timestamp) {
+						$timestamp_label = get_class($element).'_timestamp';
+						?>
 						<div class="row field-row">
 							<div class="large-9 column end">
 								<div class="row field-row">
 									<div class="large-4 column recordDateLabel">
-										<?php if ($include_date) {?>
-											<label>Date/time:</label>
-										<?php }else{?>
-											<label>Time:</label>
-										<?php }?>
+										<label for="<?php echo $timestamp_label;?>">
+											<?php if ($include_date) {?>
+												Date/time:
+											<?php } else {?>
+												Time:
+											<?php }?>
+										</label>
 									</div>
 									<div class="large-8 column end">
 										<?php
 										if ($include_date) {
 											$this->widget('zii.widgets.jui.CJuiDatePicker',array(
 												'name' => 'timestamp',
+												'id' => $timestamp_label,
 												'options' => array(
 													'showAnim' => 'fold',
 													'dateFormat' => Helper::NHS_DATE_FORMAT_JS,
@@ -104,10 +109,18 @@
 					<?php }?>
 					<?php foreach ($columns[0]['fields'] as $j => $field) {?>
 						<div class="row field-row">
-							<?php echo $this->render('Records_field',array('column_field' => $field, 'column_width' => $columns[0]['width'], 'field_width' => @$columns[0]['field_width']));
-
-							$i=0; while (isset($columns[$i+1])) {
-								echo $this->render('Records_field',array('column_field' => $columns[$i+1]['fields'][$j], 'column_width' => $columns[$i+1]['width'], 'field_width' => @$columns[0]['field_width']));
+							<?php echo $this->render('Records_field', array(
+								'column_field' => $field,
+								'column_width' => $columns[0]['width'],
+								'field_width' => @$columns[0]['field_width']
+							));
+							$i=0;
+							while (isset($columns[$i+1])) {
+								echo $this->render('Records_field',array(
+									'column_field' => $columns[$i+1]['fields'][$j],
+									'column_width' => $columns[$i+1]['width'],
+									'field_width' => @$columns[0]['field_width']
+								));
 								$i++;
 							}?>
 						</div>

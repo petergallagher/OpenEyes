@@ -1014,18 +1014,11 @@ class PatientController extends BaseController
 
 	public function actionAddFamilyHistory()
 	{
-		if (@$_POST['family_history_id']) {
-			if (!$fh = FamilyHistory::model()->findByPk($_POST['family_history_id'])) {
-				throw new Exception("FamilyHistory not found: ".$_POST['family_history_id']);
-			}
-		} else {
-			$fh = new FamilyHistory;
-		}
-
 		if (!$patient = Patient::model()->findByPk($_POST['patient_id'])) {
 			throw new Exception("Patient not found: ".$_POST['patient_id']);
 		}
 
+		$fh = new FamilyHistory;
 		$fh->patient_id = $_POST['patient_id'];
 		$fh->relative_id = $_POST['relative_id'];
 		$fh->side_id = $_POST['side_id'];
@@ -1036,6 +1029,7 @@ class PatientController extends BaseController
 			throw new Exception("Unable to save FamilyHistory item: ".print_r($fh->errors,true));
 		} else {
 			$patient->addFamilyHistory(
+				@$_POST['edit_family_history_id'],
 				$_POST['relative_id'],
 				@$_POST['other_relative'],
 				$_POST['side_id'],

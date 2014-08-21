@@ -23,6 +23,7 @@ $this->widget('application.widgets.MultiSelectList', array(
 	'htmlOptions' => array(
 		'empty' => '- Please select -',
 		'nowrapper' => true,
+		'id' => @$column_field['id']
 	),
 	'extra_fields' => @$column_field['extra_fields'],
 	'input_class' => 'recordInput',

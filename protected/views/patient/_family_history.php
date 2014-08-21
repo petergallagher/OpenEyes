@@ -307,11 +307,15 @@
 		var side_id = $('#side_id').val();
 		var relative = $(this).children('option:selected').text();
 
+		$('#side_id')
+			.attr('disabled', 'disabled')
+			.html('<option>Loading...</option>');
+
 		$.ajax({
 			'type': 'GET',
 			'url': baseUrl + '/patient/getSidesForRelative?relative_id=' + relative_id,
 			'success': function(html) {
-				$('#side_id').html(html);
+				$('#side_id').html(html).removeAttr('disabled');
 				if (callback) {
 					callback();
 				}

@@ -17,4 +17,4 @@
  * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
  */
 
-echo CHtml::textArea($column_field['field'],'',array('class' => 'recordInput'));
+echo CHtml::textArea($column_field['field'],'',array('class' => 'recordInput', 'id' => @$column_field['id']));

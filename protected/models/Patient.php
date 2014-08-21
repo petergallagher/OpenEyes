@@ -1164,8 +1164,8 @@ class Patient extends BaseActiveRecordVersioned
 	}
 
 	/**
-	 * Adds FamilyHistory entry to the patient if it's not a duplicate
-	 *
+	 * Adds/Updates FamilyHistory entry to the patient if it's not a duplicate
+	 * @param $history_id
 	 * @param $relative_id
 	 * @param $other_relative
 	 * @param $side_id
@@ -1174,7 +1174,7 @@ class Patient extends BaseActiveRecordVersioned
 	 * @param $comments
 	 * @throws Exception
 	 */
-	public function addFamilyHistory($relative_id,$other_relative,$side_id,$condition_id,$other_condition,$comments)
+	public function addFamilyHistory($history_id,$relative_id,$other_relative,$side_id,$condition_id,$other_condition,$comments)
 	{
 		$check_sql = 'patient_id=? and relative_id=? and side_id=? and condition_id=?';
 		$params = array($this->id,$relative_id,$side_id,$condition_id);
@@ -1193,14 +1193,39 @@ class Patient extends BaseActiveRecordVersioned
 			$check_sql .= ' and other_condition is null';
 		}
 
-		if (!$fh = FamilyHistory::model()->find($check_sql,$params)) {
-			$fh = new FamilyHistory;
-			$fh->patient_id = $this->id;
-			$fh->relative_id = $relative_id;
-			$fh->side_id = $side_id;
-			$fh->condition_id = $condition_id;
+		$fh = FamilyHistory::model()->find($check_sql,$params);
+
+		// Adding a new family history
+		if (!$history_id) {
+			// No existing family history with the same data exists, so we'll create a
+			// new one instead of updating the existing one.
+			if (!$fh) {
+				$fh = new FamilyHistory;
+			}
+		}
+		// Editing an existing family history
+		else {
+			if (!$editing_fh = FamilyHistory::model()->findByPk($history_id)) {
+				throw new Exception("FamilyHistory not found: ".$history_id);
+			}
+			// Edited family history matches an existing family history, so remove
+			// the edited family history entry.
+			if ($fh) {
+				if ($editing_fh->id !== $fh->id) {
+					$editing_fh->delete();
+				}
+			}
+			// Edited family history does not match any existing family histories, so we
+			// can safely update it.
+			else {
+				$fh = $editing_fh;
+			}
 		}
 
+		$fh->patient_id = $this->id;
+		$fh->relative_id = $relative_id;
+		$fh->side_id = $side_id;
+		$fh->condition_id = $condition_id;
 		$fh->comments = $comments;
 
 		if (!$fh->save()) {
@@ -1548,7 +1573,7 @@ class Patient extends BaseActiveRecordVersioned
 			if ($this->mob) {
 				$dob = new DateTime($this->yob.'-'.$this->mob.'-01');
 				$now = new DateTime;
-				
+
 				$diff = $dob->diff($now);
 
 				return $diff->format('%m');
