@@ -174,9 +174,11 @@ $(document).ready(function() {
 						var label = $(this).parent().prev('div').children('label').text().replace(/\:$/,'');
 
 						form_div.closest('.recordsWidget').find('.recordsTable').children('tbody').children('tr').map(function() {
-							if ($(this).data(name) == new_val) {
-								once_per_errors[name] = "Each " + label.toLowerCase() + " can only be used once";
-								has_once_per_errors = true;
+							if (form_div.children('.recordEditItem').val() == '' || form_div.children('.recordEditItem').val() != $(this).data('i')) {
+								if ($(this).data(name) == new_val) {
+									once_per_errors[name] = "Each " + label.toLowerCase() + " can only be used once";
+									has_once_per_errors = true;
+								}
 							}
 						});
 					}
