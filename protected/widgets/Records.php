@@ -57,10 +57,12 @@ class Records extends BaseFieldWidget
 		}
 
 		// Generate field ids
-		foreach ($this->columns as &$column) {
-			foreach($column['fields'] as &$field) {
-				if (!isset($field['id'])) {
-					$field['id'] = (is_object($this->element) ? CHtml::modelName($this->element).'_' : '').$field['field'];
+		if (is_array($this->columns)) {
+			foreach ($this->columns as &$column) {
+				foreach($column['fields'] as &$field) {
+					if (!isset($field['id'])) {
+						$field['id'] = (is_object($this->element) ? CHtml::modelName($this->element).'_' : '').$field['field'];
+					}
 				}
 			}
 		}
