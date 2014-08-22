@@ -61,7 +61,7 @@ $(document).ready(function() {
 			'url': baseUrl+'/gii/EventTypeModule?ajax=element_field&element_num='+element_num+'&field_num='+field_num,
 			'type': 'GET',
 			'success': function(data) {
-				debugger;
+				//debugger;
 				div.append(data);
 				div.children('.element_field').each(function() {
 					position++
