@@ -18,11 +18,6 @@
  */
 <?php echo "?>\n"?>
 
-<section class="element">
-	<header class="element-header">
-		<h3 class="element-title"><?php echo '<?php'?> echo $element->elementType->name<?php echo '?>'?></h3>
-	</header>
-
 	<?php if(isset($element) && $element['split_element']) { ?>
 		<div class="element-data element-eyes row">
 			<div class="element-eye right-eye column">
@@ -63,4 +58,3 @@
 		?>
 		<?php } ?>
 	</div>
-</section>

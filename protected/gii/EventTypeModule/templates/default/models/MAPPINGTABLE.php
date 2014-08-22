@@ -24,7 +24,7 @@
  * @property string $id
  * @property integer $element_id
 <?php if (isset($mapping_table)) {?>
- * @property integer $<?php echo $mapping_table['lookup_table']?>_id
+ * @property integer $<?php echo $mapping_table['mapping_field']?>
 <?php }?>
  *
  * The followings are the available model relations:
@@ -40,73 +40,25 @@
 
 class <?php if (isset($mapping_table)) echo $mapping_table['class']?> extends BaseActiveRecordVersioned
 {
-	/**
-	 * Returns the static model of the specified AR class.
-	 * @return the static model class
-	 */
-	public static function model($className = __CLASS__)
-	{
-		return parent::model($className);
-	}
-
-	/**
-	 * @return string the associated database table name
-	 */
 	public function tableName()
 	{
 		return '<?php if (isset($mapping_table)) echo $mapping_table['name']; ?>';
 	}
 
-	/**
-	 * @return array validation rules for model attributes.
-	 */
 	public function rules()
 	{
 		return array(
-			array('element_id, <?php if (isset($mapping_table)) echo $mapping_table['lookup_table']?>_id', 'safe'),
-			array('element_id, <?php if (isset($mapping_table)) echo $mapping_table['lookup_table']?>_id', 'required'),
-			array('id, element_id, <?php if (isset($mapping_table)) echo $mapping_table['lookup_table']?>_id', 'safe', 'on' => 'search'),
+			array('<?php if (isset($mapping_table)) echo $mapping_table['mapping_field']?>', 'safe'),
+			array('<?php if (isset($mapping_table)) echo $mapping_table['mapping_field']?>', 'required'),
 		);
 	}
 
-	/**
-	 * @return array relational rules.
-	 */
 	public function relations()
 	{
 		return array(
 			'element' => array(self::BELONGS_TO, '<?php if (isset($mapping_table)) echo $mapping_table['element_class']?>', 'element_id'),
-			'<?php if (isset($mapping_table)) echo $mapping_table['lookup_table']?>' => array(self::BELONGS_TO, '<?php if (isset($mapping_table)) echo $mapping_table['lookup_class']?>', '<?php if (isset($mapping_table)) echo $mapping_table['lookup_table']?>_id'),
-			'user' => array(self::BELONGS_TO, 'User', 'created_user_id'),
-			'usermodified' => array(self::BELONGS_TO, 'User', 'last_modified_user_id'),
+			'<?php if (isset($mapping_table)) echo $mapping_table['relation_name']?>' => array(self::BELONGS_TO, '<?php if (isset($mapping_table)) echo $mapping_table['lookup_class']?>', '<?php if (isset($mapping_table)) echo $mapping_table['mapping_field']?>'),
 		);
-	}
-
-	/**
-	 * @return array customized attribute labels (name=>label)
-	 */
-	public function attributeLabels()
-	{
-		return array(
-			'id' => 'ID',
-			'name' => 'Name',
-		);
-	}
-
-	/**
-	 * Retrieves a list of models based on the current search/filter conditions.
-	 * @return CActiveDataProvider the data provider that can return the models based on the search/filter conditions.
-	 */
-	public function search()
-	{
-		$criteria = new CDbCriteria;
-
-		$criteria->compare('id', $this->id, true);
-		$criteria->compare('name', $this->name, true);
-
-		return new CActiveDataProvider(get_class($this), array(
-			'criteria' => $criteria,
-		));
 	}
 }
 <?php echo '?>';?>

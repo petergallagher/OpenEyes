@@ -17,14 +17,7 @@
  * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
  * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
  */
-if ($this->checkPrintAccess()) {
-	//$this->event_actions[] = EventAction::button('Print', 'print',null,array('class'=>'small button'));
-}
-$this->beginContent('//patient/event_container');
-	if ($this->event->delete_pending) {?>
-		<div class="alert-box alert with-icon">
-			This event is pending deletion and has been locked.
-		</div>
-	<?php echo '<?php '?>}
-	$this->renderOpenElements($this->action->id);
-$this->endContent();
+?>
+<li data-element-type-class="<?php if (isset($element)) echo CHtml::modelName($element)?>" data-element-type-id="<?php if (isset($element)) echo $element->elementType->id?>" data-element-type-name="<?php if (isset($element)) echo $element->elementType->name?>" data-element-display-order="<?php if (isset($element)) echo $element->elementType->display_order?>">
+	<a href="#"><?php if (isset($element)) echo $element->elementType->name?></a>
+</li>

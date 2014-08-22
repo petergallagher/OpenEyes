@@ -1,4 +1,5 @@
-<?php echo "<?php\n"?>
+<?php echo '<?php'?>
+
 /**
  * OpenEyes
  *
@@ -16,30 +17,21 @@
  * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
  * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
  */
-<?php echo "?>\n"?>
-
-<?php echo "<?php\n"?>$this->beginContent('//patient/event_container', array());<?php echo "?>\n"?>
-
-<?php echo "<?php\n"?>
-$form = $this->beginWidget('BaseEventTypeCActiveForm', array(
-	'id'=>'update-form',
-	'enableAjaxValidation'=>false,
-	'layoutColumns' => array(
-		'label' => 2,
-		'field' => 10
-	)
-));
-
-// Event actions
-$this->event_actions[] = EventAction::button('Save', 'save', array('level' => 'save'), array('form'=>'update-form'));
-
-<?php echo "?>\n"?>
-
-<?php echo '<?php'?> $this->displayErrors($errors)<?php echo "?>\n"?>
-<?php echo '<?php'?> $this->renderDefaultElements($this->action->id, $form)<?php echo "?>\n"?>
-<?php echo '<?php'?> $this->renderOptionalElements($this->action->id, $form)<?php echo "?>\n"?>
-<?php echo '<?php'?> $this->displayErrors($errors, true)<?php echo "?>\n"?>
-
-<?php echo '<?php'?> $this->endWidget()<?php echo "?>\n"?>
-
-<?php echo '<?php'?> $this->endContent()<?php echo "?>\n"?>
+$this->beginContent('//patient/event_container', array());
+	$form = $this->beginWidget('BaseEventTypeCActiveForm', array(
+		'id'=>'update-form',
+		'enableAjaxValidation'=>false,
+		'layoutColumns' => array(
+			'label' => 2,
+			'field' => 10
+		)
+	));
+		$this->event_actions[] = EventAction::button('Save', 'save', array('level' => 'save'), array('form'=>'update-form'));
+		$this->displayErrors($errors);
+		$this->renderPartial('//patient/event_elements', array(
+			'form' => $form,
+			'disableOptionalElementActions' => true
+		));
+		$this->displayErrors($errors, true);
+	$this->endWidget();
+$this->endContent();

@@ -63,29 +63,19 @@ if (isset($element)) {
 } }?>
  */
 
-class <?php if (isset($element)) echo $element['class_name']; ?>  extends <?php if (isset($element) && $element['split_element']){?> SplitEventTypeElement<?php } else { ?> BaseEventTypeElement<?php }?>
+class <?php if (isset($element)) echo $element['class_name']?> extends<?php if (isset($element) && $element['split_element']){?> SplitEventTypeElement<?php } else { ?> BaseEventTypeElement<?php }?>
 
 {
-	/**
-	 * Returns the static model of the specified AR class.
-	 * @return the static model class
-	 */
-	public static function model($className = __CLASS__)
-	{
-		return parent::model($className);
-	}
+<?php $aur = false; if (isset($element)) foreach ($element['fields'] as $field) { if ($field['type'] == 'Multi select') { $aur = true; } };
+if ($aur) {?>
+	public $auto_update_relations = true;
+<?php }?>
 
-	/**
-	 * @return string the associated database table name
-	 */
 	public function tableName()
 	{
 		return '<?php if (isset($element)) echo $element['table_name']; ?>';
 	}
 
-	/**
-	 * @return array validation rules for model attributes.
-	 */
 	public function rules()
 	{
 <?php if (isset($element) && $element['split_element']){
@@ -100,9 +90,8 @@ class <?php if (isset($element)) echo $element['class_name']; ?>  extends <?php 
 	$element['fields']=$splitElementFields;
 }?>
 		return array(
-			array('event_id, <?php if (isset($element)) { foreach ($element['fields'] as $field) { if ($field['type'] != 'Multi select') echo $field['name'] . ", "; if ($field['type'] == 'EyeDraw' && @$field['extra_report']) { echo $field['name'].'2, '; } } } ?>', 'safe'),
-			array('<?php if (isset($element)) { foreach ($element['fields'] as $field) { if ($field['required'] && $field['type'] != 'Multi select') { echo $field['name'] . ", "; } } } ?>', 'required'),
-			array('id, event_id, <?php if (isset($element)) { foreach ($element['fields'] as $field) { if ($field['type'] != 'Multi select') echo $field['name'] . ", "; } } ?>', 'safe', 'on' => 'search'),
+			array('<?php if (isset($element)) { $j=0; foreach ($element['fields'] as $field) { if ($j) echo ', '; $j++; echo $field['name']; if ($field['type'] == 'Multi select') echo 's'; if ($field['type'] == 'EyeDraw' && @$field['extra_report']) { echo $field['name'].'2, '; } } } ?>', 'safe'),
+			array('<?php if (isset($element)) { $j=0; foreach ($element['fields'] as $field) { if ($field['required']) { if ($j) echo ','; $j++; echo $field['name']; if ($field['type'] == 'Multi select') echo 's'; } } } ?>', 'required'),
 <?php if (isset($element))
 	foreach ($element['fields'] as $field) {
 		if ($field['type'] == 'Integer' && (strlen(@$field['integer_min_value']) || strlen(@$field['integer_max_value'])) ) {
@@ -137,9 +126,6 @@ class <?php if (isset($element)) echo $element['class_name']; ?>  extends <?php 
 		);
 	}
 
-	/**
-	 * @return array relational rules.
-	 */
 	public function relations()
 	{
 		return array(
@@ -149,7 +135,7 @@ class <?php if (isset($element)) echo $element['class_name']; ?>  extends <?php 
 			'user' => array(self::BELONGS_TO, 'User', 'created_user_id'),
 			'usermodified' => array(self::BELONGS_TO, 'User', 'last_modified_user_id'),
 <?php if (isset($element)) foreach ($element['relations'] as $relation) {?>
-			'<?php echo $relation['name']?>' => array(self::<?php echo $relation['type']?>, '<?php echo $relation['class']?>', '<?php echo $relation['field']?>'),
+			'<?php echo $relation['name']?>' => array(self::<?php echo $relation['type']?>, '<?php echo $relation['class']?>', '<?php echo $relation['field']?>'<?php if (@$relation['through']) {?>, 'through' => '<?php echo $relation['through']?>'<?php }?>),
 <?php }?>
 <?php if (isset($element) && $element['split_element']){?>
 			'eye' => array(self::BELONGS_TO, 'Eye', 'eye_id'),
@@ -157,14 +143,9 @@ class <?php if (isset($element)) echo $element['class_name']; ?>  extends <?php 
 		);
 	}
 
-	/**
-	 * @return array customized attribute labels (name=>label)
-	 */
 	public function attributeLabels()
 	{
 		return array(
-			'id' => 'ID',
-			'event_id' => 'Event',
 <?php
 if (isset($element)) {
 	foreach ($element['fields'] as $field) {
@@ -174,31 +155,8 @@ if (isset($element)) {
 ?>
 		);
 	}
-
-	/**
-	 * Retrieves a list of models based on the current search/filter conditions.
-	 * @return CActiveDataProvider the data provider that can return the models based on the search/filter conditions.
-	 */
-	public function search()
-	{
-		$criteria = new CDbCriteria;
-
-		$criteria->compare('id', $this->id, true);
-		$criteria->compare('event_id', $this->event_id, true);
-<?php
-if (isset($element)) {
-	foreach ($element['fields'] as $field) {
-		echo "\t\t\$criteria->compare('". $field['name'] . '\', $this->' . $field['name'] . ');' . "\n";
-	}
-}
-?>
-
-		return new CActiveDataProvider(get_class($this), array(
-			'criteria' => $criteria,
-		));
-	}
-
 <?php if (@$element['add_selected_eye']) {?>
+
 	public function getSelectedEye()
 	{
 		if (Yii::app()->getController()->getAction()->id == 'create') {
@@ -226,68 +184,5 @@ if (isset($element)) {
 		return new Eye;
 	}
 <?php }?>
-
-<?php if (isset($element) && !empty($element['defaults_methods'])) {
-		foreach ($element['defaults_methods'] as $default_method) {
-			if (@$default_method['is_defaults_table']) {?>
-	public function get<?php echo $default_method['method']?>() {
-		$ids = array();
-		foreach (<?php echo $default_method['class']?>::model()->findAll() as $item) {
-			$ids[] = $item->value_id;
-		}
-		return $ids;
-	}
-<?php } else {?>
-	public function get<?php echo $default_method['method']?>() {
-		$ids = array();
-		foreach (<?php echo $default_method['class']?>::model()->findAll('`default` = ?',array(1)) as $item) {
-			$ids[] = $item->id;
-		}
-		return $ids;
-	}
-<?php }?>
-<?php }?>
-<?php }?>
-
-	protected function afterSave()
-	{
-<?php if (isset($element) && !empty($element['after_save'])) {
-			foreach ($element['after_save'] as $after_save) {
-				if ($after_save['type'] == 'MultiSelect') {?>
-		if (!empty($_POST['<?php echo $after_save['post_var']?>'])) {
-
-			$existing_ids = array();
-
-			foreach (<?php echo $after_save['mapping_table_class']?>::model()->findAll('element_id = :elementId', array(':elementId' => $this->id)) as $item) {
-				$existing_ids[] = $item-><?php echo $after_save['lookup_table_field_id']?>;
-			}
-
-			foreach ($_POST['<?php echo $after_save['post_var']?>'] as $id) {
-				if (!in_array($id,$existing_ids)) {
-					$item = new <?php echo $after_save['mapping_table_class']?>;
-					$item->element_id = $this->id;
-					$item-><?php echo $after_save['lookup_table_field_id']?> = $id;
-
-					if (!$item->save()) {
-						throw new Exception('Unable to save MultiSelect item: '.print_r($item->getErrors(),true));
-					}
-				}
-			}
-
-			foreach ($existing_ids as $id) {
-				if (!in_array($id,$_POST['<?php echo $after_save['post_var']?>'])) {
-					$item = <?php echo $after_save['mapping_table_class']?>::model()->find('element_id = :elementId and <?php echo $after_save['lookup_table_field_id']?> = :lookupfieldId',array(':elementId' => $this->id, ':lookupfieldId' => $id));
-					if (!$item->delete()) {
-						throw new Exception('Unable to delete MultiSelect item: '.print_r($item->getErrors(),true));
-					}
-				}
-			}
-		}
-<?php }
-			}
-		}?>
-
-		return parent::afterSave();
-	}
 }
 <?php echo '?>';?>

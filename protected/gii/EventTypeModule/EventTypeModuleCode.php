@@ -522,6 +522,8 @@ class EventTypeModuleCode extends BaseModuleCode // CCodeModel
 			$lookup_table['values'] = $field_values;
 			$lookup_table['class'] = $elements[$number]['fields'][$fields_order]['lookup_class'] = preg_replace('/^Element_/','',$elements[$number]['class_name'] . '_' . str_replace(' ','', ucwords(str_replace('_', ' ', $root_fields_value) ) ));
 
+			$elements[$number]['fields'][$fields_order]['lookup_class'] = $lookup_table['class'];
+
 			$elements[$number]['lookup_tables'][] = $lookup_table;
 
 			$elements[$number]['relations'][] = array(
@@ -545,6 +547,8 @@ class EventTypeModuleCode extends BaseModuleCode // CCodeModel
 			if (strlen($key_name) >64) {
 				$key_name = $this->generateKeyName($elements[$number]['fields'][$fields_order]['name'],$root_fields_value);
 			}
+
+			$elements[$number]['fields'][$fields_order]['lookup_class'] = EventTypeModuleCode::findModelClassForTable($lookup_table);
 
 			$elements[$number]['foreign_keys'][] = array(
 				'field' => $elements[$number]['fields'][$fields_order]['name'],
@@ -611,13 +615,15 @@ class EventTypeModuleCode extends BaseModuleCode // CCodeModel
 			);
 
 			$mapping_table = array(
-				'name' => $elements[$number]['table_name'].'_'.$elements[$number]['fields'][$fields_order]['name'].'_assignment',
+				'name' => preg_replace('/^et_/','',$elements[$number]['table_name']).'_'.$elements[$number]['fields'][$fields_order]['name'].'_assignment',
 				'lookup_table' => $lookup_table['name'],
 				'lookup_class' => $lookup_table['class'],
 				'element_class' => $elements[$number]['class_name'],
+				'mapping_field' => $elements[$number]['fields'][$fields_order]['name'].'_id',
+				'relation_name' => $elements[$number]['fields'][$fields_order]['name'],
 			);
 
-			$mapping_table['class'] = $elements[$number]['class_name'] . '_' . str_replace(' ','', ucwords(str_replace('_', ' ', $fields_value) ) ) . '_Assignment';
+			$mapping_table['class'] = preg_replace('/^Element_/','',$elements[$number]['class_name']) . '_' . str_replace(' ','', ucwords(str_replace('_', ' ', $fields_value) ) ) . '_Assignment';
 
 			$mapping_table = $this->generateKeyNames($mapping_table,array('lmui','cui','ele','lku'));
 
@@ -625,18 +631,26 @@ class EventTypeModuleCode extends BaseModuleCode // CCodeModel
 
 			$elements[$number]['relations'][] = array(
 				'type' => 'HAS_MANY',
-				'name' => $elements[$number]['fields'][$fields_order]['name'].'s',
-				#'class' => str_replace(' ','',ucwords(str_replace('_',' ',$mapping_table['name']))),
+				'name' => $elements[$number]['fields'][$fields_order]['name'].'_assignment',
 				'class' => $mapping_table['class'],
 				'field' => 'element_id',
 			);
 
+			$elements[$number]['relations'][] = array(
+				'type' => 'HAS_MANY',
+				'name' => $elements[$number]['fields'][$fields_order]['name'].'s',
+				'class' => $lookup_table['class'],
+				'field' => $mapping_table['mapping_field'],
+				'through' => $elements[$number]['fields'][$fields_order]['name'].'_assignment',
+			);
+
 			$elements[$number]['fields'][$fields_order]['multiselect_relation'] = $elements[$number]['fields'][$fields_order]['name'].'s';
-			$elements[$number]['fields'][$fields_order]['multiselect_field'] = $lookup_table['name'].'_id';
+			$elements[$number]['fields'][$fields_order]['multiselect_field'] = $mapping_table['mapping_field'];
 			$elements[$number]['fields'][$fields_order]['multiselect_lookup_class'] = $lookup_table['class'];
 			$elements[$number]['fields'][$fields_order]['multiselect_lookup_table'] = $lookup_table['name'];
 			$elements[$number]['fields'][$fields_order]['multiselect_table_field_name'] = 'name';
 			$elements[$number]['fields'][$fields_order]['multiselect_order_field'] = 'display_order';
+			$elements[$number]['fields'][$fields_order]['multiselect_related_object'] = $mapping_table['relation_name'];
 
 			$elements[$number]['after_save'][] = array(
 				'type' => 'MultiSelect',
@@ -683,6 +697,8 @@ class EventTypeModuleCode extends BaseModuleCode // CCodeModel
 				'lookup_table' => $lookup_table['name'],
 				'lookup_class' => $lookup_table['class'],
 				'element_class' => $elements[$number]['class_name'],
+				'mapping_field' => $elements[$number]['fields'][$fields_order]['name'].'_id',
+				'relation_name' => $elements[$number]['fields'][$fields_order]['name'],
 			);
 
 			$mapping_table['class'] = str_replace(' ','',ucwords(str_replace('_',' ',$mapping_table['name'])));
@@ -693,17 +709,27 @@ class EventTypeModuleCode extends BaseModuleCode // CCodeModel
 
 			$elements[$number]['relations'][] = array(
 				'type' => 'HAS_MANY',
-				'name' => $elements[$number]['fields'][$fields_order]['name'].'s',
+				'name' => $elements[$number]['fields'][$fields_order]['name'].'_assignment',
 				'class' => str_replace(' ','',ucwords(str_replace('_',' ',$mapping_table['name']))),
 				'field' => 'element_id',
 			);
 
+			$elements[$number]['relations'][] = array(
+				'type' => 'HAS_MANY',
+				'name' => $elements[$number]['fields'][$fields_order]['name'].'s',
+				'class' => $lookup_table['class'],
+				'field' => $mapping_table['mapping_field'],
+				'through' => $elements[$number]['fields'][$fields_order]['name'].'_assignment',
+			);
+
 			$elements[$number]['fields'][$fields_order]['multiselect_relation'] = $elements[$number]['fields'][$fields_order]['name'].'s';
-			$elements[$number]['fields'][$fields_order]['multiselect_field'] = $lookup_table['name'].'_id';
+			$elements[$number]['fields'][$fields_order]['multiselect_field'] = $mapping_table['mapping_field'];
 			$elements[$number]['fields'][$fields_order]['multiselect_lookup_class'] = $lookup_table['class'];
 			$elements[$number]['fields'][$fields_order]['multiselect_lookup_table'] = $lookup_table['name'];
 			$elements[$number]['fields'][$fields_order]['multiselect_table_field_name'] = @$_POST['multiSelectFieldSQLTableField'.$number.'Field'.$field_number];
 			$elements[$number]['fields'][$fields_order]['multiselect_order_field'] = @$_POST['multiSelectFieldSQLTableField'.$number.'Field'.$field_number];
+			$elements[$number]['fields'][$fields_order]['multiselect_related_object'] = $mapping_table['relation_name'];
+			$elements[$number]['fields'][$fields_order]['multiselect_defaults_class'] = $defaults_table['class'];
 
 			$elements[$number]['after_save'][] = array(
 				'type' => 'MultiSelect',
@@ -1246,26 +1272,26 @@ class EventTypeModuleCode extends BaseModuleCode // CCodeModel
 
 		switch ($field['type']) {
 			case 'Textbox':
-				return '<?php echo $form->textField($element, \''.$field['name'].'\', array(\'size\' => \''.$field['textbox_size'].'\''.($field['textbox_max_length'] ? ',\'maxlength\' => \''.$field['textbox_max_length'].'\'' : '').'))?'.'>';
+				return '<?php echo $form->textField($element, \''.$field['name'].'\', array(\'size\' => \''.$field['textbox_size'].'\''.($field['textbox_max_length'] ? ',\'maxlength\' => \''.$field['textbox_max_length'].'\'' : '').'), array(), array(\'label\' => 3, \'field\' => 4))?'.'>';
 			case 'Decimal':
-				return '<?php echo $form->textField($element, \''.$field['name'].'\', array(\'size\' => \''.$field['decimal_size'].'\''.($field['decimal_max_length'] ? ',\'maxlength\' => \''.$field['decimal_max_length'].'\'' : '').'))?'.'>';
+				return '<?php echo $form->textField($element, \''.$field['name'].'\', array(\'size\' => \''.$field['decimal_size'].'\''.($field['decimal_max_length'] ? ',\'maxlength\' => \''.$field['decimal_max_length'].'\'' : '').'), array(), array(\'label\' => 3, \'field\' => 4))?'.'>';
 			case 'Integer':
-				return '<?php echo $form->textField($element, \''.$field['name'].'\', array(\'size\' => \''.$field['integer_size'].'\''.($field['integer_max_length'] ? ',\'maxlength\' => \''.$field['integer_max_length'].'\'' : '').'))?'.'>';
+				return '<?php echo $form->textField($element, \''.$field['name'].'\', array(\'size\' => \''.$field['integer_size'].'\''.($field['integer_max_length'] ? ',\'maxlength\' => \''.$field['integer_max_length'].'\'' : '').'), array(), array(\'label\' => 3, \'field\' => 4))?'.'>';
 			case 'Textarea':
-				return '<?php echo $form->textArea($element, \''.$field['name'].'\', array(\'rows\' => '.$field['textarea_rows'].', \'cols\' => '.$field['textarea_cols'].'))?'.'>';
+				return '<?php echo $form->textArea($element, \''.$field['name'].'\', array(), false, array(), array(\'label\' => 3, \'field\' => 4))?'.'>';
 			case 'Date picker':
-				return '<?php echo $form->datePicker($element, \''.$field['name'].'\', array(\'maxDate\' => \'today\'), array(\'style\'=>\'width: 110px;\'))?'.'>';
+				return '<?php echo $form->datePicker($element, \''.$field['name'].'\', array(\'maxDate\' => \'today\'), array(), array(\'label\' => 3, \'field\' => 4))?'.'>';
 			case 'Dropdown list':
-				return '<?php echo $form->dropDownList($element, \''.$field['name'].'\', CHtml::listData('.$field['lookup_class'].'::model()->findAll(array(\'order\'=> \''.$field['order_field'].' asc\')),\'id\',\''.$field['lookup_field'].'\')'.(@$field['empty'] ? ',array(\'empty\'=>\'- Please select -\')' : '').')?'.'>';
+				return '<?php echo $form->dropDownList($element, \''.$field['name'].'\', CHtml::listData('.$field['lookup_class'].'::model()->findAll(array(\'order\'=> \''.$field['order_field'].' asc\')),\'id\',\''.$field['lookup_field'].'\')'.(@$field['empty'] ? ',array(\'empty\'=>\'- Please select -\')' : ',array()').', array(\'label\' => 3, \'field\' => 4))?'.'>';
 			case 'Textarea with dropdown':
-				return '<?php echo $form->dropDownListNoPost(\''.$field['name'].'\', CHtml::listData('.$field['lookup_class'].'::model()->findAll(),\'id\',\''.$field['lookup_field'].'\'),\'\',array(\'empty\'=>\'- '.ucfirst($field['label']).' -\',\'class\'=>\'populate_textarea\'))?'.'>'."\n".
-					'	<?php echo $form->textArea($element, \''.$field['name'].'\', array(\'rows\' => '.$field['textarea_rows'].', \'cols\' => '.$field['textarea_cols'].'))?'.'>';
+				return '<?php echo $form->dropDownListNoPost(\''.$field['name'].'\', CHtml::listData('.$field['lookup_class'].'::model()->findAll(),\'id\',\''.$field['lookup_field'].'\'),\'\',array(\'empty\'=>\'- '.ucfirst($field['label']).' -\',\'class\'=>\'populate_textarea\'), array(\'label\' => 3, \'field\' => 4))?'.'>'."\n".
+					'	<?php echo $form->textArea($element, \''.$field['name'].'\', array(), false, array(), array(\'label\' => 3, \'field\' => 4))?'.'>';
 			case 'Checkbox':
-				return '<?php echo $form->checkBox($element, \''.$field['name'].'\')?'.'>';
+				return '<?php echo $form->checkBox($element, \''.$field['name'].'\', array(), array(\'label\' => 3, \'field\' => 4))?'.'>';
 			case 'Radio buttons':
-				return '<?php echo $form->radioButtons($element, \''.$field['name'].'\', \''.$field['lookup_table'].'\')?'.'>';
+				return '<?php echo $form->radioButtons($element, \''.$field['name'].'\', CHtml::listData('.$field['lookup_class'].'::model()->findAll(array(\'order\' => \'display_order asc\')),\'id\',\'name\'),null,false,false,false,false, array(), array(\'label\' => 3, \'field\' => 4))?'.'>';
 			case 'Boolean':
-				return '<?php echo $form->radioBoolean($element, \''.$field['name'].'\')?'.'>';
+				return '<?php echo $form->radioBoolean($element, \''.$field['name'].'\', array(), array(\'label\' => 3, \'field\' => 4))?'.'>';
 			case 'EyeDraw':
 				$commandArray = '';
 				if (!empty($field['eyedraw_default_doodles'])) {
@@ -1296,9 +1322,13 @@ class EventTypeModuleCode extends BaseModuleCode // CCodeModel
 			</div>
 		</div>';
 			case 'Multi select':
-				return '<?php echo $form->multiSelectList($element, \'MultiSelect_'.$field['name'].'\', \''.@$field['multiselect_relation'].'\', \''.@$field['multiselect_field'].'\', CHtml::listData('.@$field['multiselect_lookup_class'].'::model()->findAll(array(\'order\'=>\''.$field['multiselect_order_field'].' asc\')),\'id\',\''.$field['multiselect_table_field_name'].'\'), $element->'.@$field['multiselect_lookup_table'].'_defaults, array(\'empty\' => \'- Please select -\', \'label\' => \''.$field['label'].'\'))?'.'>';
+				if (@$field['method'] == 'Manual') {
+					return '<?php echo $form->multiSelectList($element, \''.$field['name'].'s\', \''.@$field['multiselect_relation'].'\', \''.@$field['multiselect_field'].'\', CHtml::listData('.@$field['multiselect_lookup_class'].'::model()->findAll(array(\'order\'=>\''.$field['multiselect_order_field'].' asc\')),\'id\',\''.$field['multiselect_table_field_name'].'\'), CHtml::listData('.@$field['multiselect_lookup_class'].'::model()->findAll(array(\'condition\' => \'`default`=1\',\'order\'=>\''.$field['multiselect_order_field'].' asc\')),\'id\',\'id\'), array(\'empty\' => \'- Please select -\', \'label\' => \''.$field['label'].'\'),false,false,null,false,false,array(\'label\' => 3, \'field\' => 4))?'.'>';
+				} else {
+					return '<?php echo $form->multiSelectList($element, \''.$field['name'].'s\', \''.@$field['multiselect_relation'].'\', \''.@$field['multiselect_field'].'\', CHtml::listData('.@$field['multiselect_lookup_class'].'::model()->findAll(array(\'order\'=>\''.$field['multiselect_order_field'].' asc\')),\'id\',\''.$field['multiselect_table_field_name'].'\'), CHtml::listData('.@$field['multiselect_defaults_class'].'::model()->findAll(array()),\'id\',\'value_id\'), array(\'empty\' => \'- Please select -\', \'label\' => \''.$field['label'].'\'),false,false,null,false,false,array(\'label\' => 3, \'field\' => 4))?'.'>';
+				}
 			case 'Slider':
-				return '<?php echo $form->slider($element, \''.$field['name'].'\', array(\'min\' => '.$field['slider_min_value'].', \'max\' => '.$field['slider_max_value'].', \'step\' => '.$field['slider_stepping'].($field['slider_dp'] ? ', \'force_dp\' => '.$field['slider_dp'] : '').'))?'.'>';
+				return '<?php echo $form->slider($element, \''.$field['name'].'\', array(\'min\' => '.$field['slider_min_value'].', \'max\' => '.$field['slider_max_value'].', \'step\' => '.$field['slider_stepping'].($field['slider_dp'] ? ', \'force_dp\' => '.$field['slider_dp'] : '').'),array(),array(\'label\' => 3, \'field\' => 4))?'.'>';
 		}
 	}
 
@@ -1368,12 +1398,12 @@ class EventTypeModuleCode extends BaseModuleCode // CCodeModel
 		</div>' : '');
 			case 'Multi select':
 				return '		<div class="row data-row">
-			<div class="large-2 column"><div class="data-label"><?php echo CHtml::encode($element->getAttributeLabel(\''.$field['name'].'\'))?'.'>:</div></div>
+			<div class="large-2 column"><div class="data-label"><?php echo CHtml::encode($element->getAttributeLabel(\''.$field['name'].'s\'))?'.'>:</div></div>
 			<div class="large-10 column end"><div class="data-value"><?php if (!$element->'.@$field['multiselect_relation'].') {?'.'>
 							None
 						<?php } else {?'.'>
 								<?php foreach ($element->'.@$field['multiselect_relation'].' as $item) {
-									echo $item->'.@$field['multiselect_lookup_table'].'->name?'.'><br/>
+									echo $item->name?'.'><br/>
 								<?php }?'.'>
 						<?php }?'.'>
 			</div></div>
