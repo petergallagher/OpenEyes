@@ -90,9 +90,14 @@
 										}
 										$this->widget('application.widgets.TimePicker', array(
 											'name' => 'time',
-											'htmlOptions' => array('nowrapper' => true, 'class' => 'recordTime'),
+											'htmlOptions' => array(
+												'nowrapper' => true,
+												'class' => 'recordTime'
+											),
+											'options' => array(
+												'showTimeNowButton' => $include_time_now_button
+											)
 										))?>
-										<?php echo EventAction::button('Now', 'now', array('level' => 'save'),array('class' => 'recordsTimeNow'))->toHtml()?>
 									</div>
 								</div>
 							</div>
