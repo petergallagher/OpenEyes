@@ -16,6 +16,8 @@ $(document).ready(function() {
 			switch(type) {
 				case 'date':
 					return getTime(row, col);
+				case 'time':
+					return (new Date('2012-01-01 ' + getColVal(row, col))).getTime();
 				default:
 					return 1;
 			}
