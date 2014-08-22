@@ -18,9 +18,12 @@
  */
 ?>
 <?php if (@$htmlOptions['nowrapper']) {?>
+	<?php if (!empty($htmlOptions['prepend-text'])) {?>
+		<span class="field-info prepend"><?php echo $htmlOptions['prepend-text']?></span>
+	<?php }?>
 	<?php echo CHtml::textField($name, $value, $htmlOptions)?>
 	<?php if (!empty($htmlOptions['append-text'])) {?>
-		<span class="field-info"><?php echo $htmlOptions['append-text']?></span>
+		<span class="field-info append"><?php echo $htmlOptions['append-text']?></span>
 	<?php }?>
 <?php } else {?>
 	<div id="div_<?php echo CHtml::modelName($element)?>_<?php echo $field?>" class="row field-row"<?php if (@$htmlOptions['hide']) {?> style="display: none;"<?php }?>>
@@ -31,7 +34,15 @@
 			echo Chtml::label($labelText, Chtml::getIdByName($name));
 			?>
 		</div>
+		<?php if (!empty($htmlOptions['prepend-text']) && !empty($layoutColumns['prepend-text'])) {?>
+			<div class="large-<?php echo $layoutColumns['prepend-text']?> column">
+				<span class="field-info prepend"><?php echo $htmlOptions['prepend-text']?></span>
+			</div>
+		<?php }?>
 		<div class="large-<?php echo $layoutColumns['field'];?> column<?php if(empty($htmlOptions['append-text']) || empty($layoutColumns['append-text'])){?> end<?php }?>">
+			<?php if (!empty($htmlOptions['prepend-text']) && empty($layoutColumns['prepend-text'])) {?>
+				<span class="field-info prepend"><?php echo $htmlOptions['prepend-text']?></span>
+			<?php }?>
 			<?php if (@$htmlOptions['password']) { ?>
 				<?php echo CHtml::passwordField($name, $value, $htmlOptions)?>
 			<?php } else {?>
@@ -43,12 +54,12 @@
 				}
 			}?>
 			<?php if (!empty($htmlOptions['append-text']) && empty($layoutColumns['append-text'])) {?>
-				<span class="field-info"><?php echo $htmlOptions['append-text'];?></span>
+				<span class="field-info append"><?php echo $htmlOptions['append-text'];?></span>
 			<?php }?>
 		</div>
 	<?php if(!empty($htmlOptions['append-text']) && !empty($layoutColumns['append-text'])){?>
 		<div class="large-<?php echo $layoutColumns['append-text'];?> column end">
-			<span class="field-info"><?php echo $htmlOptions['append-text'];?></span>
+			<span class="field-info append"><?php echo $htmlOptions['append-text'];?></span>
 		</div>
 	<?php }?>
 	</div>
