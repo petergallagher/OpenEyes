@@ -1386,4 +1386,22 @@ class PatientController extends BaseController
 		$oprn = 'OprnCreate' . ($event_type->class_name == 'OphDrPrescription' ? 'Prescription' : 'Event');
 		return $this->checkAccess($oprn, $this->firm, $episode, $event_type);
 	}
+
+	public function renderModulePartials($area)
+	{
+		if (isset(Yii::app()->params['module_partials'][$area])) {
+			foreach (Yii::app()->params['module_partials'][$area] as $module => $partials) {
+				if ($api = Yii::app()->moduleAPI->get($module)) {
+					foreach ($partials as $partial) {
+						if ($viewFile = $api->findViewFile('patientSummary', $partial)) {
+							$this->renderFile($viewFile, array(
+								'patient' => $this->patient,
+								'api' => $api,
+							));
+						}
+					}
+				}
+			}
+		}
+	}
 }
