@@ -61,7 +61,7 @@ class Records extends BaseFieldWidget
 		if (is_array($this->columns)) {
 			foreach ($this->columns as &$column) {
 				foreach($column['fields'] as &$field) {
-					if (!isset($field['id'])) {
+					if (!isset($field['id']) && $field['type'] !== 'custom' && isset($field['field'])) {
 						$field['id'] = (is_object($this->element) ? CHtml::modelName($this->element).'_' : '').$field['field'];
 					}
 				}
