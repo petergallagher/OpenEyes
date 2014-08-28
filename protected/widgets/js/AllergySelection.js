@@ -17,6 +17,7 @@
  */
 
 $(document).ready(function() {
+
 	$('.addAllergy').unbind('click').click(function(e) {
 		e.preventDefault();
 
@@ -54,7 +55,7 @@ $(document).ready(function() {
 		}
 	});
 
-	$('#no_allergies').click(function(e) {
+	$('#no_allergies').change(function(e) {
 		if ($(this).is(':checked')) {
 			$('#allergy_field').slideUp('fast');
 		} else {
