@@ -55,3 +55,6 @@ bin/oe-git-status
 composer.phar
 features/bootstrap/Features/Templates/CODINGONLY.feature
 selenium-server-standalone-2.35.0.jar
+
+# Orbis Specific
+features/orbis.sql
