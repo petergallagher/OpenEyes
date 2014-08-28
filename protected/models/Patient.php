@@ -127,7 +127,7 @@ class Patient extends BaseActiveRecordVersioned
 	public function rules()
 	{
 		$rules =array(
-			array('hos_num', 'required'),
+			array('hos_num,gender_id', 'required'),
 			array('pas_key', 'length', 'max' => 10),
 			array('hos_num, nhs_num', 'length', 'max' => 40),
 			array('dob, gender_id, date_of_death, ethnic_group_id, yob, gp_id, practice_id, dob_day, dob_month, dob_year, dod_day, dod_month, dod_year, age_years, age_months', 'safe'),
