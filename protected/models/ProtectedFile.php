@@ -403,24 +403,20 @@ class ProtectedFile extends BaseActiveRecordVersioned
 	}
 
 	protected function generatePDFThumbnail($dimensions) {
-		$params = explode('_',$dimensions);
 
-		$size = explode('x',$params[0]);
+		$width = 0;
+		$height = 0;
+		$size = explode('x',$dimensions);
 
 		if (isset($size[1])) {
 			list($width,$height) = $size;
 		} else {
-			$width = $height = $size[0];
+			$width = $size[0];
 		}
 
-		if (isset($params[1])) {
-			$offset = explode('x',$params[1]);
-			list($offset_x,$offset_y) = $offset;
-		} else {
-			$offset_x = $offset_y = 0;
-		}
+		$width = (int) $width;
+		$height = (int) $height;
 
-		$thumbnail = imagecreatetruecolor($width, $height);
 		$thumbnail_path = $this->getThumbnailPath($dimensions);
 
 		if (!file_exists($thumbnail_path)) {
@@ -428,13 +424,37 @@ class ProtectedFile extends BaseActiveRecordVersioned
 				mkdir(dirname($thumbnail_path), 0777, true);
 			}
 
-			$im = NewMagickWand();
-			MagickReadImage($im,$this->getPath());
-			MagickCropImage($im,$width,$height,$offset_x,$offset_y);
-			MagickSetCompressionQuality($im,80);
-			MagickSetImageFormat($im,'JPEG');
-			MagickWriteImage($im,$thumbnail_path.'.jpg');
-			@rename($thumbnail_path.'.jpg',$thumbnail_path); // don't ask
+			$source = $this->getPath();
+
+			$img = new Imagick();
+			$img->readImage("{$source}[0]");
+			$img->setImageUnits(Imagick::RESOLUTION_PIXELSPERINCH);
+			$img->setImageResolution(80,80);
+			$img->setImageFormat('jpg');
+			$img = $img->flattenImages();
+
+			$dimensions = $img->getImageGeometry();
+			$image_width = $dimensions['width'];
+			$image_height = $dimensions['height'];
+
+			if ($width && $height) {
+				// Resize the image so that the smallest dimension fits the boundary,
+				// then crop off the other dimension in the centre.
+				if ($image_width / $image_height > $width / $height) {
+					$offset_x = ((($height / $image_height) * $image_width) - $width)/2;
+					$img->thumbnailImage(0, $height);
+					$img->cropImage($width,$height,$offset_x,0);
+				} else {
+					$offset_y = ((($width / $image_width) * $image_height) - $height)/2;
+					$img->thumbnailImage($width, 0);
+					$img->cropImage($width,$height,0,$offset_y);
+				}
+			} else {
+				// Just resize, keeping aspect ratio.
+				$img->thumbnailImage($width, $height);
+			}
+
+			$img->writeImage($thumbnail_path);
 		}
 
 		return true;
