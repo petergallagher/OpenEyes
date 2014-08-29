@@ -1642,4 +1642,45 @@ class Patient extends BaseActiveRecordVersioned
 
 		return Allergy::model()->findAll($criteria);
 	}
+
+	/**
+	 * Add new patient medications, if they don't already exist.
+	 * @param [array] $medications An array of medications
+	 */
+	public function addMedications($medications)
+	{
+		foreach ($medications as $medication) {
+
+			$params = array(
+				$this->id,
+				$medication->drug_id,
+				$medication->route_id,
+				$medication->frequency_id,
+				$medication->start_date
+			);
+
+			$condition = 'patient_id=? and drug_id=? and route_id=? and frequency_id=? and start_date=?';
+
+			if (!$medication->option_id) {
+				$condition .= ' and option_id IS NULL';
+			} else {
+				$condition .= ' and option_id=?';
+				$params[] = $medication->option_id;
+			}
+
+			if (!Medication::model()->find($condition,$params)) {
+
+				$_medication = new Medication;
+				$_medication->patient_id = $this->id;
+
+				foreach (array('drug_id','route_id','option_id','frequency_id','start_date') as $field) {
+					$_medication->$field = $medication->$field;
+				}
+
+				if (!$_medication->save()) {
+					throw new Exception("Unable to save medication: ".print_r($_medication->getErrors(),true));
+				}
+			}
+		}
+	}
 }
