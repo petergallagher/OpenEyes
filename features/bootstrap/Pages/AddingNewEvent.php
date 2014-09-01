@@ -20,6 +20,7 @@ class AddingNewEvent extends OpenEyesPage
         'addNewMedicalRetinalEventButton' => array('xpath' => "//*[@class='events-container show']//*[@data-attr-subspecialty-id=8]"),
         'addNewSupportFirmEventButton' => array('xpath' => "//*[@class='events-container show']//*[@data-attr-subspecialty-id='']"),
         'anaestheticSatisfaction' => array ('xpath' => "//*[@id='add-new-event-dialog']//*[contains(text(), 'Anaesthetic Satisfaction Audit')]"),
+        'anaestheticSatisfactionOrbis' => array('xpath' => "//*[@id='add-new-event-dialog']//*[contains(text(), 'Anaesthetic satisfaction audit')]"),
         'consentForm' => array('xpath' => "//*[@id='add-new-event-dialog']//*[contains(text(), 'Consent form')]"),
         'correspondence' => array('xpath' => "//*[@id='add-new-event-dialog']//*[contains(text(), 'Correspondence')]"),
         'examination' => array('xpath' => "//*[@id='add-new-event-dialog']//*[contains(text(), 'Examination')]"),
@@ -83,6 +84,10 @@ class AddingNewEvent extends OpenEyesPage
         if ($event==="Satisfaction") {
             $this->getElement('anaestheticSatisfaction')->click();
         }
+        if ($event==="SatisfactionOrbis") {
+            $this->getElement('anaestheticSatisfactionOrbis')->click();
+        }
+
         if ($event==="Consent") {
             $this->getElement('consentForm')->click();
         }
