@@ -72,7 +72,7 @@ Then I expand the Cataract sidebar
 And I add a New Event "SatisfactionOrbis"
 
 Then I select an Anaesthetist "no"
-And I select SatisfactionOrbis levels of Pain "2" Nausea "3"
+And I select Satisfaction levels of Pain "2" Nausea "3"
 
 And I tick the Vomited checkbox
 
