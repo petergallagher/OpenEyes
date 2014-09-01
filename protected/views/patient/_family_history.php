@@ -23,7 +23,7 @@
 			</thead>
 			<tbody>
 				<?php foreach ($this->patient->familyHistory as $history) {?>
-					<tr>
+					<tr data-relative_id="<?php echo $history->relative_id?>" data-other_relative="<?php echo $history->other_relative?>" data-side_id="<?php echo $history->side_id?>" data-condition_id="<?php echo $history->condition_id?>" data-other_condition="<?php echo $history->other_condition?>" data-comments="<?php echo $history->comments?>">
 						<td class="relative" data-relativeId="<?= $history->relative_id ?>"><?php echo $history->getRelativeName(); ?></td>
 						<td class="side"><?php echo $history->side->name?></td>
 						<td class="condition" data-conditionId="<?= $history->condition_id ?>"><?php echo $history->getConditionName(); ?></td>
@@ -90,7 +90,7 @@
 
 						<div class="field-row row hidden" id="family-history-o-rel-wrapper">
 							<div class="<?php echo $form->columns('label');?>">
-								<label for="comments">Other Relative:</label>
+								<label for="comments">Other relative:</label>
 							</div>
 							<div class="<?php echo $form->columns('field');?>">
 								<?php echo CHtml::textField('other_relative','',array('autocomplete'=>Yii::app()->params['html_autocomplete']))?>
@@ -127,7 +127,7 @@
 
 						<div class="field-row row hidden" id="family-history-o-con-wrapper">
 							<div class="<?php echo $form->columns('label');?>">
-								<label for="comments">Other Condition:</label>
+								<label for="comments">Other condition:</label>
 							</div>
 							<div class="<?php echo $form->columns('field');?>">
 								<?php echo CHtml::textField('other_condition','',array('autocomplete'=>Yii::app()->params['html_autocomplete']))?>
@@ -207,7 +207,7 @@
 		$.ajax({
 			'type': 'POST',
 			'url': baseUrl+'/patient/validateFamilyHistory',
-			'data': 'YII_CSRF_TOKEN=' + YII_CSRF_TOKEN + '&patient_id=' + OE_patient_id + '&family_history_id=' + $('#edit_family_history_id').val() + '&relative_id=' + $('#relative_id').val() + '&side_id=' + $('#side_id').val() + '&condition_id=' + $('#condition_id').val() + '&comments=' + $('#comments').val(),
+			'data': 'YII_CSRF_TOKEN=' + YII_CSRF_TOKEN + '&patient_id=' + OE_patient_id + '&family_history_id=' + $('#edit_family_history_id').val() + '&relative_id=' + $('#relative_id').val() + '&other_relative=' + $('#other_relative').val() + '&side_id=' + $('#side_id').val() + '&condition_id=' + $('#condition_id').val() + '&other_condition=' + $('#other_condition').val() + '&comments=' + $('#comments').val(),
 			'dataType': 'json',
 			'success': function(errors) {
 				if (errors.length == 0) {
@@ -223,37 +223,50 @@
 	});
 
 	$('a.editFamilyHistory').click(function(e) {
+		e.preventDefault();
+
 		var tr = $(this).closest('tr');
 		var history_id = $(this).attr('rel');
 
 		$('#edit_family_history_id').val(history_id);
-		var relative = tr.find('.relative').text();
 
-		$('#relative_id').children('option').map(function() {
-			if ($(this).text() == relative) {
-				$(this).attr('selected','selected');
-				updateSidesByRelative($(this).val(),function() {
-					var side = tr.find('.side').text();
-					$('#side_id').children('option').map(function() {
-						if ($(this).text() == side) {
-							$(this).attr('selected','selected');
-						}
-					});
-					var condition = tr.find('.condition').text();
-					$('#condition_id').children('option').map(function() {
-						if ($(this).text() == condition) {
-							$(this).attr('selected','selected');
-						}
-					});
-					$('#add_family_history #comments').val(tr.find('.comments').text());
-					$('#add_family_history').slideDown('fast');
-					$('#btn-add_family_history').attr('disabled',true);
-					$('#btn-add_family_history').addClass('disabled');
-				});
+		$('#relative_id').val(tr.data('relative_id'));
+
+		if ($('#relative_id').children('option:selected').text() == 'Other') {
+			$('#family-history-o-rel-wrapper').show();
+			$('#other_relative').val(tr.data('other_relative'));
+		} else {
+			$('#family-history-o-rel-wrapper').hide();
+			$('#other_relative').val('');
+		}
+
+		updateSidesByRelative($(this).val(),function() {
+			$('#side_id').val(tr.data('side_id'));
+			$('#condition_id').val(tr.data('condition_id'));
+
+			if ($('#condition_id').children('option:selected').text() == 'Other') {
+				$('#family-history-o-con-wrapper').show();
+				$('#other_condition').val(tr.data('other_condition'));
+			} else {
+				$('#family-history-o-con-wrapper').hide();
+				$('#other_condition').val('');
 			}
-		});
 
-		e.preventDefault();
+			$('#add_family_history #comments').val(tr.find('.comments').text());
+			$('#add_family_history').slideDown('fast');
+			$('#btn-add_family_history').attr('disabled',true);
+			$('#btn-add_family_history').addClass('disabled');
+		});
+	});
+
+	$('#condition_id').change(function(e) {
+		if ($(this).children('option:selected').data('other') == '1') {
+			$('#family-history-o-con-wrapper').show();
+			$('#other_condition').select().focus();
+		} else {
+			$('#family-history-o-con-wrapper').hide();
+			$('#other_condition').val('');
+		}
 	});
 
 	$('.removeFamilyHistory').live('click',function() {
@@ -300,6 +313,14 @@
 
 	$('#relative_id').change(function(e) {
 		updateSidesByRelative($(this).val(),false);
+
+		if ($(this).children('option:selected').data('other') == '1') {
+			$('#family-history-o-rel-wrapper').show();
+			$('#other_relative').select().focus();
+		} else {
+			$('#family-history-o-rel-wrapper').hide();
+			$('#other_relative').val('');
+		}
 	});
 
 	function updateSidesByRelative(relative_id,callback)
