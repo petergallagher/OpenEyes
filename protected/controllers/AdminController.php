@@ -179,7 +179,7 @@ class AdminController extends BaseAdminController
 		$request = Yii::app()->getRequest();
 
 		if ($request->getIsPostRequest()) {
-			$userAtt = $request->getPost( 'User');
+			$userAtt = $request->getPost('User');
 			$user->attributes = $userAtt;
 
 			if (!$user->validate()) {
@@ -190,8 +190,8 @@ class AdminController extends BaseAdminController
 				}
 				Audit::add('admin-User','add',$user->id);
 
-				if(!isset($userAtt['roles'])){
-					$userAtt['roles']=array();
+				if (!isset($userAtt['roles'])) {
+					$userAtt['roles'] = array();
 				}
 
 				$user->saveRoles($userAtt['roles']);
