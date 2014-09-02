@@ -286,6 +286,7 @@ class ProtectedFile extends BaseActiveRecordVersioned
 				'image/jpeg',
 				'image/gif',
 				'image/png',
+				'application/pdf',
 		));
 	}
 
@@ -427,7 +428,12 @@ class ProtectedFile extends BaseActiveRecordVersioned
 			$source = $this->getPath();
 
 			$img = new Imagick();
-			$img->readImage("{$source}[0]");
+			try {
+				$img->readImage("{$source}[0]");
+			} catch (ImagickException $e) {
+				return;
+			}
+
 			$img->setImageUnits(Imagick::RESOLUTION_PIXELSPERINCH);
 			$img->setImageResolution(80,80);
 			$img->setImageFormat('jpg');

@@ -75,9 +75,14 @@ class ProtectedFileController extends BaseController
 			throw new CHttpException(404, "File not found");
 		}
 		if (!$thumbnail = $file->getThumbnail($dimensions, true)) {
-			throw new CHttpException(404, "Thumbnail not available");
+			$mimetype = 'image/jpeg';
+			$thumbnail = array(
+				'size' => strlen(file_get_contents(Yii::app()->basePath."/assets/img/preview_unavailable.jpg")),
+				'path' => Yii::app()->basePath."/assets/img/preview_unavailable.jpg"
+			);
+		} else {
+			$mimetype = $file->mimetype == 'application/pdf' ? 'image/jpeg' : $file->mimetype;
 		}
-		$mimetype = $file->mimetype == 'application/pdf' ? 'image/jpeg' : $file->mimetype;
 
 		header('Content-Type: ' . $mimetype);
 		header('Expires: 0');
