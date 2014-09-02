@@ -997,10 +997,8 @@ class PatientController extends BaseController
 
 		$fh->patient_id = $_POST['patient_id'];
 		$fh->relative_id = $_POST['relative_id'];
-		$fh->other_relative = $_POST['other_relative'];
 		$fh->side_id = $_POST['side_id'];
 		$fh->condition_id = $_POST['condition_id'];
-		$fh->other_condition = $_POST['other_condition'];
 		$fh->comments = $_POST['comments'];
 
 		$errors = array();
@@ -1023,10 +1021,8 @@ class PatientController extends BaseController
 		$fh = new FamilyHistory;
 		$fh->patient_id = $_POST['patient_id'];
 		$fh->relative_id = $_POST['relative_id'];
-		$fh->other_relative = $_POST['other_relative'];
 		$fh->side_id = $_POST['side_id'];
 		$fh->condition_id = $_POST['condition_id'];
-		$fh->other_condition = $_POST['other_condition'];
 		$fh->comments = $_POST['comments'];
 
 		if (!$fh->validate()) {

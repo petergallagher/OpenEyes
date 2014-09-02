@@ -91,7 +91,7 @@ $(document).ready(function() {
 
 			for (var i in x) {
 				if (x[i] == 'admin') {
-					var object = x[parseInt(i)+1].replace(/s$/,'')+'s';
+					var object = x[parseInt(i)+1].replace(/s$/,'');
 				}
 			}
 		}

@@ -57,6 +57,18 @@ class AddingNewEventContext extends PageObjectContext
     }
 
     /**
+     * @Then /^I ensure that the Event page "([^"]*)" is displayed correctly$/
+     */
+    public function iEnsureThatTheEventPageIsDisplayedCorrectly($event)
+    {
+        /**
+         * @var AddingNewEvent $addNewEvent
+         */
+        $addNewEvent = $this->getPage('AddingNewEvent');
+        $addNewEvent->hasEventPageLoaded($event);
+    }
+
+    /**
      * @Then /^I expand the Cataract sidebar$/
      */
     public function iExpandTheCataractSidebar()

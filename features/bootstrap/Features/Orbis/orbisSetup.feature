@@ -1,4 +1,4 @@
-@orbisR2
+@orbisSetup
 Feature: Environment Setup on clean database
 
 Scenario: Environment Setup Broom Glaucoma
@@ -112,3 +112,5 @@ Then I enter Comments "This test is for Site 2 Kings, Firm 3 Anderson Glaucoma"
 And I select the Yes option for Ready to Discharge
 
 Then I Save the Event
+
+

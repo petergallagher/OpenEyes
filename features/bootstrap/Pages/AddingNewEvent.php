@@ -1,5 +1,5 @@
 <?php
-
+use Behat\Behat\Exception\BehaviorException;
 
 class AddingNewEvent extends OpenEyesPage
 {
@@ -19,6 +19,7 @@ class AddingNewEvent extends OpenEyesPage
         'addNewGlaucomaEventButton' => array('xpath' => "//*[@class='events-container show']//*[@data-attr-subspecialty-id=7]"),
         'addNewMedicalRetinalEventButton' => array('xpath' => "//*[@class='events-container show']//*[@data-attr-subspecialty-id=8]"),
         'addNewSupportFirmEventButton' => array('xpath' => "//*[@class='events-container show']//*[@data-attr-subspecialty-id='']"),
+//       EVENTS
         'anaestheticSatisfaction' => array ('xpath' => "//*[@id='add-new-event-dialog']//*[contains(text(), 'Anaesthetic Satisfaction Audit')]"),
         'anaestheticSatisfactionOrbis' => array('xpath' => "//*[@id='add-new-event-dialog']//*[contains(text(), 'Anaesthetic satisfaction audit')]"),
         'consentForm' => array('xpath' => "//*[@id='add-new-event-dialog']//*[contains(text(), 'Consent form')]"),
@@ -31,6 +32,16 @@ class AddingNewEvent extends OpenEyesPage
         'intravitreal' => array('xpath' => "//*[@id='add-new-event-dialog']//*[contains(text(), 'Intravitreal injection')]"),
         'laser' => array('xpath' => "//*[@id='add-new-event-dialog']//*[contains(text(), 'Laser')]"),
         'therapyApplication' => array('xpath' => "//*[@id='add-new-event-dialog']//*[contains(text(), 'Therapy Application')]"),
+//        ORBIS ONLY EVENTS
+        'anesthesiaPatientDischarge' => array ('xpath' => "//*[@id='add-new-event-dialog']//*[contains(text(), 'Anesthesia patient discharge')]"),
+        'anesthesiaPatientDischargeCheck' => array('xpath' => "//*[@class='event-title'][contains(text(),'Anesthesia patient discharge')]"),
+        'anesthesiaPreOpAssessment' => array('xpath' => "//*[@id='add-new-event-dialog']//*[contains(text(), 'Anesthesia pre-operative assessment')]"),
+        'anesthesiaPreOpAssessmentCheck' => array ('xpath' => "//*[@class='event-title'][contains(text(),'Anesthesia pre-operative assessment')]"),
+        'biometry' => array('xpath' => "//*[@id='add-new-event-dialog']//*[contains(text(), 'Biometry')]"),
+        'biometryCheck' => array ('xpath' => "//*[@class='event-title'][contains(text(),'Biometry44')]"),
+
+
+
     );
 
     public function addFirstNewEpisode()
@@ -87,7 +98,6 @@ class AddingNewEvent extends OpenEyesPage
         if ($event==="SatisfactionOrbis") {
             $this->getElement('anaestheticSatisfactionOrbis')->click();
         }
-
         if ($event==="Consent") {
             $this->getElement('consentForm')->click();
         }
@@ -118,5 +128,57 @@ class AddingNewEvent extends OpenEyesPage
         if ($event==="Therapy") {
             $this->getElement('therapyApplication')->click();
         }
+        if ($event==="Anaesthesia Patient Discharge") {
+            $this->getElement('anesthesiaPatientDischarge')->click();
+        }
+        if ($event==="Anaesthesia Pre Op Assessment") {
+            $this->getElement('anesthesiaPreOpAssessment')->click();
+        }
+        if ($event==="Biometry") {
+            $this->getElement('biometry')->click();
+        }
+        $this->getSession()->wait(5000, 'window.$ && $.active ==0');
     }
+
+    protected function hasPatientDischargeLoaded ()
+    {
+        return (bool) $this->find('xpath', $this->getElement('anesthesiaPatientDischargeCheck')->getXpath());
+    }
+    protected function hasAnesthesiaPreOpAssessmentLoaded ()
+    {
+        return (bool) $this->find('xpath', $this->getElement('anesthesiaPreOpAssessmentCheck')->getXpath());
+    }
+    protected function hasBiometryLoaded ()
+    {
+        return (bool) $this->find('xpath', $this->getElement('biometryCheck')->getXpath());
+    }
+
+    public function hasEventPageLoaded ($event)
+    {
+        if ($event==="Anaesthesia Patient Discharge")
+            if ($this->hasPatientDischargeLoaded()) {
+                print "$event Event page had been loaded";
+            }
+        else {
+            throw new BehaviorException ("$event Event has NOT BEEN DISPLAYED!!!");
+        }
+
+        if ($event==="Anaesthesia Pre Op Assessment")
+            if ($this->hasAnesthesiaPreOpAssessmentLoaded()) {
+                print "$event Event page had been loaded";
+            }
+            else {
+                throw new BehaviorException ("$event Event has NOT BEEN DISPLAYED!!!");
+        }
+
+        if ($event==="Biometry")
+            if ($this->hasBiometryLoaded()) {
+                print "$event Event page had been loaded";
+            }
+            else {
+                throw new BehaviorException ("$event Event has NOT BEEN DISPLAYED!!!");
+            }
+
+    }
+
 }
