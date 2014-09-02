@@ -23,3 +23,35 @@ Scenario: Ensure ALL Events are loaded correctly
   Then I expand the Glaucoma sidebar
   And I add a New Event "Biometry"
   Then I ensure that the Event page "Biometry" is displayed correctly
+
+  Then I expand the Glaucoma sidebar
+  Then I add a New Event "Nursing intra-operative record"
+  Then I ensure that the Event page "Nursing intra-operative record" is displayed correctly
+
+  Then I expand the Glaucoma sidebar
+  Then I add a New Event "Nursing post-operative record"
+  Then I ensure that the Event page "Nursing post-operative record" is displayed correctly
+
+  Then I expand the Glaucoma sidebar
+  Then I add a New Event "Nursing pre-operative assessment"
+  Then I ensure that the Event page "Nursing pre-operative assessment" is displayed correctly
+
+  Then I expand the Glaucoma sidebar
+  Then I add a New Event "Patient Admission"
+  Then I ensure that the Event page "Patient Admission" is displayed correctly
+
+  Then I expand the Glaucoma sidebar
+  Then I add a New Event "Patient Counseling"
+  Then I ensure that the Event page "Patient Counseling" is displayed correctly
+
+  Then I expand the Glaucoma sidebar
+  Then I add a New Event "Patient discharge instructions"
+  Then I ensure that the Event page "Patient discharge instructions" is displayed correctly
+
+  Then I expand the Glaucoma sidebar
+  Then I add a New Event "Patient Education"
+  Then I ensure that the Event page "Patient Education" is displayed correctly
+
+  Then I expand the Glaucoma sidebar
+  Then I add a New Event "Scan"
+  Then I ensure that the Event page "Scan" is displayed correctly

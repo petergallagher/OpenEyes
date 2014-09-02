@@ -38,7 +38,32 @@ class AddingNewEvent extends OpenEyesPage
         'anesthesiaPreOpAssessment' => array('xpath' => "//*[@id='add-new-event-dialog']//*[contains(text(), 'Anesthesia pre-operative assessment')]"),
         'anesthesiaPreOpAssessmentCheck' => array ('xpath' => "//*[@class='event-title'][contains(text(),'Anesthesia pre-operative assessment')]"),
         'biometry' => array('xpath' => "//*[@id='add-new-event-dialog']//*[contains(text(), 'Biometry')]"),
-        'biometryCheck' => array ('xpath' => "//*[@class='event-title'][contains(text(),'Biometry44')]"),
+        'biometryCheck' => array ('xpath' => "//*[@class='event-title'][contains(text(),'Biometry')]"),
+        'NursingIntraOperativeRecord' => array('xpath' => "//*[@id='add-new-event-dialog']//*[contains(text(), 'Nursing intra-operative record')]"),
+        'NursingIntraOperativeRecordCheck' => array('xpath' => "//*[@class='element-title'][contains(text(),'Create nursing intra-operative record')]"),
+        'NursingPostOperativeRecord' => array('xpath' => "//*[@id='add-new-event-dialog']//*[contains(text(), 'Nursing post-operative record')]"),
+        'NursingPostOperativeRecordCheck' => array('xpath' => "//*[@class='event-title'][contains(text(),'Nursing post-operative record')]"),
+        'NursingPreOperativeAssessment' => array('xpath' => "//*[@id='add-new-event-dialog']//*[contains(text(), 'Nursing pre-operative assessment')]"),
+        'NursingPreOperativeAssessmentCheck' => array('xpath' => "//*[@class='event-title'][contains(text(),'Nursing pre-operative assessment')]"),
+        'patientAdmission' => array ('xpath' => "//*[@id='add-new-event-dialog']//*[contains(text(), 'Patient admission')]"),
+        'patientAdmissionCheck' => array('xpath' => "//*[@class='event-title'][contains(text(),'Patient admission')]"),
+        'patientCounseling' => array ('xpath' => "//*[@id='add-new-event-dialog']//*[contains(text(), 'Patient counseling')]"),
+        'patientCounselingCheck' => array ('xpath' => "//*[@class='event-title'][contains(text(),'Patient counseling')]"),
+        'patientDischargeInstructions' => array ('xpath' => "//*[@id='add-new-event-dialog']//*[contains(text(), 'Patient discharge instructions')]"),
+        'patientDischargeInstructionsCheck' => array ('xpath' => "//*[@class='event-title'][contains(text(),'Patient discharge instructions')]"),
+        'patientEducation' => array ('xpath' => "//*[@id='add-new-event-dialog']//*[contains(text(), 'Patient education')]"),
+        'patientEducationCheck' => array ('xpath' => "//*[@class='event-title'][contains(text(),'Patient education')]"),
+        'scan' => array ('xpath' => "//*[@id='add-new-event-dialog']//*[contains(text(), 'Scan')]"),
+        'scanCheck' => array ('xpath' => "//*[@class='event-title'][contains(text(),'Scan')]"),
+
+
+
+
+
+
+
+
+
 
 
 
@@ -137,6 +162,38 @@ class AddingNewEvent extends OpenEyesPage
         if ($event==="Biometry") {
             $this->getElement('biometry')->click();
         }
+        if ($event==="Nursing intra-operative record") {
+            $this->getElement('NursingIntraOperativeRecord')->click();
+        }
+        if ($event==="Nursing post-operative record") {
+            $this->getElement('NursingPostOperativeRecord')->click();
+        }
+        if ($event==="Nursing pre-operative assessment") {
+            $this->getElement('NursingPreOperativeAssessment')->click();
+        }
+        if ($event==="Patient Admission") {
+            $this->getElement('patientAdmission')->click();
+        }
+        if ($event==="Patient Counseling") {
+            $element = $this->getElement('patientCounseling');
+            $this->scrollWindowToElement($element);
+            $element->click();
+        }
+        if ($event==="Patient discharge instructions") {
+            $element = $this->getElement('patientDischargeInstructions');
+            $this->scrollWindowToElement($element);
+            $element->click();
+        }
+        if ($event==="Patient Education") {
+            $element = $this->getElement('patientEducation');
+            $this->scrollWindowToElement($element);
+            $element->click();
+        }
+        if ($event==="Scan") {
+            $element = $this->getElement('scan');
+            $this->scrollWindowToElement($element);
+            $element->click();
+        }
         $this->getSession()->wait(5000, 'window.$ && $.active ==0');
     }
 
@@ -151,6 +208,38 @@ class AddingNewEvent extends OpenEyesPage
     protected function hasBiometryLoaded ()
     {
         return (bool) $this->find('xpath', $this->getElement('biometryCheck')->getXpath());
+    }
+    protected function hasNursingIntraOpRecordLoaded ()
+    {
+        return (bool) $this->find('xpath', $this->getElement('NursingIntraOperativeRecordCheck')->getXpath());
+    }
+    protected function hasNursingPostOpRecordLoaded ()
+    {
+        return (bool) $this->find('xpath', $this->getElement('NursingPostOperativeRecordCheck')->getXpath());
+    }
+    protected function hasNursingPreOperativeAssessmentLoaded ()
+    {
+        return (bool) $this->find('xpath', $this->getElement('NursingPreOperativeAssessmentCheck')->getXpath());
+    }
+    protected function hasPatientAdmissionLoaded ()
+    {
+        return (bool) $this->find('xpath', $this->getElement('patientAdmissionCheck')->getXpath());
+    }
+    protected function hasPatientCounselingLoaded ()
+    {
+        return (bool) $this->find('xpath', $this->getElement('patientCounselingCheck')->getXpath());
+    }
+    protected function hasPatientDischargeInstructionsLoaded ()
+    {
+        return (bool) $this->find('xpath', $this->getElement('patientDischargeInstructionsCheck')->getXpath());
+    }
+    protected function hasEducationLoaded ()
+    {
+        return (bool) $this->find('xpath', $this->getElement('patientEducationCheck')->getXpath());
+    }
+    protected function hasScanLoaded ()
+    {
+        return (bool) $this->find('xpath', $this->getElement('scanCheck')->getXpath());
     }
 
     public function hasEventPageLoaded ($event)
@@ -173,6 +262,70 @@ class AddingNewEvent extends OpenEyesPage
 
         if ($event==="Biometry")
             if ($this->hasBiometryLoaded()) {
+                print "$event Event page had been loaded";
+            }
+            else {
+                throw new BehaviorException ("$event Event has NOT BEEN DISPLAYED!!!");
+        }
+
+        if ($event==="Nursing intra-operative record")
+            if ($this->hasNursingIntraOpRecordLoaded()) {
+                print "$event Event page had been loaded";
+            }
+            else {
+                throw new BehaviorException ("$event Event has NOT BEEN DISPLAYED!!!");
+        }
+
+        if ($event==="Nursing post-operative record")
+            if ($this->hasNursingPostOpRecordLoaded()) {
+                print "$event Event page had been loaded";
+            }
+            else {
+                throw new BehaviorException ("$event Event has NOT BEEN DISPLAYED!!!");
+        }
+
+        if ($event==="NursingPreOperativeAssessment")
+            if ($this->hasNursingPreOperativeAssessmentLoaded()) {
+                print "$event Event page had been loaded";
+            }
+            else {
+                throw new BehaviorException ("$event Event has NOT BEEN DISPLAYED!!!");
+        }
+
+        if ($event==="Patient Admission")
+            if ($this->hasPatientAdmissionLoaded()) {
+                print "$event Event page had been loaded";
+            }
+            else {
+                throw new BehaviorException ("$event Event has NOT BEEN DISPLAYED!!!");
+        }
+
+        if ($event==="Patient Counseling")
+            if ($this->hasPatientCounselingLoaded()) {
+                print "$event Event page had been loaded";
+            }
+            else {
+                throw new BehaviorException ("$event Event has NOT BEEN DISPLAYED!!!");
+        }
+
+        if ($event==="Patient discharge instructions")
+            if ($this->hasPatientDischargeInstructionsLoaded()) {
+                print "$event Event page had been loaded";
+            }
+            else {
+                throw new BehaviorException ("$event Event has NOT BEEN DISPLAYED!!!");
+        }
+
+        if ($event==="patientEducation")
+            if ($this->hasEducationLoaded()) {
+                print "$event Event page had been loaded";
+            }
+            else {
+                throw new BehaviorException ("$event Event has NOT BEEN DISPLAYED!!!");
+        }
+
+        if ($event==="Scan")
+            if ($this->hasScanLoaded()) {
                 print "$event Event page had been loaded";
             }
             else {
