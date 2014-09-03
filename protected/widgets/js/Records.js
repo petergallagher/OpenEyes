@@ -278,7 +278,10 @@ $(document).ready(function() {
 			m = '0'+m;
 		}
 
+		var date = $.datepicker.formatDate('d M yy', d);
+
 		$(this).closest('div').find('.recordTime').val(h+':'+m);
+		$(this).closest('div').find('.recordTimestamp').val(date);
 	});
 
 	$('.recordsUseLastItemRow').unbind('click').click(function(e) {
