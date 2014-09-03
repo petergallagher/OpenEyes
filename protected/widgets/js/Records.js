@@ -264,7 +264,7 @@ $(document).ready(function() {
 		});
 	});
 
-	$('.recordsTimeNow').unbind('click').click(function(e) {
+	$('.time-now').unbind('click').click(function(e) {
 		e.preventDefault();
 
 		var d = new Date;
