@@ -1224,10 +1224,8 @@ class Patient extends BaseActiveRecordVersioned
 
 		$fh->patient_id = $this->id;
 		$fh->relative_id = $relative_id;
-		$fh->other_relative = $other_relative;
 		$fh->side_id = $side_id;
 		$fh->condition_id = $condition_id;
-		$fh->other_condition = $other_condition;
 		$fh->comments = $comments;
 
 		if (!$fh->save()) {
