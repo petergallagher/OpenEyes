@@ -77,6 +77,7 @@
 								<label></label>
 							</div>
 							<div class="<?php echo $form->columns('field');?>">
+								<input type="hidden" name="no_allergies" value="0" />
 								<?php echo CHtml::checkBox('no_allergies', $patient->no_allergies_date ? true : false); ?>
 								<label for="no_allergies">Confirm patient has no allergies:</label>
 							</div>

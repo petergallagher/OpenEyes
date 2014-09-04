@@ -178,7 +178,10 @@ class BaseEventTypeController extends BaseModuleController
 		if (!$this->patient = Patient::model()->findByPk($patient_id)) {
 			throw new CHttpException(404, 'Invalid patient_id.');
 		}
+	}
 
+	public function setPatientAllergies()
+	{
 		if (isset($_POST['Allergies_none'])) {
 			$assignments = array();
 			$allergies = array();
@@ -565,6 +568,7 @@ class BaseEventTypeController extends BaseModuleController
 		$this->moduleStateCssClass = 'edit';
 
 		$this->setPatient($_REQUEST['patient_id']);
+		$this->setPatientAllergies();
 
 		if (!$this->episode = $this->getEpisode()) {
 			$this->redirectToPatientEpisodes();
@@ -616,6 +620,8 @@ class BaseEventTypeController extends BaseModuleController
 		$this->moduleStateCssClass = 'edit';
 
 		$this->initWithEventId(@$_GET['id']);
+
+		$this->setPatientAllergies();
 	}
 
 	/**
@@ -1797,6 +1803,14 @@ class BaseEventTypeController extends BaseModuleController
 			}
 
 			PatientAllergyAssignment::model()->deleteAll($criteria);
+
+			if (count(PatientAllergyAssignment::model()->findAll('patient_id=?',array($this->patient->id))) == 0) {
+				$this->patient->no_allergies_date = null;
+
+				if (!$this->patient->save()) {
+					throw new Exception("Unable to save patient: ".print_r($this->patient->errors,true));
+				}
+			}
 		}
 	}
 }
