@@ -370,6 +370,8 @@ class JSONConverterTest extends \CDbTestCase
 		$resource->addresses[0]->zip = 'testing 5';
 		$resource->addresses[0]->country = 'United Kingdom';
 
+		$resource->hos_num = '343434';
+
 		$resource->gp_ref = \Yii::app()->service->Gp(1);
 		$resource->prac_ref = \Yii::app()->service->Practice(1);
 
@@ -380,7 +382,7 @@ class JSONConverterTest extends \CDbTestCase
 		$patient = \Patient::model()->findByPk($patient->id);
 
 		$this->assertEquals('54321',$patient->nhs_num);
-		$this->assertEquals('12345',$patient->hos_num);
+		$this->assertEquals('343434',$patient->hos_num);
 		$this->assertEquals('Mr',$patient->title);
 		$this->assertEquals('Aylward',$patient->last_name);
 		$this->assertEquals('Jim',$patient->first_name);
