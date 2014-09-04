@@ -18,7 +18,9 @@ namespace services;
 class PatientFamilyHistoryItem extends Resource
 {
 	public $relative;
+	public $other_relative;
 	public $side;
 	public $condition;
+	public $other_condition;
 	public $comments;
 }

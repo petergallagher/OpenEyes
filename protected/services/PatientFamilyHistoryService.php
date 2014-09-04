@@ -43,8 +43,10 @@ class PatientFamilyHistoryService extends DeclarativeModelService
 			),
 			'fields' => array(
 				'relative' => 'relative.name',
+				'other_relative' => 'other_relative',
 				'side' => 'side.name',
 				'condition' => 'condition.name',
+				'other_condition' => 'other_condition',
 				'comments' => 'comments',
 			),
 		),

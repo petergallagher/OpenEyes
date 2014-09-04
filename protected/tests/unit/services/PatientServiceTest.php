@@ -428,7 +428,7 @@ class PatientServiceTest extends \CDbTestCase
 
 	public function testJsonToModel_Save_Create_ModelCountsCorrect()
 	{
-		$json = '{"nhs_num":"54321","hos_num":"12345","title":"Mr","family_name":"Aylward","given_name":"Jim","gender_ref":{"service":"Gender","id":1},"birth_date":{"date":"1970-01-01","timezone_type":3,"timezone":"Europe/London"},"date_of_death":null,"primary_phone":"07123 456789","addresses":[{"date_start":{"date":"2014-06-06 16:39:29","timezone_type":3,"timezone":"Europe\/London"},"date_end":{"date":"2014-06-06 16:39:29","timezone_type":3,"timezone":"Europe\/London"},"correspond":false,"transport":false,"use":null,"line1":"flat 1","line2":"bleakley creek","city":"flitchley","state":"london","zip":"ec1v 0dx","country":"United States"}],"care_providers":[],"gp_ref":{"service":"Gp","id":1},"prac_ref":{"service":"Practice","id":1},"cb_refs":[],"contact_id":1030}';
+		$json = '{"nhs_num":"54321","hos_num":"34343","title":"Mr","family_name":"Aylward","given_name":"Jim","gender_ref":{"service":"Gender","id":1},"birth_date":{"date":"1970-01-01","timezone_type":3,"timezone":"Europe/London"},"date_of_death":null,"primary_phone":"07123 456789","addresses":[{"date_start":{"date":"2014-06-06 16:39:29","timezone_type":3,"timezone":"Europe\/London"},"date_end":{"date":"2014-06-06 16:39:29","timezone_type":3,"timezone":"Europe\/London"},"correspond":false,"transport":false,"use":null,"line1":"flat 1","line2":"bleakley creek","city":"flitchley","state":"london","zip":"ec1v 0dx","country":"United States"}],"care_providers":[],"gp_ref":{"service":"Gp","id":1},"prac_ref":{"service":"Practice","id":1},"cb_refs":[],"contact_id":1030}';
 
 		$total_patients = count(\Patient::model()->findAll());
 		$total_contacts = count(\Contact::model()->findAll());
@@ -449,14 +449,14 @@ class PatientServiceTest extends \CDbTestCase
 
 	public function testJsonToModel_Save_Create_DBIsCorrect()
 	{
-		$json = '{"nhs_num":"54321","hos_num":"12345","title":"Mr","family_name":"Aylward","given_name":"Jim","gender_ref":{"service":"Gender","id":1},"birth_date":{"date":"1970-01-01","timezone_type":3,"timezone":"Europe/London"},"date_of_death":null,"primary_phone":"07123 456789","addresses":[{"date_start":{"date":"2014-06-06 16:39:29","timezone_type":3,"timezone":"Europe\/London"},"date_end":{"date":"2014-06-06 16:39:29","timezone_type":3,"timezone":"Europe\/London"},"correspond":false,"transport":false,"use":null,"line1":"flat 1","line2":"bleakley creek","city":"flitchley","state":"london","zip":"ec1v 0dx","country":"United States"}],"care_providers":[],"gp_ref":{"service":"Gp","id":1},"prac_ref":{"service":"Practice","id":1},"cb_refs":[],"contact_id":1030}';
+		$json = '{"nhs_num":"54321","hos_num":"34343","title":"Mr","family_name":"Aylward","given_name":"Jim","gender_ref":{"service":"Gender","id":1},"birth_date":{"date":"1970-01-01","timezone_type":3,"timezone":"Europe/London"},"date_of_death":null,"primary_phone":"07123 456789","addresses":[{"date_start":{"date":"2014-06-06 16:39:29","timezone_type":3,"timezone":"Europe\/London"},"date_end":{"date":"2014-06-06 16:39:29","timezone_type":3,"timezone":"Europe\/London"},"correspond":false,"transport":false,"use":null,"line1":"flat 1","line2":"bleakley creek","city":"flitchley","state":"london","zip":"ec1v 0dx","country":"United States"}],"care_providers":[],"gp_ref":{"service":"Gp","id":1},"prac_ref":{"service":"Practice","id":1},"cb_refs":[],"contact_id":1030}';
 
 		$ps = new PatientService;
 		$patient = $ps->jsonToModel($json, new \Patient);
 		$patient = \Patient::model()->findByPk($patient->id);
 
 		$this->assertEquals('54321',$patient->nhs_num);
-		$this->assertEquals('12345',$patient->hos_num);
+		$this->assertEquals('34343',$patient->hos_num);
 		$this->assertEquals('Mr',$patient->title);
 		$this->assertEquals('Aylward',$patient->last_name);
 		$this->assertEquals('Jim',$patient->first_name);
@@ -629,5 +629,65 @@ class PatientServiceTest extends \CDbTestCase
 		
 		$this->assertCount(1, $patient->commissioningbody_assignments);
 		$this->assertEquals('Apple', $patient->commissioningbody_assignments[0]->commissioning_body->name);
+	}
+
+	public function testJsonToModel_Save_AllowDupeHosNums()
+	{
+		$resource = \Yii::app()->service->Patient(1)->fetch();
+
+		$resource->contact_id = null;
+		$resource->addresses[0] = new PatientAddress;
+		$resource->addresses[0]->date_start = new Date(date('Y-m-d'));
+		$resource->addresses[0]->date_end = new Date(date('Y-m-d'));
+		$resource->addresses[0]->line1 = 'testing 1';
+		$resource->addresses[0]->line2 = 'testing 2';
+		$resource->addresses[0]->city = 'testing 3';
+		$resource->addresses[0]->state = 'testing 4';
+		$resource->addresses[0]->zip = 'testing 5';
+		$resource->addresses[0]->country = 'United Kingdom';
+
+		$json = $resource->serialise();
+
+		$total_patients = count(\Patient::model()->findAll());
+
+		\Yii::app()->params['allow_duplicate_identifiers'] = true;
+
+		$jc = new JSONConverter(new PatientService);
+		$patient = $jc->jsonToModel($json, new \Patient);
+		$patient = \Patient::model()->findByPk($patient->id);
+
+		$this->assertEquals($total_patients+1, count(\Patient::model()->findAll()));
+	}
+
+	public function testJsonToModel_Save_NoDupeHosNums()
+	{
+		$resource = \Yii::app()->service->Patient(1)->fetch();
+
+		$resource->contact_id = null;
+		$resource->addresses[0] = new PatientAddress;
+		$resource->addresses[0]->date_start = new Date(date('Y-m-d'));
+		$resource->addresses[0]->date_end = new Date(date('Y-m-d'));
+		$resource->addresses[0]->line1 = 'testing 1';
+		$resource->addresses[0]->line2 = 'testing 2';
+		$resource->addresses[0]->city = 'testing 3';
+		$resource->addresses[0]->state = 'testing 4';
+		$resource->addresses[0]->zip = 'testing 5';
+		$resource->addresses[0]->country = 'United Kingdom';
+
+		$json = $resource->serialise();
+
+		$total_patients = count(\Patient::model()->findAll());
+
+		\Yii::app()->params['allow_duplicate_identifiers'] = false;
+
+		$this->setExpectedException('Exception','Validation failure on Patient: '.print_r(array(
+			'hos_num' => array('Hospital number "12345" has already been taken.')
+		),true));
+
+		$jc = new JSONConverter(new PatientService);
+		$patient = $jc->jsonToModel($json, new \Patient);
+		$patient = \Patient::model()->findByPk($patient->id);
+
+		$this->assertEquals($total_patients+1, count(\Patient::model()->findAll()));
 	}
 }

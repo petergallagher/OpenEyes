@@ -20,6 +20,7 @@ class PatientSocialHistoryServiceTest extends \CDbTestCase
 	public $fixtures = array(
 		'patients' => 'Patient',
 		'social_history' => 'SocialHistory',
+		'socialhistory_smoking_status' => 'SocialHistorySmokingStatus',
 	);
 
 	public function testModelToResource()
@@ -49,7 +50,7 @@ class PatientSocialHistoryServiceTest extends \CDbTestCase
 
 		$resource->occupation = 'Sickness';
 		$resource->driving_status = 'Motor vehicle';
-		$resource->smoking_status = 'Tons';
+		$resource->smoking_status = 'Smoker';
 		$resource->accommodation = 'Lives alone - coping';
 		$resource->comments = 'this is a really unnecessarily long comment';
 		$resource->type_of_job = 'shady';

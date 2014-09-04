@@ -20,6 +20,7 @@ class PatientFamilyHistoryServiceTest extends \CDbTestCase
 	public $fixtures = array(
 		'patients' => 'Patient',
 		'family_history' => 'FamilyHistory',
+		'family_history_relative' => 'FamilyHistoryRelative',
 	);
 
 	public function testModelToResource()
@@ -63,6 +64,7 @@ class PatientFamilyHistoryServiceTest extends \CDbTestCase
 		$history1->relative = 'Cousin';
 		$history1->side = 'Maternal';
 		$history1->condition = 'Other';
+		$history1->other_condition = 'Ebola';
 		$history1->comments = 'i am writing tests';
 
 		$history2 = new PatientFamilyHistoryItem;
@@ -303,7 +305,7 @@ class PatientFamilyHistoryServiceTest extends \CDbTestCase
 
 	public function testJsonToResource()
 	{
-		$json = '{"history":[{"relative":"Cousin","side":"Maternal","condition":"Other","comments":"i am writing tests","id":null,"last_modified":null},{"relative":"Grandmother","side":"Unknown","condition":"Cataract","comments":"i am writing more tests","id":null,"last_modified":null}],"id":null,"last_modified":null}';
+		$json = '{"history":[{"relative":"Cousin","other_relative":"","side":"Maternal","condition":"Other","other_condition":"leprosy","comments":"i am writing tests","id":null,"last_modified":null},{"relative":"Grandmother","other_relative":"","side":"Unknown","condition":"Cataract","other_condition":"","comments":"i am writing more tests","id":null,"last_modified":null}],"id":null,"last_modified":null}';
 
 		$ps = new PatientFamilyHistoryService;
 		$resource = $ps->jsonToResource($json);
@@ -315,6 +317,7 @@ class PatientFamilyHistoryServiceTest extends \CDbTestCase
 		$this->assertEquals('Cousin',$resource->history[0]->relative);
 		$this->assertEquals('Maternal',$resource->history[0]->side);
 		$this->assertEquals('Other',$resource->history[0]->condition);
+		$this->assertEquals('leprosy',$resource->history[0]->other_condition);
 		$this->assertEquals('i am writing tests',$resource->history[0]->comments);
 
 		$this->assertInstanceOf('services\PatientFamilyHistoryItem',$resource->history[1]);
@@ -326,7 +329,7 @@ class PatientFamilyHistoryServiceTest extends \CDbTestCase
 
 	public function testJsonToModel_NoSave_NoNewRows()
 	{
-		$json = '{"history":[{"relative":"Cousin","side":"Maternal","condition":"Other","comments":"i am writing tests","id":null,"last_modified":null},{"relative":"Grandmother","side":"Unknown","condition":"Cataract","comments":"i am writing more tests","id":null,"last_modified":null}],"id":null,"last_modified":null}';
+		$json = '{"history":[{"relative":"Cousin","other_relative":"","side":"Maternal","condition":"Other","other_condition":"leprosy","comments":"i am writing tests","id":null,"last_modified":null},{"relative":"Grandmother","other_relative":"","side":"Unknown","condition":"Cataract","other_condition":"","comments":"i am writing more tests","id":null,"last_modified":null}],"id":null,"last_modified":null}';
 
 		$total_fh = count(\FamilyHistory::model()->findAll());
 
@@ -338,7 +341,7 @@ class PatientFamilyHistoryServiceTest extends \CDbTestCase
 
 	public function testJsonToModel_NoSave_ModelIsCorrect()
 	{
-		$json = '{"history":[{"relative":"Cousin","side":"Maternal","condition":"Other","comments":"i am writing tests","id":null,"last_modified":null},{"relative":"Grandmother","side":"Unknown","condition":"Cataract","comments":"i am writing more tests","id":null,"last_modified":null}],"id":null,"last_modified":null}';
+		$json = '{"history":[{"relative":"Cousin","other_relative":"","side":"Maternal","condition":"Other","other_condition":"leprosy","comments":"i am writing tests","id":null,"last_modified":null},{"relative":"Grandmother","other_relative":"","side":"Unknown","condition":"Cataract","other_condition":"","comments":"i am writing more tests","id":null,"last_modified":null}],"id":null,"last_modified":null}';
 
 		$ps = new PatientFamilyHistoryService;
 		$patient = $ps->jsonToModel($json, $this->patients('patient2'), false);
@@ -373,7 +376,7 @@ class PatientFamilyHistoryServiceTest extends \CDbTestCase
 
 	public function testJsonToModel_Save_Create_ModelCountsCorrect()
 	{
-		$json = '{"history":[{"relative":"Cousin","side":"Maternal","condition":"Other","comments":"i am writing tests","id":null,"last_modified":null},{"relative":"Grandmother","side":"Unknown","condition":"Cataract","comments":"i am writing more tests","id":null,"last_modified":null}],"id":null,"last_modified":null}';
+		$json = '{"history":[{"relative":"Cousin","other_relative":"","side":"Maternal","condition":"Other","other_condition":"leprosy","comments":"i am writing tests","id":null,"last_modified":null},{"relative":"Grandmother","other_relative":"","side":"Unknown","condition":"Cataract","other_condition":"","comments":"i am writing more tests","id":null,"last_modified":null}],"id":null,"last_modified":null}';
 
 		$total_fh = count(\FamilyHistory::model()->findAll());
 
@@ -385,8 +388,7 @@ class PatientFamilyHistoryServiceTest extends \CDbTestCase
 
 	public function testJsonToModel_Save_Create_ModelIsCorrect()
 	{
-		$json = '{"history":[{"relative":"Cousin","side":"Maternal","condition":"Other","comments":"i am writing tests","id":null,"last_modified":null},{"relative":"Grandmother","side":"Unknown","condition":"Cataract","comments":"i am writing more tests","id":null,"last_modified":null
-}],"id":null,"last_modified":null}';
+		$json = '{"history":[{"relative":"Cousin","other_relative":"","side":"Maternal","condition":"Other","other_condition":"leprosy","comments":"i am writing tests","id":null,"last_modified":null},{"relative":"Grandmother","other_relative":"","side":"Unknown","condition":"Cataract","other_condition":"","comments":"i am writing more tests","id":null,"last_modified":null}],"id":null,"last_modified":null}';
 
 		$ps = new PatientFamilyHistoryService;
 		$patient = $ps->jsonToModel($json, $this->patients('patient2'));
@@ -418,7 +420,7 @@ class PatientFamilyHistoryServiceTest extends \CDbTestCase
 
 	public function testJsonToModel_Save_Create_DBIsCorrect()
 	{
-		$json = '{"history":[{"relative":"Cousin","side":"Maternal","condition":"Other","comments":"i am writing tests","id":null,"last_modified":null},{"relative":"Grandmother","side":"Unknown","condition":"Cataract","comments":"i am writing more tests","id":null,"last_modified":null}],"id":null,"last_modified":null}';
+		$json = '{"history":[{"relative":"Cousin","other_relative":"","side":"Maternal","condition":"Other","other_condition":"leprosy","comments":"i am writing tests","id":null,"last_modified":null},{"relative":"Grandmother","other_relative":"","side":"Unknown","condition":"Cataract","other_condition":"","comments":"i am writing more tests","id":null,"last_modified":null}],"id":null,"last_modified":null}';
 
 		$ps = new PatientFamilyHistoryService;
 		$patient = $ps->jsonToModel($json, $this->patients('patient2'));
@@ -451,7 +453,7 @@ class PatientFamilyHistoryServiceTest extends \CDbTestCase
 
 	public function testJsonToModel_Save_Update_ModelCountsCorrect()
 	{
-		$json = '{"history":[{"relative":"Cousin","side":"Maternal","condition":"Other","comments":"i am writing tests","id":null,"last_modified":null},{"relative":"Grandmother","side":"Unknown","condition":"Cataract","comments":"i am writing more tests","id":null,"last_modified":null}],"id":null,"last_modified":null}';
+		$json = '{"history":[{"relative":"Cousin","other_relative":"","side":"Maternal","condition":"Other","other_condition":"leprosy","comments":"i am writing tests","id":null,"last_modified":null},{"relative":"Grandmother","other_relative":"","side":"Unknown","condition":"Cataract","other_condition":"","comments":"i am writing more tests","id":null,"last_modified":null}],"id":null,"last_modified":null}';
 
 		$total_fh = count(\FamilyHistory::model()->findAll());
 
@@ -463,7 +465,7 @@ class PatientFamilyHistoryServiceTest extends \CDbTestCase
 
 	public function testJsonToModel_Save_Update_ModelIsCorrect()
 	{
-		$json = '{"history":[{"relative":"Cousin","side":"Maternal","condition":"Other","comments":"i am writing tests","id":null,"last_modified":null},{"relative":"Grandmother","side":"Unknown","condition":"Cataract","comments":"i am writing more tests","id":null,"last_modified":null}],"id":null,"last_modified":null}';
+		$json = '{"history":[{"relative":"Cousin","other_relative":"","side":"Maternal","condition":"Other","other_condition":"leprosy","comments":"i am writing tests","id":null,"last_modified":null},{"relative":"Grandmother","other_relative":"","side":"Unknown","condition":"Cataract","other_condition":"","comments":"i am writing more tests","id":null,"last_modified":null}],"id":null,"last_modified":null}';
 
 		$ps = new PatientFamilyHistoryService;
 		$patient = $ps->jsonToModel($json, $this->patients('patient1'));
@@ -498,7 +500,7 @@ class PatientFamilyHistoryServiceTest extends \CDbTestCase
 
 	public function testJsonToModel_Save_Update_DBIsCorrect()
 	{
-		$json = '{"history":[{"relative":"Cousin","side":"Maternal","condition":"Other","comments":"i am writing tests","id":null,"last_modified":null},{"relative":"Grandmother","side":"Unknown","condition":"Cataract","comments":"i am writing more tests","id":null,"last_modified":null}],"id":null,"last_modified":null}';
+		$json = '{"history":[{"relative":"Cousin","other_relative":"","side":"Maternal","condition":"Other","other_condition":"leprosy","comments":"i am writing tests","id":null,"last_modified":null},{"relative":"Grandmother","other_relative":"","side":"Unknown","condition":"Cataract","other_condition":"","comments":"i am writing more tests","id":null,"last_modified":null}],"id":null,"last_modified":null}';
 
 		$ps = new PatientFamilyHistoryService;
 		$patient = $ps->jsonToModel($json, $this->patients('patient1'));

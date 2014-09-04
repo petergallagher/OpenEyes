@@ -16,45 +16,26 @@
  * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
  * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
  */
+
 return array(
-	'fhr1' => array(
+	array(
 		'id' => 1,
-		'name' => 'Mother',
-		'display_order' => 1
+		'name' => 'Non-smoker',
 	),
-	'fhr2' => array(
+	array(
 		'id' => 2,
-		'name' => 'Father',
-		'display_order' => 2
+		'name' => 'Smoker',
 	),
-	'fhr3' => array(
+	array(
 		'id' => 3,
-		'name' => 'Brother',
-		'display_order' => 3
+		'name' => 'Ex smoker',
 	),
-	'fhr4' => array(
+	array(
 		'id' => 4,
-		'name' => 'Cousin',
-		'display_order' => 4
+		'name' => 'Never smoked tobacco',
 	),
-	'fhr5' => array(
+	array(
 		'id' => 5,
-		'name' => 'Uncle',
-		'display_order' => 5,
-	),
-	'fhr6' => array(
-		'id' => 6,
-		'name' => 'Aunt',
-		'display_order' => 6,
-	),
-	'fhr7' => array(
-		'id' => 7,
-		'name' => 'Grandmother',
-		'display_order' => 7,
-	),
-	'fhr8' => array(
-		'id' => 8,
-		'name' => 'Grandfather',
-		'display_order' => 8,
+		'name' => 'Tobacco smoking consumption unknown',
 	),
 );
