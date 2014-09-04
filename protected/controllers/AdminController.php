@@ -179,7 +179,7 @@ class AdminController extends BaseAdminController
 		$request = Yii::app()->getRequest();
 
 		if ($request->getIsPostRequest()) {
-			$userAtt = $request->getPost( 'User');
+			$userAtt = $request->getPost('User');
 			$user->attributes = $userAtt;
 
 			if (!$user->validate()) {

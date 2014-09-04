@@ -84,6 +84,8 @@ class FamilyHistory extends BaseActiveRecordVersioned
 			'relative_id' => 'Relative',
 			'side_id' => 'Side',
 			'condition_id' => 'Condition',
+			'other_relative' => 'Other relative',
+			'other_condition' => 'Other condition',
 		);
 	}
 
@@ -111,6 +113,18 @@ class FamilyHistory extends BaseActiveRecordVersioned
 		if ($this->relative && $this->side) {
 			if (!$this->side->always_show && !FamilyHistoryRelativeSide::model()->find('relative_id=? and side_id=?',array($this->relative_id,$this->side_id))) {
 				$this->addError('side_id','Side cannot be '.$this->side->name.' when relative is '.$this->relative->name);
+			}
+		}
+
+		if ($this->relative && $this->relative->name == 'Other') {
+			if (!$this->other_relative) {
+				$this->addError('other_relative',$this->getAttributeLabel('other_relative').' cannot be blank');
+			}
+		}
+
+		if ($this->condition && $this->condition->name == 'Other') {
+			if (!$this->other_condition) {
+				$this->addError('other_condition',$this->getAttributeLabel('other_condition').' cannot be blank');
 			}
 		}
 

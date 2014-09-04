@@ -33,6 +33,7 @@ class MultiSelectList extends BaseFieldWidget
 	public $showNonePlaceholder = false;
 	public $extra_fields = false;
 	public $input_class = false;
+	public $option_id_field = 'id';
 
 	public static $fieldNames = array();
 
@@ -50,8 +51,8 @@ class MultiSelectList extends BaseFieldWidget
 				}
 			} else if ($this->element && $this->relation && $this->element->{$this->relation}) {
 				foreach ($this->element->{$this->relation} as $item) {
-					$this->selected_ids[] = $item->id;
-					unset($this->filtered_options[$item->id]);
+					$this->selected_ids[] = $item->{$this->option_id_field};
+					unset($this->filtered_options[$item->{$this->option_id_field}]);
 				}
 			} else if (!$this->element || !$this->element->id) {
 				if (is_array($this->default_options)) {
