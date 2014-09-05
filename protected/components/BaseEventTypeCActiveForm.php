@@ -19,6 +19,25 @@
 
 class BaseEventTypeCActiveForm extends FormLayout
 {
+
+	public function addWidget($type,$options)
+	{
+		if((array_key_exists('element',$options) && array_key_exists('field',$options)) && !array_key_exists('name',$options)) {
+			$field = $options['field'];
+			$options['name'] = CHtml::modelName($options['element'])."[$field]";
+		}
+
+		if(!array_key_exists('htmlOptions',$options)) {
+			$options['htmlOptions']=$this->layoutColumns;
+		}
+
+		if(!array_key_exists('layoutColumns',$options)) {
+			$options['layoutColumns']=$this->htmlOptions;
+		}
+
+		$this->widget("application.widgets.$type", $options);
+	}
+
 	public function dropDownList($model, $field, $data, $htmlOptions=array(), $hidden=false, $layoutColumns=array())
 	{
 		$this->widget('application.widgets.DropDownList', array(
