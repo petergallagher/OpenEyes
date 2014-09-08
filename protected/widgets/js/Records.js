@@ -150,13 +150,15 @@ $(document).ready(function() {
 
 		data += '&patient_id=' + OE_patient_id;
 
-		var i = table.children('tbody').children('tr:last').data('i');
+		i = 0;
 
-		if (typeof(i) == 'undefined') {
-			i = 0;
-		} else {
-			i = parseInt(i) + 1;
-		}
+		table.children('tbody').children('tr').map(function() {
+			if (typeof($(this).data('i')) != 'undefined') {
+				if (parseInt($(this).data('i')) >= i) {
+					i = parseInt($(this).data('i')) + 1;
+				}
+			}
+		});
 
 		$.ajax({
 			'type': 'POST',
