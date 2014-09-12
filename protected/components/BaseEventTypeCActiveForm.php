@@ -19,6 +19,15 @@
 
 class BaseEventTypeCActiveForm extends FormLayout
 {
+
+	public function activeWidget($className,$element,$field,$properties=array(),$captureOutput=false)
+	{
+		$properties['element'] = $element;
+		$properties['field'] = $field;
+
+		return parent::widget($className,$properties,$captureOutput);
+	}
+
 	public function dropDownList($model, $field, $data, $htmlOptions=array(), $hidden=false, $layoutColumns=array())
 	{
 		$this->widget('application.widgets.DropDownList', array(
