@@ -30,17 +30,20 @@
 				$assetpath = '/assets/';
 			}
 			// temporary hack to ensure that we are checking the right operation name for the event.
-			$oprn = 'OprnCreate' . ($eventType->class_name == 'OphDrPrescription' ? 'Prescription' : 'Event');
-			if ($this->checkAccess($oprn, $this->firm, Episode::getCurrentEpisodeByFirm($this->patient->id, $this->firm), $eventType)) {
-
+			$oprn_create = 'OprnCreate' . ($eventType->class_name == 'OphDrPrescription' ? 'Prescription' : 'Event');
+			$oprn_view = 'OprnViewEvent';
+			if ($this->checkAccess($oprn_create, $this->firm, Episode::getCurrentEpisodeByFirm($this->patient->id, $this->firm), $eventType)) {
 				?>
 				<li>
 					<?php echo CHtml::link('<img src="'.$assetpath.'small.png" alt="operation" /> - <strong>'.$eventType->name.'</strong>',Yii::app()->createUrl($eventType->class_name.'/Default/create').'?patient_id='.$patient->id)?>
 				</li>
-			<?php } else { ?>
-				<li id="<?php echo $eventType->class_name?>_disabled" class="add_event_disabled" title="<?php echo $eventType->disabled ? $eventType->disabled_title : 'You do not have permission to add ' . $eventType->name ?>">
-					<?php echo CHtml::link('<img src="'.$assetpath.'small.png" alt="operation" /> - <strong>'.$eventType->name.'</strong>','#')?>
-				</li>
+			<?php } else {
+				if ($this->checkAccess($oprn_view, $this->firm, Episode::getCurrentEpisodeByFirm($this->patient->id, $this->firm), $eventType)) {
+					?>
+					<li id="<?php echo $eventType->class_name?>_disabled" class="add_event_disabled" title="<?php echo $eventType->disabled ? $eventType->disabled_title : 'You do not have permission to add ' . $eventType->name ?>">
+						<?php echo CHtml::link('<img src="'.$assetpath.'small.png" alt="operation" /> - <strong>'.$eventType->name.'</strong>','#')?>
+					</li>
+				<?php }?>
 			<?php }?>
 		<?php }?>
 	<?php }?>
