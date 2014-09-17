@@ -30,6 +30,7 @@
 				$assetpath = '/assets/';
 			}
 			// temporary hack to ensure that we are checking the right operation name for the event.
+			// this hack can be fixed once genetics is merged
 			$oprn_create = 'OprnCreate' . ($eventType->class_name == 'OphDrPrescription' ? 'Prescription' : 'Event');
 			$oprn_view = 'OprnViewEvent';
 			if ($this->checkAccess($oprn_create, $this->firm, Episode::getCurrentEpisodeByFirm($this->patient->id, $this->firm), $eventType)) {
