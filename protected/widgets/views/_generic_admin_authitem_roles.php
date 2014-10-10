@@ -16,16 +16,11 @@
  * @copyright Copyright (c) 2011-2013, OpenEyes Foundation
  * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
  */
-?>
-<?php
-if (!isset($id) && isset($this->event_type)) {
-	$id = $this->event_type->class_name.'_print';
+
+$htmlOptions = @$disabled ? array('disabled' => 'disabled') : array();
+if (isset($params['empty'])) {
+	$htmlOptions['empty'] = $params['empty'];
 }
-?>
-<div class="container main" id="<?php echo @$id;?>" style="margin-bottom: 10em;">
-	<?php $this->renderPartial('//print/event_header')?>
-	<?php $this->renderPartial('//print/event_content', array(
-		'hide_modified' => @$hide_modified,
-		'hide_created' => @$hide_created
-	));?>
-</div>
+$value = $row ? $row->{$params['field']} : '';
+$data = AuthItem::model()->findAll(array('condition' => 'type=2','order' => 'name asc'));
+echo CHtml::dropDownList($params['field'].'[]',$value,CHtml::listData($data,'name','name'),$htmlOptions);
