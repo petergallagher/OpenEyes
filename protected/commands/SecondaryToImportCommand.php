@@ -31,7 +31,10 @@ Import data from csv that defines disorders to appear as "secondary to" options 
 for importing secondary to options where data has already been set up for the common opthalmic disoders. The secondary to feature was a later
 addition to the drop down list short cut in diagnosis selection.
 
+if reset_parent is set to true, then all current common disorders for any subspecialty in the import file will be removed.
+
 EOH;
+
 	}
 
 	public $reset_parent = false;
@@ -79,7 +82,7 @@ EOH;
 					$record = str_getcsv($line, ',', '"');
 					$data = array();
 					foreach ($columns as $i => $col) {
-						$data[$col] = $record[$i];
+						$data[$col] = @$record[$i];
 					}
 					if (!$subspecialty = $this->getSubspecialty($data['subspecialty_code'])) {
 						$warnings[] = "no subspecialty found for {$data['subspecialty_code']}";
@@ -166,10 +169,21 @@ EOH;
 	{
 		$key = "{$disorder_id}:{$subspecialty->id}";
 		if (!array_key_exists($key, $this->cod)) {
-			if (!$cod = CommonOphthalmicDisorder::model()->findByAttributes(array('disorder_id' => $disorder_id, 'subspecialty_id' => $subspecialty->id))
-				&& $this->reset_parent) {
+			$criteria = new CDbCriteria;
+			$criteria->addCondition('subspecialty_id = :si');
+			$criteria->params[':si'] = $subspecialty->id;
+			if ($disorder_id == 'null') {
+				$criteria->addCondition('disorder_id is null');
+			} else {
+				$criteria->addCondition('disorder_id = :di');
+				$criteria->params[':di'] = $disorder_id;
+			}
+
+			if (!$cod = CommonOphthalmicDisorder::model()->find($criteria) && $this->reset_parent) {
+				$_disorder_id = Disorder::model()->findByPk($disorder_id) ? $disorder_id : null;
+
 				$cod = new CommonOphthalmicDisorder();
-				$cod->disorder_id = $disorder_id;
+				$cod->disorder_id = $_disorder_id;
 				$cod->subspecialty_id = $subspecialty->id;
 				$cod->save();
 			}

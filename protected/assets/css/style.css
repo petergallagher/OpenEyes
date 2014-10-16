@@ -1922,88 +1922,92 @@ table.patient-episodes .speciality td {
 table.patient-data th, table.patient-data td {
   background: #fff;
 }
+/* line 260, ../sass/openeyes/components/_tables.scss */
+table.patient-data .driving_statuses {
+  vertical-align: top;
+}
 
-/* line 265, ../sass/openeyes/components/_tables.scss */
+/* line 268, ../sass/openeyes/components/_tables.scss */
 table.patient-contacts {
   margin-top: 10px;
 }
-/* line 267, ../sass/openeyes/components/_tables.scss */
+/* line 270, ../sass/openeyes/components/_tables.scss */
 table.patient-contacts td {
   font-size: 0.6875rem;
 }
-/* line 270, ../sass/openeyes/components/_tables.scss */
+/* line 273, ../sass/openeyes/components/_tables.scss */
 table.patient-contacts th, table.patient-contacts td {
   padding-left: 10px;
   padding-right: 10px;
 }
-/* line 274, ../sass/openeyes/components/_tables.scss */
+/* line 277, ../sass/openeyes/components/_tables.scss */
 table.patient-contacts td:first-child {
   font-size: 0.8125rem;
 }
 
-/* line 314, ../sass/openeyes/components/_tables.scss */
+/* line 317, ../sass/openeyes/components/_tables.scss */
 table.audit-logs tr.even.green {
   background-color: #c6ebb9;
 }
-/* line 317, ../sass/openeyes/components/_tables.scss */
+/* line 320, ../sass/openeyes/components/_tables.scss */
 table.audit-logs tr.odd.green {
   background-color: #e0f8d8;
 }
-/* line 320, ../sass/openeyes/components/_tables.scss */
+/* line 323, ../sass/openeyes/components/_tables.scss */
 table.audit-logs tr.even.red {
   background-color: #eba694;
 }
-/* line 323, ../sass/openeyes/components/_tables.scss */
+/* line 326, ../sass/openeyes/components/_tables.scss */
 table.audit-logs tr.odd.red {
   background-color: #e9c2b8;
 }
-/* line 328, ../sass/openeyes/components/_tables.scss */
+/* line 331, ../sass/openeyes/components/_tables.scss */
 table.log-details {
   width: 100%;
   table-layout: fixed;
 }
-/* line 331, ../sass/openeyes/components/_tables.scss */
+/* line 334, ../sass/openeyes/components/_tables.scss */
 table.log-details th {
   vertical-align: top;
   width: 9%;
 }
-/* line 335, ../sass/openeyes/components/_tables.scss */
+/* line 338, ../sass/openeyes/components/_tables.scss */
 table.log-details .data {
   overflow-x: auto;
   padding-bottom: 1px;
 }
 
-/* line 343, ../sass/openeyes/components/_tables.scss */
+/* line 346, ../sass/openeyes/components/_tables.scss */
 table.grid {
   border: solid 1px #ddd;
 }
-/* line 348, ../sass/openeyes/components/_tables.scss */
+/* line 351, ../sass/openeyes/components/_tables.scss */
 table.grid tr {
   border-bottom: 1px solid #CCD;
 }
-/* line 350, ../sass/openeyes/components/_tables.scss */
+/* line 353, ../sass/openeyes/components/_tables.scss */
 table.grid tr:last-child {
   border: 0;
 }
-/* line 354, ../sass/openeyes/components/_tables.scss */
+/* line 357, ../sass/openeyes/components/_tables.scss */
 table.grid th, table.grid td {
   border-right: 1px solid #CCD;
 }
-/* line 358, ../sass/openeyes/components/_tables.scss */
+/* line 361, ../sass/openeyes/components/_tables.scss */
 table.grid th:last-child,
 table.grid td:last-child {
   border-right: none;
 }
-/* line 361, ../sass/openeyes/components/_tables.scss */
+/* line 364, ../sass/openeyes/components/_tables.scss */
 table.grid tfoot {
   border-top: 1px solid #dddddd;
 }
-/* line 363, ../sass/openeyes/components/_tables.scss */
+/* line 366, ../sass/openeyes/components/_tables.scss */
 table.grid tfoot tr {
   border-bottom: 0;
 }
 @media print {
-  /* line 368, ../sass/openeyes/components/_tables.scss */
+  /* line 371, ../sass/openeyes/components/_tables.scss */
   table.grid th {
     border-bottom: 1px solid #CCD;
   }
