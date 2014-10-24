@@ -33,6 +33,11 @@
  */
 class CommonOphthalmicDisorder extends BaseActiveRecordVersioned
 {
+	const SELECTION_LABEL_FIELD = 'disorder_id';
+	const SELECTION_LABEL_RELATION = 'disorder';
+	const SELECTION_ORDER = 'subspecialty.name, t.display_order';
+	const SELECTION_WITH = 'subspecialty';
+
 	/**
 	 * Returns the static model of the specified AR class.
 	 * @return CommonOphthalmicDisorder the static model class
@@ -48,6 +53,11 @@ class CommonOphthalmicDisorder extends BaseActiveRecordVersioned
 	public function tableName()
 	{
 		return 'common_ophthalmic_disorder';
+	}
+
+	public function defaultScope()
+	{
+		return array('order' => $this->getTableAlias(true, false) . '.display_order');
 	}
 
 	/**
@@ -144,7 +154,7 @@ class CommonOphthalmicDisorder extends BaseActiveRecordVersioned
 		$disorders = array();
 		$secondary_to = array();
 		if ($ss_id = $firm->getSubspecialtyID()) {
-			$cods = self::model()->with(array('disorder', 'secondary_to_disorders'))->findAllByAttributes(array('subspecialty_id' => $ss_id), array('order' => 'disorder.term'));
+			$cods = self::model()->with(array('disorder', 'secondary_to_disorders'))->findAllByAttributes(array('subspecialty_id' => $ss_id));
 			foreach ($cods as $cod) {
 				$disorders[] = $cod->disorder;
 				if ($secondary_tos = $cod->secondary_to_disorders) {
@@ -170,5 +180,18 @@ class CommonOphthalmicDisorder extends BaseActiveRecordVersioned
 		}
 
 		return array($_disorders, $_secondary);
+	}
+
+	public function getSelectionLabel() {
+
+		$lbl = $this->subspecialty->name . " - ";
+
+		if ($this->disorder) {
+			$lbl .= $this->disorder->term;
+		}
+		else {
+			$lbl .= 'None';
+		}
+		return $lbl;
 	}
 }
