@@ -25,7 +25,7 @@
 <div class="panel patient<?php if ($warnings) echo " warning" ?>" id="patientID">
 	<div class="patient-details">
 		<?php
-			$display_name = ($this->patient->getDisplayName()) ? $this->patient->getDisplayName() : $this->patient->hos_num;
+			$display_name = ($this->patient->getDisplayName()) ? $this->patient->getDisplayName() : '<span class="patient-id">ID: '.$this->patient->hos_num.'</span>';
 			echo CHtml::link($display_name, array('/patient/view/'.$this->patient->id))
 		?>
 		<span class="patient-age">(<?php if ($this->patient->isDeceased()) { ?>Deceased<?php } else { echo $this->patient->getAge(); } ?>)</span>
