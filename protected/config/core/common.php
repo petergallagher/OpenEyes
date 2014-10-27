@@ -290,5 +290,12 @@ return array(
 		'html_autocomplete' => 'off',
 		'hide_missing_demographics' => false,
 		'hide_patientsummary_forms'=> false,
+		'search_tabs' => array(
+			'main' => array(
+				'title' => 'OpenEyes search',
+				'url' => '/',
+				'position' => 0,
+			)
+		),
 	),
 );

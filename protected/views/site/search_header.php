@@ -12,21 +12,15 @@
  * @copyright Copyright (C) 2014, OpenEyes Foundation
  * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
  */
+
+$tabs = array_filter(Yii::app()->params['search_tabs'], function ($tab) { return $tab['position'] !== null; });
+usort($tabs, function ($a, $b) { return ($a['position'] < $b['position']) ? -1 : 1; });
 ?>
 <h1 class="badge">Search</h1>
-<?php if (($tabs = Yii::app()->params['search_tabs'])): ?>
+<?php if (count($tabs) > 1): ?>
 	<div class="row">
 		<div class="large-8 large-centered column panel">
 			<ul class="inline-list tabs search">
-				<?php
-					$tabs[] = array(
-						'title' => 'OpenEyes search',
-						'url' => '/',
-						'position' => 0,
-					);
-
-					usort($tabs, function ($a, $b) { return ($a['position'] < $b['position']) ? -1 : 1; });
-				?>
 				<?php foreach ($tabs as $tab): ?>
 					<li<?php if ($tab['url'] == Yii::app()->request->requestUri) echo ' class="selected"' ?> >
 						<a href="<?= $tab['url'] ?>"><?= CHtml::encode($tab['title']) ?></a>
