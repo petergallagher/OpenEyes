@@ -17,6 +17,9 @@
  * @license http://www.gnu.org/licenses/gpl-3.0.html The GNU General Public License V3.0
  */
 ?>
+<?php
+	if(!Yii::app()->params['hide_missing_demographics'] || $this->patient->primary_phone || !empty($this->patient->contact->address->email)) {
+?>
 <section class="box patient-info js-toggle-container">
 	<h3 class="box-title">Contact details:</h3>
 	<a href="#" class="toggle-trigger toggle-hide js-toggle">
@@ -25,6 +28,7 @@
 		</span>
 	</a>
 	<div class="js-toggle-body">
+		<?php if(!Yii::app()->params['hide_missing_demographics'] || $this->patient->primary_phone) { ?>
 		<div class="row data-row">
 			<div class="large-4 column">
 				<div class="data-label">Telephone:</div>
@@ -33,6 +37,8 @@
 				<div class="data-value"><?php echo !empty($this->patient->primary_phone) ? $this->patient->primary_phone : 'Unknown'?></div>
 			</div>
 		</div>
+		<?php }
+		if(!Yii::app()->params['hide_missing_demographics'] || !empty($this->patient->contact->address->email)) { ?>
 		<div class="row data-row">
 			<div class="large-4 column">
 				<div class="data-label">Email:</div>
@@ -41,13 +47,7 @@
 				<div class="data-value"><?php echo !empty($this->patient->contact->address->email) ? $this->patient->contact->address->email : 'Unknown'?></div>
 			</div>
 		</div>
-		<div class="row data-row">
-			<div class="large-4 column">
-				<div class="data-label">Next of Kin:</div>
-			</div>
-			<div class="large-8 column">
-				<div class="data-value">Unknown</div>
-			</div>
-		</div>
+		<?php } ?>
 	</div>
 </section>
+<?php } ?>

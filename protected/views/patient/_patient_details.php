@@ -25,6 +25,7 @@
 		</span>
 	</a>
 	<div class="js-toggle-body">
+		<?php if(!Yii::app()->params['hide_missing_demographics'] || $this->patient->first_name) { ?>
 		<div class="row data-row">
 			<div class="large-4 column">
 				<div class="data-label">First name(s):</div>
@@ -33,6 +34,8 @@
 				<div class="data-value"><?php echo $this->patient->first_name?></div>
 			</div>
 		</div>
+		<?php }
+		if(!Yii::app()->params['hide_missing_demographics'] || $this->patient->last_name) { ?>
 		<div class="row data-row">
 			<div class="large-4 column">
 				<div class="data-label">Last name:</div>
@@ -41,6 +44,8 @@
 				<div class="data-value"><?php echo $this->patient->last_name?></div>
 			</div>
 		</div>
+		<?php }
+		if(!Yii::app()->params['hide_missing_demographics'] || $this->patient->contact->address) { ?>
 		<div class="row data-row">
 			<div class="large-4 column">
 				<div class="data-label">Address:</div>
@@ -51,6 +56,8 @@
 				</div>
 			</div>
 		</div>
+		<?php }
+		if(!Yii::app()->params['hide_missing_demographics'] || $this->patient->dob) { ?>
 		<div class="row data-row">
 			<div class="large-4 column">
 				<div class="data-label">Date of Birth:</div>
@@ -61,7 +68,6 @@
 				</div>
 			</div>
 		</div>
-
 		<div class="row data-row">
 			<?php if ($this->patient->date_of_death) { ?>
 				<div class="large-4 column">
@@ -83,6 +89,8 @@
 				</div>
 			<?php }?>
 		</div>
+		<?php }
+		if(!Yii::app()->params['hide_missing_demographics'] || $this->patient->gender) { ?>
 		<div class="row data-row">
 			<div class="large-4 column">
 				<div class="data-label">Gender:</div>
@@ -93,6 +101,8 @@
 				</div>
 			</div>
 		</div>
+		<?php }
+		if(!Yii::app()->params['hide_missing_demographics'] || $this->patient->ethnic_group_id) { ?>
 		<div class="row data-row">
 			<div class="large-4 column">
 				<div class="data-label">Ethnic Group:</div>
@@ -103,5 +113,6 @@
 				</div>
 			</div>
 		</div>
+		<?php } ?>
 	</div>
 </section>

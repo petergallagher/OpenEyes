@@ -82,28 +82,30 @@ else if ($this->checkAccess('OprnCreateEpisode')) {
 	echo '<div class="box patient-info episode-links">' . CHtml::link($msg,Yii::app()->createUrl('patient/episodes/'.$this->patient->id)) . '</div>';
 }
 
-try {
-	echo $this->renderPartial('custom/info');
-} catch (Exception $e) {
-	// This is our default layout
-	$codes = $this->patient->getSpecialtyCodes();
-	// specialist diagnoses
-	foreach ($codes as $code) {
-		try {
-			echo $this->renderPartial('_' . $code . '_diagnoses');
-		} catch (Exception $e) {}
+if(!Yii::app()->params['hide_patientsummary_forms']) {
+	try {
+		echo $this->renderPartial('custom/info');
+	} catch (Exception $e) {
+		// This is our default layout
+		$codes = $this->patient->getSpecialtyCodes();
+		// specialist diagnoses
+		foreach ($codes as $code) {
+			try {
+				echo $this->renderPartial('_' . $code . '_diagnoses');
+			} catch (Exception $e) {}
+		}
+		$this->renderPartial('_systemic_diagnoses');
+		$this->renderPartial('_previous_operations');
+		$this->renderPartial('_medications');
+		// specialist extra data
+		foreach ($codes as $code) {
+			try {
+				echo $this->renderPartial('_' . $code . '_info');
+			} catch (Exception $e) {}
+		}
+		$this->renderPartial('_allergies');
+		$this->renderPartial('_family_history');
+		$this->renderPartial('_social_history');
 	}
-	$this->renderPartial('_systemic_diagnoses');
-	$this->renderPartial('_previous_operations');
-	$this->renderPartial('_medications');
-	// specialist extra data
-	foreach ($codes as $code) {
-		try {
-			echo $this->renderPartial('_' . $code . '_info');
-		} catch (Exception $e) {}
-	}
-	$this->renderPartial('_allergies');
-	$this->renderPartial('_family_history');
-	$this->renderPartial('_social_history');
 }
 ?>

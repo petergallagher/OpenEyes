@@ -288,5 +288,7 @@ return array(
 		'event_lock_days' => 0,
 		'event_lock_disable' => false,
 		'html_autocomplete' => 'off',
+		'hide_missing_demographics' => false,
+		'hide_patientsummary_forms'=> false,
 	),
 );

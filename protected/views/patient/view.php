@@ -98,7 +98,7 @@ $warnings = $this->patient->getWarnings($clinical);
 			<?php $this->renderPartial('_patient_contact_details')?>
 			<?php $this->renderPartial('_patient_gp')?>
 			<?php $this->renderPartial('_patient_commissioningbodies')?>
-			<?php $this->renderPartial('_patient_contacts')?>
+			<?php if(!Yii::app()->params['hide_patientsummary_forms']) { $this->renderPartial('_patient_contacts'); } ?>
 		</div>
 		<div class="large-6 column" id="patient-summary-form-container">
 			<?php if ($this->checkAccess('OprnViewClinical')) {?>
