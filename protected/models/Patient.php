@@ -427,7 +427,14 @@ class Patient extends BaseActiveRecordVersioned
 
 	public function getDisplayName()
 	{
-		return '<span class="patient-surname">'.strtoupper($this->last_name).'</span>, <span class="patient-name">'.$this->first_name.'</span>';
+		$names = array();
+		if($this->last_name) {
+			$names[] = '<span class="patient-surname">'.strtoupper($this->last_name).'</span>';
+		}
+		if($this->first_name) {
+			$names[] = '<span class="patient-name">'.$this->first_name.'</span>';
+		}
+		return implode(', ', $names);
 	}
 
 	private function randomData($field)

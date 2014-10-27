@@ -24,9 +24,13 @@
 
 <div class="panel patient<?php if ($warnings) echo " warning" ?>" id="patientID">
 	<div class="patient-details">
-		<?php echo CHtml::link($this->patient->getDisplayName(),array('/patient/view/'.$this->patient->id)) ?>
+		<?php
+			$display_name = ($this->patient->getDisplayName()) ? $this->patient->getDisplayName() : $this->patient->hos_num;
+			echo CHtml::link($display_name, array('/patient/view/'.$this->patient->id))
+		?>
 		<span class="patient-age">(<?php if ($this->patient->isDeceased()) { ?>Deceased<?php } else { echo $this->patient->getAge(); } ?>)</span>
 	</div>
+	<?php if(!Yii::app()->params['hide_missing_demographics'] || $this->patient->getDisplayName()) { ?>
 	<div class="hospital-number">
 		<span class="screen-only">
 			No.
@@ -36,16 +40,19 @@
 		</span>
 		<?php echo $this->patient->hos_num?>
 	</div>
+	<?php } ?>
 	<div class="row">
 		<div class="large-8 column">
 
+			<?php if(!Yii::app()->params['hide_missing_demographics'] || $this->patient->nhs_num) { ?>
 			<!-- NHS number -->
 			<div class="nhs-number">
 				<span class="hide-text print-only">
 					NHS number:
 				</span>
-				<?php echo $this->patient->nhsnum?>
+				<?php echo $this->patient->nhsnum ?>
 			</div>
+			<?php } ?>
 
 			<!-- Gender -->
 			<span class="icon icon-alert icon-alert-<?php echo strtolower($this->patient->getGenderString()) ?>_trans">
