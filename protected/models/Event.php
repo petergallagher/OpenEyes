@@ -449,7 +449,7 @@ class Event extends BaseActiveRecordVersioned
 
 	public function getImageDirectory()
 	{
-		return Yii::app()->assetManager->basePath."/events/event_{$this->id}_".strtotime($this->last_modified_date);
+		return Yii::app()->basePath."/runtime/cache/events/event_{$this->id}_".strtotime($this->last_modified_date);
 	}
 
 	public function hasEventImage($name)
@@ -488,8 +488,6 @@ class Event extends BaseActiveRecordVersioned
 
 	public function getBarCodeHTML()
 	{
-		require_once(Yii::app()->basePath.'/extensions/tcpdf/tcpdf/barcodes.php');
-
 		$barcode = new TCPDFBarcode("E:$this->id", 'C128');
 
 		return $barcode->getBarcodeHTML(1,8);
