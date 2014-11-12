@@ -244,7 +244,12 @@ class WKHtmlToPDF
 		$left_margin = Yii::app()->params['wkhtmltopdf_left_margin'] ? "-L ".Yii::app()->params['wkhtmltopdf_left_margin'] : '';
 		$right_margin = Yii::app()->params['wkhtmltopdf_right_margin'] ? "-R ".Yii::app()->params['wkhtmltopdf_right_margin'] : '';
 
-		$res = $this->execute("{$this->wkhtmltopdf} --footer-html '$footer_file' --print-media-type $top_margin $bottom_margin $left_margin $right_margin '$html_file' '$pdf_file' 2>&1");
+		if(Yii::app()->params['windows']) {
+			$res = $this->execute("\"{$this->wkhtmltopdf}\" --footer-html file:///$footer_file --print-media-type $top_margin $bottom_margin $left_margin $right_margin file:///$html_file $pdf_file");
+		}
+		else {
+		$res = $this->execute("{$this->wkhtmltopdf} --footer-html '$footer_file' --print-media-type $top_margin $bottom_margin $left_margin $right_margin '$html_file' '$pdf_file'");
+		}
 
 		if (!$this->fileExists($pdf_file) || $this->fileSize($pdf_file) == 0) {
 			if ($this->fileSize($pdf_file) == 0) {
