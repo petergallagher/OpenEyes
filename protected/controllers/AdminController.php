@@ -759,7 +759,7 @@ class AdminController extends BaseAdminController
 				if (!$contactlabel->save()) {
 					throw new Exception("Unable to save contactlabel: ".print_r($contactlabel->getErrors(),true));
 				}
-				Audit::add('admin-ContactLabel','add',$contactLabel->id);
+				Audit::add('admin-ContactLabel','add',$contactlabel->id);
 				$this->redirect('/admin/contactlabels/'.ceil($contactlabel->id/$this->items_per_page));
 			}
 		}
