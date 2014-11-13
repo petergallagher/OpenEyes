@@ -726,6 +726,14 @@ class AdminController extends BaseAdminController
 				if (!$contact->save()) {
 					throw new Exception("Unable to save contact: ".print_r($contact->getErrors(),true));
 				}
+
+				$person = new Person;
+				$person->contact_id = $contact->id;
+
+				if (!$person->save()) {
+					throw new Exception("Unable to save new person: ".print_r($person->errors,true));
+				}
+
 				Audit::add('admin-Contact','add',$contact->id);
 
 				$this->redirect(array('/admin/editContact?contact_id='.$contact->id));
