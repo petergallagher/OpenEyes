@@ -171,7 +171,6 @@ class CommonOphthalmicDisorder extends BaseActiveRecordVersioned
 		$_secondary = array();
 
 		if ($cod = self::model()->find('subspecialty_id=? and disorder_id is null',array($ss_id))) {
-			$_disorders['NONE'] = 'None';
 			$_secondary['NONE'] = CHtml::listData(SecondaryToCommonOphthalmicDisorder::model()->findAll(array('condition' => 'parent_id = :pid','params' => array(':pid' => $cod->id))),'disorder_id','disorder.term');
 		}
 
