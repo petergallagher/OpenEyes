@@ -30,7 +30,7 @@ return array(
 		'application.models.*',
 		'application.models.elements.*',
 		'application.components.*',
-		'application.extensions.tcpdf.*',
+		'application.extensions.*',
 		'application.modules.*',
 		'application.commands.*',
 		'application.commands.shell.*',

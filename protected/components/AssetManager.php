@@ -135,9 +135,9 @@ class AssetManager extends CAssetManager
 
 	/**
 	 * Set the ClientScript reference.
-	 * @param ClientScript $clientScript The ClientScript instance.
+	 * @param CClientScript $clientScript The ClientScript instance.
 	 */
-	public function setClientScript(ClientScript $clientScript)
+	public function setClientScript(CClientScript $clientScript)
 	{
 		$this->clientScript = $clientScript;
 	}

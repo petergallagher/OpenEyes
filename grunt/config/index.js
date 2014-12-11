@@ -6,6 +6,8 @@ module.exports = function(grunt) {
 		jshint: require('./jshint'),
 		styleguide: require('./styleguide'),
 		clean: require('./clean'),
+		concat: require('./concat'),
+		uglify: require('./uglify'),
 		modernizr: require('./modernizr'),
 		copy: require('./copy'),
 		jsdoc: require('./jsdoc'),
