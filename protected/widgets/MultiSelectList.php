@@ -52,7 +52,7 @@ class MultiSelectList extends BaseFieldWidget
 			}
 		} else {
 
-			if (isset($_POST[$this->field])) {
+			if (!empty($_POST[$this->field])) {
 				foreach ($_POST[$this->field] as $id) {
 					$this->selected_ids[] = $id;
 					unset($this->filtered_options[$id]);
