@@ -109,6 +109,14 @@ class FeatureContext extends PageObjectContext implements YiiAwareContextInterfa
 		}
 	}
 
+	/**
+	 * Wait for all ajax calls to complete
+	 */
+	public function waitForAjax()
+	{
+		$this->mink->getSession()->wait(5000, '$.active == 0');
+	}
+
 	public function setMink(\Behat\Mink\Mink $mink)
 	{
 		$this->mink = $mink;
