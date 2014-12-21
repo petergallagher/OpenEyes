@@ -13,10 +13,21 @@ use \SensioLabs\Behat\PageObjectExtension\Context\PageObjectContext;
 
 class ExaminationContext extends PageObjectContext
 {
-    public function __construct(array $parameters)
-    {
+	/**
+	 * @When /^I expand the "([^"]*)" section$/
+	 */
+	public function openElement($title)
+	{
+		$page = $this->getMainContext()->mink->getSession()->getPage();
 
-    }
+		if (!($el = $page->find('css', "li:contains('{$title}')"))) {
+			throw new Exception("Couldn't find section '{$title}'");
+		}
+
+		$el->click();
+
+		$this->getMainContext()->waitForAjax();
+	}
 
     /**
      * @Then /^I select a History of Blurred Vision, Mild Severity, Onset (\d+) Week, Left Eye, (\d+) Week$/
@@ -31,18 +42,6 @@ class ExaminationContext extends PageObjectContext
     }
 
     /**
-     * @Given /^I choose to expand the Comorbidities section$/
-     */
-    public function iChooseToExpandTheComorbiditiesSection()
-    {
-        /**
-         * @var Examination $examination
-         */
-        $examination= $this->getPage('Examination');
-        $examination->openComorbidities();
-    }
-
-    /**
      * @Then /^I Add a Comorbiditiy of "([^"]*)"$/
      */
     public function iAddAComorbiditiyOf($com)
@@ -52,32 +51,6 @@ class ExaminationContext extends PageObjectContext
          */
         $examination= $this->getPage('Examination');
         $examination->addComorbiditiy($com);
-    }
-
-    /**
-     * @Then /^I choose to expand the Visual Function section$/
-     */
-    public function iChooseToExpandTheVisualFunctionSection()
-    {
-        /**
-         * @var Examination $examination
-         */
-        $examination = $this->getPage('Examination');
-        $examination->openVisualFunction();
-
-    }
-
-    /**
-     * @Then /^I choose to expand the Visual Acuity section$/
-     */
-    public function iChooseToExpandTheVisualAcuitySection()
-    {
-        /**
-         * @var Examination $examination
-         */
-        $examination = $this->getPage('Examination');
-        $examination->openVisualAcuity();
-
     }
 
     /**
@@ -142,18 +115,6 @@ class ExaminationContext extends PageObjectContext
     }
 
     /**
-     * @Then /^I choose to expand the Intraocular Pressure section$/
-     */
-    public function iChooseToExpandTheIntraocularPressureSection()
-    {
-        /**
-         * @var Examination $examination
-         */
-        $examination= $this->getPage('Examination');
-        $examination->expandIntraocularPressure();
-    }
-
-    /**
      * @Then /^I choose a left Intraocular Pressure of "([^"]*)" and Instrument "([^"]*)"$/
      */
     public function iChooseALeftIntraocularPressureOfAndInstrument($pressure, $instrument)
@@ -175,18 +136,6 @@ class ExaminationContext extends PageObjectContext
          */
         $examination= $this->getPage('Examination');
         $examination->rightIntracocular($pressure, $instrument);
-    }
-
-    /**
-     * @Then /^I choose to expand the Dilation section$/
-     */
-    public function iChooseToExpandTheDilationSection()
-    {
-        /**
-         * @var Examination $examination
-         */
-        $examination= $this->getPage('Examination');
-        $examination->openDilation();
     }
 
     /**
@@ -260,19 +209,6 @@ class ExaminationContext extends PageObjectContext
          */
         $examination= $this->getPage('Examination');
         $examination->removeLeftDilation();
-    }
-
-    /**
-     * @Then /^I choose to expand the Refraction section$/
-     */
-    public function iChooseToExpandTheRefractionSection()
-    {
-        /**
-         * @var Examination $examination
-         */
-        $examination= $this->getPage('Examination');
-        $examination->openRefraction();
-
     }
 
     /**
@@ -399,42 +335,6 @@ class ExaminationContext extends PageObjectContext
     }
 
     /**
-     * @Then /^I choose to expand the Visual Fields section$/
-     */
-    public function iChooseToExpandTheVisualFieldsSection()
-    {
-        /**
-         * @var Examination $examination
-         */
-        $examination= $this->getPage('Examination');
-        $examination->expandVisualFields();
-    }
-
-    /**
-     * @Then /^I choose to expand the Gonioscopy section$/
-     */
-    public function iChooseToExpandTheGonioscopySection()
-    {
-        /**
-         * @var Examination $examination
-         */
-        $examination= $this->getPage('Examination');
-        $examination->expandGonioscopy();
-    }
-
-    /**
-     * @Then /^I choose to expand the Adnexal Comorbidity section$/
-     */
-    public function iChooseToExpandTheAdnexalComorbiditySection()
-    {
-        /**
-         * @var Examination $examination
-         */
-        $examination= $this->getPage('Examination');
-        $examination->expandAdnexalComorbidity();
-    }
-
-    /**
      * @Given /^I add a left Adnexal Comorbidity of "([^"]*)"$/
      */
     public function iAddALeftAdnexalComorbidityOf($left)
@@ -456,30 +356,6 @@ class ExaminationContext extends PageObjectContext
          */
         $examination= $this->getPage('Examination');
         $examination->rightAdnexal($right);
-    }
-
-    /**
-     * @Then /^I choose to expand the Anterior Segment section$/
-     */
-    public function iChooseToExpandTheAnteriorSegmentSection()
-    {
-        /**
-         * @var Examination $examination
-         */
-        $examination= $this->getPage('Examination');
-        $examination->expandAnteriorSegment();
-    }
-
-    /**
-     * @Then /^I choose to expand the Pupillary Abnormalities section$/
-     */
-    public function iChooseToExpandThePupillaryAbnormalitiesSection()
-    {
-        /**
-         * @var Examination $examination
-         */
-        $examination= $this->getPage('Examination');
-        $examination->expandPupillaryAbnormalities();
     }
 
      /**
@@ -504,55 +380,6 @@ class ExaminationContext extends PageObjectContext
          */
         $examination= $this->getPage('Examination');
         $examination->rightPupillaryAbnormality($right);
-    }
-
-    /**
-     * @Then /^I choose to expand the DR Grading section$/
-     */
-    public function iChooseToExpandTheDRGradingSection()
-    {
-        /**
-         * @var Examination $examination
-         */
-        $examination= $this->getPage('Examination');
-        $examination->expandDRGrading();
-    }
-
-
-    /**
-     * @Then /^I choose to expand the Optic Disc section$/
-     */
-    public function iChooseToExpandTheOpticDiscSection()
-    {
-        /**
-         * @var Examination $examination
-         */
-        $examination= $this->getPage('Examination');
-        $examination->expandOpticDisc();
-    }
-
-    /**
-     * @Then /^I choose to expand the Posterior Pole section$/
-     */
-    public function iChooseToExpandThePosteriorPoleSection()
-    {
-        /**
-         * @var Examination $examination
-         */
-        $examination= $this->getPage('Examination');
-        $examination->expandPosteriorPole();
-    }
-
-    /**
-     * @Then /^I choose to expand the Diagnoses section$/
-     */
-    public function iChooseToExpandTheDiagnosesSection()
-    {
-        /**
-         * @var Examination $examination
-         */
-        $examination= $this->getPage('Examination');
-        $examination->expandDiagnoses();
     }
 
     /**
@@ -604,18 +431,6 @@ class ExaminationContext extends PageObjectContext
     }
 
     /**
-     * @Then /^I choose to expand the Investigation section$/
-     */
-    public function iChooseToExpandTheInvestigationSection()
-    {
-        /**
-         * @var Examination $examination
-         */
-        $examination= $this->getPage('Examination');
-        $examination->expandInvestigation();
-    }
-
-    /**
      * @Given /^I add an Investigation of "([^"]*)"$/
      */
     public function iAddAnInvestigationOf($investigation)
@@ -625,31 +440,6 @@ class ExaminationContext extends PageObjectContext
          */
         $examination= $this->getPage('Examination');
         $examination->addInvestigation($investigation);
-    }
-
-
-    /**
-     * @Then /^I choose to expand the Clinical Management section$/
-     */
-    public function iChooseToExpandTheClinicalManagementSection()
-    {
-        /**
-         * @var Examination $examination
-         */
-        $examination= $this->getPage('Examination');
-        $examination->expandClinicalManagement();
-    }
-
-    /**
-     * @Given /^I choose to expand Cataract Surgical Management$/
-     */
-    public function iChooseToExpandCataractSurgicalManagement()
-    {
-        /**
-         * @var Examination $examination
-         */
-        $examination= $this->getPage('Examination');
-        $examination->expandCataractSurgicalManagement();
     }
 
     /**
@@ -833,18 +623,6 @@ class ExaminationContext extends PageObjectContext
     }
 
     /**
-     * @Then /^I choose to expand the Laser Management section$/
-     */
-    public function iChooseToExpandTheLaserManagementSection()
-    {
-        /**
-         * @var Examination $examination
-         */
-        $examination= $this->getPage('Examination');
-        $examination->expandLaserManagement();
-    }
-
-    /**
  * @Given /^I choose a right laser choice of "([^"]*)"$/
  */
     public function iChooseARightLaserOf($laser)
@@ -891,18 +669,6 @@ class ExaminationContext extends PageObjectContext
          */
         $examination= $this->getPage('Examination');
         $examination->rightLaser($laser);
-    }
-
-    /**
-     * @Then /^I choose to expand the Injection Management section$/
-     */
-    public function iChooseToExpandTheInjectionManagementSection()
-    {
-        /**
-         * @var Examination $examination
-         */
-        $examination= $this->getPage('Examination');
-        $examination->expandInjectionManagement();
     }
 
     /**
@@ -1410,18 +1176,6 @@ class ExaminationContext extends PageObjectContext
     }
 
     /**
-     * @Then /^I choose to expand the Risks section$/
-     */
-    public function iChooseToExpandTheRisksSection()
-    {
-        /**
-         * @var Examination $examination
-         */
-        $examination= $this->getPage('Examination');
-        $examination->expandRisks();
-    }
-
-    /**
      * @Given /^I add comments to the Risk section of "([^"]*)"$/
      */
     public function iAddCommentsToTheRiskSectionOf($comments)
@@ -1431,18 +1185,6 @@ class ExaminationContext extends PageObjectContext
          */
         $examination= $this->getPage('Examination');
         $examination->riskComments($comments);
-    }
-
-    /**
-     * @Then /^I choose to expand the Clinic Outcome section$/
-     */
-    public function iChooseToExpandTheClinicOutcomeSection()
-    {
-        /**
-         * @var Examination $examination
-         */
-        $examination= $this->getPage('Examination');
-        $examination->expandClinicalOutcome();
     }
 
     /**
@@ -1515,18 +1257,6 @@ class ExaminationContext extends PageObjectContext
          */
         $examination= $this->getPage('Examination');
         $examination->clinicalRole($role);
-    }
-
-    /**
-     * @Then /^I choose to expand the Conclusion section$/
-     */
-    public function iChooseToExpandTheConclusionSection()
-    {
-        /**
-         * @var Examination $examination
-         */
-        $examination= $this->getPage('Examination');
-        $examination->expandConclusion();
     }
 
     /**
@@ -2033,18 +1763,6 @@ class ExaminationContext extends PageObjectContext
     }
 
     /**
-     * @Then /^I choose to expand the Overall Management section$/
-     */
-    public function iChooseToExpandTheOverallManagementSection()
-    {
-        /**
-         * @var Examination $examination
-         */
-        $examination= $this->getPage('Examination');
-        $examination->expandOverallManagement();
-    }
-
-    /**
      * @Given /^I choose a Clinical Interval of "([^"]*)"$/
      */
     public function iChooseAClinicalIntervalOf($interval)
@@ -2162,18 +1880,6 @@ class ExaminationContext extends PageObjectContext
          */
         $examination= $this->getPage('Examination');
         $examination->leftGonio($gonio);
-    }
-
-    /**
-     * @Then /^I choose to expand the Current Management section$/
-     */
-    public function iChooseToExpandTheCurrentManagementSection()
-    {
-        /**
-         * @var Examination $examination
-         */
-        $examination= $this->getPage('Examination');
-        $examination->expandCurrentManagement();
     }
 
     /**
@@ -2510,18 +2216,6 @@ class ExaminationContext extends PageObjectContext
          */
         $examination= $this->getPage('Examination');
         $examination->rightRAPDComments($comments);
-    }
-
-    /**
-     * @Then /^I choose to expand the Colour Vision section$/
-     */
-    public function iChooseToExpandTheColourVisionSection()
-    {
-        /**
-         * @var Examination $examination
-         */
-        $examination= $this->getPage('Examination');
-        $examination->openColourVision();
     }
 
     /**

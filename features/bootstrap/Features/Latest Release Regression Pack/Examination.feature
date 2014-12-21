@@ -23,7 +23,7 @@ Feature: Create New Examination Regression Tests
 
     Then I select a History of Blurred Vision, Mild Severity, Onset 1 Week, Left Eye, 1 Week
 
-    And I choose to expand the Comorbidities section
+    And I expand the "Comorbidities" section
     Then I Add a Comorbiditiy of "1"
     Then I Add a Comorbiditiy of "2"
     Then I Add a Comorbiditiy of "3"
@@ -42,7 +42,7 @@ Feature: Create New Examination Regression Tests
 
     Then I remove all comorbidities
 
-    Then I choose to expand the Refraction section
+    Then I expand the "Refraction" section
 
     Then I enter left Refraction details of Sphere "1" integer "6" fraction "0.75"
     And I enter left cylinder details of of Cylinder "-1" integer "7" fraction "0.75"
@@ -59,7 +59,7 @@ Feature: Create New Examination Regression Tests
 #    Then I enter right Axis degrees of "38"
     And I enter a right type of "3"
 
-    Then I choose to expand the Visual Function section
+    Then I expand the "Visual Function" section
 
     Then I select a Left RAPD
     And I add Left RAPD comments of "Left RAPD Automation test comments"
@@ -67,22 +67,22 @@ Feature: Create New Examination Regression Tests
     Then I select a Right RAPD
     And I add Right RAPD comments of "Left RAPD Automation test comments"
 
-    Then I choose to expand the Colour Vision section
+    Then I expand the "Colour Vision" section
     And I choose a Left Colour Vision of "1"
     And I choose A Left Colour Vision Value of "8"
     And I choose a Right Colour Vision of "2"
     And I choose A Right Colour Vision Value of "4"
 
-    Then I choose to expand the Visual Acuity section
+    Then I expand the "Visual Acuity" section
     And I select a Visual Acuity of "2"
     Then I choose a left Visual Acuity Snellen Metre "4" and a reading method of "5"
     Then I choose a right Visual Acuity Snellen Metre "4" and a reading method of "5"
 
-    Then I choose to expand the Intraocular Pressure section
+    Then I expand the "Intraocular Pressure" section
     Then I choose a left Intraocular Pressure of "19" and Instrument "2"
     Then I choose a right Intraocular Pressure of "29" and Instrument "2"
 
-    Then I choose to expand the Dilation section
+    Then I expand the "Dilation" section
     Then I choose left Dilation of "2" and drops of "5"
     Then I choose right Dilation of "6" and drops of "3"
     And I enter a left Dilation time of "10:00"
@@ -113,10 +113,10 @@ Feature: Create New Examination Regression Tests
 
     Then I select a History of Blurred Vision, Mild Severity, Onset 1 Week, Left Eye, 1 Week
 
-    And I choose to expand the Comorbidities section
+    And I expand the "Comorbidities" section
     Then I Add a Comorbiditiy of "4"
 
-    Then I choose to expand the Visual Function section
+    Then I expand the "Visual Function" section
 
     Then I select a Left RAPD
     And I add Left RAPD comments of "Left RAPD Automation test comments"
@@ -124,13 +124,13 @@ Feature: Create New Examination Regression Tests
     Then I select a Right RAPD
     And I add Right RAPD comments of "Left RAPD Automation test comments"
 
-    Then I choose to expand the Colour Vision section
+    Then I expand the "Colour Vision" section
     And I choose a Left Colour Vision of "1"
     And I choose A Left Colour Vision Value of "8"
     And I choose a Right Colour Vision of "2"
     And I choose A Right Colour Vision Value of "4"
 
-    Then I choose to expand the Visual Acuity section
+    Then I expand the "Visual Acuity" section
     And I select a Visual Acuity of "1"
     Then I choose a left Visual Acuity ETDRS Letters Snellen Metre "119" and a reading method of "2"
     Then I choose a right Visual Acuity ETDRS Letters Snellen Metre "119" and a reading method of "2"
@@ -141,17 +141,17 @@ Feature: Create New Examination Regression Tests
     Then I remove the newly added Left Visual Acuity
     Then I remove the newly added Right Visual Acuity
 
-    Then I choose to expand the Intraocular Pressure section
+    Then I expand the "Intraocular Pressure" section
     Then I choose a left Intraocular Pressure of "8" and Instrument "4"
     Then I choose a right Intraocular Pressure of "77" and Instrument "1"
 
-    Then I choose to expand the Dilation section
+    Then I expand the "Dilation" section
     Then I choose left Dilation of "5" and drops of "4"
     Then I choose right Dilation of "2" and drops of "2"
     And I enter a left Dilation time of "20:00"
     And I enter a right Dilation time of "16:11"
 
-    Then I choose to expand the Refraction section
+    Then I expand the "Refraction" section
     Then I enter left Refraction details of Sphere "-1" integer "11" fraction "0.50"
     And I enter left cylinder details of of Cylinder "1" integer "4" fraction "0.25"
     Then I enter left Axis degrees of "56"
@@ -180,10 +180,10 @@ Feature: Create New Examination Regression Tests
 
     Then I select a History of Blurred Vision, Mild Severity, Onset 1 Week, Left Eye, 1 Week
 
-    And I choose to expand the Comorbidities section
+    And I expand the "Comorbidities" section
     Then I Add a Comorbiditiy of "8"
 
-    Then I choose to expand the Visual Function section
+    Then I expand the "Visual Function" section
 
     Then I select a Left RAPD
     And I add Left RAPD comments of "Left RAPD Automation test comments"
@@ -191,28 +191,28 @@ Feature: Create New Examination Regression Tests
     Then I select a Right RAPD
     And I add Right RAPD comments of "Left RAPD Automation test comments"
 
-    Then I choose to expand the Colour Vision section
+    Then I expand the "Colour Vision" section
     And I choose a Left Colour Vision of "1"
     And I choose A Left Colour Vision Value of "8"
     And I choose a Right Colour Vision of "2"
     And I choose A Right Colour Vision Value of "4"
 
-    Then I choose to expand the Visual Acuity section
+    Then I expand the "Visual Acuity" section
     And I select a Visual Acuity of "1"
     Then I choose a left Visual Acuity ETDRS Letters Snellen Metre "119" and a reading method of "2"
     Then I choose a right Visual Acuity ETDRS Letters Snellen Metre "119" and a reading method of "2"
 
-    Then I choose to expand the Intraocular Pressure section
+    Then I expand the "Intraocular Pressure" section
     Then I choose a left Intraocular Pressure of "8" and Instrument "4"
     Then I choose a right Intraocular Pressure of "77" and Instrument "1"
 
-    Then I choose to expand the Dilation section
+    Then I expand the "Dilation" section
     Then I choose left Dilation of "5" and drops of "4"
     Then I choose right Dilation of "2" and drops of "2"
     And I enter a left Dilation time of "08:35"
     And I enter a right Dilation time of "22:12"
 
-    Then I choose to expand the Refraction section
+    Then I expand the "Refraction" section
     Then I enter left Refraction details of Sphere "-1" integer "11" fraction "0.50"
     And I enter left cylinder details of of Cylinder "1" integer "4" fraction "0.25"
     Then I enter left Axis degrees of "56"
@@ -224,7 +224,7 @@ Feature: Create New Examination Regression Tests
     Then I enter right Axis degrees of "167"
     And I enter a right type of "3"
 
-    Then I choose to expand the Conclusion section
+    Then I expand the "Conclusion" section
     And I choose a Conclusion option of "booked for first eye, "
 
     Then I Save the Examination and confirm it has been created successfully
@@ -247,10 +247,10 @@ Feature: Create New Examination Regression Tests
 
     Then I select a History of Blurred Vision, Mild Severity, Onset 1 Week, Left Eye, 1 Week
 
-    And I choose to expand the Comorbidities section
+    And I expand the "Comorbidities" section
     Then I Add a Comorbiditiy of "8"
 
-    Then I choose to expand the Visual Function section
+    Then I expand the "Visual Function" section
 
     Then I select a Left RAPD
     And I add Left RAPD comments of "Left RAPD Automation test comments"
@@ -258,29 +258,29 @@ Feature: Create New Examination Regression Tests
     Then I select a Right RAPD
     And I add Right RAPD comments of "Left RAPD Automation test comments"
 
-    Then I choose to expand the Colour Vision section
+    Then I expand the "Colour Vision" section
     And I choose a Left Colour Vision of "1"
     And I choose A Left Colour Vision Value of "8"
     And I choose a Right Colour Vision of "2"
     And I choose A Right Colour Vision Value of "4"
 
-    Then I choose to expand the Visual Acuity section
+    Then I expand the "Visual Acuity" section
     And I select a Visual Acuity of "1"
     Then I choose a left Visual Acuity ETDRS Letters Snellen Metre "119" and a reading method of "2"
     Then I choose a right Visual Acuity ETDRS Letters Snellen Metre "119" and a reading method of "2"
 
-    Then I choose to expand the Intraocular Pressure section
+    Then I expand the "Intraocular Pressure" section
     Then I choose a left Intraocular Pressure of "8" and Instrument "4"
     Then I choose a right Intraocular Pressure of "77" and Instrument "1"
 
-    Then I choose to expand the Dilation section
+    Then I expand the "Dilation" section
 
     Then I choose left Dilation of "5" and drops of "4"
     Then I choose right Dilation of "2" and drops of "2"
     And I enter a left Dilation time of "08:35"
     And I enter a right Dilation time of "22:12"
 
-    Then I choose to expand the Refraction section
+    Then I expand the "Refraction" section
     Then I enter left Refraction details of Sphere "-1" integer "11" fraction "0.50"
     And I enter left cylinder details of of Cylinder "1" integer "4" fraction "0.25"
     Then I enter left Axis degrees of "56"
@@ -292,16 +292,15 @@ Feature: Create New Examination Regression Tests
     Then I enter right Axis degrees of "167"
     And I enter a right type of "3"
 
-    Then I choose to expand the Adnexal Comorbidity section
-    Then I choose to expand the Adnexal Comorbidity section
+    Then I expand the "Adnexal Comorbidity" section
     And I add a left Adnexal Comorbidity of "lower lid ectropion, "
     And I add a right Adnexal Comorbidity of "conjunctivitis, "
 
-    Then I choose to expand the Pupillary Abnormalities section
+    Then I expand the "Pupillary Abnormalities" section
     And I add a left Abnormality of "3"
     And I add a right Abnormality of "4"
 
-    Then I choose to expand the Diagnoses section
+    Then I expand the "Diagnoses" section
     And I choose a left eye diagnosis
     And I select "Familial infantile myasthenia" for "Diagnosis"
     And I choose a right eye diagnosis
@@ -310,15 +309,15 @@ Feature: Create New Examination Regression Tests
     And I select "Cataract" for "Diagnosis"
     Then I choose a principal diagnosis
 
-    Then I choose to expand the Investigation section
+    Then I expand the "Investigation" section
     And I add an Investigation of "refraction, "
     And I add an Investigation of "Fluorescein angiography, "
     And I add an Investigation of "OCT, "
     And I add an Investigation of "ultrasound, "
     And I add an Investigation of "field test, "
 
-    Then I choose to expand the Clinical Management section
-    And I choose to expand Cataract Surgical Management
+    Then I expand the "Clinical Management" section
+    And I expand the "Cataract Surgical Management" section
     And I add Cataract Management Comments of "new glasses prescribed, "
     Then I select First Eye
 
@@ -330,13 +329,13 @@ Feature: Create New Examination Regression Tests
     Then I select Previous Refractive Surgery Yes
     And I select Vitrectomised Eye Yes
 
-    Then I choose to expand the Laser Management section
+    Then I expand the "Laser Management" section
     And I choose a right laser choice of "4"
     And I choose a left laser choice of "4"
     And I choose a left laser type of "1"
     And I choose a right laser type of "2"
 
-    Then I choose to expand the Injection Management section
+    Then I expand the "Injection Management" section
 
     And I select a Right Diagnosis of Choroidal Retinal Neovascularisation
     Then I select Right Secondary to "267718000"
@@ -357,14 +356,14 @@ Feature: Create New Examination Regression Tests
     Then I choose a Left Loss of 5 letters Yes
     Then I choose a Left Loss of 5 letters >5 No
 
-    Then I choose to expand the Risks section
+    Then I expand the "Risks" section
     And I add comments to the Risk section of "Risk section comments Automation Test"
 
-    Then I choose to expand the Clinic Outcome section
+    Then I expand the "Clinic Outcome" section
 
     And I choose a Clinical Outcome Status of Discharge
 
-    Then I choose to expand the Conclusion section
+    Then I expand the "Conclusion" section
     And I choose a Conclusion option of "booked for first eye, "
 
     Then I Save the Examination and confirm it has been created successfully
@@ -388,10 +387,10 @@ Feature: Create New Examination Regression Tests
 
     Then I select a History of Blurred Vision, Mild Severity, Onset 1 Week, Left Eye, 1 Week
 
-    And I choose to expand the Comorbidities section
+    And I expand the "Comorbidities" section
     Then I Add a Comorbiditiy of "8"
 
-    Then I choose to expand the Visual Function section
+    Then I expand the "Visual Function" section
 
     Then I select a Left RAPD
     And I add Left RAPD comments of "Left RAPD Automation test comments"
@@ -399,28 +398,28 @@ Feature: Create New Examination Regression Tests
     Then I select a Right RAPD
     And I add Right RAPD comments of "Left RAPD Automation test comments"
 
-    Then I choose to expand the Colour Vision section
+    Then I expand the "Colour Vision" section
     And I choose a Left Colour Vision of "1"
     And I choose A Left Colour Vision Value of "8"
     And I choose a Right Colour Vision of "2"
     And I choose A Right Colour Vision Value of "4"
 
-    Then I choose to expand the Visual Acuity section
+    Then I expand the "Visual Acuity" section
     And I select a Visual Acuity of "1"
     Then I choose a left Visual Acuity ETDRS Letters Snellen Metre "119" and a reading method of "2"
     Then I choose a right Visual Acuity ETDRS Letters Snellen Metre "119" and a reading method of "2"
 
-    Then I choose to expand the Intraocular Pressure section
+    Then I expand the "Intraocular Pressure" section
     Then I choose a left Intraocular Pressure of "8" and Instrument "4"
     Then I choose a right Intraocular Pressure of "77" and Instrument "1"
 
-    Then I choose to expand the Dilation section
+    Then I expand the "Dilation" section
     Then I choose left Dilation of "5" and drops of "4"
     Then I choose right Dilation of "2" and drops of "2"
     And I enter a left Dilation time of "09:14"
     And I enter a right Dilation time of "12:00"
 
-    Then I choose to expand the Refraction section
+    Then I expand the "Refraction" section
     Then I enter left Refraction details of Sphere "-1" integer "11" fraction "0.50"
     And I enter left cylinder details of of Cylinder "1" integer "4" fraction "0.25"
     Then I enter left Axis degrees of "56"
@@ -432,28 +431,28 @@ Feature: Create New Examination Regression Tests
     Then I enter right Axis degrees of "167"
     And I enter a right type of "3"
 
-    Then I choose to expand the Adnexal Comorbidity section
+    Then I expand the "Adnexal Comorbidity" section
     And I add a left Adnexal Comorbidity of "crusting of lashes, "
     And I add a right Adnexal Comorbidity of "conjunctivitis, "
 
-    Then I choose to expand the Pupillary Abnormalities section
+    Then I expand the "Pupillary Abnormalities" section
     And I add a left Abnormality of "3"
     And I add a right Abnormality of "4"
 
-    Then I choose to expand the Diagnoses section
+    Then I expand the "Diagnoses" section
     And I choose a left eye diagnosis
     And I select "Pseudophakia" for "Diagnosis"
     Then I choose a principal diagnosis
 
-    Then I choose to expand the Investigation section
+    Then I expand the "Investigation" section
     And I add an Investigation of "refraction, "
     And I add an Investigation of "Fluorescein angiography, "
     And I add an Investigation of "OCT, "
     And I add an Investigation of "ultrasound, "
     And I add an Investigation of "field test, "
 
-    Then I choose to expand the Clinical Management section
-    And I choose to expand Cataract Surgical Management
+    Then I expand the "Clinical Management" section
+    And I expand the "Cataract Surgical Management" section
     And I add Cataract Management Comments of "new glasses prescribed, "
     Then I select First Eye
 
@@ -465,13 +464,13 @@ Feature: Create New Examination Regression Tests
     Then I select Previous Refractive Surgery No
     And I select Vitrectomised Eye No
 
-    Then I choose to expand the Laser Management section
+    Then I expand the "Laser Management" section
     And I choose a right laser choice of "4"
     And I choose a left laser choice of "4"
     And I choose a left laser type of "1"
     And I choose a right laser type of "2"
 
-    Then I choose to expand the Injection Management section
+    Then I expand the "Injection Management" section
 
     And I select a Right Diagnosis of Choroidal Retinal Neovascularisation
     Then I select Right Secondary to "255025001"
@@ -492,10 +491,10 @@ Feature: Create New Examination Regression Tests
     Then I choose a Left Loss of 5 letters No
     Then I choose a Left Loss of 5 letters >5 Yes
 
-    Then I choose to expand the Risks section
+    Then I expand the "Risks" section
     And I add comments to the Risk section of "Risk section comments Automation Test"
 
-    Then I choose to expand the Clinic Outcome section
+    Then I expand the "Clinic Outcome" section
 
     And I choose a Clinical Outcome Status of Follow Up
     Then I choose a Follow Up quantity of "5"
@@ -503,7 +502,7 @@ Feature: Create New Examination Regression Tests
     And I tick the Patient Suitable for Community Patient Tariff
     Then I choose a Role of "4"
 
-    Then I choose to expand the Conclusion section
+    Then I expand the "Conclusion" section
     And I choose a Conclusion option of "glasses prescribed, "
 
     Then I Save the Examination and confirm it has been created successfully
@@ -525,10 +524,10 @@ Feature: Create New Examination Regression Tests
 
     Then I select a History of Blurred Vision, Mild Severity, Onset 1 Week, Left Eye, 1 Week
 
-    And I choose to expand the Comorbidities section
+    And I expand the "Comorbidities" section
     Then I Add a Comorbiditiy of "8"
 
-    Then I choose to expand the Visual Function section
+    Then I expand the "Visual Function" section
 
     Then I select a Left RAPD
     And I add Left RAPD comments of "Left RAPD Automation test comments"
@@ -536,28 +535,28 @@ Feature: Create New Examination Regression Tests
     Then I select a Right RAPD
     And I add Right RAPD comments of "Left RAPD Automation test comments"
 
-    Then I choose to expand the Colour Vision section
+    Then I expand the "Colour Vision" section
     And I choose a Left Colour Vision of "1"
     And I choose A Left Colour Vision Value of "8"
     And I choose a Right Colour Vision of "2"
     And I choose A Right Colour Vision Value of "4"
 
-    Then I choose to expand the Visual Acuity section
+    Then I expand the "Visual Acuity" section
     And I select a Visual Acuity of "1"
     Then I choose a left Visual Acuity ETDRS Letters Snellen Metre "119" and a reading method of "2"
     Then I choose a right Visual Acuity ETDRS Letters Snellen Metre "119" and a reading method of "2"
 
-    Then I choose to expand the Intraocular Pressure section
+    Then I expand the "Intraocular Pressure" section
     Then I choose a left Intraocular Pressure of "8" and Instrument "4"
     Then I choose a right Intraocular Pressure of "77" and Instrument "1"
 
-    Then I choose to expand the Dilation section
+    Then I expand the "Dilation" section
     Then I choose left Dilation of "5" and drops of "4"
     Then I choose right Dilation of "2" and drops of "2"
     And I enter a left Dilation time of "06:05"
     And I enter a right Dilation time of "18:45"
 
-    Then I choose to expand the Refraction section
+    Then I expand the "Refraction" section
     Then I enter left Refraction details of Sphere "-1" integer "11" fraction "0.50"
     And I enter left cylinder details of of Cylinder "1" integer "4" fraction "0.25"
     Then I enter left Axis degrees of "56"
@@ -569,28 +568,28 @@ Feature: Create New Examination Regression Tests
     Then I enter right Axis degrees of "167"
     And I enter a right type of "3"
 
-    Then I choose to expand the Adnexal Comorbidity section
+    Then I expand the "Adnexal Comorbidity" section
     And I add a left Adnexal Comorbidity of "crusting of lashes, "
     And I add a right Adnexal Comorbidity of "conjunctivitis, "
 
-    Then I choose to expand the Pupillary Abnormalities section
+    Then I expand the "Pupillary Abnormalities" section
     And I add a left Abnormality of "3"
     And I add a right Abnormality of "4"
 
-    Then I choose to expand the Diagnoses section
+    Then I expand the "Diagnoses" section
     And I choose a right eye diagnosis
     And I select "Traumatic cataract" for "Diagnosis"
     Then I choose a principal diagnosis
 
-    Then I choose to expand the Investigation section
+    Then I expand the "Investigation" section
     And I add an Investigation of "refraction, "
     And I add an Investigation of "Fluorescein angiography, "
     And I add an Investigation of "OCT, "
     And I add an Investigation of "ultrasound, "
     And I add an Investigation of "field test, "
 
-    Then I choose to expand the Clinical Management section
-    And I choose to expand Cataract Surgical Management
+    Then I expand the "Clinical Management" section
+    And I expand the "Cataract Surgical Management" section
     And I add Cataract Management Comments of "new glasses prescribed, "
     Then I select First Eye
 
@@ -602,13 +601,13 @@ Feature: Create New Examination Regression Tests
     Then I select Previous Refractive Surgery No
     And I select Vitrectomised Eye No
 
-    Then I choose to expand the Laser Management section
+    Then I expand the "Laser Management" section
     And I choose a right laser choice of "4"
     And I choose a left laser choice of "4"
     And I choose a left laser type of "1"
     And I choose a right laser type of "2"
 
-    Then I choose to expand the Injection Management section
+    Then I expand the "Injection Management" section
 
     And I select a Right Diagnosis of Macular retinal oedema
     Then I select Right Secondary of Venous retinal branch occlusion
@@ -637,10 +636,10 @@ Feature: Create New Examination Regression Tests
     Then I choose a Left Previous Anti VEGF of Yes
     Then I choose a Left Previous Anti VEGF of No
 
-    Then I choose to expand the Risks section
+    Then I expand the "Risks" section
     And I add comments to the Risk section of "Risk section comments Automation Test"
 
-    Then I choose to expand the Clinic Outcome section
+    Then I expand the "Clinic Outcome" section
 
     And I choose a Clinical Outcome Status of Discharge
 
@@ -650,7 +649,7 @@ Feature: Create New Examination Regression Tests
     And I tick the Patient Suitable for Community Patient Tariff
     Then I choose a Role of "1"
 
-    Then I choose to expand the Conclusion section
+    Then I expand the "Conclusion" section
     And I choose a Conclusion option of "booked for first eye, "
 
     Then I Save the Examination and confirm it has been created successfully
@@ -669,7 +668,7 @@ Feature: Create New Examination Regression Tests
     Then I expand the Glaucoma sidebar
     And I add a New Event "Examination"
 
-    Then I choose to expand the Conclusion section
+    Then I expand the "Conclusion" section
 
     Then I Save the Examination
 
@@ -690,7 +689,7 @@ Feature: Create New Examination Regression Tests
     Then I expand the Cataract sidebar
     And I add a New Event "Examination"
 
-    Then I choose to expand the Dilation section
+    Then I expand the "Dilation" section
 
     Then I Save the Examination
 
@@ -711,7 +710,7 @@ Feature: Create New Examination Regression Tests
     Then I expand the Medical Retinal sidebar
     And I add a New Event "Examination"
 
-    Then I choose to expand the Dilation section
+    Then I expand the "Dilation" section
 
     Then I Save the Examination
 
@@ -732,7 +731,7 @@ Feature: Create New Examination Regression Tests
     Then I expand the Glaucoma sidebar
     And I add a New Event "Examination"
 
-    Then I choose to expand the Dilation section
+    Then I expand the "Dilation" section
 
     Then I Save the Examination
 
@@ -793,7 +792,7 @@ Feature: Create New Examination Regression Tests
     Then I expand the Cataract sidebar
     And I add a New Event "Examination"
 
-    Then I choose to expand the Dilation section
+    Then I expand the "Dilation" section
     Then I choose left Dilation of "5" and drops of "4"
     Then I choose right Dilation of "2" and drops of "2"
     And I enter a left Dilation time of "35:00"
@@ -822,7 +821,7 @@ Feature: Create New Examination Regression Tests
 
     Then I select a History of Blurred Vision, Mild Severity, Onset 1 Week, Left Eye, 1 Week
 
-    Then I choose to expand the DR Grading section
+    Then I expand the "DR Grading" section
 
     And I select a left Clinical Grading for Retinopathy of "2"
     And I select a left NSC Retinopathy of "2"
@@ -858,7 +857,7 @@ Feature: Create New Examination Regression Tests
 
     Then I select a History of Blurred Vision, Mild Severity, Onset 1 Week, Left Eye, 1 Week
 
-    Then I choose to expand the DR Grading section
+    Then I expand the "DR Grading" section
 
     And I select a left Clinical Grading for Retinopathy of "1"
     And I select a left NSC Retinopathy of "1"
@@ -874,7 +873,7 @@ Feature: Create New Examination Regression Tests
     And I select a right NSC maculopathy of "1"
     And I select a right Maculopathy photocoagulation of No
 
-    Then I choose to expand the Dilation section
+    Then I expand the "Dilation" section
     Then I choose left Dilation of "5" and drops of "4"
     Then I choose right Dilation of "2" and drops of "2"
 
@@ -898,7 +897,7 @@ Feature: Create New Examination Regression Tests
 
     Then I select a History of Blurred Vision, Mild Severity, Onset 1 Week, Left Eye, 1 Week
 
-    Then I choose to expand the DR Grading section
+    Then I expand the "DR Grading" section
 
     And I select a left Clinical Grading for Retinopathy of "3"
     And I select a left NSC Retinopathy of "3"
@@ -914,7 +913,7 @@ Feature: Create New Examination Regression Tests
     And I select a right NSC maculopathy of "3"
     And I select a right Maculopathy photocoagulation of Yes
 
-    Then I choose to expand the Dilation section
+    Then I expand the "Dilation" section
     Then I choose left Dilation of "5" and drops of "4"
     Then I choose right Dilation of "2" and drops of "2"
 
@@ -938,10 +937,10 @@ Feature: Create New Examination Regression Tests
 
     Then I select a History of Blurred Vision, Mild Severity, Onset 1 Week, Left Eye, 1 Week
 
-    And I choose to expand the Comorbidities section
+    And I expand the "Comorbidities" section
     Then I Add a Comorbiditiy of "4"
 
-    Then I choose to expand the Visual Function section
+    Then I expand the "Visual Function" section
 
     Then I select a Left RAPD
     And I add Left RAPD comments of "Left RAPD Automation test comments"
@@ -949,13 +948,13 @@ Feature: Create New Examination Regression Tests
     Then I select a Right RAPD
     And I add Right RAPD comments of "Left RAPD Automation test comments"
 
-    Then I choose to expand the Colour Vision section
+    Then I expand the "Colour Vision" section
     And I choose a Left Colour Vision of "1"
     And I choose A Left Colour Vision Value of "8"
     And I choose a Right Colour Vision of "2"
     And I choose A Right Colour Vision Value of "4"
 
-    Then I choose to expand the Visual Acuity section
+    Then I expand the "Visual Acuity" section
 
     And I remove the initial Left Visual Acuity
     And I select Left Unable to assess checkbox
@@ -984,10 +983,10 @@ Feature: Create New Examination Regression Tests
 
     Then I select a History of Blurred Vision, Mild Severity, Onset 1 Week, Left Eye, 1 Week
 
-    And I choose to expand the Comorbidities section
+    And I expand the "Comorbidities" section
     Then I Add a Comorbiditiy of "8"
 
-    Then I choose to expand the Visual Function section
+    Then I expand the "Visual Function" section
 
     Then I select a Left RAPD
     And I add Left RAPD comments of "Left RAPD Automation test comments"
@@ -995,28 +994,28 @@ Feature: Create New Examination Regression Tests
     Then I select a Right RAPD
     And I add Right RAPD comments of "Left RAPD Automation test comments"
 
-    Then I choose to expand the Colour Vision section
+    Then I expand the "Colour Vision" section
     And I choose a Left Colour Vision of "1"
     And I choose A Left Colour Vision Value of "8"
     And I choose a Right Colour Vision of "2"
     And I choose A Right Colour Vision Value of "4"
 
-    Then I choose to expand the Visual Acuity section
+    Then I expand the "Visual Acuity" section
     And I select a Visual Acuity of "2"
     Then I choose a left Visual Acuity Snellen Metre "4" and a reading method of "5"
     Then I choose a right Visual Acuity Snellen Metre "4" and a reading method of "5"
 
-    Then I choose to expand the Intraocular Pressure section
+    Then I expand the "Intraocular Pressure" section
     Then I choose a left Intraocular Pressure of "8" and Instrument "4"
     Then I choose a right Intraocular Pressure of "77" and Instrument "1"
 
-    Then I choose to expand the Dilation section
+    Then I expand the "Dilation" section
     Then I choose left Dilation of "5" and drops of "4"
     Then I choose right Dilation of "2" and drops of "2"
     And I enter a left Dilation time of "06:05"
     And I enter a right Dilation time of "18:45"
 
-    Then I choose to expand the Refraction section
+    Then I expand the "Refraction" section
     Then I enter left Refraction details of Sphere "-1" integer "11" fraction "0.50"
     And I enter left cylinder details of of Cylinder "1" integer "4" fraction "0.25"
     Then I enter left Axis degrees of "56"
@@ -1028,28 +1027,28 @@ Feature: Create New Examination Regression Tests
     Then I enter right Axis degrees of "167"
     And I enter a right type of "3"
 
-    Then I choose to expand the Adnexal Comorbidity section
+    Then I expand the "Adnexal Comorbidity" section
     And I add a left Adnexal Comorbidity of "crusting of lashes, "
     And I add a right Adnexal Comorbidity of "conjunctivitis, "
 
-    Then I choose to expand the Pupillary Abnormalities section
+    Then I expand the "Pupillary Abnormalities" section
     And I add a left Abnormality of "3"
     And I add a right Abnormality of "4"
 
-    Then I choose to expand the Diagnoses section
+    Then I expand the "Diagnoses" section
     And I choose both eyes diagnosis
     And I select "Congenital cataract" for "Diagnosis"
     Then I choose a principal diagnosis
 
-    Then I choose to expand the Investigation section
+    Then I expand the "Investigation" section
     And I add an Investigation of "refraction, "
     And I add an Investigation of "Fluorescein angiography, "
     And I add an Investigation of "OCT, "
     And I add an Investigation of "ultrasound, "
     And I add an Investigation of "field test, "
 
-    Then I choose to expand the Clinical Management section
-    And I choose to expand Cataract Surgical Management
+    Then I expand the "Clinical Management" section
+    And I expand the "Cataract Surgical Management" section
     And I add Cataract Management Comments of "new glasses prescribed, "
     Then I select First Eye
 
@@ -1061,13 +1060,13 @@ Feature: Create New Examination Regression Tests
     Then I select Previous Refractive Surgery No
     And I select Vitrectomised Eye No
 
-    Then I choose to expand the Laser Management section
+    Then I expand the "Laser Management" section
     And I choose a right laser choice of "4"
     And I choose a left laser choice of "4"
     And I choose a left laser type of "1"
     And I choose a right laser type of "2"
 
-    Then I choose to expand the Injection Management section
+    Then I expand the "Injection Management" section
 
     And I select a Right Diagnosis of Macular retinal oedema
     Then I select Right Secondary of Venous retinal branch occlusion
@@ -1101,7 +1100,7 @@ Feature: Create New Examination Regression Tests
     And I choose a Left Risks of "1"
     Then I choose Left Injection Management Comments of "Automation Test Comments"
 
-    Then I choose to expand the Overall Management section
+    Then I expand the "Overall Management" section
     And I choose a Clinical Interval of "1"
     And I choose a Photo of "1"
     And I choose a OCT of "4"
@@ -1113,7 +1112,7 @@ Feature: Create New Examination Regression Tests
     And I choose a Left Target IOP of "15"
   #    And I choose a Left Gonio of "3"
 
-    Then I choose to expand the Current Management section
+    Then I expand the "Current Management" section
 
   #    And I choose a Referral of Other Service
   #    And I choose a Referral of Refraction
@@ -1139,10 +1138,10 @@ Feature: Create New Examination Regression Tests
     And I select a Right Drops of "4"
     And I select a Right Surgery of "5"
 
-    Then I choose to expand the Risks section
+    Then I expand the "Risks" section
     And I add comments to the Risk section of "Risk section comments Automation Test"
 
-    Then I choose to expand the Clinic Outcome section
+    Then I expand the "Clinic Outcome" section
 
     And I choose a Clinical Outcome Status of Discharge
 
@@ -1152,7 +1151,7 @@ Feature: Create New Examination Regression Tests
     And I tick the Patient Suitable for Community Patient Tariff
     Then I choose a Role of "1"
 
-    Then I choose to expand the Conclusion section
+    Then I expand the "Conclusion" section
     And I choose a Conclusion option of "booked for first eye, "
 
     Then I Save the Examination and confirm it has been created successfully
