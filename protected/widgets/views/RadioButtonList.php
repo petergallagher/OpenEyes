@@ -25,6 +25,12 @@
 		<input type="hidden" value="" name="<?php echo CHtml::modelName($element)?>[<?php echo $field?>]">
 	<?php }?>
 
+	<?php if (@$htmlOptions['empty'] && !@$htmlOptions['empty-after']) {?>
+		<label class="inline highlight">
+			<?php echo CHtml::radioButton($name, is_null($value), array('value' => "", "id" => CHtml::modelName($element). '_' . $field . '_'))?>
+			<?php echo CHtml::encode(@$htmlOptions['empty'])?>
+		</label>
+	<?php }?>
 	<?php foreach ($data as $id => $data_value) {?>
 		<?php
 			$options = array('value' => $id, "id" => CHtml::modelName($element). '_' . $field . '_' . $id);
@@ -36,8 +42,14 @@
 			}?>
 			<label class="inline highlight">
 				<?php echo CHtml::radioButton($name, (!is_null($value) && $value == $id) && (!is_string($value) || $value!=""), $options); ?>
-		 		<?php echo CHtml::encode($data_value)?>
-	 		</label>
+				<?php echo CHtml::encode($data_value)?>
+			</label>
+	<?php }?>
+	<?php if (@$htmlOptions['empty'] && @$htmlOptions['empty-after']) {?>
+		<label class="inline highlight">
+			<?php echo CHtml::radioButton($name, is_null($value), array('value' => "", "id" => CHtml::modelName($element). '_' . $field . '_'))?>
+			<?php echo CHtml::encode(@$htmlOptions['empty'])?>
+		</label>
 	<?php }?>
 
 <?php } else {?>
@@ -58,6 +70,12 @@
 					<?php echo CHtml::encode($element->getAttributeLabel($field))?>
 				</label>
 			<?php }?>
+			<?php if (@$htmlOptions['empty'] && !@$htmlOptions['empty-after']) {?>
+				<label class="inline highlight">
+					<?php echo CHtml::radioButton($name, is_null($value), array('value' => "", "id" => CHtml::modelName($element). '_' . $field . '_'))?>
+					<?php echo CHtml::encode(@$htmlOptions['empty'])?>
+				</label>
+			<?php }?>
 			<?php foreach ($data as $id => $data_value) {?>
 				<label class="inline highlight">
 					<?php
@@ -72,6 +90,12 @@
 						echo CHtml::radioButton($name, (!is_null($value) && $value == $id) && (!is_string($value) || $value!=""), $options);
 					?>
 					<?php echo CHtml::encode($data_value)?>
+				</label>
+			<?php }?>
+			<?php if (@$htmlOptions['empty'] && @$htmlOptions['empty-after']) {?>
+				<label class="inline highlight">
+					<?php echo CHtml::radioButton($name, is_null($value), array('value' => "", "id" => CHtml::modelName($element). '_' . $field . '_'))?>
+					<?php echo CHtml::encode(@$htmlOptions['empty'])?>
 				</label>
 			<?php }?>
 		</div>
