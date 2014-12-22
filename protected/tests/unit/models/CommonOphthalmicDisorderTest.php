@@ -84,22 +84,6 @@ class CommonOphthalmicDisorderTest extends CDbTestCase
 		$this->assertEmpty($this->disorders('commonOphthalmicDisorder1')->errors);
 	}
 
-	/**
-	 * @covers CommonOphthalmicDisorder::attributeLabels
-	 */
-	public function testAttributeLabels()
-	{
-		$expected = array(
-			'id' => 'ID',
-			'disorder_id' => 'Disorder',
-			'subspecialty_id' => 'Subspecialty',
-			'finding_id' => 'Finding',
-			'alternate_disorder_id' => 'Alternate Disorder'
-		);
-
-		$this->assertEquals($expected, $this->model->attributeLabels());
-	}
-
 	public function testGetList_MissingFirm_ThrowsException()
 	{
 		$this->setExpectedException('Exception');

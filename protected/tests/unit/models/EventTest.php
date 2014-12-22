@@ -97,18 +97,6 @@ class EventTest extends CDbTestCase
 	}
 
 	/**
-	 * @covers Event::attributeLabels
-	 * @todo	 Implement testAttributeLabels().
-	 */
-	public function testAttributeLabels()
-	{
-			// Remove the following lines when you implement this test.
-			$this->markTestIncomplete(
-				'This test has not been implemented yet.'
-			);
-	}
-
-	/**
 	 * @covers Event::search
 	 * @todo	 Implement testSearch().
 	 */
@@ -265,15 +253,6 @@ class EventTest extends CDbTestCase
 		$this->assertEquals(null, $event->getElements());
 
 		$this->markTestIncomplete('At the moment this does not test that we are actually querying the element types for the event type of the event.');
-	}
-
-	public function testGetImageDirectory()
-	{
-		Yii::app()->assetManager->basePath = Yii::app()->basePath."/assets";
-
-		$event = $this->event('event1');
-
-		$this->assertEquals(Yii::app()->basePath."/assets/events/event_{$event->id}_".(strtotime($event->last_modified_date)), $event->getImageDirectory());
 	}
 
 	public function testHasEventImage_False()
