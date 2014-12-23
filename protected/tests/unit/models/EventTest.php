@@ -297,6 +297,8 @@ class EventTest extends CDbTestCase
 
 	public function testHasPDF_Event_True()
 	{
+		$this->markTestSkipped("PDF caching temporarily disabled, see OEM-281");
+
 		Yii::app()->assetManager->basePath = Yii::app()->basePath."/assets";
 	 
 		$event = $this->event('event1');
@@ -321,6 +323,8 @@ class EventTest extends CDbTestCase
 
 	public function testHasPDF_Event_False()
 	{
+		$this->markTestSkipped("PDF caching temporarily disabled, see OEM-281");
+
 		Yii::app()->assetManager->basePath = Yii::app()->basePath."/assets";
 
 		$event = $this->event('event1');
@@ -330,6 +334,8 @@ class EventTest extends CDbTestCase
 
 	public function testHasPDF_Other_True()
 	{
+		$this->markTestSkipped("PDF caching temporarily disabled, see OEM-281");
+
 		Yii::app()->assetManager->basePath = Yii::app()->basePath."/assets";
 	
 		$event = $this->event('event1');
@@ -354,6 +360,8 @@ class EventTest extends CDbTestCase
 
 	public function testHasPDF_Other_False()
 	{
+		$this->markTestSkipped("PDF caching temporarily disabled, see OEM-281");
+
 		Yii::app()->assetManager->basePath = Yii::app()->basePath."/assets";
 
 		$event = $this->event('event1');
