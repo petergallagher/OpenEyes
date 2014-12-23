@@ -20,7 +20,7 @@
 <?php if (@$htmlOptions['nowrapper']) {?>
 	<?php echo CHtml::activeDropDownList($element,$field,$data,$htmlOptions)?>
 <?php } else {?>
-	<div id="div_<?php echo CHtml::modelName($element)?>_<?php echo $field?>" class="row field-row"<?php if (@$hidden) {?> style="display: none;"<?php }?>>
+	<div id="div_<?php echo CHtml::modelName($element)?>_<?php echo $field?>" class="row field-row<?php if (@$htmlOptions['div-class']) {?> <?php echo $htmlOptions['div-class']?><?php }?>"<?php if (@$hidden) {?> style="display: none;"<?php }?>>
 
 		<?php if (@$htmlOptions['layout'] == 'vertical') {?>
 			<div class="large-12 column end">

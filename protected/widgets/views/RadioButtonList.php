@@ -27,7 +27,7 @@
 
 	<?php if (@$htmlOptions['empty'] && !@$htmlOptions['empty-after']) {?>
 		<label class="inline highlight">
-			<?php echo CHtml::radioButton($name, is_null($value), array('value' => "", "id" => CHtml::modelName($element). '_' . $field . '_'))?>
+			<?php echo CHtml::radioButton($name, strlen($value) == 0, array('value' => "", "id" => CHtml::modelName($element). '_' . $field . '_'))?>
 			<?php echo CHtml::encode(@$htmlOptions['empty'])?>
 		</label>
 	<?php }?>
@@ -47,7 +47,7 @@
 	<?php }?>
 	<?php if (@$htmlOptions['empty'] && @$htmlOptions['empty-after']) {?>
 		<label class="inline highlight">
-			<?php echo CHtml::radioButton($name, is_null($value), array('value' => "", "id" => CHtml::modelName($element). '_' . $field . '_'))?>
+			<?php echo CHtml::radioButton($name, strlen($value) == 0, array('value' => "", "id" => CHtml::modelName($element). '_' . $field . '_'))?>
 			<?php echo CHtml::encode(@$htmlOptions['empty'])?>
 		</label>
 	<?php }?>
@@ -72,7 +72,7 @@
 			<?php }?>
 			<?php if (@$htmlOptions['empty'] && !@$htmlOptions['empty-after']) {?>
 				<label class="inline highlight">
-					<?php echo CHtml::radioButton($name, is_null($value), array('value' => "", "id" => CHtml::modelName($element). '_' . $field . '_'))?>
+					<?php echo CHtml::radioButton($name, strlen($value) == 0, array('value' => "", "id" => CHtml::modelName($element). '_' . $field . '_'))?>
 					<?php echo CHtml::encode(@$htmlOptions['empty'])?>
 				</label>
 			<?php }?>
@@ -94,7 +94,7 @@
 			<?php }?>
 			<?php if (@$htmlOptions['empty'] && @$htmlOptions['empty-after']) {?>
 				<label class="inline highlight">
-					<?php echo CHtml::radioButton($name, is_null($value), array('value' => "", "id" => CHtml::modelName($element). '_' . $field . '_'))?>
+					<?php echo CHtml::radioButton($name, strlen($value) == 0, array('value' => "", "id" => CHtml::modelName($element). '_' . $field . '_'))?>
 					<?php echo CHtml::encode(@$htmlOptions['empty'])?>
 				</label>
 			<?php }?>
