@@ -213,7 +213,6 @@ class AdminController extends BaseAdminController
 
 	public function actionAddDrug()
 	{
-		return; //disabled OE-4474
 		$drug=new Drug('create');
 
 		if (!empty($_POST)) {
@@ -252,7 +251,6 @@ class AdminController extends BaseAdminController
 
 	public function actionEditDrug($id)
 	{
-		return; //disabled OE-4474
 		if (!$drug = Drug::model()->findByPk($id)) {
 			throw new Exception("Drug not found: $id");
 		}
@@ -310,6 +308,18 @@ class AdminController extends BaseAdminController
 				'drug' => $drug,
 				'errors' => @$errors,
 			));
+	}
+
+	public function actionDrugSets()
+	{
+
+
+		$this->render('/admin/drugsets',array(
+			'subspecialty_id' => null,
+			'errors' => null,
+			'drug_set'=>array(),
+			'drug_sets'=>array(),
+		));
 	}
 
 	public function actionUserFind()
