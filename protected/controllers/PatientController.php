@@ -84,6 +84,10 @@ class PatientController extends BaseController
 				'actions' => array('editSocialHistory', 'editSocialHistory'),
 				'roles' => array('OprnEditSocialHistory')
 			),
+			array('allow',
+				'actions' => array('shortCodeDescription'),
+				'roles' => array('admin'),
+			),
 		);
 	}
 
@@ -1359,5 +1363,14 @@ class PatientController extends BaseController
 	{
 		$oprn = 'OprnCreate' . ($event_type->class_name == 'OphDrPrescription' ? 'Prescription' : 'Event');
 		return $this->checkAccess($oprn, $this->firm, $episode, $event_type);
+	}
+
+	public function actionShortCodeDescription()
+	{
+		if (!$code = PatientShortcode::model()->find('code=?',array(@$_GET['shortcode']))) {
+			throw new Exception("Unknown shortcode: ".@$_GET['shortcode']);
+		}
+
+		echo $code->code.": ".$code->description;
 	}
 }
