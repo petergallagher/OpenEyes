@@ -136,29 +136,6 @@ class CommonOphthalmicDisorder extends BaseActiveRecordVersioned
 	}
 
 	/**
-	 * Retrieves a list of models based on the current search/filter conditions.
-	 * @return CActiveDataProvider the data provider that can return the models based on the search/filter conditions.
-	 */
-	public function search()
-	{
-		// Warning: Please modify the following code to remove attributes that
-		// should not be searched.
-
-		$criteria=new CDbCriteria;
-
-		$criteria->compare('id',$this->id,true);
-		$criteria->compare('disorder_id',$this->disorder_id,true);
-		$criteria->compare('finding_id',$this->finding_id,true);
-		$criteria->compare('group_id',$this->group_id,true);
-		$criteria->compare('alternate_disorder_id',$this->subspecialty_id,true);
-		$criteria->compare('subspecialty_id',$this->subspecialty_id,true);
-
-		return new CActiveDataProvider(get_class($this), array(
-			'criteria'=>$criteria,
-		));
-	}
-
-	/**
 	 * @return string
 	 */
 	public function getType()

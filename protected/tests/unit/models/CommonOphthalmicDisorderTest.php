@@ -30,17 +30,6 @@ class CommonOphthalmicDisorderTest extends CDbTestCase
 		'disorders' => 'CommonOphthalmicDisorder'
 	);
 
-	public function dataProvider_Search()
-	{
-		return array(
-			array(array('disorder_id' => 1), 1, array('commonOphthalmicDisorder1')),
-			array(array('disorder_id' => 2), 1, array('commonOphthalmicDisorder2')),
-			array(array('disorder_id' => 3), 1, array('commonOphthalmicDisorder3')),
-			array(array('disorder_id' => 6), 0, array()),
-			array(array('subspecialty_id' => 1), 2, array('commonOphthalmicDisorder1', 'commonOphthalmicDisorder2')),
-		);
-	}
-
 	public function dataProvider_List()
 	{
 		return array(
@@ -105,28 +94,6 @@ class CommonOphthalmicDisorderTest extends CDbTestCase
 	{
 		$res = CommonOphthalmicDisorder::getList($this->firms($firmkey), $get_findings);
 		$this->assertCount($result_count, $res);
-	}
-
-	/**
-	 * @dataProvider dataProvider_Search
-	 */
-	public function testSearch_WithValidTerms_ReturnsExpectedResults($searchTerms, $numResults, $expectedKeys)
-	{
-		$this->markTestIncomplete('Temporarily suspended as search isnt really used');
-		$disorder = new CommonOphthalmicDisorder;
-		$disorder->setAttributes($searchTerms);
-		$results = $disorder->search();
-		$data = $results->getData();
-
-		$expectedResults = array();
-		if (!empty($expectedKeys)) {
-			foreach ($expectedKeys as $key) {
-				$expectedResults[] = $this->disorders($key);
-			}
-		}
-
-		$this->assertEquals($numResults, $results->getItemCount());
-		$this->assertEquals($expectedResults, $data);
 	}
 
 	public function testgetListWithSecondaryTo()
