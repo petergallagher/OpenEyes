@@ -28,8 +28,7 @@ return array(
 	),
 	'ex_findings_subspec_ass3' => array(
 		'id' => 3,
-		'finding_id' => 3,
+		'finding_id' => 4,
 		'subspecialty_id' => 2
 	),
-
 );

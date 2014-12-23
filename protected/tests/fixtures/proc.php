@@ -36,10 +36,10 @@ return array(
 		'unbooked' => 1,
 	),
 	'procedure3' => array(
-		'term' => 'Test Procedure 2',
+		'term' => 'Another One',
 		'short_format' => 'PP',
 		'snomed_code' => '67891',
-		'snomed_term' => 'Blah',
+		'snomed_term' => 'Bluh',
 		'default_duration' => 23,
 		'unbooked' => 1,
 	)
