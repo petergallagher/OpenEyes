@@ -23,7 +23,7 @@ abstract class ModelService extends InternalService
 	/**
 	 * Default set of operations for a model service, override if required
 	 */
-	static protected $operations = array(self::OP_READ, self::OP_UPDATE, self::OP_CREATE);
+	static protected $operations = array(self::OP_READ, self::OP_UPDATE, self::OP_CREATE, self::OP_HISTORY);
 
 	/**
 	 * The primary model class for this service
@@ -100,6 +100,27 @@ abstract class ModelService extends InternalService
 		$model = new $class;
 		$this->resourceToModel($resource, $model);
 		return $model->id;
+	}
+
+	/**
+	 * @param int $count
+	 * @param DateTime $since
+	 * @return ModelResource[]
+	 */
+	public function history($count = null, \DateTime $since = null)
+	{
+		$crit = new \CDbCriteria(array('order' => 'last_modified_date'));
+
+		if ($count) $crit->limit = $count;
+		if ($since) {
+			$since->setTimeZone(new \DateTimeZone(date_default_timezone_get()));  // FIXME: this is probably broken
+			$crit->addCondition('last_modified_date >= :since');
+			$crit->params[':since'] = $since->format('Y-m-d H:i:s');
+		}
+
+		$class = static::$primary_model;
+		$resources = $class::model()->findAll($crit);
+		return array_map(array($this, 'modelToResource'), $resources);
 	}
 
 	/**

@@ -210,6 +210,41 @@ class Api_PatientTest extends FhirTestCase
 		$this->assertXPathEquals('Patient', 'local-name(./atom:entry/atom:content/*)');
 	}
 
+	public function testTypeHistory_Count()
+	{
+		$this->get('Patient/_history?_count=23');
+		$this->assertXPathEquals($this->client->getBaseUrl(), 'string(./atom:link[@rel="base"]/@href)');
+		$this->assertUrlEquals(
+			$this->client->getBaseUrl() . '/Patient/_history?_count=23',
+			$this->xPathEval('string(./atom:link[@rel="self"]/@href)')
+		);
+		$this->assertXPathEquals('feed', 'local-name()');
+		$this->assertXPathCount(23, './atom:entry');
+
+		$expected_ids = array(17885,17886,17887,17888,17889,17890,17891,17892,17893,17894,17895,17896,17897,17898,17899,17900,17901,17902,17903,17904,17905,17906,17907);
+		$actual_ids = array_map(function ($node) { return preg_replace('|^.*/|', '', $node->wholeText); }, iterator_to_array($this->xPathEval('./atom:entry/atom:id/text()')));
+
+		$this->assertEmpty(array_diff($expected_ids, $actual_ids));
+	}
+
+	public function testTypeHistory_Since()
+	{
+		$url = 'Patient/_history?_since=' . urlencode('2012-10-05T12:24:40+0100');
+
+		$this->get($url);
+		$this->assertXPathEquals($this->client->getBaseUrl(), 'string(./atom:link[@rel="base"]/@href)');
+		$this->assertUrlEquals(
+			$this->client->getBaseUrl() . '/' . $url,
+			$this->xPathEval('string(./atom:link[@rel="self"]/@href)')
+		);
+		$this->assertXPathEquals('feed', 'local-name()');
+
+		$expected_ids = array(19951,19952,19953,19954,19955,19956,19957,19958,19959,19960,19961,19962,19963,19964,19965,19966,19967,19968,19969);
+		$actual_ids = array_map(function ($node) { return preg_replace('|^.*/|', '', $node->wholeText); }, iterator_to_array($this->xPathEval('./atom:entry/atom:id/text()')));
+
+		$this->assertEmpty(array_diff($expected_ids, $actual_ids));
+	}
+
 	public function testCountryDefaultsToUk()
 	{
 		$this->post('Patient', file_get_contents(__DIR__ . '/files/Patient-invalid-country.xml'));

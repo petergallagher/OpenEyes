@@ -77,7 +77,7 @@ class ServiceManager extends \CApplicationComponent
 	 * @param string[] $profiles
 	 * @return InternalService|null
 	 */
-	public function getFhirService($fhir_type, array $profiles)
+	public function getFhirService($fhir_type, array $profiles = array())
 	{
 		$candidates = array_filter($this->service_config, function ($config) use ($fhir_type) { return $config['fhir_type'] == $fhir_type; });
 

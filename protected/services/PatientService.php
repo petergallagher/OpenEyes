@@ -17,7 +17,7 @@ namespace services;
 
 class PatientService extends ModelService
 {
-	static protected $operations = array(self::OP_READ, self::OP_UPDATE, self::OP_CREATE, self::OP_SEARCH);
+	static protected $operations = array(self::OP_READ, self::OP_UPDATE, self::OP_CREATE, self::OP_SEARCH, self::OP_HISTORY);
 
 	static protected $search_params = array(
 		'id' => self::TYPE_TOKEN,

@@ -320,18 +320,7 @@ class ApiController extends CController
 			$resources = array();
 		}
 
-		$self_url = $this->createAbsoluteUrl("api/search", $used_params);
-		$base_url = $this->createAbsoluteUrl('api/');
-
-		$indexed_resources = array();
-		foreach ($resources as $resource) {
-			$url = $base_url . '/' . Yii::app()->service->serviceAndIdToFhirUrl($service->getServiceName(), $resource->getId());
-			$indexed_resources[$url] = $resource;
-		}
-
-		$bundle = services\FhirBundle::create("Search results", $self_url, $base_url, $indexed_resources);
-
-		$this->sendBundle($bundle);
+		$this->sendBundle($service, $resources, $used_params);
 	}
 
 	private function getSearchService($resource_type, array &$params)
@@ -361,6 +350,31 @@ class ApiController extends CController
 		}
 
 		return $service;
+	}
+
+	/**
+	 * Retrieve resource type history
+	 *
+	 * @param string $resource_type
+	 */
+	public function actionTypeHistory($resource_type)
+	{
+		if (isset($_GET['_since'])) {
+			$since = DateTime::createFromFormat(DateTime::ISO8601, $_GET['_since']);
+			if ($since === false) {
+				// TODO
+			}
+		} else {
+			$since = null;
+		}
+
+		$service = Yii::app()->service->getFhirService($resource_type);
+
+		$resources = $service->history(@$_GET['_count'], $since);
+
+		$used_params = array('resource_type' => $resource_type) + array_intersect_key($_GET, array('_format' => 1, '_count' => 1, '_since' => 1));
+
+		$this->sendBundle($service, $resources, $used_params);
 	}
 
 	// WhOLE SYSTEM INTERACTIONS
@@ -461,8 +475,22 @@ class ApiController extends CController
 		}
 	}
 
-	protected function sendBundle(services\FhirBundle $bundle)
+	protected function sendBundle(services\Service $service = null, array $resources, array $used_params = array())
 	{
+		$base_url = $this->createAbsoluteUrl('api/');
+
+		$indexed_resources = array();
+		if ($service) {
+			foreach ($resources as $resource) {
+				$url = $base_url . '/' . Yii::app()->service->serviceAndIdToFhirUrl($service->getServiceName(), $resource->getId());
+				$indexed_resources[$url] = $resource;
+			}
+		}
+
+		$self_url = $this->createAbsoluteUrl($this->getRoute(), $used_params);
+
+		$bundle = services\FhirBundle::create("Search results", $self_url, $base_url, $indexed_resources);
+
 		$data = $bundle->toFhir();
 
 		if ($this->output_format == 'xml') {

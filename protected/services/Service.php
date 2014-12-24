@@ -71,4 +71,14 @@ abstract class Service
 	 * @return Resource[]
 	 */
 	abstract public function search(array $params);
+
+
+	/**
+	 * Retrieve history of all resources of this type
+	 *
+	 * @param int $count
+	 * @param DateTime $since
+	 * @return Resource[]
+	 */
+	abstract public function history($count = null, \DateTime $since = null);
 }

@@ -26,6 +26,7 @@ abstract class InternalService extends Service
 	const OP_DELETE = 'delete';
 	const OP_CREATE = 'create';
 	const OP_SEARCH = 'search-type';
+	const OP_HISTORY = 'history-type';
 
 	// Available search parameter types (from http://hl7.org/implement/standards/fhir/search-param-type.html)
 	const TYPE_NUMBER = \FhirValueSet::SEARCHPARAMTYPE_NUMBER;
@@ -153,6 +154,18 @@ abstract class InternalService extends Service
 	 * @return Resource[]
 	 */
 	public function search(array $params)
+	{
+		throw new ProcessingNotSupported("Search operation not supported");
+	}
+
+	/**
+	 * Retrieve history of all resources of this type
+	 *
+	 * @param int $count
+	 * @param DateTime $since
+	 * @return Resource[]
+	 */
+	public function history($count = null, \DateTime $since = null)
 	{
 		throw new ProcessingNotSupported("Search operation not supported");
 	}

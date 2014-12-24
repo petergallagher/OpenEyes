@@ -208,6 +208,7 @@ return array(
 				array('api/create', 'pattern' => 'api/<resource_type:\w+>', 'verb' => 'POST'),
 				array('api/search', 'pattern' => 'api/<resource_type:\w+>', 'verb' => 'GET'),
 				array('api/search', 'pattern' => 'api/<resource_type:\w+>/_search', 'verb' => 'GET,POST'),
+				array('api/typeHistory', 'pattern' => 'api/<resource_type:\w+>/_history', 'verb' => 'GET'),
 				array('api/badrequest', 'pattern' => 'api/(.*)'),
 
 				'<module:\w+>/<controller:\w+>/<action:\w+>/<id:\d+>' => '<module>/<controller>/<action>',
