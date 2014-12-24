@@ -19,7 +19,14 @@ class Patient extends Resource
 {
 	static public function fromFhirValues(array $values)
 	{
-		if (@$values['gender'] == 'UN') $values['gender'] = 'O';
+		switch (@$values['gender']) {
+			case 'UN':
+				$values['gender'] = 'O';
+				break;
+			case 'UNK':
+				$values['gender'] = null;
+				break;
+		}
 
 		foreach ((array)@$values['care_providers'] as $ref) {
 			switch ($ref->getServiceName()) {
