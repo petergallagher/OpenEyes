@@ -314,9 +314,19 @@ class AdminController extends BaseAdminController
 	{
 
 
+		if($_POST){
+			if(isset($_POST['subspecialty_id'])){
+				$subspecialty_id = $_POST['subspecialty_id'];
+			}
+			if(isset($_POST['drug_set_id'])){
+				$drug_set_id = $_POST['drug_set_id'];
+			}
+		}
+
 		$this->render('/admin/drugsets',array(
-			'subspecialty_id' => null,
 			'errors' => null,
+			'subspecialty_id' => $subspecialty_id ,
+			'drug_set_id'=>$drug_set_id,
 			'drug_set'=>array(),
 			'drug_sets'=>array(),
 		));

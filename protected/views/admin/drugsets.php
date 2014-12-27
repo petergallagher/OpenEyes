@@ -41,15 +41,18 @@ $form = $this->beginWidget('BaseEventTypeCActiveForm', array(
 		</div>
 	</div>
 
+	<div <?php if (empty($subspecialty_id)) { ?> style="display: none;" <?php } ?>>
+
 	<div class="row field-row">
 		<div class="large-3 column">
 			<label for="drug_set_id">Set Name:</label>
 		</div>
 		<div class="large-3 column end">
-			<?php echo CHtml::dropDownList('drug_set_id', null, CHtml::listData($drug_sets, 'id', 'name'), array('empty' => '-- Select --')); ?>
+			<?php echo CHtml::dropDownList('drug_set_id', $drug_set_id, CHtml::listData($drug_sets, 'id', 'name'), array('empty' => '-- Select --')); ?>
 		</div>
 	</div>
 
+	<div <?php if (empty($drug_set_id)) { ?> style="display: none;" <?php } ?>>
 
 	<div class="row field-row">
 		<div class="large-6 column">
@@ -113,7 +116,8 @@ $form = $this->beginWidget('BaseEventTypeCActiveForm', array(
 		} ?>
 		</tbody>
 	</table>
-
+	</div>
+</div>
 	<?php $this->endWidget()?>
 
 	<script type="text/javascript">
@@ -125,6 +129,8 @@ $form = $this->beginWidget('BaseEventTypeCActiveForm', array(
 		}
 	});
 	applyFilter();
+
+	$('body').delegate('#subspecialty_id', 'change', 	function () { this.form.submit();	});
 
 	$('body').delegate('#common_drug_id', 'change', function() {
 		var selected = $(this).children('option:selected');
