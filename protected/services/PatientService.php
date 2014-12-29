@@ -65,10 +65,10 @@ class PatientService extends ModelService
 		$res = parent::modelToResource($patient);
 		$res->nhs_num = $patient->nhs_num;
 		$res->hos_num = $patient->hos_num;
-		$res->title = $patient->contact->title;
-		$res->family_name = $patient->contact->last_name;
-		$res->given_name = $patient->contact->first_name;
-		$res->gender = $patient->gender;
+		$res->title = $patient->contact->title ?: null;
+		$res->family_name = $patient->contact->last_name ?: null;
+		$res->given_name = $patient->contact->first_name ?: null;
+		$res->gender = $patient->gender ?: null;
 		$res->birth_date = $patient->dob;
 		$res->date_of_death = $patient->date_of_death;
 		$res->primary_phone = $patient->contact->primary_phone;
