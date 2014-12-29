@@ -226,6 +226,8 @@ class Api_PatientTest extends FhirTestCase
 
 	public function testDuplicateHosNum()
 	{
+		$this->markTestSkipped("Hos num uniqueness has been disabled to avoid breaking MEH PAS integration");
+
 		$source = file_get_contents(__DIR__ . '/files/Patient-dupe.xml');
 		$this->post('Patient', $source);
 		$this->setExpectedHttpError(409);
