@@ -313,13 +313,25 @@ class AdminController extends BaseAdminController
 	public function actionDrugSets()
 	{
 
+		$subspecialty_id = null;
+		$drug_set_id = null;
+		$drug_sets = array();
+		$drug_set = array();
+
 
 		if($_POST){
-			if(isset($_POST['subspecialty_id'])){
+			if(!empty($_POST['subspecialty_id'])){
 				$subspecialty_id = $_POST['subspecialty_id'];
+				$params = array(':subspecialty_id' => $subspecialty_id);
+				$drug_sets = DrugSet::model()->findAll(array(
+					'condition' => 'subspecialty_id = :subspecialty_id',
+					'order' => 'name',
+					'params' => $params,
+				));
 			}
-			if(isset($_POST['drug_set_id'])){
+			if(!empty($_POST['drug_set_id'])){
 				$drug_set_id = $_POST['drug_set_id'];
+				$drug_set = DrugSetItem::model()->findAllByAttributes(array('drug_set_id' => $drug_set_id));
 			}
 		}
 
@@ -327,10 +339,40 @@ class AdminController extends BaseAdminController
 			'errors' => null,
 			'subspecialty_id' => $subspecialty_id ,
 			'drug_set_id'=>$drug_set_id,
-			'drug_set'=>array(),
-			'drug_sets'=>array(),
+			'drug_set'=>$drug_set,
+			'drug_sets'=>$drug_sets,
 		));
 	}
+
+	protected function renderDrugSetItem($key, $source)
+	{
+		$item = new DrugSetItem();
+
+		$item->drug_id = $source->drug_id;
+		foreach (array('duration_id','frequency_id','dose') as $field) {
+			if ($source->$field) {
+				$item->$field = $source->$field;
+			}
+		}
+		if ($source->tapers) {
+			$tapers = array();
+			foreach ($source->tapers as $taper) {
+				$taper_model = new DrugItemTaper();
+				foreach (array('duration_id','frequency_id','dose') as $field) {
+					if ($taper->$field) {
+						$taper_model->$field = $taper->$field;
+					} else {
+						$taper_model->$field = $item->$field;
+					}
+				}
+				$tapers[] = $taper_model;
+			}
+			$item->tapers = $tapers;
+		}
+
+		$this->renderPartial('drug_set_item', array('key' => $key, 'item' => $item));
+	}
+
 
 	public function actionUserFind()
 	{

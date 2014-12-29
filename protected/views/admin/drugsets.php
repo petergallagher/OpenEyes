@@ -103,16 +103,14 @@ $form = $this->beginWidget('BaseEventTypeCActiveForm', array(
 		<tr>
 			<th>Drug</th>
 			<th>Dose</th>
-			<th>Route</th>
 			<th>Options</th>
 			<th>Frequency</th>
-			<th>Duration</th>
 			<th></th>
 		</tr>
 		</thead>
 		<tbody>
 		<?php foreach ($drug_set as $key => $item) {
-			$this->renderPartial('drug_set_item', array('key' => $key, 'item' => $item, 'patient' => $this->patient));
+			$this->renderDrugSetItem($key, $item);
 		} ?>
 		</tbody>
 	</table>
@@ -131,6 +129,7 @@ $form = $this->beginWidget('BaseEventTypeCActiveForm', array(
 	applyFilter();
 
 	$('body').delegate('#subspecialty_id', 'change', 	function () { this.form.submit();	});
+	$('body').delegate('#drug_set_id', 'change', 	function () { this.form.submit();	});
 
 	$('body').delegate('#common_drug_id', 'change', function() {
 		var selected = $(this).children('option:selected');
@@ -195,22 +194,22 @@ $form = $this->beginWidget('BaseEventTypeCActiveForm', array(
 		var taper_key = (last_row.attr('data-taper')) ? parseInt(last_row.attr('data-taper')) + 1 : 0;
 
 		// Clone item fields to create taper row
-		var dose_input = row.find('td.drug_setItemDose input').first().clone();
+		var dose_input = row.find('td.drugSetItemDose input').first().clone();
 		dose_input.attr('name', dose_input.attr('name').replace(/\[dose\]/, "[taper]["+taper_key+"][dose]"));
 		dose_input.attr('id', dose_input.attr('id').replace(/_dose$/, "_taper_"+taper_key+"_dose"));
-		var frequency_input = row.find('td.drug_setItemFrequencyId select').first().clone();
+		var frequency_input = row.find('td.drugSetItemFrequencyId select').first().clone();
 		frequency_input.attr('name', frequency_input.attr('name').replace(/\[frequency_id\]/, "[taper]["+taper_key+"][frequency_id]"));
 		frequency_input.attr('id', frequency_input.attr('id').replace(/_frequency_id$/, "_taper_"+taper_key+"_frequency_id"));
-		frequency_input.val(row.find('td.drug_setItemFrequencyId select').val());
-		var duration_input = row.find('td.drug_setItemDurationId select').first().clone();
+		frequency_input.val(row.find('td.drugSetItemFrequencyId select').val());
+		var duration_input = row.find('td.drugSetItemDurationId select').first().clone();
 		duration_input.attr('name', duration_input.attr('name').replace(/\[duration_id\]/, "[taper]["+taper_key+"][duration_id]"));
 		duration_input.attr('id', duration_input.attr('id').replace(/_duration_id$/, "_taper_"+taper_key+"_duration_id"));
-		duration_input.val(row.find('td.drug_setItemDurationId select').val());
+		duration_input.val(row.find('td.drugSetItemDurationId select').val());
 
 		// Insert taper row
 		var odd_even = (row.hasClass('odd')) ? 'odd' : 'even';
 		var new_row = $('<tr data-key="'+key+'" data-taper="'+taper_key+'" class="drug_set-tapier '+odd_even+'"></tr>');
-		new_row.append($('<td class="drug_set-label"><span>then</span></td>'), $('<td></td>').append(dose_input), $('<td colspan="2"></td>'), $('<td></td>').append(frequency_input), $('<td></td>').append(duration_input), $('<td class="drug_setItemActions"><a class="removeTaper"	href="#">Remove</a></td>'));
+		new_row.append($('<td class="drug_set-label"><span>then</span></td>'), $('<td></td>').append(dose_input), $('<td></td>').append(frequency_input), $('<td></td>').append(duration_input), $('<td class="drugSetItemActions"><a class="removeTaper"	href="#">Remove</a></td>'));
 		last_row.after(new_row);
 
 		return false;
@@ -303,7 +302,7 @@ $form = $this->beginWidget('BaseEventTypeCActiveForm', array(
 	// Fix odd/even classes on all rows
 	function decorateRows()
 	{
-		$('#drug_set_items .drug_setItem').each(function(i) {
+		$('#drug_set_items .drugSetItem').each(function(i) {
 			if (i % 2) {
 				$(this).removeClass('even').addClass('odd');
 			} else {
@@ -323,7 +322,7 @@ $form = $this->beginWidget('BaseEventTypeCActiveForm', array(
 	// Get next key for adding rows
 	function getNextKey()
 	{
-		var last_item = $('#drug_set_items .drug_setItem').last();
+		var last_item = $('#drug_set_items .drugSetItem').last();
 		return (last_item.attr('data-key')) ? parseInt(last_item.attr('data-key')) + 1 : 0;
 	}
 
