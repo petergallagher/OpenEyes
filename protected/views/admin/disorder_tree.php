@@ -23,5 +23,10 @@
 			<h2>Disorder tree</h2>
 		</div>
 	</div>
+	<div class="row data-row">
+		<div class="large-2 column end">
+			<?php echo CHtml::htmlButton("Add item",array('class' => 'button small addDisorderTreeItem'))?>
+		</div>
+	</div>
 	<?php $this->renderPartial('_disorder_tree',array('disorder_tree' => $disorder_tree))?>
 </div>

@@ -334,6 +334,12 @@ $(document).ready(function() {
 		});
 	});
 
+	$('.addDisorderTreeItem').click(function(e) {
+		e.preventDefault();
+
+		window.location.href = baseUrl + '/admin/DisorderTreeAddItem';
+	});
+
 	$('#query').select().focus();
 });
 
