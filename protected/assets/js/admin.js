@@ -344,6 +344,12 @@ $(document).ready(function() {
 		window.location.href = baseUrl + '/admin/DisorderTreeAddItem';
 	});
 
+	handleButton($('#et_cancel_edit_disorder_tree_item'),function(e) {
+		e.preventDefault();
+
+		window.location.href = baseUrl + '/admin/DisorderTree';
+	});
+
 	$('#query').select().focus();
 });
 

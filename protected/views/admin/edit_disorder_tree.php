@@ -43,6 +43,11 @@
 			'label' => $item->id ? $item->disorder->term : null,
 		));
 		?>
-		<?php echo $form->formActions()?>
+		<div class="row data-row">
+			<div class="large-4 large-offset-2 column end">
+				<button class="button small primary event-action" name="save" type="submit" id="et_save">Save</button>
+				<button class="warning button small primary event-action" name="cancel" type="submit" id="et_cancel_edit_disorder_tree_item">Cancel</button>
+			</div>
+		</div>
 	<?php $this->endWidget()?>
 </div>
