@@ -365,4 +365,53 @@ class TreeBehavior extends CActiveRecordBehavior
 		return count(array_intersect($ids, $all_ancestors)) > 0;
 
 	}
+
+	public function getAllAsTree()
+	{
+		$tree = array();
+		$items = array();
+
+		$item_ids = array();
+
+		foreach (Yii::app()->db->createCommand()->select("*")->from($this->owner->treeTable())->order("lft asc, rght asc")->queryAll() as $item) {
+			$items[] = $item;
+			$item_ids[] = $item[$this->idAttribute];
+		}
+
+		$criteria = new CDbCriteria;
+		$criteria->addInCondition('id',$item_ids);
+
+		$item_text_values = array();
+
+		foreach ($this->owner->findAll($criteria) as $model) {
+			$item_text_values[$model->id] = $model->getTreeText();
+		}
+
+		foreach ($items as $item) {
+			if (!$item['parent_id']) {
+				$item['text'] = $item_text_values[$item[$this->idAttribute]];
+				$item['children'] = $this->getDescendants($item, $items, $item_text_values);
+
+				$tree[] = $item;
+			}
+		}
+
+		return $tree;
+	}
+
+	public function getDescendants($parent, $items, $item_text_values)
+	{
+		$children = array();
+
+		foreach ($items as $item) {
+			if ($item['parent_id'] == $parent['id']) {
+				$item['text'] = $item_text_values[$item[$this->idAttribute]];
+				$item['children'] = $this->getDescendants($item, $items, $item_text_values);
+
+				$children[] = $item;
+			}
+		}
+
+		return $children;
+	}
 }

@@ -188,4 +188,9 @@ class Disorder extends BaseActiveRecordVersioned
 		}
 		return true;
 	}
+
+	public function getTreeText()
+	{
+		return $this->id.' '.$this->term;
+	}
 }

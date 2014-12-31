@@ -1817,4 +1817,11 @@ class AdminController extends BaseAdminController
 			echo "0";
 		}
 	}
+
+	public function actionDisorderTree()
+	{
+		$this->render('disorder_tree',array(
+			'disorder_tree' => Disorder::model()->getAllAsTree()
+		));
+	}
 }
