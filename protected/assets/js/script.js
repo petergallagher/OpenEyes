@@ -187,7 +187,7 @@ $(document).ready(function(){
 	var submitted = false;
 
 
-  $('#patient-alerts form').on("change", function(e) {
+	$('#patient-alerts form').on("change", function(e) {
 		window.changedTickets[$(e.target).closest('#PatientTicketing-queue-assignment').data('queue')]=true;
 		window.patientTicketChanged = true;
 	});
@@ -258,9 +258,9 @@ $(document).ready(function(){
 		$('input.'+$(this).attr('class')).attr('checked',$(this).is(':checked') ? 'checked' : false);
 	});
 
-    $(this).on('click', '.alert-box .close' , function(e) {
-        $(e.srcElement).closest('.alert-box').fadeOut(500);
-    });
+		$(this).on('click', '.alert-box .close' , function(e) {
+				$(e.srcElement).closest('.alert-box').fadeOut(500);
+		});
 });
 
 function changeState(wb,sp) {

@@ -178,7 +178,7 @@ $(document).ready(function() {
 				if (resp == "1") {
 					window.location.reload();
 				} else {
-					alert("Something went wrong trying to reject the deletion request.  Please try again or contact support for assistance.");
+					alert("Something went wrong trying to reject the deletion request.	Please try again or contact support for assistance.");
 				}
 			}
 		});
@@ -238,4 +238,102 @@ $(document).ready(function() {
 		e.preventDefault();
 		window.location.href = baseUrl+'/admin/settings';
 	});
+
+	$('.filterDisorders').click(function(e) {
+		e.preventDefault();
+
+		var base_uri = baseUrl + '/admin/disorders';
+		var uri = base_uri;
+
+		var fields = ['orderby','order'];
+
+		for (var i in fields) {
+			if (typeof(queryParam[fields[i]]) != 'undefined') {
+				uri += (base_uri == uri) ? '?' : '&';
+				uri += fields[i] + '=' + rawurlencode(queryParam[fields[i]]);
+			}
+		}
+
+		var fields = ['specialty_id','active','query'];
+
+		for (var i in fields) {
+			if ($('#'+fields[i]).val() != '') {
+				uri += (base_uri == uri) ? '?' : '&';
+				uri += fields[i] + '=' + rawurlencode($('#'+fields[i]).val());
+			}
+		}
+
+		window.location.href = uri;
+	});
+
+	$('.resetFilterDisorders').click(function(e) {
+		e.preventDefault();
+
+		window.location.href = baseUrl + '/admin/disorders';
+	});
+
+	$('#query').keypress(function(e) {
+		if (e.keyCode == 13) {
+			$('.filterDisorders').click();
+		}
+	});
+
+	handleButton($('.addDisorder'),function(e) {
+		e.preventDefault();
+
+		window.location.href = baseUrl + '/admin/addDisorder';
+	});
+
+	$('.deleteDisorders').click(function(e) {
+		var disorders = {disorder_id: []};
+
+		$('#admin_disorders tbody').find('input[type="checkbox"]:checked').map(function() {
+			disorders['disorder_id'].push($(this).val());
+		});
+
+		if (disorders['disorder_id'].length == 0) {
+			alert("Please select at least one disorder to delete.");
+		} else {
+			$.ajax({
+				'type': 'POST',
+				'url': baseUrl + '/admin/deleteDisorders',
+				'data': $.param(disorders) + '&YII_CSRF_TOKEN=' + YII_CSRF_TOKEN,
+				'success': function(resp) {
+					if (resp != "1") {
+						alert("Something went wrong trying to mark the disorder(s) as deleted. Please try again or contact support for assistance.");
+					} else {
+						window.location.reload();
+					}
+				}
+			});
+		}
+	});
+
+	$('#query').select().focus();
 });
+
+var queryParam = (function(a) {
+	if (a == "") return {};
+	var b = {};
+	for (var i = 0; i < a.length; ++i)
+	{
+		var p=a[i].split('=', 2);
+		if (p.length == 1)
+			b[p[0]] = "";
+		else
+			b[p[0]] = decodeURIComponent(p[1].replace(/\+/g, " "));
+	}
+	return b;
+})(window.location.search.substr(1).split('&'));
+
+function rawurlencode(str)
+{
+	str = (str + '').toString();
+
+	return encodeURIComponent(str)
+		.replace(/!/g, '%21')
+		.replace(/'/g, '%27')
+		.replace(/\(/g, '%28')
+		.replace(/\)/g, '%29')
+		.replace(/\*/g, '%2A');
+}

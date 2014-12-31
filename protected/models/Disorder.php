@@ -83,6 +83,7 @@ class Disorder extends BaseActiveRecordVersioned
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
+			array('fully_specified_name, term, specialty_id, active', 'safe'),
 			array('id, fully_specified_name, term', 'required'),
 			array('id', 'length', 'max' => 10),
 			array('fully_specified_name, term', 'length', 'max' => 255),
@@ -135,9 +136,10 @@ class Disorder extends BaseActiveRecordVersioned
 	{
 		return array(
 			'id' => 'ID',
-			'fully_specified_name' => 'Fully Specified Name',
+			'fully_specified_name' => 'Fully specified name',
 			'term' => 'Term',
 			'systemic' => 'Systemic',
+			'specialty_id' => 'Specialty',
 		);
 	}
 

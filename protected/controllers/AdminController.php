@@ -1632,4 +1632,189 @@ class AdminController extends BaseAdminController
 	{
 		$this->genericAdmin(SocialHistory::model()->getAttributeLabel('accommodation_id'), 'SocialHistoryAccommodation');
 	}
+
+	public function actionDisorders()
+	{
+		$disorders = $this->getDisorders();
+
+		$specialty_ids = array();
+
+		foreach (Yii::app()->db->createCommand()->select("distinct(specialty_id)")->from("disorder")->where("specialty_id is not null")->queryAll() as $row) {
+			$specialty_ids[] = $row['specialty_id'];
+		}
+
+		if (!empty($specialty_ids)) {
+			$criteria = new CDbCriteria;
+			$criteria->addInCondition('id',$specialty_ids);
+			$criteria->order = 'name asc';
+
+			$specialties = Specialty::model()->findAll($criteria);
+		} else {
+			$specialties = array();
+		}
+
+		Yii::app()->session['disorder_admin_return_uri'] = $_SERVER['REQUEST_URI'];
+
+		$this->render('disorders',array(
+			'disorders' => $this->getDisorders(),
+			'specialties' => $specialties,
+			'column_uris' => array(
+				'id' => $this->getDisorderSortURI('id'),
+				'specialty_id' => $this->getDisorderSortURI('specialty_id'),
+				'term' => $this->getDisorderSortURI('term'),
+				'fully_specified_name' => $this->getDisorderSortURI('fully_specified_name'),
+				'active' => $this->getDisorderSortURI('active'),
+			),
+		));
+	}
+
+	public function getDisorderSortURI($field)
+	{
+		$order = @$_GET['orderby'] == $field ? (@$_GET['order'] == 'asc' ? 'desc' : 'asc') : 'asc';
+
+		return Yii::app()->baseUrl.'/admin/disorders?orderby='.$field.'&order='.$order;
+	}
+
+	public function getDisorderPageURI($page)
+	{
+		$uri = $base_uri = Yii::app()->baseUrl.'/admin/disorders';
+
+		foreach (array('orderby','order','specialty_id','active','query') as $field) {
+			if (strlen(@$_GET[$field]) >0) {
+				$uri .= ($uri == $base_uri) ? '?' : '&';
+				$uri .= $field.'='.rawurlencode($_GET[$field]);
+			}
+		}
+
+		$uri .= ($uri == $base_uri) ? '?' : '&';
+
+		return $uri.'page='.$page;
+	}
+
+	public function getDisorders()
+	{
+		$criteria = new CDbCriteria;
+
+		if (@$_GET['specialty_id']) {
+			if (@$_GET['specialty_id'] == 'NONE') {
+				$criteria->addCondition('specialty_id is null');
+			} else {
+				if (!Specialty::model()->findByPk(@$_GET['specialty_id'])) {
+					throw new Exception("Specialty not found: ".@$_GET['specialty_id']);
+				}
+
+				$criteria->addCondition('specialty_id = :si');
+				$criteria->params[':si'] = $_GET['specialty_id'];
+			}
+		}
+
+		if (strlen(@$_GET['active']) >0) {
+			$criteria->addCondition('active = :a');
+			$criteria->params[':a'] = $_GET['active'];
+		}
+
+		if (strlen(@$_GET['query']) >0) {
+			$criteria->addCondition('lower(term) like :query or lower(fully_specified_name) like :query');
+			$criteria->params[':query'] = '%'.strtolower($_GET['query']).'%';
+		}
+
+		$orderby = 'id';
+		$order = 'asc';
+
+		if (in_array(@$_GET['orderby'],array('id','specialty_id','term','fully_specified_name','active'))) {
+			$orderby = $_GET['orderby'];
+		}
+
+		if (in_array(@$_GET['order'],array('asc','desc'))) {
+			$order = $_GET['order'];
+		}
+
+		$return = array(
+			'total' => Disorder::model()->count($criteria)
+		);
+
+		$criteria->order = $orderby.' '.$order;
+		$criteria->limit = 50;
+
+		$return['pages'] = ceil($return['total'] / 50);
+
+		if (ctype_digit(@$_GET['page']) && @$_GET['page'] >= 1) {
+			$return['page'] = $_GET['page'];
+
+			if ($return['page'] > $return['pages']) {
+				$return['page'] = $return['pages'];
+			}
+
+			$criteria->offset = ($return['page']-1) * 50;
+		} else {
+			$return['page'] = 1;
+		}
+
+		$return['results'] = Disorder::model()->findAll($criteria);
+
+		return $return;
+	}
+
+	public function actionAddDisorder()
+	{
+		$disorder = new Disorder;
+
+		if (!empty($_POST)) {
+			$disorder->attributes = $_POST['Disorder'];
+
+			if (!$disorder->validate()) {
+				$errors = $disorder->errors;
+			} else {
+				if (!$disorder->save()) {
+					throw new Exception("Unable to save disorder: ".print_r($disorder->errors,true));
+				}
+
+				$this->redirect(array('/admin/disorders'));
+			}
+		}
+
+		$this->render('edit_disorder',array(
+			'disorder' => $disorder,
+			'errors' => @$errors,
+		));
+	}
+
+	public function actionEditDisorder($id)
+	{
+		if (!$disorder = Disorder::model()->findByPk($id)) {
+			throw new Exception("Disorder not found: $id");
+		}
+
+		if (!empty($_POST)) {
+			$disorder->attributes = $_POST['Disorder'];
+
+			if (!$disorder->validate()) {
+				$errors = $disorder->errors;
+			} else {
+				if (!$disorder->save()) {
+					throw new Exception("Unable to save disorder: ".print_r($disorder->errors,true));
+				}
+
+				$this->redirect(array(Yii::app()->session['disorder_admin_return_uri']));
+			}
+		}
+
+		$this->render('edit_disorder',array(
+			'disorder' => $disorder,
+			'errors' => @$errors,
+		));
+	}
+
+	public function actionDeleteDisorders()
+	{
+		$criteria = new CDbCriteria;
+
+		$criteria->addInCondition('id',@$_POST['disorder_id']);
+
+		if (Disorder::model()->updateAll(array('active' => 0))) {
+			echo "1";
+		} else {
+			echo "0";
+		}
+	}
 }
