@@ -309,6 +309,31 @@ $(document).ready(function() {
 		}
 	});
 
+	$('.disorder_tree.admin .addTreeItemHere').click(function(e) {
+		e.preventDefault();
+
+		window.location.href = baseUrl + '/admin/DisorderTreeAddItem?parent_id=' + $(this).attr('rel');
+	});
+
+	$('.disorder_tree.admin .deleteTreeItem').click(function(e) {
+		e.preventDefault();
+
+		var id = $(this).attr('rel');
+
+		$.ajax({
+			'type': 'POST',
+			'url': baseUrl + '/admin/DisorderTreeDeleteItem',
+			'data': 'id=' + id + '&YII_CSRF_TOKEN=' + YII_CSRF_TOKEN,
+			'success': function(resp) {
+				if (resp != "1") {
+					alert("Something went wrong trying to delete the tree item. Please try again or contact support for assistance.");
+				} else {
+					window.location.reload();
+				}
+			}
+		});
+	});
+
 	$('#query').select().focus();
 });
 

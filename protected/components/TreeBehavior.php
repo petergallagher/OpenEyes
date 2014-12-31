@@ -387,16 +387,7 @@ class TreeBehavior extends CActiveRecordBehavior
 			$item_text_values[$model->id] = $model->getTreeText();
 		}
 
-		foreach ($items as $item) {
-			if (!$item['parent_id']) {
-				$item['text'] = $item_text_values[$item[$this->idAttribute]];
-				$item['children'] = $this->getDescendants($item, $items, $item_text_values);
-
-				$tree[] = $item;
-			}
-		}
-
-		return $tree;
+		return $this->getDescendants(null, $items, $item_text_values);
 	}
 
 	public function getDescendants($parent, $items, $item_text_values)
@@ -405,7 +396,10 @@ class TreeBehavior extends CActiveRecordBehavior
 
 		foreach ($items as $item) {
 			if ($item['parent_id'] == $parent['id']) {
-				$item['text'] = $item_text_values[$item[$this->idAttribute]];
+				$item['simpletext'] = $item_text_values[$item[$this->idAttribute]];
+				$item['text'] = '<a href="'.Yii::app()->baseUrl.'/admin/disorderTreeEditItem/'.$item['id'].'">' . ($parent === null ? '<strong>' : '') . $item_text_values[$item[$this->idAttribute]] . ($parent === null ? '</strong>' : '') . '</a>';
+				$item['text'] .= " <a href=\"#\" rel=\"{$item['id']}\" class=\"addTreeItemHere\"><img style=\"height:20px\" alt=\"Add tree item here\" src=\"".Yii::app()->assetManager->createUrl('img/_elements/btns/plus-sign.png')."\" /></a>\n";
+				$item['text'] .= " <a href=\"#\" rel=\"{$item['id']}\" class=\"deleteTreeItem\">(delete)</a>";
 				$item['children'] = $this->getDescendants($item, $items, $item_text_values);
 
 				$children[] = $item;
@@ -413,5 +407,48 @@ class TreeBehavior extends CActiveRecordBehavior
 		}
 
 		return $children;
+	}
+
+	public function getAllAsTreeForDropdown()
+	{
+		return $this->getDescendantsForDropdown($this->owner->getAllAsTree());
+	}
+
+	public function getDescendantsForDropdown($children, $level=0)
+	{
+		$list = array();
+
+		foreach ($children as $child) {
+			$list[$child['id']] = str_repeat('- ',$level).$child['simpletext'];
+
+			$list += $this->getDescendantsForDropdown($child['children'], $level+1);
+		}
+
+		return $list;
+	}
+
+	public function rebuildMPTTTree()
+	{
+		$left = 1;
+		$values = array();
+
+		$this->calculateMPTTValues($this->owner->getAllAsTree(), $left, $values);
+
+		foreach ($values as $id => $mptt) {
+			Yii::app()->db->createCommand("update ".$this->owner->treeTable()." set lft = {$mptt['left']}, rght = {$mptt['right']} where id = $id")->query();
+		}
+	}
+
+	public function calculateMPTTValues($items, &$left, &$values)
+	{
+		foreach ($items as $item) {
+			$values[$item['id']] = array(
+				'left' => $left++
+			);
+
+			$this->calculateMPTTValues($item['children'], $left, $values);
+
+			$values[$item['id']]['right'] = $left++;
+		}
 	}
 }

@@ -1824,4 +1824,76 @@ class AdminController extends BaseAdminController
 			'disorder_tree' => Disorder::model()->getAllAsTree()
 		));
 	}
+
+	public function actionDisorderTreeAddItem()
+	{
+		$item = new DisorderTree;
+
+		if (!empty($_POST)) {
+			$item->attributes = $_POST['DisorderTree'];
+
+			if (!$item->validate()) {
+				$errors = $item->errors;
+			} else {
+				$item->lft = $item->rght = 9999999999;
+				if (!$item->save()) {
+					throw new Exception("Unable to save disorder tree item: ".print_r($item->errors,true));
+				}
+
+				Disorder::model()->rebuildMPTTTree();
+
+				$this->redirect(array('/admin/disorderTree'));
+			}
+		} else {
+			$item->parent_id = @$_GET['parent_id'];
+		}
+
+		$this->render('edit_disorder_tree',array(
+			'item' => $item,
+			'errors' => @$errors,
+			'parents' => Disorder::model()->getAllAsTreeForDropdown()
+		));
+	}
+
+	public function actionDisorderTreeEditItem($id)
+	{
+		if (!$item = DisorderTree::model()->findByPk($id)) {
+			throw new Exception("Disorder tree item not found: $id");
+		}
+
+		if (!empty($_POST)) {
+			$item->attributes = $_POST['DisorderTree'];
+
+			if (!$item->validate()) {
+				$errors = $item->errors;
+			} else {
+				if (!$item->save()) {
+					throw new Exception("Unable to save disorder tree item: ".print_r($item->errors,true));
+				} 
+
+				Disorder::model()->rebuildMPTTTree();
+
+				$this->redirect(array('/admin/disorderTree'));
+			}
+		}
+
+		$this->render('edit_disorder_tree',array(
+			'item' => $item,
+			'errors' => @$errors,
+			'parents' => Disorder::model()->getAllAsTreeForDropdown()
+		));
+	}
+
+	public function actionDisorderTreeDeleteItem()
+	{
+		if (!$item = DisorderTree::model()->findByPk(@$_POST['id'])) {
+			throw new Exception("Disorder tree item not found: ".@$_POST['id']);
+		}
+
+		if (!$item->delete()) {
+			throw new Exception("Unable to delete disorder tree item: ".print_r($item->errors,true));
+		}
+
+		echo "1";
+	}
 }
