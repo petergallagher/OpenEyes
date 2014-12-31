@@ -115,7 +115,12 @@ $form = $this->beginWidget('BaseEventTypeCActiveForm', array(
 		</tbody>
 	</table>
 	</div>
+
+		<button class="small primary event-action" name="save" type="submit" id="et_save">Save</button>
+
 </div>
+
+
 	<?php $this->endWidget()?>
 
 	<script type="text/javascript">
