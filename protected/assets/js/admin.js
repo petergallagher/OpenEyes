@@ -317,6 +317,7 @@ $(document).ready(function() {
 
 	$('.disorder_tree.admin .deleteTreeItem').click(function(e) {
 		e.preventDefault();
+		disableButtons();
 
 		var id = $(this).attr('rel');
 
@@ -330,6 +331,9 @@ $(document).ready(function() {
 				} else {
 					window.location.reload();
 				}
+			},
+			'error': function() {
+				alert("Something went wrong trying to delete the tree item. Please try again or contact support for assistance.");
 			}
 		});
 	});

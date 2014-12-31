@@ -35,7 +35,8 @@ class DisorderTree extends BaseActiveRecordVersioned
 	public function relations()
 	{
 		return array(
-			'disorder' => array(self::BELONGS_TO, 'Disorder', 'disorder_id')
+			'disorder' => array(self::BELONGS_TO, 'Disorder', 'disorder_id'),
+			'children' => array(self::HAS_MANY, 'DisorderTree', 'parent_id'),
 		);
 	}
 
@@ -45,5 +46,16 @@ class DisorderTree extends BaseActiveRecordVersioned
 			'parent_id' => 'Parent',
 			'disorder_id' => 'Disorder',
 		);
+	}
+
+	public function delete()
+	{
+		foreach ($this->children as $child) {
+			if (!$child->delete()) {
+				throw new Exception("Unable to delete disorder tree item: ".print_r($child->errors,true));
+			}
+		}
+
+		return parent::delete();
 	}
 }
