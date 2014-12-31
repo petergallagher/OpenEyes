@@ -332,6 +332,12 @@ class Api_Test extends FhirTestCase
 		);
 	}
 
+	public function testTypeHistory_InvalidSince()
+	{
+		$this->setExpectedHttpError(422);
+		$this->get('Patient/_history?_since=foo');
+	}
+
 	public function testCreateHeaders()
 	{
 		$source = file_get_contents(__DIR__ . '/files/Patient-headers.xml');

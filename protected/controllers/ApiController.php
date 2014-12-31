@@ -362,7 +362,7 @@ class ApiController extends CController
 		if (isset($_GET['_since'])) {
 			$since = DateTime::createFromFormat(DateTime::ISO8601, $_GET['_since']);
 			if ($since === false) {
-				// TODO
+				throw new services\InvalidValue("Invalid value passed for _since: '{$_GET['_since']}'");
 			}
 		} else {
 			$since = null;
