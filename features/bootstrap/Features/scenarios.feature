@@ -102,7 +102,7 @@ Feature: Open Eyes Login and Patient Diagnosis Screen Template
 
     Then I select a History of Blurred Vision, Mild Severity, Onset 1 Week, Left Eye, 1 Week
 
-    And I choose to expand the Comorbidities section
+    And I expand the "Comorbidities" section
     Then I Add a Comorbiditiy of "1"
     Then I Add a Comorbiditiy of "2"
     Then I Add a Comorbiditiy of "3"
@@ -121,7 +121,7 @@ Feature: Open Eyes Login and Patient Diagnosis Screen Template
 
     Then I remove all comorbidities
 
-    Then I choose to expand the Refraction section
+    Then I expand the "Refraction" section
 
     Then I enter left Refraction details of Sphere "1" integer "6" fraction "0.75"
     And I enter left cylinder details of of Cylinder "-1" integer "7" fraction "0.75"
@@ -138,7 +138,7 @@ Feature: Open Eyes Login and Patient Diagnosis Screen Template
 #    Then I enter right Axis degrees of "38"
     And I enter a right type of "3"
 
-    Then I choose to expand the Visual Function section
+    Then I expand the "Visual Function" section
 
     Then I select a Left RAPD
     And I add Left RAPD comments of "Left RAPD Automation test comments"
@@ -146,22 +146,22 @@ Feature: Open Eyes Login and Patient Diagnosis Screen Template
     Then I select a Right RAPD
     And I add Right RAPD comments of "Left RAPD Automation test comments"
 
-    Then I choose to expand the Colour Vision section
+    Then I expand the "Colour Vision" section
     And I choose a Left Colour Vision of "1"
     And I choose A Left Colour Vision Value of "8"
     And I choose a Right Colour Vision of "2"
     And I choose A Right Colour Vision Value of "4"
 
-    Then I choose to expand the Visual Acuity section
+    Then I expand the "Visual Acuity" section
     And I select a Visual Acuity of "2"
     Then I choose a left Visual Acuity Snellen Metre "4" and a reading method of "5"
     Then I choose a right Visual Acuity Snellen Metre "4" and a reading method of "5"
 
-    Then I choose to expand the Intraocular Pressure section
+    Then I expand the "Intraocular Pressure" section
     Then I choose a left Intraocular Pressure of "19" and Instrument "2"
     Then I choose a right Intraocular Pressure of "29" and Instrument "2"
 
-    Then I choose to expand the Dilation section
+    Then I expand the "Dilation" section
     Then I choose left Dilation of "2" and drops of "5"
     Then I choose right Dilation of "6" and drops of "3"
 
