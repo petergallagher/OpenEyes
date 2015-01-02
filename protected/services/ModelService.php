@@ -104,14 +104,16 @@ abstract class ModelService extends InternalService
 
 	/**
 	 * @param int $count
+	 * @param int $offset
 	 * @param DateTime $since
 	 * @return ModelResource[]
 	 */
-	public function history($count = null, \DateTime $since = null)
+	public function history($count = null, $offset = null, \DateTime $since = null)
 	{
 		$crit = new \CDbCriteria(array('order' => 'last_modified_date'));
 
 		if ($count) $crit->limit = $count;
+		if ($offset) $crit->offset = $offset;
 		if ($since) {
 			$since->setTimeZone(new \DateTimeZone(date_default_timezone_get()));  // FIXME: this is probably broken
 			$crit->addCondition('last_modified_date >= :since');

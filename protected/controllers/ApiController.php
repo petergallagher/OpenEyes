@@ -300,7 +300,7 @@ class ApiController extends CController
 
 		// We keep track of the search params that were actually used in order to create a self URL for the bundle (http://www.hl7.org/implement/standards/fhir/search.html#conformance)
 		$used_params = array('resource_type' => $resource_type);
-		foreach (array('_count', '_format', '_id', '_profile') as $param) {
+		foreach (array('_count', '_format', '_id', '_profile', 'page') as $param) {
 			if (isset($params[$param])) $used_params[$param] = $params[$param];
 		}
 
@@ -313,9 +313,8 @@ class ApiController extends CController
 
 			$resources = $service->search($params);
 
-			if (isset($_REQUEST['_count'])) {
-				$resources = array_slice($resources, 0, $_REQUEST['_count']);
-			}
+			list ($count, $offset) = $this->getLimits($_REQUEST);
+			if ($count) $resources = array_slice($resources, $offset, $count);
 		} else {
 			$resources = array();
 		}
@@ -359,6 +358,8 @@ class ApiController extends CController
 	 */
 	public function actionTypeHistory($resource_type)
 	{
+		list ($count, $offset) = $this->getLimits($_GET);
+
 		if (isset($_GET['_since'])) {
 			$since = DateTime::createFromFormat(DateTime::ISO8601, $_GET['_since']);
 			if ($since === false) {
@@ -370,9 +371,9 @@ class ApiController extends CController
 
 		$service = Yii::app()->service->getFhirService($resource_type);
 
-		$resources = $service->history(@$_GET['_count'], $since);
+		$resources = $service->history($count, $offset, $since);
 
-		$used_params = array('resource_type' => $resource_type) + array_intersect_key($_GET, array('_format' => 1, '_count' => 1, '_since' => 1));
+		$used_params = array('resource_type' => $resource_type) + array_intersect_key($_GET, array('_format' => 1, '_count' => 1, '_since' => 1, 'page' => 1));
 
 		$this->sendBundle($service, $resources, $used_params);
 	}
@@ -407,6 +408,24 @@ class ApiController extends CController
 			throw new \services\NotFound("Unrecognised resource type or ID: {$resource_type}/{$id}");
 		}
 		return $ref;
+	}
+
+	protected function getLimits($params)
+	{
+		$count = null;
+		$offset = 0;
+
+		if (isset($params['_count'])) {
+			$count = (int)$params['_count'];
+			if ($count < 1) throw new services\InvalidValue("Invalid value supplied for _count: '{$params['_count']}'");
+			if (isset($params['page'])) {
+				$page = (int)$params['page'];
+				if ($page < 1) throw new services\InvalidValue("Invalid value supplied for page: '{$params['page']}'");
+				$offset = ($page - 1) * $count;
+			}
+		}
+
+		return array($count, $offset);
 	}
 
 	protected function parseInput()
@@ -489,7 +508,10 @@ class ApiController extends CController
 
 		$self_url = $this->createAbsoluteUrl($this->getRoute(), $used_params);
 
-		$bundle = services\FhirBundle::create("Search results", $self_url, $base_url, $indexed_resources);
+		$used_params['page'] = isset($used_params['page']) ? $used_params['page'] + 1 : 2;
+		$next_page_url = $this->createAbsoluteUrl($this->getRoute(), $used_params);
+
+		$bundle = services\FhirBundle::create("Search results", $self_url, $base_url, $next_page_url, $indexed_resources);
 
 		$data = $bundle->toFhir();
 

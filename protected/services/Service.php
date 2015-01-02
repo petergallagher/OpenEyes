@@ -77,8 +77,9 @@ abstract class Service
 	 * Retrieve history of all resources of this type
 	 *
 	 * @param int $count
+	 * @param int $offset
 	 * @param DateTime $since
 	 * @return Resource[]
 	 */
-	abstract public function history($count = null, \DateTime $since = null);
+	abstract public function history($count = null, $offset = null, \DateTime $since = null);
 }

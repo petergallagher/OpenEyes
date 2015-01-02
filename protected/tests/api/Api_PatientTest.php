@@ -210,6 +210,34 @@ class Api_PatientTest extends FhirTestCase
 		$this->assertXPathEquals('Patient', 'local-name(./atom:entry/atom:content/*)');
 	}
 
+	public function testSearch_Paging()
+	{
+		$url = 'Patient?family=Smith&_count=2';
+
+		$this->get($url);
+		$this->assertXPathEquals($this->client->getBaseUrl(), 'string(./atom:link[@rel="base"]/@href)');
+		$this->assertUrlEquals(
+			$this->client->getBaseUrl() . '/' . $url,
+			$this->xPathEval('string(./atom:link[@rel="self"]/@href)')
+		);
+		$this->assertXPathEquals('feed', 'local-name()');
+		$this->assertXPathCount(2, './atom:entry');
+
+		$next_page_url = $this->xPathEval('string(./atom:link[@rel="next"]/@href)');
+		$this->get($next_page_url);
+		$this->assertXPathEquals($this->client->getBaseUrl(), 'string(./atom:link[@rel="base"]/@href)');
+		$this->assertUrlEquals($next_page_url, $this->xPathEval('string(./atom:link[@rel="self"]/@href)'));
+		$this->assertXPathEquals('feed', 'local-name()');
+		$this->assertXPathCount(1, './atom:entry');
+
+		$next_page_url = $this->xPathEval('string(./atom:link[@rel="next"]/@href)');
+		$this->get($next_page_url);
+		$this->assertXPathEquals($this->client->getBaseUrl(), 'string(./atom:link[@rel="base"]/@href)');
+		$this->assertUrlEquals($next_page_url, $this->xPathEval('string(./atom:link[@rel="self"]/@href)'));
+		$this->assertXPathEquals('feed', 'local-name()');
+		$this->assertXPathCount(0, './atom:entry');
+	}
+
 	public function testTypeHistory_Count()
 	{
 		$this->get('Patient/_history?_count=23');
@@ -243,6 +271,60 @@ class Api_PatientTest extends FhirTestCase
 		$actual_ids = array_map(function ($node) { return preg_replace('|^.*/|', '', $node->wholeText); }, iterator_to_array($this->xPathEval('./atom:entry/atom:id/text()')));
 
 		$this->assertEmpty(array_diff($expected_ids, $actual_ids));
+	}
+
+	public function testTypeHistory_Paging()
+	{
+		$this->get('Patient/_history?_count=10');
+		$this->assertXPathEquals($this->client->getBaseUrl(), 'string(./atom:link[@rel="base"]/@href)');
+		$this->assertUrlEquals(
+			$this->client->getBaseUrl() . '/Patient/_history?_count=10',
+			$this->xPathEval('string(./atom:link[@rel="self"]/@href)')
+		);
+		$this->assertXPathEquals('feed', 'local-name()');
+		$this->assertXPathCount(10, './atom:entry');
+
+		$first_ids = array_map(function ($node) { return preg_replace('|^.*/|', '', $node->wholeText); }, iterator_to_array($this->xPathEval('./atom:entry/atom:id/text()')));
+
+		$next_page_url = $this->xPathEval('string(./atom:link[@rel="next"]/@href)');
+
+		$this->get($next_page_url);
+		$this->assertXPathEquals($this->client->getBaseUrl(), 'string(./atom:link[@rel="base"]/@href)');
+		$this->assertUrlEquals($next_page_url, $this->xPathEval('string(./atom:link[@rel="self"]/@href)'));
+		$this->assertXPathEquals('feed', 'local-name()');
+		$this->assertXPathCount(10, './atom:entry');
+
+		$second_ids = array_map(function ($node) { return preg_replace('|^.*/|', '', $node->wholeText); }, iterator_to_array($this->xPathEval('./atom:entry/atom:id/text()')));
+
+		$this->assertEmpty(array_intersect($first_ids, $second_ids));
+	}
+
+	public function testTypeHistory_PagingWithSince()
+	{
+		$url = 'Patient/_history?_count=15&_since=' . urlencode('2012-10-05T12:24:40+0100');
+		$this->get($url);
+
+		$this->assertXPathEquals($this->client->getBaseUrl(), 'string(./atom:link[@rel="base"]/@href)');
+		$this->assertUrlEquals(
+			$this->client->getBaseUrl() . '/' . $url,
+			$this->xPathEval('string(./atom:link[@rel="self"]/@href)')
+		);
+		$this->assertXPathEquals('feed', 'local-name()');
+		$this->assertXPathCount(15, './atom:entry');
+
+		$first_ids = array_map(function ($node) { return preg_replace('|^.*/|', '', $node->wholeText); }, iterator_to_array($this->xPathEval('./atom:entry/atom:id/text()')));
+
+		$next_page_url = $this->xPathEval('string(./atom:link[@rel="next"]/@href)');
+
+		$this->get($next_page_url);
+		$this->assertXPathEquals($this->client->getBaseUrl(), 'string(./atom:link[@rel="base"]/@href)');
+		$this->assertUrlEquals($next_page_url, $this->xPathEval('string(./atom:link[@rel="self"]/@href)'));
+		$this->assertXPathEquals('feed', 'local-name()');
+		$this->assertLessThan(15, $this->xPathQuery('./atom:entry')->length);
+
+		$second_ids = array_map(function ($node) { return preg_replace('|^.*/|', '', $node->wholeText); }, iterator_to_array($this->xPathEval('./atom:entry/atom:id/text()')));
+
+		$this->assertEmpty(array_intersect($first_ids, $second_ids));
 	}
 
 	public function testCountryDefaultsToUk()

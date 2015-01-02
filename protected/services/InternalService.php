@@ -162,12 +162,13 @@ abstract class InternalService extends Service
 	 * Retrieve history of all resources of this type
 	 *
 	 * @param int $count
+	 * @param int $offset
 	 * @param DateTime $since
 	 * @return Resource[]
 	 */
-	public function history($count = null, \DateTime $since = null)
+	public function history($count = null, $offset = null, \DateTime $since = null)
 	{
-		throw new ProcessingNotSupported("Search operation not supported");
+		throw new ProcessingNotSupported("History operation not supported");
 	}
 
 	/**

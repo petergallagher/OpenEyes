@@ -10,6 +10,10 @@
 		{
 			"rel": "base",
 			"href": {":subst": "base_url"}
+		},
+		{
+			"rel": "next",
+			"href": {":subst": "next_page_url"}
 		}
 	],
 	"updated": {":subst": "updated"},

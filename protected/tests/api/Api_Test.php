@@ -332,6 +332,30 @@ class Api_Test extends FhirTestCase
 		);
 	}
 
+	public function testSearch_InvalidCount()
+	{
+		$this->setExpectedHttpError(422);
+		$this->get('Patient/?_count=-1');
+	}
+
+	public function testSearch_InvalidPage()
+	{
+		$this->setExpectedHttpError(422);
+		$this->get('Patient/?_count=10&page=-1');
+	}
+
+	public function testTypeHistory_InvalidCount()
+	{
+		$this->setExpectedHttpError(422);
+		$this->get('Patient/_history?_count=-1');
+	}
+
+	public function testTypeHistory_InvalidPage()
+	{
+		$this->setExpectedHttpError(422);
+		$this->get('Patient/_history?_count=10&page=-1');
+	}
+
 	public function testTypeHistory_InvalidSince()
 	{
 		$this->setExpectedHttpError(422);

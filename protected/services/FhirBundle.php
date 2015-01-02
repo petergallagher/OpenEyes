@@ -23,7 +23,7 @@ class FhirBundle extends DataObject
 	 * @param string $base_url
 	 * @param Resource[] $resources Indexed by URL
 	 */
-	static public function create($title, $self_url, $base_url, array $resources)
+	static public function create($title, $self_url, $base_url, $next_page_url, array $resources)
 	{
 		$bundle = new self(
 			array(
@@ -31,6 +31,7 @@ class FhirBundle extends DataObject
 				'id' => 'urn:uuid:' . \Helper::generateUuid(),
 				'self_url' => $self_url,
 				'base_url' => $base_url,
+				'next_page_url' => $next_page_url,
 				'updated' => date(DATE_ATOM),
 			)
 		);
@@ -46,6 +47,7 @@ class FhirBundle extends DataObject
 	public $id;
 	public $self_url;
 	public $base_url;
+	public $next_page_url;
 	public $updated;
 	public $entries = array();
 }
