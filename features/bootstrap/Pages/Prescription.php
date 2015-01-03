@@ -144,7 +144,6 @@ class Prescription extends OpenEyesPage
     public function repeatPrescription ()
     {
         $this->getElement('repeatPrescription')->click();
-        $this->getSession()->wait(1000);
     }
 
     protected function hasPrescriptionSaved ()

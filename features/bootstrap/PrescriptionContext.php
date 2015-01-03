@@ -306,6 +306,7 @@ class PrescriptionContext extends PageObjectContext
          */
         $prescription= $this->getPage('Prescription');
         $prescription->repeatPrescription();
+        $this->getMainContext()->waitForAjax();
     }
 
     /**
