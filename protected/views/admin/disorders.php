@@ -28,7 +28,7 @@
 			<?php echo CHtml::dropDownList('specialty_id',@$_GET['specialty_id'],array('NONE' => '- Systemic -') + CHtml::listData($specialties,'id','name'),array('empty' => '- Specialty -'))?>
 		</div>
 		<div class="large-2 column">
-			<?php echo CHtml::dropDownList('active',@$_GET['active'],array('1' => 'Yes', '2' => 'No'),array('empty' => '- Active status -'))?>
+			<?php echo CHtml::dropDownList('active',@$_GET['active'],array('1' => 'Yes', '0' => 'No'),array('empty' => '- Active status -'))?>
 		</div>
 		<div class="large-1 column">
 			<label for="query">
