@@ -1656,7 +1656,7 @@ class AdminController extends BaseAdminController
 		Yii::app()->session['disorder_admin_return_uri'] = $_SERVER['REQUEST_URI'];
 
 		$this->render('disorders',array(
-			'disorders' => $this->getDisorders(),
+			'disorders' => $disorders,
 			'specialties' => $specialties,
 			'column_uris' => array(
 				'id' => $this->getDisorderSortURI('id'),
@@ -1807,11 +1807,12 @@ class AdminController extends BaseAdminController
 
 	public function actionDeleteDisorders()
 	{
+		if(!isset($_POST['disorder_id']) || !is_array($_POST['disorder_id'])) {
+			echo "0";
+		}
 		$criteria = new CDbCriteria;
-
-		$criteria->addInCondition('id',@$_POST['disorder_id']);
-
-		if (Disorder::model()->updateAll(array('active' => 0))) {
+		$criteria->addInCondition('id', @$_POST['disorder_id']);
+		if (Disorder::model()->updateAll(array('active' => 0), $criteria)) {
 			echo "1";
 		} else {
 			echo "0";
